@@ -3,4 +3,12 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+
+    <!-- Tab ChangeColor-->
+    <color name="tab_text_normal">#696969</color>
+    <color name="tab_text_selected">#ffc800</color>
+
+    <color name="divider_color">#cccaca</color>
+    <color name="white">#FFFFFF</color>
 </resources>

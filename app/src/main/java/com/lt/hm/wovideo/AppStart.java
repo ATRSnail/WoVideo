@@ -3,6 +3,7 @@ package com.lt.hm.wovideo;
 import android.os.Bundle;
 
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.utils.UIHelper;
 
 /**
  * @author leonardo
@@ -17,7 +18,7 @@ public class AppStart extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
-
+        UIHelper.ToMain(this);
     }
 
     @Override

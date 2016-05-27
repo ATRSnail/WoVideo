@@ -9,7 +9,7 @@ import com.lt.hm.wovideo.base.BaseActivity;
  * @version 1.0
  * @create_date 16/5/26
  */
-public class MainActivity extends BaseActivity {
+public class MainPage extends BaseActivity {
     @Override
     protected int getLayoutId() {
         return super.getLayoutId();

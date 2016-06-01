@@ -10,7 +10,10 @@ import android.view.View;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.base.BaseFragment;
-import com.lt.hm.wovideo.fragment.HomeFragment;
+import com.lt.hm.wovideo.fragment.ChoicePage;
+import com.lt.hm.wovideo.fragment.ClassPage;
+import com.lt.hm.wovideo.fragment.EventsPage;
+import com.lt.hm.wovideo.fragment.VipPage;
 import com.lt.hm.wovideo.widget.indicatorTab.IconPagerAdapter;
 import com.lt.hm.wovideo.widget.indicatorTab.IconTabPageIndicator;
 
@@ -34,8 +37,6 @@ public class MainPage extends BaseActivity implements IconTabPageIndicator.OnTab
     IconTabPageIndicator indicator;
 
 
-
-
     @Override
     protected int getLayoutId() {
         return R.layout.layout_main;
@@ -43,14 +44,27 @@ public class MainPage extends BaseActivity implements IconTabPageIndicator.OnTab
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        List<BaseFragment> list= new ArrayList<>();
-        for (int i = 0; i < 4; i++) {
-            HomeFragment home = new HomeFragment();
-            home.setTitle("首页");
-            home.setIconId(R.mipmap.ic_launcher);
-            list.add(home);
-        }
-        FragmentPagerAdapter adapter= new FragmentAdapter(list,getSupportFragmentManager());
+        viewPager.setOffscreenPageLimit(3);
+        List<BaseFragment> list = new ArrayList<>();
+        ChoicePage home = new ChoicePage();
+        home.setTitle("推荐");
+        home.setIconId(R.mipmap.ic_launcher);
+        list.add(home);
+        ClassPage classes = new ClassPage();
+        classes.setTitle("分类");
+        classes.setIconId(R.mipmap.ic_launcher);
+        list.add(classes);
+
+        VipPage vp = new VipPage();
+        vp.setTitle("VIP会员");
+        vp.setIconId(R.mipmap.ic_launcher);
+        list.add(vp);
+
+        EventsPage events = new EventsPage();
+        events.setTitle("活动");
+        events.setIconId(R.mipmap.ic_launcher);
+        list.add(events);
+        FragmentPagerAdapter adapter = new FragmentAdapter(list, getSupportFragmentManager());
         viewPager.setAdapter(adapter);
         indicator.setViewPager(viewPager);
         indicator.setOnTabReselectedListener(this);

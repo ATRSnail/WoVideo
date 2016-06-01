@@ -18,7 +18,9 @@ public class AppStart extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        UIHelper.ToMain(this);
+//        UIHelper.ToMain2(this);
+        UIHelper.ToVideo(this);
+        this.finish();
     }
 
     @Override

@@ -3,7 +3,11 @@ package com.lt.hm.wovideo.utils;
 import android.content.Context;
 import android.content.Intent;
 
-import com.lt.hm.wovideo.ui.MainPage;
+import com.lt.hm.wovideo.ui.LoginPage;
+import com.lt.hm.wovideo.ui.MainActivity;
+import com.lt.hm.wovideo.ui.MainPage2;
+import com.lt.hm.wovideo.ui.RegistPage;
+import com.lt.hm.wovideo.ui.VideoPage;
 
 /**
  * @author leonardo
@@ -13,8 +17,32 @@ import com.lt.hm.wovideo.ui.MainPage;
 public class UIHelper {
 
 
-    public static void ToMain(Context context){
-        Intent intent = new Intent(context, MainPage.class);
+    public static void ToMain(Context context) {
+        Intent intent = new Intent(context, MainActivity.class);
         context.startActivity(intent);
     }
+
+    public static void ToMain2(Context context) {
+        Intent intent = new Intent(context, MainPage2.class);
+        context.startActivity(intent);
+    }
+
+    public static void ToLogin(Context context) {
+        Intent intent = new Intent(context, LoginPage.class);
+        context.startActivity(intent);
+    }
+
+    public static void ToRegister(Context context) {
+        Intent intent = new Intent(context, RegistPage.class);
+        context.startActivity(intent);
+    }
+
+    public static void ToVideo(Context context) {
+        Intent intent = new Intent(context, VideoPage.class);
+        context.startActivity(intent);
+    }
+
+
+
+
 }

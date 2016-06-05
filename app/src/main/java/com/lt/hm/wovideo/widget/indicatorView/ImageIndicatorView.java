@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.utils.StringUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -29,10 +30,6 @@ import java.util.List;
  * @author savant-pan
  */
 public class ImageIndicatorView extends RelativeLayout {
-	/**
-	 * cycle list arrow anchor
-	 */
-	public static final int INDICATE_ARROW_ROUND_STYLE = 0;
 	/**
 	 * user guide anchor
 	 */
@@ -389,7 +386,9 @@ public class ImageIndicatorView extends RelativeLayout {
 
 		@Override
 		public void destroyItem(View arg0, int arg1, Object arg2) {
-			((ViewPager) arg0).removeView(pageViews.get(arg1));
+			if (arg1<viewList.size()&& !StringUtils.isNullOrEmpty(pageViews.get(arg1))) {
+				((ViewPager) arg0).removeView(pageViews.get(arg1));
+			}
 		}
 
 		@Override

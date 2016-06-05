@@ -1,8 +1,5 @@
 package com.jeremyfeinstein.slidingmenu.lib;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -29,24 +26,27 @@ import android.widget.Scroller;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnClosedListener;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu.OnOpenedListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class CustomViewAbove extends ViewGroup {
 
 	private static final String TAG = "CustomViewAbove";
 	private static final boolean DEBUG = false;
 
-	//ÊÇ·ñÊ¹ÓÃ»º´æ
+	//ï¿½Ç·ï¿½Ê¹ï¿½Ã»ï¿½ï¿½ï¿½
 	private static final boolean USE_CACHE = false;
 
-	//×î´ó³ÖÐøµÄÊ±¼ä
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
 	private static final int MAX_SETTLE_DURATION = 600; // ms
 	
-	//×îÐ¡»¬¶¯µÄ¾àÀë
+	//ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
 	private static final int MIN_DISTANCE_FOR_FLING = 25; // dips
 
 	/**
-	 * ¶¨ÒåÒ»¸öÐÞÊÎ¶¯»­µÄÐ§¹ûÀà
-	 * Interpolator±»ÓÃÀ´ÐÞÊÎ¶¯»­Ð§¹û£¬¶¨Òå¶¯»­µÄ±ä»¯ÂÊ£¬¿ÉÒÔÊ¹´æÔÚµÄ¶¯»­Ð§¹û¿ÉÒÔ accelerated(¼ÓËÙ)£¬decelerated(¼õËÙ),repeated(ÖØ¸´),bounced(µ¯Ìø)µÈ¡£
+	 * ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Î¶ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
+	 * Interpolatorï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î¶ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½å¶¯ï¿½ï¿½ï¿½Ä±ä»¯ï¿½Ê£ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½ï¿½ÚµÄ¶ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½ï¿½ accelerated(ï¿½ï¿½ï¿½ï¿½)ï¿½ï¿½decelerated(ï¿½ï¿½ï¿½ï¿½),repeated(ï¿½Ø¸ï¿½),bounced(ï¿½ï¿½ï¿½ï¿½)ï¿½È¡ï¿½
 	 */
 	private static final Interpolator sInterpolator = new Interpolator() {
 		public float getInterpolation(float t) {
@@ -55,83 +55,83 @@ public class CustomViewAbove extends ViewGroup {
 		}
 	};
 
-	//¶¨ÒåÄÚÈÝÊÓÍ¼
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 	private View mContent;
 
-	//µ±Ç°µÄÑ¡Ïî
+	//ï¿½ï¿½Ç°ï¿½ï¿½Ñ¡ï¿½ï¿½
 	private int mCurItem;
 	
-	//¹ö¶¯»¬ÂÖ
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private Scroller mScroller;
 
-	//ÊÇ·ñÄÜ¹»Ê¹ÓÃ»¬¶¯»º´æ
+	//ï¿½Ç·ï¿½ï¿½Ü¹ï¿½Ê¹ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private boolean mScrollingCacheEnabled;
 
-	//ÊÇ·ñÕýÔÚ»¬¶¯
+	//ï¿½Ç·ï¿½ï¿½ï¿½ï¿½Ú»ï¿½ï¿½ï¿½
 	private boolean mScrolling;
 
-	//ÊÇ·ñÕýÔÚÍÏ¶¯
+	//ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½
 	private boolean mIsBeingDragged;
 	
-	//ÊÇ·ñÄÜ¹»ÍÏ¶¯
+	//ï¿½Ç·ï¿½ï¿½Ü¹ï¿½ï¿½Ï¶ï¿½
 	private boolean mIsUnableToDrag;
 	
-	//¶¨Òå´¥ÃþÒç³öµÄÖµ
+	//ï¿½ï¿½ï¿½å´¥ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	private int mTouchSlop;
 	
-	//³õÊ¼»¯´¥ÃþÆÁÄ»XÖáµÄÖµ
+	//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»Xï¿½ï¿½ï¿½Öµ
 	private float mInitialMotionX;
 	
-	//×îºóÒÆ¶¯µ½µÄX¡¢YµÄ×ø±ê
+	//ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½ï¿½Yï¿½ï¿½ï¿½ï¿½ï¿½
 	private float mLastMotionX,mLastMotionY;
 	
 	/**
-	 * ¶¨ÒåÒ»¸ö»î¶¯Ö¸Õë£¬ÔÚ¶àµã´¥ÃþµÄÊ±ºòµ÷ÓÃ
+	 * ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½î¶¯Ö¸ï¿½ë£¬ï¿½Ú¶ï¿½ã´¥ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	protected int mActivePointerId = INVALID_POINTER;
 	
 	/**
-	 * Îªµ±Ç°µÄ»î¶¯Ö¸Õë¸³Öµ
+	 * Îªï¿½ï¿½Ç°ï¿½Ä»î¶¯Ö¸ï¿½ë¸³Öµ
 	 */
 	private static final int INVALID_POINTER = -1;
 
 	/**
-	 * ´¥Ãþ¹ö¶¯ÆÚ¼äµÄ¾ø¶ÔËÙ¶È
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¼ï¿½Ä¾ï¿½ï¿½ï¿½Ù¶ï¿½
 	 */
 	protected VelocityTracker mVelocityTracker;
 	
-	//×îÐ¡»¬¶¯ËÙ¶ÈÖµ
+	//ï¿½ï¿½Ð¡ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½Öµ
 	private int mMinimumVelocity;
 	
-	//×î´ó»¬¶¯ËÙ¶ÈÖµ
+	//ï¿½ï¿½ó»¬¶ï¿½ï¿½Ù¶ï¿½Öµ
 	protected int mMaximumVelocity;
 	
-	//»¬¶¯µÄ¾àÀë
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
 	private int mFlingDistance;
 
-	//¶¨ÒåÏÂ·½ÊÓÍ¼¶ÔÏó
+	//ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½
 	private CustomViewBehind mViewBehind;
 
-	//ÊÇ·ñÄÜ¹»Ê¹ÓÃ
+	//ï¿½Ç·ï¿½ï¿½Ü¹ï¿½Ê¹ï¿½ï¿½
 	private boolean mEnabled = true;
 
-	//Ò³Ãæ¸Ä±ä¼àÌýÆ÷
+	//Ò³ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private OnPageChangeListener mOnPageChangeListener;
 	
-	//ÄÚ²¿Ò³Ãæ¸Ä±ä¼àÌýÆ÷
+	//ï¿½Ú²ï¿½Ò³ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	private OnPageChangeListener mInternalPageChangeListener;
 
-	//¹Ø±Õ¼àÌýÆ÷
+	//ï¿½Ø±Õ¼ï¿½ï¿½ï¿½ï¿½ï¿½
 	private OnClosedListener mClosedListener;
 	
-	//´ò¿ª¼àÌýÆ÷
+	//ï¿½ò¿ª¼ï¿½ï¿½ï¿½ï¿½ï¿½
 	private OnOpenedListener mOpenedListener;
 
-	//´æ·Å±»ºöÂÔµÄÊÓÍ¼×é¼þÁÐ±í
+	//ï¿½ï¿½Å±ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½Í¼ï¿½ï¿½ï¿½ï¿½Ð±ï¿½
 	private List<View> mIgnoredViews = new ArrayList<View>();
 
 	/**
-	 * µ÷ÓÃ´Ë½Ó¿ÚÈ¥ÏìÓ¦¸Ä±äÑ¡ÖÐÒ³ÃæµÄ×´Ì¬
+	 * ï¿½ï¿½ï¿½Ã´Ë½Ó¿ï¿½È¥ï¿½ï¿½Ó¦ï¿½Ä±ï¿½Ñ¡ï¿½ï¿½Ò³ï¿½ï¿½ï¿½×´Ì¬
 	 */
 	public interface OnPageChangeListener {
 
@@ -187,31 +187,31 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * ³õÊ¼»¯×îÉÏ·½ÊÓÍ¼
+	 * ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½Í¼
 	 */
 	void initCustomViewAbove() {
-		//ÉèÖÃÊÇ·ñÄÜ¹»µ÷ÓÃ×Ô¶¨ÒåµÄ²¼¾Ö£¬falseÊÇ¿ÉÒÔ
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½Ä²ï¿½ï¿½Ö£ï¿½falseï¿½Ç¿ï¿½ï¿½ï¿½
 		setWillNotDraw(false);
-		//ÓÅÏÈÆä×ÓÀà¿Ø¼þ¶ø»ñÈ¡µ½½¹µã
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
-		//ÉèÖÃÊÇ·ñÄÜ¹»»ñÈ¡½¹µã
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½
 		setFocusable(true);
 		
-		//µÃµ½ÉÏÏÂÎÄ
+		//ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		final Context context = getContext();
 		
-		//ÊµÀý»¯¹ö¶¯Æ÷
+		//Êµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		mScroller = new Scroller(context, sInterpolator);
 		
 		final ViewConfiguration configuration = ViewConfiguration.get(context);
 		
-		//»ñµÃÄÜ¹»½øÐÐÊÖÊÆ»¬¶¯µÄ¾àÀë£¬±íÊ¾»¬¶¯µÄÊ±ºò£¬ÊÖµÄÒÆ¶¯Òª´óÓÚÕâ¸ö¾àÀë²Å¿ªÊ¼ÒÆ¶¯¿Ø¼þ
+		//ï¿½ï¿½ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ»ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ë£¬ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Öµï¿½ï¿½Æ¶ï¿½Òªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å¿ï¿½Ê¼ï¿½Æ¶ï¿½ï¿½Ø¼ï¿½
 		mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
 		
-		//»ñµÃÔÊÐíÖ´ÐÐÒ»¸öflingÊÖÊÆ¶¯×÷µÄ×îÐ¡ËÙ¶ÈÖµ
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½Ò»ï¿½ï¿½flingï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½Ù¶ï¿½Öµ
 		mMinimumVelocity = configuration.getScaledMinimumFlingVelocity();
 		
-		//»ñµÃÔÊÐíÖ´ÐÐÒ»¸öflingÊÖÊÆ¶¯×÷µÄ×î´óËÙ¶ÈÖµ
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½Ò»ï¿½ï¿½flingï¿½ï¿½ï¿½Æ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½Öµ
 		mMaximumVelocity = configuration.getScaledMaximumFlingVelocity();
 		
 		setInternalPageChangeListener(new SimpleOnPageChangeListener() {
@@ -229,42 +229,42 @@ public class CustomViewAbove extends ViewGroup {
 				}
 			}
 		});
-		//»ñµÃ¸ÃÊÖ»úÉè±¸µÄÆÁÄ»ÃÜ¶ÈÖµ
+		//ï¿½ï¿½Ã¸ï¿½ï¿½Ö»ï¿½ï¿½è±¸ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ü¶ï¿½Öµ
 		final float density = context.getResources().getDisplayMetrics().density;
-		//»¬¶¯µÄ¾àÀë
+		//ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
 		mFlingDistance = (int) (MIN_DISTANCE_FOR_FLING * density);
 	}
 
 	/**
-	 * ÉèÖÃµ±Ç°Ñ¡ÖÐµÄÏî
+	 * ï¿½ï¿½ï¿½Ãµï¿½Ç°Ñ¡ï¿½Ðµï¿½ï¿½ï¿½
 	 */
 	public void setCurrentItem(int item) {
 		setCurrentItemInternal(item, true, false);
 	}
 
 	/**
-	 * ÉèÖÃµ±Ç°Ñ¡ÖÐµÄÏî£¬ÊÇ·ñÆ½»¬µÄ¹ý¶Éµ½Ñ¡ÖÐÏîµÄÒ³Ãæ
+	 * ï¿½ï¿½ï¿½Ãµï¿½Ç°Ñ¡ï¿½Ðµï¿½ï¿½î£¬ï¿½Ç·ï¿½Æ½ï¿½ï¿½ï¿½Ä¹ï¿½Éµï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½Ò³ï¿½ï¿½
 	 */
 	public void setCurrentItem(int item, boolean smoothScroll) {
 		setCurrentItemInternal(item, smoothScroll, false);
 	}
 
 	/**
-	 * µÃµ½µ±Ç°Ñ¡ÖÐµÄÏî
+	 * ï¿½Ãµï¿½ï¿½ï¿½Ç°Ñ¡ï¿½Ðµï¿½ï¿½ï¿½
 	 */
 	public int getCurrentItem() {
 		return mCurItem;
 	}
 
 	/**
-	 * ÉèÖÃµ±Ç°ÄÚ²¿Ñ¡ÖÐµÄÏî
+	 * ï¿½ï¿½ï¿½Ãµï¿½Ç°ï¿½Ú²ï¿½Ñ¡ï¿½Ðµï¿½ï¿½ï¿½
 	 */
 	void setCurrentItemInternal(int item, boolean smoothScroll, boolean always) {
 		setCurrentItemInternal(item, smoothScroll, always, 0);
 	}
 
 	/**
-	 * ÉèÖÃµ±Ç°ÄÚ²¿Ñ¡ÖÐµÄÏî
+	 * ï¿½ï¿½ï¿½Ãµï¿½Ç°ï¿½Ú²ï¿½Ñ¡ï¿½Ðµï¿½ï¿½ï¿½
 	 */
 	void setCurrentItemInternal(int item, boolean smoothScroll, boolean always, int velocity) {
 		if (!always && mCurItem == item) {
@@ -292,21 +292,21 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * ÉèÖÃÒ»¸ö¼àÌýÊÂ¼þµ±Ò³Ãæ¸Ä±ä»òÕß¼ÓËÙ¹ö¶¯µÄÊ±ºòµ÷ÓÃ
+	 * ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½Ò³ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ß¼ï¿½ï¿½Ù¹ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	public void setOnPageChangeListener(OnPageChangeListener listener) {
 		mOnPageChangeListener = listener;
 	}
 
 	/**
-	 * ÉèÖÃ´ò¿ª¼àÌýÊÂ¼þ
+	 * ï¿½ï¿½ï¿½Ã´ò¿ª¼ï¿½ï¿½ï¿½ï¿½Â¼ï¿½
 	 */
 	public void setOnOpenedListener(OnOpenedListener l) {
 		mOpenedListener = l;
 	}
 
 	/**
-	 * ÉèÖÃ¹Ø±Õ¼àÌýÊÂ¼þ
+	 * ï¿½ï¿½ï¿½Ã¹Ø±Õ¼ï¿½ï¿½ï¿½ï¿½Â¼ï¿½
 	 */
 	public void setOnClosedListener(OnClosedListener l) {
 		mClosedListener = l;
@@ -325,7 +325,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * Ìí¼Ó±»ºöÂÔµÄ×é¼þ
+	 * ï¿½ï¿½Ó±ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½
 	 */
 	public void addIgnoredView(View v) {
 		if (!mIgnoredViews.contains(v)) {
@@ -334,14 +334,14 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * ÒÆ³ý±»ºöÂÔµÄ×é¼þ
+	 * ï¿½Æ³ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½
 	 */
 	public void removeIgnoredView(View v) {
 		mIgnoredViews.remove(v);
 	}
 
 	/**
-	 * Çå¿Õ±»ºöÂÔµÄ×é¼þ
+	 * ï¿½ï¿½Õ±ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½
 	 */
 	public void clearIgnoredViews() {
 		mIgnoredViews.clear();
@@ -358,7 +358,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µÃµ½»¬¶¯µ½µÄXÖáµÄ×ø±ê
+	 * ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	public int getDestScrollX(int page) {
 		switch (page) {
@@ -372,14 +372,14 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µÃµ½×ó±ß¿ò
+	 * ï¿½Ãµï¿½ï¿½ï¿½ß¿ï¿½
 	 */
 	private int getLeftBound() {
 		return mViewBehind.getAbsLeftBound(mContent);
 	}
 
 	/**
-	 * µÃµ½ÓÒ±ß¿ò
+	 * ï¿½Ãµï¿½ï¿½Ò±ß¿ï¿½
 	 */
 	private int getRightBound() {
 		return mViewBehind.getAbsRightBound(mContent);
@@ -390,14 +390,14 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µÃµ½»¬¶¯²Ëµ¥ÊÇ·ñ´ò¿ª
+	 * ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëµï¿½ï¿½Ç·ï¿½ï¿½
 	 */
 	public boolean isMenuOpen() {
 		return mCurItem == 0 || mCurItem == 2;
 	}
 
 	/**
-	 * ÊÇ·ñºöÂÔÊÓÍ¼
+	 * ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 	 */
 	private boolean isInIgnoredView(MotionEvent ev) {
 		Rect rect = new Rect();
@@ -409,7 +409,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µÃµ½ÏÂ·½ÊÓÍ¼µÄ¿í¶È
+	 * ï¿½Ãµï¿½ï¿½Â·ï¿½ï¿½ï¿½Í¼ï¿½Ä¿ï¿½ï¿½
 	 */
 	public int getBehindWidth() {
 		if (mViewBehind == null) {
@@ -420,7 +420,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µÃµ½×Ó¿Ø¼þµÄ¿í¶È
+	 * ï¿½Ãµï¿½ï¿½Ó¿Ø¼ï¿½ï¿½Ä¿ï¿½ï¿½
 	 */
 	public int getChildWidth(int i) {
 		switch (i) {
@@ -434,28 +434,28 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µÃµ½ÊÇ·ñÄÜ¹»»¬¶¯
+	 * ï¿½Ãµï¿½ï¿½Ç·ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	public boolean isSlidingEnabled() {
 		return mEnabled;
 	}
 
 	/**
-	 * ÉèÖÃÊÇ·ñÄÜ¹»»¬¶¯
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½Ü¹ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	public void setSlidingEnabled(boolean b) {
 		mEnabled = b;
 	}
 
 	/**
-	 * Æ½»¬µÄ»¬¶¯µ½Ö¸¶¨µÄÎ»ÖÃ
+	 * Æ½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 	 */
 	void smoothScrollTo(int x, int y) {
 		smoothScrollTo(x, y, 0);
 	}
 
 	/**
-	 * Í¨¹ýÉèÖÃËÙ¶ÈÀ´Æ½»¬µÄ»¬¶¯µ½Ö¸¶¨µÄÎ»ÖÃ
+	 * Í¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½ï¿½ï¿½Æ½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½
 	 */
 	void smoothScrollTo(int x, int y, int velocity) {
 		if (getChildCount() == 0) {
@@ -463,14 +463,14 @@ public class CustomViewAbove extends ViewGroup {
 			setScrollingCacheEnabled(false);
 			return;
 		}
-		//»ñµÃµ±Ç°ViewÏÔÊ¾²¿·ÖµÄ×ó±ßµ½µÚÒ»¸öViewµÄ×ó±ßµÄ¾àÀë
+		//ï¿½ï¿½Ãµï¿½Ç°Viewï¿½ï¿½Ê¾ï¿½ï¿½ï¿½Öµï¿½ï¿½ï¿½ßµï¿½ï¿½ï¿½Ò»ï¿½ï¿½Viewï¿½ï¿½ï¿½ï¿½ßµÄ¾ï¿½ï¿½ï¿½
 		int sx = getScrollX();
 		int sy = getScrollY();
 		
 		int dx = x - sx;
 		int dy = y - sy;
 		
-		//Èç¹û¶¼µÈÓÚ0£¬ËµÃ÷ÕýºÃÊÇ»¬¶¯ÁËÒ»¸öÆÁÄ»µÄ¾àÀë
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½Ëµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç»ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ä»ï¿½Ä¾ï¿½ï¿½ï¿½
 		if (dx == 0 && dy == 0) {
 			completeScroll();
 			if (isMenuOpen()) {
@@ -486,43 +486,43 @@ public class CustomViewAbove extends ViewGroup {
 		setScrollingCacheEnabled(true);
 		mScrolling = true;
 
-		//»ñµÃÏÂ·½ÊÓÍ¼µÄ¿í¶È
+		//ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Í¼ï¿½Ä¿ï¿½ï¿½
 		final int width = getBehindWidth();
 		
 		final int halfWidth = width / 2;
 		
-		//È¡Á½ÊýÖÐ×îÐ¡µÄÖµ¸³¸ø»¬¶¯¾àÀëÓëÏÂ·½ÊÓÍ¼¿í¶ÈµÄ±ÈÖµ
+		//È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Í¼ï¿½ï¿½ÈµÄ±ï¿½Öµ
 		final float distanceRatio = Math.min(1f, 1.0f * Math.abs(dx) / width);
 		
-		//»ñµÃµ±Ç°»¬¶¯µÄ¾àÀë
+		//ï¿½ï¿½Ãµï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½
 		final float distance = halfWidth + halfWidth * distanceInfluenceForSnapDuration(distanceRatio);
 
-		//³õÊ¼»¯³ÖÐøµÄÊ±¼ä
+		//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
 		int duration = 0;
 		
-		//»ñµÃËÙ¶ÈµÄ¾ø¶ÔÖµ
+		//ï¿½ï¿½ï¿½ï¿½Ù¶ÈµÄ¾ï¿½ï¿½Öµ
 		velocity = Math.abs(velocity);
 		
 		if (velocity > 0) {
-			//Math.round()ËÄÉáÎåÈë
+			//Math.round()ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			duration = 4 * Math.round(1000 * Math.abs(distance / velocity));
 		} else {
 			final float pageDelta = (float) Math.abs(dx) / width;
 			duration = (int) ((pageDelta + 1) * 100);
 			duration = MAX_SETTLE_DURATION;
 		}
-		//È¡Á½ÊýÖÐ×îÐ¡µÄÒ»¸öÖµ¸³¸ø³ÖÐøµÄÊ±¼ä
+		//È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¡ï¿½ï¿½Ò»ï¿½ï¿½Öµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
 		duration = Math.min(duration, MAX_SETTLE_DURATION);
 
-		//¿ªÊ¼»¬¶¯
+		//ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½
 		mScroller.startScroll(sx, sy, dx, dy, duration);
 		
-		//Ë¢ÐÂ½çÃæ
+		//Ë¢ï¿½Â½ï¿½ï¿½ï¿½
 		invalidate();
 	}
 
 	/**
-	 * ÉèÖÃÄÚÈÝÊÓÍ¼
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 	 */
 	public void setContent(View v) {
 		if (mContent != null) 
@@ -532,21 +532,21 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µÃµ½ÄÚÈÝÊÓÍ¼
+	 * ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¼
 	 */
 	public View getContent() {
 		return mContent;
 	}
 
 	/**
-	 * ÉèÖÃÏÂ·½ÊÓÍ¼
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Â·ï¿½ï¿½ï¿½Í¼
 	 */
 	public void setCustomViewBehind(CustomViewBehind cvb) {
 		mViewBehind = cvb;
 	}
 
 	/**
-	 * ÔÚ¸¸ÔªËØÕýÒª·ÅÖÃ¸Ã¿Ø¼þÊ±µ÷ÓÃ¡£Ëü»áÎÊÒ»¸öÎÊÌâ£¬¡°ÄãÏëÒªÓÃ¶à´óµØ·½°¡£¿¡±£¬È»ºó´«ÈëÁ½¸ö²ÎÊý¡ª¡ªwidthMeasureSpecºÍheightMeasureSpec¡£
+	 * ï¿½Ú¸ï¿½Ôªï¿½ï¿½ï¿½ï¿½Òªï¿½ï¿½ï¿½Ã¸Ã¿Ø¼ï¿½Ê±ï¿½ï¿½ï¿½Ã¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½â£¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½Ã¶ï¿½ï¿½Ø·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½widthMeasureSpecï¿½ï¿½heightMeasureSpecï¿½ï¿½
 	 */
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -560,7 +560,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µ±ÊÓÍ¼³ß´ç¸Ä±äµÄÊ±ºòµ÷ÓÃ
+	 * ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ß´ï¿½Ä±ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
@@ -583,7 +583,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * ÉèÖÃÉÏ·½ÊÓÍ¼µÄÆ«ÒÆÁ¿
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½ï¿½ï¿½Í¼ï¿½ï¿½Æ«ï¿½ï¿½ï¿½ï¿½
 	 */
 	public void setAboveOffset(int i) {		
 		mContent.setPadding(i, mContent.getPaddingTop(), mContent.getPaddingRight(), mContent.getPaddingBottom());
@@ -610,12 +610,12 @@ public class CustomViewAbove extends ViewGroup {
 			}
 		}
 
-		//Íê³É»¬¶¯£¬Çå³ý×´Ì¬
+		//ï¿½ï¿½É»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬
 		completeScroll();
 	}
 
 	/**
-	 * Ò³Ãæ¹ö¶¯
+	 * Ò³ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	private void pageScrolled(int xpos) {
 		final int widthWithMargin = getWidth();
@@ -627,7 +627,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * Ò³Ãæ¹ö¶¯
+	 * Ò³ï¿½ï¿½ï¿½ï¿½ï¿½
 	 *
 	 * @param position Position index of the first page currently being displayed.
 	 *                 Page position+1 will be visible if positionOffset is nonzero.
@@ -644,27 +644,27 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * Íê³É»¬¶¯
+	 * ï¿½ï¿½É»ï¿½ï¿½ï¿½
 	 */
 	private void completeScroll() {
-		//ÊÇ·ñÐèÒªÒÆ¶¯
+		//ï¿½Ç·ï¿½ï¿½ï¿½Òªï¿½Æ¶ï¿½
 		boolean needPopulate = mScrolling;
 		
 		if (needPopulate) {
 			// Done with scroll, no longer want to cache view drawing.
 			setScrollingCacheEnabled(false);
-			//ÖÕÖ¹¶¯»­Ð§¹û
+			//ï¿½ï¿½Ö¹ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½
 			mScroller.abortAnimation();
 			
-			//»ñµÃ¹ö¶¯Ìõ³õÊ¼µÄ×ø±ê
+			//ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½
 			int oldX = getScrollX();
 			int oldY = getScrollY();
 			
-			//»ñµÃ¹ö¶¯Ìõµ±Ç°µÄ×ø±ê
+			//ï¿½ï¿½Ã¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½ï¿½ï¿½
 			int x = mScroller.getCurrX();
 			int y = mScroller.getCurrY();
 			
-			//Èç¹û¹ö¶¯Ìõ³õÊ¼µÄ×ø±êºÍµ±Ç°µÄ×ø±ê²»µÈÔò»¬¶¯
+			//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½Íµï¿½Ç°ï¿½ï¿½ï¿½ï¿½ê²»ï¿½ï¿½ï¿½ò»¬¶ï¿½
 			if (oldX != x || oldY != y) {
 				scrollTo(x, y);
 			}
@@ -676,29 +676,29 @@ public class CustomViewAbove extends ViewGroup {
 					mClosedListener.onClosed();
 			}
 		}
-		//½«»¬¶¯µÄ×´Ì¬ÉèÖÃÎªfalse
+		//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½Îªfalse
 		mScrolling = false;
 	}
 
-	//»ñµÃ´¥ÃþÄ£Ê½µÄÖµ
+	//ï¿½ï¿½Ã´ï¿½ï¿½ï¿½Ä£Ê½ï¿½ï¿½Öµ
 	protected int mTouchMode = SlidingMenu.TOUCHMODE_MARGIN;
 
 	/**
-	 * ÉèÖÃ´¥ÃþµÄÄ£Ê½
+	 * ï¿½ï¿½ï¿½Ã´ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½
 	 */
 	public void setTouchMode(int i) {
 		mTouchMode = i;
 	}
 
 	/**
-	 * µÃµ½´¥ÃþµÄÄ£Ê½
+	 * ï¿½Ãµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä£Ê½
 	 */
 	public int getTouchMode() {
 		return mTouchMode;
 	}
 
 	/**
-	 * ÅÐ¶ÏÊÇ·ñÔÊÐí´¥Ãþ´ò¿ª»¬¶¯²Ëµ¥
+	 * ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½ï¿½ò¿ª»ï¿½ï¿½ï¿½ï¿½Ëµï¿½
 	 */
 	private boolean thisTouchAllowed(MotionEvent ev) {
 		int x = (int) (ev.getX() + mScrollX);
@@ -718,7 +718,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * ÅÐ¶ÏÊÇ·ñÔÊÐí»¬¶¯
+	 * ï¿½Ð¶ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½?ï¿½ï¿½
 	 */
 	private boolean thisSlideAllowed(float dx) {
 		boolean allowed = false;
@@ -733,7 +733,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * µÃµ½Ö¸ÕëµÄË÷ÒýÖµ
+	 * ï¿½Ãµï¿½Ö¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	 */
 	private int getPointerIndex(MotionEvent ev, int id) {
 		int activePointerIndex = MotionEventCompat.findPointerIndex(ev, id);
@@ -988,7 +988,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * ¿ªÊ¼ÍÏ¶¯
+	 * ï¿½ï¿½Ê¼ï¿½Ï¶ï¿½
 	 */
 	private void startDrag() {
 		mIsBeingDragged = true;
@@ -996,7 +996,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * ½áÊøÍÏ¶¯
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½
 	 */
 	private void endDrag() {
 		mQuickReturn = false;
@@ -1011,7 +1011,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * ÉèÖÃÄÜ·ñÊ¹ÓÃ»¬¶¯»º´æ
+	 * ï¿½ï¿½ï¿½ï¿½ï¿½Ü·ï¿½Ê¹ï¿½Ã»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	private void setScrollingCacheEnabled(boolean enabled) {
 		if (mScrollingCacheEnabled != enabled) {
@@ -1068,7 +1068,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * Ö´ÐÐ°´¼üÏìÓ¦ÊÂ¼þ
+	 * Ö´ï¿½Ð°ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½Â¼ï¿½
 	 */
 	public boolean executeKeyEvent(KeyEvent event) {
 		boolean handled = false;
@@ -1097,7 +1097,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * »ñµÃ»¬¶¯µÄ·½Ïò
+	 * ï¿½ï¿½Ã»ï¿½ï¿½ï¿½ï¿½Ä·ï¿½ï¿½ï¿½
 	 */
 	public boolean arrowScroll(int direction) {
 		View currentFocused = findFocus();
@@ -1133,7 +1133,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * Ò³ÃæÊÇ·ñÏò×óÒÆ¶¯
+	 * Ò³ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 	 */
 	boolean pageLeft() {
 		if (mCurItem > 0) {
@@ -1144,7 +1144,7 @@ public class CustomViewAbove extends ViewGroup {
 	}
 
 	/**
-	 * Ò³ÃæÊÇ·ñÏòÓÒÒÆ¶¯
+	 * Ò³ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ¶ï¿½
 	 */
 	boolean pageRight() {
 		if (mCurItem < 1) {

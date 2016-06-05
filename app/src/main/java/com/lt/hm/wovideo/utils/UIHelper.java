@@ -8,6 +8,7 @@ import com.lt.hm.wovideo.ui.MainActivity;
 import com.lt.hm.wovideo.ui.MainPage2;
 import com.lt.hm.wovideo.ui.RegistPage;
 import com.lt.hm.wovideo.ui.VideoPage;
+import com.lt.hm.wovideo.ui.VideoPage_03;
 
 /**
  * @author leonardo
@@ -39,6 +40,15 @@ public class UIHelper {
 
     public static void ToVideo(Context context) {
         Intent intent = new Intent(context, VideoPage.class);
+        context.startActivity(intent);
+    }
+    public static void ToVideo2(Context context) {
+        Intent intent = new Intent(context, com.lt.hm.wovideo.video.VideoPage.class);
+        context.startActivity(intent);
+    }
+
+    public static void ToVideo3(Context context) {
+        Intent intent = new Intent(context, VideoPage_03.class);
         context.startActivity(intent);
     }
 

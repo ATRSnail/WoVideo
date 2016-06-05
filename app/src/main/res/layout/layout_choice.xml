@@ -1,23 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <include layout="@layout/layout_topbar"/>
-
-    <FrameLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView
+        android:layout_height="match_parent">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:id="@+id/img_indicator"
-            />
-        <include layout="@layout/layout_search"
-            android:layout_gravity="bottom"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/serach_view"
-            />
-    </FrameLayout>
-</LinearLayout>
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <include layout="@layout/layout_topbar" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView
+                    android:id="@+id/img_indicator"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp" />
+
+                <include
+                    android:id="@+id/serach_view"
+                    layout="@layout/layout_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom" />
+            </FrameLayout>
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/id_viewpager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="60dp"
+                android:layout_marginRight="60dp"
+                android:clipChildren="false" />
+
+
+        </LinearLayout>
+    </ScrollView>
+
+</android.support.v4.widget.SwipeRefreshLayout>

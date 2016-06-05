@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.interf.OnPersonOpenListener;
 import com.lt.hm.wovideo.interf.OnTabReselectListener;
 import com.lt.hm.wovideo.widget.MyFragmentTabHost;
 import com.lt.hm.wovideo.widget.SlidingMenu;
@@ -27,7 +28,7 @@ import butterknife.BindView;
  * @version 1.0
  * @create_date 16/5/30
  */
-public class MainPage2 extends BaseActivity implements View.OnTouchListener, TabHost.OnTabChangeListener {
+public class MainPage2 extends BaseActivity implements View.OnTouchListener, TabHost.OnTabChangeListener,OnPersonOpenListener {
     @BindView(R.id.realtabcontent)
     FrameLayout realtabcontent;
     @BindView(android.R.id.tabcontent)
@@ -154,5 +155,15 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
             }
         }
         supportInvalidateOptionsMenu();
+    }
+
+    @Override
+    public void OpenCenter() {
+        idMenu.openMenu();
+    }
+
+    @Override
+    public void CloseCenter() {
+        idMenu.closeMenu();
     }
 }

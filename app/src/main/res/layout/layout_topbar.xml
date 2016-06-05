@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:padding="10dp"
+    >
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,14 +15,13 @@
         android:layout_height="wrap_content"
         android:id="@+id/logo"
         android:layout_centerHorizontal="true"
-        android:src="@mipmap/ic_launcher"
-
+        android:src="@drawable/top_logo"
         />
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/qr_scan"
-        android:src="@mipmap/ic_launcher"
+        android:src="@drawable/icon_person"
         android:layout_alignParentRight="true"
         />
 </RelativeLayout>

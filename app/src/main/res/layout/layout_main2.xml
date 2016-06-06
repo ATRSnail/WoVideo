@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?><!--<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"--><!--xmlns:tools="http://schemas.android.com/tools"--><!--android:id="@+id/drawer_layout"--><!--android:layout_width="match_parent"--><!--android:layout_height="match_parent">-->
-<com.lt.hm.wovideo.widget.SlidingMenu xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:zhy="http://schemas.android.com/apk/res-auto"
     android:id="@+id/id_menu"
-    android:scrollbars="none"
-    android:focusable="false"
-    zhy:rightPadding="100dp">
+    android:scrollbars="none">
 <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
-    <include layout="@layout/layout_person" />
+    <!--<include layout="@layout/layout_person" />-->
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical">
+        <include layout="@layout/layout_topbar" />
 
         <FrameLayout
             android:id="@+id/realtabcontent"
@@ -38,6 +36,6 @@
         </com.lt.hm.wovideo.widget.MyFragmentTabHost>
     </LinearLayout>
 </LinearLayout>
-</com.lt.hm.wovideo.widget.SlidingMenu>
+</LinearLayout>
 
     <!--</android.support.v4.widget.DrawerLayout>-->

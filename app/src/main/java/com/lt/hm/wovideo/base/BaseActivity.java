@@ -3,7 +3,7 @@ package com.lt.hm.wovideo.base;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,10 +19,9 @@ import butterknife.Unbinder;
 /**
  * Created by leonardo on 16/3/21.
  */
-public abstract class BaseActivity extends AppCompatActivity implements BaseViewInterface {
+public abstract class BaseActivity extends ActionBarActivity implements BaseViewInterface {
 	protected LayoutInflater mInflater;
 	private boolean _isVisible;
-	private ActionBar mActionBar;
 	private TextView mTvActionTitle;
 	private boolean showActionBar=false;
 	Unbinder unbinder;
@@ -39,15 +38,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 		if (getLayoutId() != 0) {
 			setContentView(getLayoutId());
 		}
-		mActionBar = getSupportActionBar();
-		if (!showActionBar){
-			mActionBar.hide();
-		}
-		mInflater = getLayoutInflater();
-		if (hasActionBar()) {
-			initActionBar(mActionBar);
-		}
+
 		unbinder=ButterKnife.bind(this);
+		mInflater = getLayoutInflater();
 		init(savedInstanceState);
 //		//透明状态栏
 //		getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -131,10 +124,9 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
 		if (title.isEmpty()) {
 			title = getString(R.string.app_name);
 		}
-		if (hasActionBar() && mActionBar != null) {
-			// TODO: 16/3/21  根据 设定 ActionTitle
-			mActionBar.setTitle(title);
-		}
+//		if (hasActionBar() && mActionBar != null) {
+//			mActionBar.setTitle(title);
+//		}
 	}
 
 	protected void onBeforeSetContentLayout() {

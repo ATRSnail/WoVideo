@@ -10,16 +10,13 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
-import com.lt.hm.wovideo.interf.OnPersonOpenListener;
 import com.lt.hm.wovideo.interf.OnTabReselectListener;
 import com.lt.hm.wovideo.widget.MyFragmentTabHost;
-import com.lt.hm.wovideo.widget.SlidingMenu;
 
 import butterknife.BindView;
 
@@ -28,43 +25,21 @@ import butterknife.BindView;
  * @version 1.0
  * @create_date 16/5/30
  */
-public class MainPage2 extends BaseActivity implements View.OnTouchListener, TabHost.OnTabChangeListener,OnPersonOpenListener {
+public class MainPage2 extends BaseActivity implements View.OnTouchListener, TabHost.OnTabChangeListener {
+    @BindView(R.id.person_center)
+    ImageView personCenter;
+    @BindView(R.id.qr_scan)
+    ImageView qrScan;
     @BindView(R.id.realtabcontent)
     FrameLayout realtabcontent;
     @BindView(android.R.id.tabcontent)
     FrameLayout tabcontent;
     @BindView(android.R.id.tabhost)
     MyFragmentTabHost tabhost;
-    @BindView(R.id.head_icon)
-    ImageView headIcon;
-    @BindView(R.id.login_tag)
-    TextView loginTag;
-    @BindView(R.id.regist_tag)
-    TextView registTag;
-    @BindView(R.id.person_head_bg)
-    LinearLayout personHeadBg;
-    @BindView(R.id.order_icon)
-    ImageView orderIcon;
-    @BindView(R.id.order)
-    RelativeLayout order;
-    @BindView(R.id.integral_icon)
-    ImageView integralIcon;
-    @BindView(R.id.integral)
-    RelativeLayout integral;
-    @BindView(R.id.history_icon)
-    ImageView historyIcon;
-    @BindView(R.id.history)
-    RelativeLayout history;
-    @BindView(R.id.cache_icon)
-    ImageView cacheIcon;
-    @BindView(R.id.cache)
-    RelativeLayout cache;
-    @BindView(R.id.collect_icon)
-    ImageView collectIcon;
-    @BindView(R.id.collect)
-    RelativeLayout collect;
     @BindView(R.id.id_menu)
-    SlidingMenu idMenu;
+    LinearLayout idMenu;
+//    @BindView(R.id.id_menu)
+//    SlidingMenu idMenu;
 
     @Override
     protected int getLayoutId() {
@@ -157,13 +132,13 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
         supportInvalidateOptionsMenu();
     }
 
-    @Override
-    public void OpenCenter() {
-        idMenu.openMenu();
-    }
-
-    @Override
-    public void CloseCenter() {
-        idMenu.closeMenu();
-    }
+//    @Override
+//    public void OpenCenter() {
+//        idMenu.openMenu();
+//    }
+//
+//    @Override
+//    public void CloseCenter() {
+//        idMenu.closeMenu();
+//    }
 }

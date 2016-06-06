@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
@@ -105,28 +106,28 @@ public class SlidingMenu extends HorizontalScrollView {
         }
     }
 
-//    @Override
-//    public boolean onTouchEvent(MotionEvent ev)
-//    {
-//        int action = ev.getAction();
-//        switch (action)
-//        {
-//            // Up时，进行判断，如果显示区域大于菜单宽度一半则完全显示，否则隐藏
-//            case MotionEvent.ACTION_UP:
-//                int scrollX = getScrollX();
-//                if (scrollX > mHalfMenuWidth)
-//                {
-//                    this.smoothScrollTo(mMenuWidth, 0);
-//                    isOpen = false;
-//                } else
-//                {
-//                    this.smoothScrollTo(0, 0);
-//                    isOpen = true;
-//                }
-//                return true;
-//        }
-//        return super.onTouchEvent(ev);
-//    }
+    @Override
+    public boolean onTouchEvent(MotionEvent ev)
+    {
+        int action = ev.getAction();
+        switch (action)
+        {
+            // Up时，进行判断，如果显示区域大于菜单宽度一半则完全显示，否则隐藏
+            case MotionEvent.ACTION_UP:
+                int scrollX = getScrollX();
+                if (scrollX > mHalfMenuWidth)
+                {
+                    this.smoothScrollTo(mMenuWidth, 0);
+                    isOpen = false;
+                } else
+                {
+                    this.smoothScrollTo(0, 0);
+                    isOpen = true;
+                }
+                return true;
+        }
+        return super.onTouchEvent(ev);
+    }
 
     /**
      * 打开菜单

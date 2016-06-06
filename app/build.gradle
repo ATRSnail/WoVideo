@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.lt.hm.wovideo"
-        minSdkVersion 21
+        minSdkVersion 15
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -28,31 +28,21 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
-    //下拉刷新添加
-    // metrarial Desigin  add
-    // 百分比布局
-    // Ok Http lib 库
-    //注解
-    apt 'com.jakewharton:butterknife-compiler:8.0.1'
-    // 图片加载
-    // recycleView 使用
-    // 流式布局
-    compile project(':vitamio')
-    compile 'com.huxq17.xrefreshview:xrefreshview:2.1.9'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'com.android.support:design:23.4.0'
+    //注解
+    compile 'com.jakewharton:butterknife:8.0.1'
+    apt 'com.jakewharton:butterknife-compiler:8.0.1'
+    compile project(':vitamio')
+    compile 'com.huxq17.xrefreshview:xrefreshview:2.1.9'
     compile 'com.android.support:percent:23.2.0'
     compile 'com.zhy:okhttputils:2.5.2'
     compile 'com.facebook.stetho:stetho:1.3.1'
     compile 'com.facebook.stetho:stetho-okhttp3:1.3.1'
-    compile 'com.jakewharton:butterknife:8.0.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'com.android.support:recyclerview-v7:23.4.0'
-    compile 'com.zhy:flowlayout-lib:1.0.3'
-    compile 'com.android.support:support-v4:23.4.0'
     compile project(':wkvideoplayer')
-
-    //https://github.com/malmstein/fenster videp player
-    compile 'com.malmstein:fenster:0.0.2'
+    // base recycler
+    compile 'com.android.support:recyclerview-v7:23.2.0'
+    compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:v1.5.3'
 
 }

@@ -9,4 +9,10 @@
     <declare-styleable name="SlidingMenu">
         <attr name="rightPadding" />
     </declare-styleable>
+
+
+    <attr name="visible_tab_count" format="integer"/>
+    <declare-styleable name="ViewPagerIndicator">
+        <attr name="visible_tab_count"/>
+    </declare-styleable>
 </resources>

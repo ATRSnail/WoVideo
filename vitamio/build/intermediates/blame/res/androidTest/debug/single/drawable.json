@@ -16,6 +16,10 @@
         "source": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/res/drawable/abc_cab_background_internal_bg.xml"
     },
     {
+        "merged": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/res/merged/androidTest/debug/drawable/abc_edit_text_material.xml",
+        "source": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/res/drawable/abc_edit_text_material.xml"
+    },
+    {
         "merged": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/res/merged/androidTest/debug/drawable/abc_dialog_material_background_light.xml",
         "source": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/res/drawable/abc_dialog_material_background_light.xml"
     },
@@ -70,6 +74,10 @@
     {
         "merged": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/res/merged/androidTest/debug/drawable/abc_text_cursor_material.xml",
         "source": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/res/drawable/abc_text_cursor_material.xml"
+    },
+    {
+        "merged": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/res/merged/androidTest/debug/drawable/abc_btn_colored_material.xml",
+        "source": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/exploded-aar/com.android.support/appcompat-v7/23.4.0/res/drawable/abc_btn_colored_material.xml"
     },
     {
         "merged": "/Users/leonardo/AndroidStudioProjects/WoVideo/vitamio/build/intermediates/res/merged/androidTest/debug/drawable/abc_ratingbar_small_material.xml",

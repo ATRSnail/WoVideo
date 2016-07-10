@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <View
+        android:background="@color/gray_btn_bg_color"
+        android:layout_width="match_parent"
+        android:layout_height="7dp"></View>
+   <LinearLayout
+       android:orientation="vertical"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+       <FrameLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content">
+           <ImageView
+               android:src="@drawable/img_hd1"
+               android:id="@+id/img_huodong_item"
+               android:layout_width="match_parent"
+               android:layout_height="wrap_content" />
+
+           <LinearLayout
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:orientation="horizontal"
+               android:background="@drawable/bg_act"
+               android:padding="10dp"
+               android:layout_marginTop="10dp"
+               android:layout_gravity="right|top"
+               android:gravity="center"
+               >
+               <ImageView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:src="@drawable/icon_clock"
+                   />
+               <TextView
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:paddingLeft="3dp"
+                   android:text="活动进行中"
+                   android:textColor="@android:color/holo_green_light"
+                   />
+           </LinearLayout>
+
+       </FrameLayout>
+
+
+
+       <RelativeLayout
+           android:orientation="horizontal"
+           android:layout_width="match_parent"
+           android:background="@color/white"
+           android:gravity="center"
+           android:padding="10dp"
+           android:layout_height="50dp">
+           <TextView
+               android:textColor="@color/gray_darker"
+               android:id="@+id/item_tv_name"
+               android:layout_alignParentLeft="true"
+               android:layout_gravity="left|center_horizontal"
+               android:text="观看有礼物"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+           <TextView
+               android:textColor="@color/gray_btn_bg_color"
+               android:id="@+id/item_tv_time"
+               android:layout_alignParentRight="true"
+               android:layout_gravity="right|center_horizontal"
+               android:text="2016-06-11 - 2016-07-01"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+       </RelativeLayout>
+
+   </LinearLayout>
+
+</LinearLayout>

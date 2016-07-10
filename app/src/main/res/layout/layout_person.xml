@@ -12,12 +12,12 @@
         >
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:id="@+id/order"
             >
             <ImageView
                 style="@style/person_menu_img"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/icon_order"
                 android:id="@+id/order_icon"
                 />
             <TextView
@@ -33,12 +33,12 @@
             />
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:id="@+id/integral"
             >
             <ImageView
                 style="@style/person_menu_img"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/icon_integral"
                 android:id="@+id/integral_icon"
                 />
             <TextView
@@ -54,12 +54,12 @@
             />
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:id="@+id/history"
             >
             <ImageView
                 style="@style/person_menu_img"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/icon_history"
                 android:id="@+id/history_icon"
                 />
             <TextView
@@ -75,8 +75,9 @@
             />
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:id="@+id/cache"
+            android:visibility="gone"
             >
             <ImageView
                 style="@style/person_menu_img"
@@ -92,16 +93,17 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:visibility="gone"
             android:background="@color/divider_color"
             />
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:id="@+id/collect"
             >
             <ImageView
                 style="@style/person_menu_img"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/icon_collect_press"
                 android:id="@+id/collect_icon"
                 />
             <TextView
@@ -113,11 +115,9 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:visibility="gone"
             android:background="@color/divider_color"
             />
-
-
-
     </LinearLayout>
 
 </LinearLayout>

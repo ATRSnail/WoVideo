@@ -1,22 +1,29 @@
 package com.lt.hm.wovideo.video;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.utils.ScreenUtils;
+import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 
@@ -49,22 +56,34 @@ public class WoVideoPlayer extends RelativeLayout {
     LiveMediaController mMediaController;
     @BindView(R.id.progressbar)
     View mProgressBarView;
-    @BindView(R.id.video_close_view)
-    FrameLayout videoCloseView;
-    @BindView(R.id.video_share_tv_view)
-    FrameLayout videoShareTvView;
     @BindView(R.id.video_inner_container)
     RelativeLayout videoInnerContainer;
     @BindView(R.id.video_back_icon)
     View back_icon;
+    @BindView(R.id.operation_bg)
+    ImageView mOperationBg;
+    @BindView(R.id.operation_volume_brightness)
+    FrameLayout mVolumeBrightnessLayout;
+    @BindView(R.id.operation_percent)
+    ImageView mOperationPercent;
+    @BindView(R.id.operation_progress_forward)
+    ImageView mOperationProgressForward;
+    @BindView(R.id.operation_progress_rewind)
+    ImageView mOperationProgressRewind;
+    @BindView(R.id.operation_progress)
+    FrameLayout progressBG;
 
+    GestureDetector detector;
+    Unbinder unbinder;
+    private int mVolume = -1;
+    private AudioManager mAudioManager;
+    private int mMaxVolume;
     private LiveMediaController.PageType mCurrPageType = LiveMediaController.PageType.SHRINK;//当前是横屏还是竖屏
     //是否自动隐藏控制栏
     private boolean mAutoHideController = true;
     private VideoModel mNowPlayVideo;
     private VideoPlayCallbackImpl mVideoPlayCallback;
     private Timer mUpdateTimer;
-    Unbinder unbinder;
     private Handler mHandler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -77,6 +96,8 @@ public class WoVideoPlayer extends RelativeLayout {
             return false;
         }
     });
+
+
     private MediaPlayer.OnPreparedListener mOnPreparedListener = new MediaPlayer.OnPreparedListener() {
         @Override
         public void onPrepared(MediaPlayer mediaPlayer) {
@@ -90,7 +111,7 @@ public class WoVideoPlayer extends RelativeLayout {
 //                    if (what == MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START
 //                            || what == MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING) {
 //                        mProgressBarView.setVisibility(View.GONE);
-                        if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START
+                    if (what == MediaPlayer.MEDIA_INFO_BUFFERING_START
                             || what == MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING) {
                         mProgressBarView.setVisibility(View.GONE);
 //                        setCloseButton(true);
@@ -103,15 +124,17 @@ public class WoVideoPlayer extends RelativeLayout {
 
         }
     };
-    private View.OnTouchListener mOnTouchVideoListener = new OnTouchListener() {
-        @Override
-        public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
-                showOrHideController();
-            }
-            return mCurrPageType == LiveMediaController.PageType.EXPAND;
-        }
-    };
+    //    private View.OnTouchListener mOnTouchVideoListener = new OnTouchListener() {
+//        @Override
+//        public boolean onTouch(View view, MotionEvent motionEvent) {
+//            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+//                showOrHideController();
+//            }else{
+//                detector.onTouchEvent(motionEvent);
+//            }
+//            return mCurrPageType == LiveMediaController.PageType.EXPAND;
+//        }
+//    };
     private MediaPlayer.OnCompletionListener mOnCompletionListener = new MediaPlayer.OnCompletionListener() {
         @Override
         public void onCompletion(MediaPlayer mediaPlayer) {
@@ -191,6 +214,15 @@ public class WoVideoPlayer extends RelativeLayout {
             }
         }
     };
+    /**
+     * 定时隐藏
+     */
+    private Handler mDismissHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            mVolumeBrightnessLayout.setVisibility(View.GONE);
+        }
+    };
 
     public WoVideoPlayer(Context context) {
         super(context);
@@ -206,29 +238,43 @@ public class WoVideoPlayer extends RelativeLayout {
         mVideoPlayCallback = videoPlayCallback;
     }
 
+    /**
+     * 如果在地图页播放视频，请先调用该接口
+     */
+    @SuppressWarnings("unused")
+    public void setSupportPlayOnSurfaceView() {
+        mSuperVideoView.setZOrderMediaOverlay(true);
+    }
+
+    @SuppressWarnings("unused")
+    public WoVideoView getSuperVideoView() {
+        return mSuperVideoView;
+    }
+
     /***
      *
      */
     private void showOrHideController() {
-//        mMediaController.closeAllSwitchList();
-        if (mMediaController.getVisibility() == View.VISIBLE) {
-            Animation animation = AnimationUtils.loadAnimation(mContext,
-                    com.android.tedcoder.wkvideoplayer.R.anim.anim_exit_from_bottom);
-            animation.setAnimationListener(new AnimationImp() {
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    super.onAnimationEnd(animation);
-                    mMediaController.setVisibility(View.GONE);
-                }
-            });
-            mMediaController.startAnimation(animation);
-        } else {
-            mMediaController.setVisibility(View.VISIBLE);
-            mMediaController.clearAnimation();
-            Animation animation = AnimationUtils.loadAnimation(mContext,
-                    com.android.tedcoder.wkvideoplayer.R.anim.anim_enter_from_bottom);
-            mMediaController.startAnimation(animation);
-            resetHideTimer();
+        if (!StringUtils.isNullOrEmpty(mMediaController)) {
+            if (mMediaController.getVisibility() == View.VISIBLE) {
+                Animation animation = AnimationUtils.loadAnimation(mContext,
+                        com.android.tedcoder.wkvideoplayer.R.anim.anim_exit_from_bottom);
+                animation.setAnimationListener(new AnimationImp() {
+                    @Override
+                    public void onAnimationEnd(Animation animation) {
+                        super.onAnimationEnd(animation);
+                        mMediaController.setVisibility(View.GONE);
+                    }
+                });
+                mMediaController.startAnimation(animation);
+            } else {
+                mMediaController.setVisibility(View.VISIBLE);
+                mMediaController.clearAnimation();
+                Animation animation = AnimationUtils.loadAnimation(mContext,
+                        com.android.tedcoder.wkvideoplayer.R.anim.anim_enter_from_bottom);
+                mMediaController.startAnimation(animation);
+                resetHideTimer();
+            }
         }
     }
 
@@ -236,27 +282,129 @@ public class WoVideoPlayer extends RelativeLayout {
      * 更新播放的进度时间
      */
     private void updatePlayTime() {
-        int allTime = (int) mSuperVideoView.getDuration();
-        int playTime = (int) mSuperVideoView.getCurrentPosition();
-        mMediaController.setPlayProgressTxt(playTime, allTime);
+        if (!StringUtils.isNullOrEmpty(mSuperVideoView)) {
+            int allTime = (int) mSuperVideoView.getDuration();
+            int playTime = (int) mSuperVideoView.getCurrentPosition();
+            mMediaController.setPlayProgressTxt(playTime, allTime);
+        }
+
     }
 
     /**
      * 更新播放进度条
      */
     private void updatePlayProgress() {
-        int allTime = (int) mSuperVideoView.getDuration();
-        int playTime = (int) mSuperVideoView.getCurrentPosition();
-        int loadProgress = mSuperVideoView.getBufferPercentage();
-        int progress = playTime * 100 / allTime;
-        mMediaController.setProgressBar(progress, loadProgress);
+        if (!StringUtils.isNullOrEmpty(mSuperVideoView)) {
+            int allTime = (int) mSuperVideoView.getDuration();
+            int playTime = (int) mSuperVideoView.getCurrentPosition();
+            int loadProgress = mSuperVideoView.getBufferPercentage();
+            int progress = playTime * 100 / allTime;
+            mMediaController.setProgressBar(progress, loadProgress);
+        }
+
     }
 
     private void initView(Context context) {
         mContext = context;
         View view = View.inflate(context, R.layout.layout_video_view, this);
-        unbinder= ButterKnife.bind(view);
+        unbinder = ButterKnife.bind(view);
+        mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         initDatas();
+        detector = new GestureDetector(mContext, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                TLog.log("detector_down");
+                return true;
+            }
+
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                showOrHideController();
+                return super.onDoubleTap(e);
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                float mOldX = e1.getX(), mOldY = e1.getY();
+                int y = (int) e2.getRawY();
+                int x = (int) e2.getRawX();
+                int windowWidth = ScreenUtils.getScreenWidth(context);
+                int windowHeight = ScreenUtils.getScreenHeight(context);
+                onVolumeSlide((mOldY - y) / windowHeight);
+                onSeekToChange((mOldX - x) / windowWidth);
+                return super.onScroll(e1, e2, distanceX, distanceY);
+            }
+        });
+
+
+    }
+
+    private void onSeekToChange(float percent) {
+        if (mVolume == -1) {
+            mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            if (mVolume < 0)
+                mVolume = 0;
+            progressBG.setVisibility(View.VISIBLE);
+            // 显示
+//            mOperationBg.setImageResource(R.drawable.video_volumn_bg);
+//            mVolumeBrightnessLayout.setVisibility(View.VISIBLE);
+        }
+        mVolumeBrightnessLayout.setVisibility(View.GONE);
+        long cur_postion = mSuperVideoView.getCurrentPosition();
+        if (percent<=0){
+            mOperationProgressForward.setVisibility(View.VISIBLE);
+
+        }else{
+            mOperationProgressRewind.setVisibility(View.VISIBLE);
+        }
+
+
+        int index = (int) ((int) (percent * mSuperVideoView.getDuration()) + mSuperVideoView.getDuration());
+        if (index > mSuperVideoView.getDuration())
+            index = mMaxVolume;
+        else if (index < 0)
+            index = 0;
+
+        // 变更声音
+//        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0);
+        mSuperVideoView.seekTo(index);
+
+        mMediaController.setPlayProgressTxt((int)mSuperVideoView.getCurrentPosition(),(int)mSuperVideoView.getDuration());
+        // 变更进度条
+//        ViewGroup.LayoutParams lp = mOperationPercent.getLayoutParams();
+//        lp.width = findViewById(R.id.operation_full).getLayoutParams().width * index / mMaxVolume;
+//        mOperationPercent.setLayoutParams(lp);
+    }
+    /**
+     * 滑动改变声音大小
+     *
+     * @param percent
+     */
+    private void onVolumeSlide(float percent) {
+        if (mVolume == -1) {
+            mVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            if (mVolume < 0)
+                mVolume = 0;
+
+            // 显示
+            mOperationBg.setImageResource(R.drawable.video_volumn_bg);
+            mVolumeBrightnessLayout.setVisibility(View.VISIBLE);
+        }
+
+        int index = (int) (percent * mMaxVolume) + mVolume;
+        if (index > mMaxVolume)
+            index = mMaxVolume;
+        else if (index < 0)
+            index = 0;
+
+        // 变更声音
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0);
+
+        // 变更进度条
+        ViewGroup.LayoutParams lp = mOperationPercent.getLayoutParams();
+        lp.width = findViewById(R.id.operation_full).getLayoutParams().width * index / mMaxVolume;
+        mOperationPercent.setLayoutParams(lp);
     }
 
     /**
@@ -322,26 +470,48 @@ public class WoVideoPlayer extends RelativeLayout {
 
     private void initDatas() {
         mMediaController.setMediaControl(mMediaControl);
-        mSuperVideoView.setOnTouchListener(mOnTouchVideoListener);
-        mSuperVideoView.setHardwareDecoder(true);
-        mSuperVideoView.setBufferSize(5*1024*1024);
+        mSuperVideoView.setOnTouchListener(new OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (detector.onTouchEvent(event))
+                    return true;
+                // 处理手势结束
+                switch (event.getAction() & MotionEvent.ACTION_MASK) {
+                    case MotionEvent.ACTION_UP:
+                        endGesture();
+                        break;
+                }
 
+                return detector.onTouchEvent(event);
+            }
+        });
+        mSuperVideoView.setHardwareDecoder(true);
+        mSuperVideoView.setBufferSize(10 * 1024 * 1024);
         back_icon.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCurrPageType==LiveMediaController.PageType.EXPAND){
+                if (mCurrPageType == LiveMediaController.PageType.EXPAND) {
                     // TODO: 16/6/3 退出全屏模式，切换至竖屏模式
-
-                }else{
+                    mVideoPlayCallback.onLanToPor();
+                } else {
                     // TODO: 16/6/3  退出该页面并 清除  播放器 当前缓存，节约内存占用
                     mVideoPlayCallback.onCloseVideo();
-
                 }
             }
         });
     }
 
-    private void alwaysShowController() {
+    /**
+     * 手势结束
+     */
+    private void endGesture() {
+        mVolume = -1;
+        // 隐藏
+        mDismissHandler.removeMessages(0);
+        mDismissHandler.sendEmptyMessageDelayed(0, 500);
+    }
+
+    public void alwaysShowController() {
         mHandler.removeMessages(MSG_HIDE_CONTROLLER);
         mMediaController.setVisibility(View.VISIBLE);
     }
@@ -381,31 +551,10 @@ public class WoVideoPlayer extends RelativeLayout {
         return mAutoHideController;
     }
 
-    public interface VideoPlayCallbackImpl {
-        void onCloseVideo();
-
-        void onSwitchPageType();
-
-        void onPlayFinish();
-    }
-
-    private class AnimationImp implements Animation.AnimationListener {
-
-        @Override
-        public void onAnimationEnd(Animation animation) {
-        }
-        @Override
-        public void onAnimationRepeat(Animation animation) {
-        }
-        @Override
-        public void onAnimationStart(Animation animation) {
-        }
-    }
-
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (unbinder!=null){
+        if (unbinder != null) {
             unbinder.unbind();
         }
     }
@@ -415,7 +564,7 @@ public class WoVideoPlayer extends RelativeLayout {
      */
     public void close() {
         mMediaController.setPlayState(LiveMediaController.PlayState.PAUSE);
-        setPageType(LiveMediaController.PageType.SHRINK);
+//        setPageType(LiveMediaController.PageType.SHRINK);
         stopHideTimer(true);
         stopUpdateTimer();
         mSuperVideoView.pause();
@@ -426,6 +575,39 @@ public class WoVideoPlayer extends RelativeLayout {
     public void setPageType(LiveMediaController.PageType pageType) {
         mMediaController.setPageType(pageType);
         mCurrPageType = pageType;
+    }
+
+    /***
+     * 强制横屏模式
+     */
+    @SuppressWarnings("unused")
+    public void forceLandscapeMode() {
+        mMediaController.forceLandscapeMode();
+    }
+
+    public interface VideoPlayCallbackImpl {
+        void onCloseVideo();
+
+        void onSwitchPageType();
+
+        void onPlayFinish();
+
+        void onLanToPor();
+    }
+
+    private class AnimationImp implements Animation.AnimationListener {
+
+        @Override
+        public void onAnimationEnd(Animation animation) {
+        }
+
+        @Override
+        public void onAnimationRepeat(Animation animation) {
+        }
+
+        @Override
+        public void onAnimationStart(Animation animation) {
+        }
     }
 
 }

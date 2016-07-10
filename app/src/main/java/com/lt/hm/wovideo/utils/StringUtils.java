@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.utils;
 
 import android.content.Context;
+import android.telephony.TelephonyManager;
 import android.text.format.DateUtils;
 
 import java.io.BufferedReader;
@@ -726,6 +727,21 @@ public class StringUtils {
 	}
 
 	/**
+	 * 获取一个月之后的时间
+	 * @param context
+	 * @return
+     */
+	public static String ToMonthDay(Context context) throws ParseException {
+		String cur= getCurrentTime(context);
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+		java.util.Calendar cal = java.util.Calendar.getInstance();
+		cal.setTime(sdf.parse(cur));
+//		cal.add(java.util.Calendar.DATE, -7); // 向前一周；如果需要向后一周，用正数即可
+    	cal.add(java.util.Calendar.MONTH, -1); // 向前一月；如果需要向后一月，用正数即可
+		return sdf.format(cal.getTime());
+	}
+
+	/**
 	 * 读取本地文件中JSON字符串
 	 *
 	 * @param fileName
@@ -854,6 +870,34 @@ public class StringUtils {
 		}
 		TLog.log(result.toString());
 		return result.toString();
+	}
+
+
+	/**
+	 * 是否为联通手机号
+	 *
+	 * @param context
+	 * @return
+	 */
+	public static boolean getOperators(Context context) {
+		TelephonyManager tm = (TelephonyManager) context
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		boolean flag=false;
+		String IMSI = tm.getSubscriberId();
+		if (IMSI == null || IMSI.equals("")) {
+			return false;
+		}
+		if (IMSI.startsWith("46000") || IMSI.startsWith("46002")) {
+//			operator = "中国移动";
+			flag=false;
+		} else if (IMSI.startsWith("46001")) {
+//			operator = "中国联通";
+			flag=true;
+		} else if (IMSI.startsWith("46003")) {
+//			operator = "中国电信";
+			flag=false;
+		}
+		return flag;
 	}
 
 

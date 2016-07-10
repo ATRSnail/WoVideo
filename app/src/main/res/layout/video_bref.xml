@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lt.hm.wovideo.widget.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/bref_string"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        android:padding="10dp"
+        />
+
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        >
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="200dp"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/img_1"
+            android:scaleType="centerCrop"
+            android:id="@+id/movie_bref_img"
+            />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_toRightOf="@id/movie_bref_img"
+            >
+
+                <com.lt.hm.wovideo.widget.CustomListView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/video_bref_intros"
+                    android:divider="@null"
+                    android:layout_gravity="top"
+                    />
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|bottom"
+                android:id="@+id/movie_bref_purch"
+                android:src="@drawable/btn_p_blue"
+                />
+        </FrameLayout>
+
+    </android.support.percent.PercentRelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp"
+        >
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/bref_txt1"
+            android:text="有时候我们会遇到这样的情况，为了让布局显得更为精简，会对大段的文本（一般用于人物介绍等地方）进行折叠，用户点击展开。通常都带有一个小图标，随着折叠展开来进行翻转。这种效果是怎么展现的呢，老规矩，先上效果图。用的是genymotion模拟器，确实快了很多，只是电脑太渣，占用很多内存。"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/bref_txt2"
+            android:text="在这里实现也很简单。直接贴出代码，代码有注释，一看就明白。"
+            android:visibility="gone"
+            />
+
+        <ImageView
+            android:paddingTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_expand"
+            android:layout_gravity="bottom|center"
+            android:id="@+id/bref_expand"
+            />
+    </LinearLayout>
+</com.lt.hm.wovideo.widget.PercentLinearLayout>

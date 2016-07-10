@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016. Just for fun
+  -->
+
+
+<com.lt.hm.wovideo.widget.PercentLinearLayout
+    android:id="@+id/search_head"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="46dp"
+    android:background="@color/white"
+    android:orientation="horizontal"
+    >
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/layout_circle_corner"
+        android:gravity="center_vertical"
+        app:layout_marginBottomPercent="8%"
+
+        app:layout_marginLeftPercent="2%"
+        app:layout_marginRightPercent="2%"
+        app:layout_marginTopPercent="8%"
+        app:layout_widthPercent="80%"
+        >
+
+        <ImageView
+            android:id="@+id/search_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:src="@drawable/icon_search"
+            app:layout_marginLeftPercent="3%"
+            android:visibility="visible"
+            />
+
+        <EditText
+            android:id="@+id/search_edit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/search_icon"
+            android:background="@null"
+            android:imeOptions="actionSearch"
+            android:singleLine="true"
+            android:hint="@string/search_hint"
+            android:textColorHint="@color/font_gray"
+            android:textColor="@color/black"
+            app:layout_marginLeftPercent="1%"
+            />
+    </android.support.percent.PercentRelativeLayout>
+
+    <Button
+        android:id="@+id/search_cancel"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@null"
+        android:text="@string/cancel_string"
+        android:textColor="@color/black"
+        app:layout_marginRightPercent="4%"
+        app:layout_widthPercent="20%"
+        />
+</com.lt.hm.wovideo.widget.PercentLinearLayout>
+

@@ -15,6 +15,7 @@ import java.util.List;
  * @create_date 16/6/6
  */
 public class IntegralAdapter extends BaseQuickAdapter<Integral> {
+
     public IntegralAdapter(Context context, int layoutResId, List<Integral> data) {
         super(context, layoutResId, data);
     }

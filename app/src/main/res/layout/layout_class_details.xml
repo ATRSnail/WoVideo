@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/font_gray"
+    >
+
+    <!--<include layout="@layout/layout_class_details_head"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="@dimen/s_46"-->
+        <!--android:layout_gravity="center_vertical"-->
+        <!--/>-->
+
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/class_details_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/login"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/icon_choosen" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginTop="3dp"
+        >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/white"
+            >
+            <com.lt.hm.wovideo.widget.ViewPagerIndicator
+                android:layout_width="wrap_content"
+                android:layout_weight="0.9"
+                android:layout_height="60dp"
+                android:id="@+id/class_view_indicator"
+                android:background="@color/white"
+                android:orientation="horizontal"
+                app:visible_tab_count="6"
+                android:visibility="gone"
+                />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="0.1"
+                android:layout_height="wrap_content"
+                android:src="@drawable/icon_choosen"
+                android:visibility="gone"
+                android:layout_gravity="right|center_vertical"
+                />
+        </LinearLayout>
+
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/class_view_page"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1.0"
+            />
+    </LinearLayout>
+
+
+</LinearLayout>

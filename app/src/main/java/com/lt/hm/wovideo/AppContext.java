@@ -4,10 +4,10 @@ import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.lt.hm.wovideo.base.BaseApplication;
 import com.zhy.http.okhttp.OkHttpUtils;
-import com.zhy.http.okhttp.log.LoggerInterceptor;
 
 import java.util.concurrent.TimeUnit;
 
+import cn.sharesdk.framework.ShareSDK;
 import okhttp3.OkHttpClient;
 
 /**
@@ -17,7 +17,6 @@ import okhttp3.OkHttpClient;
  */
 public class AppContext extends BaseApplication {
     private static AppContext instance;
-
 
     public static AppContext getInstance() {
         return instance;
@@ -31,16 +30,17 @@ public class AppContext extends BaseApplication {
         _resource = _context.getResources();
         Stetho.initializeWithDefaults(this);
         initNetWork();
-
+        ShareSDK.initSDK(this);
+//        Glide.get(this).register(GlideUrl.class, InputStream.class,
+//                new OkHttpClient.Factory(OkHttpUtils.getInstance()));
     }
 
     private void initNetWork() {
         OkHttpClient okHttpClient= new OkHttpClient.Builder()
                 .connectTimeout(10000L, TimeUnit.MILLISECONDS)
                 .readTimeout(10000L,TimeUnit.MILLISECONDS)
-                .addInterceptor(new LoggerInterceptor("TAG"))
+//                .addInterceptor(new LoggerInterceptor("WoVideo"))
                 .addNetworkInterceptor(new StethoInterceptor())
-
                 .build();
         OkHttpUtils.initClient(okHttpClient);
     }

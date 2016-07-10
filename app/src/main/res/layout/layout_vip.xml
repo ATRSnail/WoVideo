@@ -2,36 +2,47 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/pinned_page_container"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="180dp">
-
-        <com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView
-            android:id="@+id/img_indicator_vip"
-            android:layout_width="match_parent"
-            android:layout_height="180dp" />
-    </FrameLayout>
-    <include layout="@layout/vip_person_layout"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        />
-
+    android:layout_height="match_parent"
+    android:background="@color/font_gray"
+    >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:id="@+id/vip_layout_pinned_bottom"
+        android:background="@color/white"
         >
-        <com.lt.hm.wovideo.widget.ViewPagerIndicator
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/vip_view_indicator"
-            android:background="@color/white"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
             android:orientation="horizontal"
+            >
+        <com.lt.hm.wovideo.widget.ViewPagerIndicator
+            android:layout_width="0dp"
+            android:layout_weight="8.0"
+            android:layout_height="50dp"
+            android:id="@+id/vip_view_indicator"
+            android:orientation="horizontal"
+            android:layout_alignParentLeft="true"
             app:visible_tab_count="4"
             />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/font_gray"/>
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:layout_weight="1.0"
+                android:id="@+id/vip_selector"
+                android:src="@drawable/icon_choosen"
+                />
+        </LinearLayout>
         <android.support.v4.view.ViewPager
             android:id="@+id/vip_view_page"
             android:layout_width="match_parent"
@@ -39,7 +50,5 @@
             android:layout_weight="1.0"
             />
     </LinearLayout>
-
-
 
 </LinearLayout>

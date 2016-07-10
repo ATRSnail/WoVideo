@@ -10,13 +10,19 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.bumptech.glide.Glide;
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.http.HttpUtils;
+import com.lt.hm.wovideo.model.BannerList;
 import com.lt.hm.wovideo.utils.StringUtils;
 
 import java.lang.ref.WeakReference;
@@ -34,6 +40,7 @@ public class ImageIndicatorView extends RelativeLayout {
 	 * user guide anchor
 	 */
 	public static final int INDICATE_USERGUIDE_STYLE = 1;
+	private Context mContext;
 	/**
 	 * ViewPager
 	 */
@@ -94,6 +101,7 @@ public class ImageIndicatorView extends RelativeLayout {
 		this.viewPager.addOnPageChangeListener(new PageChangeListener());
 
 		this.refreshHandler = new ScrollIndicateHandler(ImageIndicatorView.this);
+		this.mContext= context;
 	}
 
 	/**
@@ -174,31 +182,38 @@ public class ImageIndicatorView extends RelativeLayout {
 	}
 
 	/**
-	 * 设置显示 网络图片，使用ImageLoader 加载网络图片，需要提前配置ImageLoader
+	 * 设置显示 网络图片，使用Glide
 	 */
-//	@TargetApi(Build.VERSION_CODES.KITKAT)
-//	public void setupLayoutByURL(final List<Event> urllist) {
-//		if (urllist == null)
-//			throw new NullPointerException();
-//		final int len = urllist.size();
-//		if (this.viewList.size() > 0) {
-//			this.viewList.clear();
-//		}
-//		if (this.indicateLayout.getChildCount() > 0) {
-//			this.indicateLayout.removeAllViews();
-//		}
-//		if (len > 0) {
-//			for (int i = 0; i < len; i++) {
-//				final ImageView pageItem = new ImageView(getContext());
-//				ImageLoader.getInstance().displayImage(
-//						Constants.getHMURL(urllist.get(i).getActImg()), pageItem,
-//						AppConfig.getOptions(R.drawable.default_circle));
-//				pageItem.setScaleType(ImageView.ScaleType.FIT_XY);
-//
-//				addViewItem(pageItem);
-//			}
-//		}
-//	}
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	public void setupLayoutByURL(final List<BannerList.Banner> urllist) {
+		if (urllist == null)
+			throw new NullPointerException();
+		final int len = urllist.size();
+		if (this.viewList.size() > 0) {
+			this.viewList.clear();
+		}
+		if (this.indicateLayout.getChildCount() > 0) {
+			this.indicateLayout.removeAllViews();
+		}
+		if (len > 0) {
+			for (int i = 0; i < len; i++) {
+				FrameLayout frameLayout= new FrameLayout(getContext());
+
+				final ImageView pageItem = new ImageView(getContext());
+				Glide.with(mContext).load(HttpUtils.appendUrl(urllist.get(i).getImg())).crossFade().into(pageItem);
+				pageItem.setScaleType(ImageView.ScaleType.CENTER_CROP);
+				frameLayout.addView(pageItem);
+				if (urllist.get(i).getIsvip().equals("1")){
+					ImageView view= new ImageView(getContext());
+					view.setImageResource(R.drawable.icon_v_vip);
+					LinearLayout.LayoutParams params =new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+					params.gravity= Gravity.RIGHT;
+					frameLayout.addView(view,params);
+				}
+				addViewItem(frameLayout);
+			}
+		}
+	}
 
 	/**
 	 * set show item current

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/media_controller_view_height"
+        android:background="@drawable/biz_video_bar_bg"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_play"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/controller_start"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:id="@+id/controller_cur_position"
+            android:text="00:00"
+            android:layout_marginLeft="10dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/controller_start"
+            />
+
+        <RelativeLayout
+            android:id="@+id/controller_expand_layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp"
+            >
+
+            <ImageView
+                android:id="@+id/controller_expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_media_fullscreen_stretch"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/controller_shink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_media_fullscreen_shrink"
+                android:visibility="visible"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/controller_total_duration"
+            android:text="00:00"
+            android:textColor="@color/white"
+            android:layout_marginRight="10dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/controller_expand_layout"
+            />
+        <SeekBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:id="@+id/controller_seekbar"
+            android:layout_toRightOf="@id/controller_cur_position"
+            android:layout_toLeftOf="@id/controller_total_duration"
+            android:thumb="@drawable/biz_video_progress_thumb"
+            android:thumbOffset="1.5dip"
+            android:progressDrawable="@drawable/biz_video_progressbar"
+            />
+
+
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>

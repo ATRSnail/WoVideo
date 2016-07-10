@@ -58,7 +58,9 @@ public class ViewPagerIndicator extends LinearLayout {
 
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true); // 抗锯齿
-		mPaint.setColor(context.getResources().getColor(R.color.tab_text_selected));
+		// TODO: 16/6/8 修改 选中时的 颜色
+//		mPaint.setColor(context.getResources().getColor(R.color.tab_text_selected));
+		mPaint.setColor(context.getResources().getColor(R.color.nav_text_selected));
 		mPaint.setStyle(Paint.Style.FILL);
 		mPaint.setPathEffect(new CornerPathEffect(3));
 

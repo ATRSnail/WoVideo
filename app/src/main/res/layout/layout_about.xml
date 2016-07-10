@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lt.hm.wovideo.widget.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+<com.lt.hm.wovideo.widget.SecondTopbar
+    android:id="@+id/about_topbar"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/s_46"
+    app:CustomtitleTextColor="@color/black"
+    app:CustomtitleTextSize="@dimen/f_16"
+    app:Customtoptitle="@string/about"
+    app:leftBackGround="@drawable/left_arrow"
+    app:rightBackGround="@drawable/left_arrow"
+    />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="15dp"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/top_logo"/>
+
+        <TextView
+            android:id="@+id/version_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="版本编号"
+            android:textColor="@color/font_gray"
+            android:textSize="@dimen/f_16"/>
+
+        <RelativeLayout
+            android:id="@+id/check_version"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="50dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/version_hint"
+                android:textSize="@dimen/f_16"
+                />
+
+            <TextView
+                android:id="@+id/version_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="center_vertical"
+                android:text="已是最新版"
+                android:textColor="@color/font_gray"
+
+                android:textSize="@dimen/f_16"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/about_phone"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginTop="1dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/service_number"
+                android:textSize="@dimen/f_16"
+
+                />
+
+            <TextView
+                android:id="@+id/about_phone_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:gravity="center_vertical"
+                android:text="400-964-0600"
+                android:textColor="@color/font_gray"
+
+                android:textSize="@dimen/f_16"/>
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+
+            android:layout_gravity="center_horizontal"
+            android:gravity="bottom"
+            android:text="@string/about_bottom_hint"
+            android:layout_marginBottom="3dp"
+            />
+
+    </LinearLayout>
+
+
+</com.lt.hm.wovideo.widget.PercentLinearLayout>

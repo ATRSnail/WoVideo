@@ -1,62 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.lt.hm.wovideo.widget.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:scrollbars="none"
+    android:descendantFocusability="afterDescendants"
     >
+        <include layout="@layout/layout_choice_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
 
-
-     <FrameLayout
+     <android.support.percent.PercentFrameLayout
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:orientation="vertical"
          >
          <!--<include layout="@layout/layout_topbar" />-->
-         <android.support.design.widget.FloatingActionButton
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_gravity="bottom|right"
-             android:src="@drawable/icon_person"
-             />
          <android.support.v4.widget.SwipeRefreshLayout
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:layout_alignParentTop="true"
+             android:id="@+id/refresh_choice"
              >
              <ScrollView
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
                  android:scrollbars="none"
                  android:fillViewport="true">
-             <LinearLayout
+             <com.lt.hm.wovideo.widget.PercentLinearLayout
                  android:layout_width="match_parent"
                  android:layout_height="wrap_content"
                  android:orientation="vertical"
                  >
 
-                 <FrameLayout
+                 <android.support.percent.PercentFrameLayout
                      android:layout_width="match_parent"
-                     android:layout_height="180dp">
+                     android:layout_height="180dp"
+                     >
 
                      <com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView
                          android:id="@+id/img_indicator"
                          android:layout_width="match_parent"
                          android:layout_height="180dp" />
 
-                     <include
-                         layout="@layout/layout_search"
-                         android:layout_width="match_parent"
+                     <ImageView
+                         android:layout_width="wrap_content"
                          android:layout_height="wrap_content"
-                         android:layout_gravity="bottom|center" />
-                 </FrameLayout>
+                         android:src="@drawable/img_search"
+                         android:id="@+id/home_search_img"
+                         android:visibility="gone"
+                         android:layout_gravity="bottom|center"
+                         android:paddingBottom="10dp"
+                         />
 
-                 <FrameLayout
+                     <!--<include-->
+                         <!--layout="@layout/layout_search"-->
+                         <!--android:layout_width="match_parent"-->
+                         <!--android:layout_height="wrap_content"-->
+                         <!--android:layout_gravity="bottom|center" />-->
+                 </android.support.percent.PercentFrameLayout>
+
+                 <android.support.percent.PercentFrameLayout
                      android:layout_width="match_parent"
-                     android:layout_height="180dp"
+                     android:layout_height="220dp"
                      android:clipChildren="false"
+                     android:paddingTop="10dp"
+                     android:paddingBottom="10dp"
+                     android:layerType="software"
                      android:layout_centerInParent="true"
-                     android:background="@color/white"
+                     android:background="@color/font_gray"
                      >
                      <android.support.v4.view.ViewPager
                          android:id="@+id/id_viewpager"
@@ -64,22 +78,37 @@
                          android:clipChildren="false"
                          android:layout_marginTop="5dp"
                          android:layout_marginBottom="5dp"
-                         android:layout_height="180dp"
+                         android:layout_height="200dp"
                          android:layout_gravity="center"
                          >
                      </android.support.v4.view.ViewPager>
 
-                 </FrameLayout>
+                 </android.support.percent.PercentFrameLayout>
                  <include layout="@layout/home_bottom"
                      android:layout_width="match_parent"
                      android:layout_height="wrap_content"
                      />
-             </LinearLayout>
+             </com.lt.hm.wovideo.widget.PercentLinearLayout>
              </ScrollView>
 
          </android.support.v4.widget.SwipeRefreshLayout>
 
-     </FrameLayout>
+         <android.support.design.widget.FloatingActionButton
+             android:id="@+id/float_button"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_marginBottom="10dp"
+             android:layout_marginRight="10dp"
+             android:layout_gravity="bottom|right"
+             android:src="@drawable/icon_float_action_button"
+             app:backgroundTint="@color/float_button_color"
+             app:rippleColor="#33728dff"
+             app:elevation="6dp"
+             android:visibility="gone"
+             app:pressedTranslationZ="12dp"
+             app:borderWidth="0dp"
+             />
+     </android.support.percent.PercentFrameLayout>
 
 
-</LinearLayout>
+</com.lt.hm.wovideo.widget.PercentLinearLayout>

@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:id="@+id/person_head_bg"
-    android:background="@android:color/holo_blue_dark"
-    >
+    android:background="@drawable/bg_person_center">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@mipmap/ic_launcher"
+            android:id="@+id/btn_person_back"
+            android:padding="15dp"
+            android:src="@drawable/left_arrow"
+            />
+
+        <ImageView
+            android:id="@+id/btn_set"
+            android:layout_alignTop="@id/btn_person_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_set"
+            android:padding="15dp"
             android:layout_alignParentRight="true"
             />
     </RelativeLayout>
@@ -19,37 +32,49 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:gravity="left|center_vertical"
+        android:paddingLeft="40dp"
         >
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
             >
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@mipmap/ic_launcher"
+            <com.lt.hm.wovideo.widget.CircleImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/icon_head"
+                android:layout_alignParentLeft="true"
                 android:id="@+id/head_icon"
+                app:border_width="1dp"
+                app:border_color="@color/white"
                 />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="20dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="20dp"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/head_icon"
+                android:id="@+id/unlogin_layout"
                 >
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/login_tag"
+                    android:textColor="@color/white"
                     android:text="@string/login"
                     />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:textColor="@color/white"
                     android:text="/"
                     />
 
@@ -57,11 +82,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/regist_tag"
+                    android:textColor="@color/white"
                     android:text="@string/regist"
                     />
             </LinearLayout>
 
-        </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_centerInParent="true"
+                android:layout_centerVertical="true"
+                android:id="@+id/login_layout"
+                android:paddingLeft="20dp"
+                android:layout_toRightOf="@id/head_icon"
+                android:visibility="gone"
+                >
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:text="用户名"
+                    android:id="@+id/pc_username"
+                    />
+            </LinearLayout>
+
+
+        </RelativeLayout>
     </RelativeLayout>
 
 

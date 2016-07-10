@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/person_info_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/person_info_top"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/left_arrow" />
+
+
+    <com.lt.hm.wovideo.widget.PercentLinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/p_info_logo_layout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+
+            <TextView
+                style="@style/person_menu_text"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="20dp"
+                android:text="@string/p_logo" />
+
+            <com.lt.hm.wovideo.widget.CircleImageView
+                android:id="@+id/p_info_logo"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentRight="true"
+                android:paddingLeft="15dp"
+                android:paddingRight="20dp"
+                android:layout_centerVertical="true"
+                android:src="@drawable/icon_plogo"
+                app:border_color="@color/white"
+                app:border_width="2dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/nick_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                style="@style/person_menu_text"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="20dp"
+                android:text="@string/nick_name" />
+
+            <ImageView
+                android:id="@+id/nick_name_arrow"
+                style="@style/set_menu_img" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/nick_name_arrow"
+                android:text="doudou"
+                android:layout_centerVertical="true"
+                android:textColor="@color/font_gray" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/sex_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                style="@style/person_menu_text"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="20dp"
+                android:text="@string/sex_string" />
+
+            <ImageView
+                android:id="@+id/sex_arrow"
+                style="@style/set_menu_img" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/sex_arrow"
+                android:text="@string/male"
+                android:layout_centerVertical="true"
+                android:textColor="@color/font_gray" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/email_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                style="@style/person_menu_text"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="20dp"
+                android:text="@string/email_string" />
+
+            <ImageView
+                android:id="@+id/email_arrow"
+                style="@style/set_menu_img" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toLeftOf="@id/email_arrow"
+                android:text="@string/unbind_email"
+                android:layout_centerVertical="true"
+                android:textColor="@color/font_gray" />
+        </RelativeLayout>
+
+
+        <RelativeLayout
+            android:id="@+id/modify_pwd"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <TextView
+                style="@style/person_menu_text"
+                android:layout_alignParentLeft="true"
+                android:paddingLeft="20dp"
+                android:text="@string/modify_pwd" />
+
+            <ImageView style="@style/set_menu_img" />
+
+        </RelativeLayout>
+
+
+    </com.lt.hm.wovideo.widget.PercentLinearLayout>
+
+
+</LinearLayout>

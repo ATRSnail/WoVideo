@@ -62,7 +62,7 @@ public class LiveMediaController extends MediaController implements SeekBar.OnSe
 
     private void initViews(Context context) {
         mContext = context;
-      View view =   View.inflate(context, R.layout.layout_video_controller, this);
+        View view =   View.inflate(context, R.layout.layout_video_controller, this);
         unbinder = ButterKnife.bind(view);
         initEvents();
 
@@ -89,21 +89,25 @@ public class LiveMediaController extends MediaController implements SeekBar.OnSe
         mShrinkImg.setVisibility(pageType.equals(PageType.SHRINK) ? GONE : VISIBLE);
     }
 
+
+
+
+
+
+
+
     @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser)
             mMediaControl.onProgressTurn(ProgressState.DOING, progress);
     }
-
-
     @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
         mMediaControl.onProgressTurn(ProgressState.START, 0);
     }
-
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
-        mMediaControl.onProgressTurn(ProgressState.STOP, 0);
+        mMediaControl.onProgressTurn(ProgressState.STOP, seekBar.getProgress());
     }
 
     @Override
@@ -145,9 +149,13 @@ public class LiveMediaController extends MediaController implements SeekBar.OnSe
 
     public void playFinish(int allTime) {
         mProgressSeekBar.setProgress(0);
+//        setPlayProgressTxt(0, 0);
         setPlayProgressTxt(0, allTime);
         setPlayState(PlayState.PAUSE);
+//        setPlayState(PlayState.PLAY);
     }
+
+
     /**
      * 播放样式 展开、缩放
      */
@@ -183,5 +191,13 @@ public class LiveMediaController extends MediaController implements SeekBar.OnSe
         if (unbinder!=null){
             unbinder.unbind();
         }
+    }
+
+    /***
+     * 强制横屏模式
+     */
+    public void forceLandscapeMode(){
+        mExpandImg.setVisibility(INVISIBLE);
+        mShrinkImg.setVisibility(INVISIBLE);
     }
 }

@@ -67,6 +67,11 @@ public class VideoPage extends BaseActivity{
         public void onPlayFinish() {
             // TODO: 16/6/3 添加 显示 信息／电视剧 可能需要 自动播放下一集
         }
+
+        @Override
+        public void onLanToPor() {
+
+        }
     };
 
     @Override
@@ -78,7 +83,7 @@ public class VideoPage extends BaseActivity{
         VideoModel video = new VideoModel();
         VideoUrl videoUrl= new VideoUrl();
 //        videoUrl.setFormatUrl("http://111.206.133.53:9910/if5ax/live/live_nsn/index.m3u8?vkey=4E36E4353070E6ECC78CADC43354B1DEFE83B110106A2&vid=Z-2oTN5kQ9ad_cJINnfZmA&apptype=web&pid=8031006300&portalid=319&preview=1&spid=21170&spip=111.206.133.39&spport=9910&tag=12&userid=18510509670&userip=61.148.116.190&videoname=abc&tradeid=ba0f7e78399aafaa0e00a6e61e67ed9c&lsttm=20160603154606&enkey=8e1bcc174918850a01e353eef012f642");
-        videoUrl.setFormatUrl("http://111.206.133.53:9910/if5ax/video/wovideo/sp1/sp1.m3u8?vkey=4E36E4353070E6ECC78CADC43354B1DEFE83B110106A2&vid=Z-2oTN5kQ9ad_cJINnfZmA&apptype=web&pid=8031006300&portalid=319&preview=1&spid=21170&spip=111.206.133.39&spport=9910&tag=12&userid=18510509670&userip=61.148.116.190&videoname=abc&tradeid=aa13c96eb5f4a34c13a7252babf0f031&lsttm=20160603192655&enkey=e74bf8741443e61372294e600edd3773");
+        videoUrl.setFormatUrl("http://111.206.133.53:9910/if5ax/video/wovideo/sp1/sp1.m3u8?vkey=4E36E4353070E6ECC78CADC43354B1DEFE83B110106A2&vid=Z-2oTN5kQ9ad_cJINnfZmA&apptype=web&pid=8031006300&portalid=319&preview=1&spid=21170&spip=111.206.133.39&spport=9910&tag=12&userid=18510509670&userip=61.148.116.190&videoname=abc&tradeid=c01d4b4613eaf67a30eefd42851e4246&lsttm=20160613221935&enkey=d087cd3c40028067d46dba116978c93b");
 //        videoUrl.setFormatUrl("http://42.81.5.133/v.cctv.com/flash/mp4video6/TMS/2011/01/05/cf752b1c12ce452b3040cab2f90bc265_h264818000nero_aac32-1.mp4?wshc_tag=0&wsts_tag=57513d2a&wsid_tag=6a02e926&wsiphost=ipdbm");
         video.setmPlayUrl(videoUrl);
         videoView.setVideoPlayCallback(mVideoPlayCallback);

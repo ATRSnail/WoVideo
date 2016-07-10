@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:pv="http://schemas.android.com/apk/res-auto"
+    xmlns:tc="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/ad_img"
+        android:scaleType="fitXY"
+        />
+
+    <!--显示 圆形进度-->
+    <!--<com.lt.hm.wovideo.widget.RoundProgressBar-->
+        <!--android:id="@+id/round_progress"-->
+        <!--android:layout_width="50dp"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:layout_gravity="right"-->
+        <!--tc:circleColor="@android:color/holo_blue_light"-->
+        <!--tc:radius="17dp"-->
+        <!--android:visibility="gone"-->
+        <!--android:layout_margin="10dp"-->
+        <!--tc:ringColor="@android:color/holo_blue_light"-->
+        <!--tc:strokeWidth="3dp"/>-->
+    <TextView
+        android:layout_width="60dp"
+        android:layout_height="30dp"
+        android:textSize="@dimen/sp_12"
+        android:layout_margin="10dp"
+        android:id="@+id/count_time_text"
+        android:layout_gravity="right"
+        android:text="跳过3s"
+        android:gravity="center"
+        android:background="@color/gray_darker"
+        android:textColor="@color/white"
+        />
+
+</FrameLayout>

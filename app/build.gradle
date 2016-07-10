@@ -19,9 +19,25 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    retrolambda {
+        // 官方建議使用環境變數，不過我這邊路經都回傳 null
+        //jdk System.getenv("JAVA8_HOME")
+        //oldJdk System.getenv("JAVA6_HOME")
+        //下列是我 mac java7 及 java8 的相對路徑
+//        jdk '/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home'
+//        oldJdk '/Library/Java/JavaVirtualMachines/jdk1.7.0_15.jdk/Contents/Home'
+        javaVersion JavaVersion.VERSION_1_7
+        jvmArgs '-noverify'
+        defaultMethods false
+        incremental true
+    }
     compileOptions {
         targetCompatibility 1.8
         sourceCompatibility 1.8
+    }
+    lintOptions{
+        abortOnError false
     }
 }
 
@@ -36,13 +52,17 @@ dependencies {
     compile project(':vitamio')
     compile 'com.huxq17.xrefreshview:xrefreshview:2.1.9'
     compile 'com.android.support:percent:23.2.0'
-    compile 'com.zhy:okhttputils:2.5.2'
+    compile 'com.zhy:okhttputils:2.6.1'
     compile 'com.facebook.stetho:stetho:1.3.1'
     compile 'com.facebook.stetho:stetho-okhttp3:1.3.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile project(':wkvideoplayer')
-    // base recycler
     compile 'com.android.support:recyclerview-v7:23.2.0'
     compile 'com.github.CymChad:BaseRecyclerViewAdapterHelper:v1.5.3'
-
+    compile 'cn.pedant.sweetalert:library:1.3'
+    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'org.greenrobot:eventbus:3.0.0'
+    compile files('libs/zxing.jar')
+    compile project(':share_sdk')
+    compile project(path: ':library')
 }

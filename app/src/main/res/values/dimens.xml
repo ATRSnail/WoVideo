@@ -9,4 +9,13 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
+    <dimen name="divider_width">1dp</dimen>
+    <dimen name="btn_back_margin">10dp</dimen>
+    <dimen name="s_46">46dp</dimen>
+    <dimen name="f_16">16sp</dimen>
+    <dimen name="s_200">200dp</dimen>
+    <dimen name="s_180">180dp</dimen>
+    <dimen name="s_20">20dp</dimen>
+    <dimen name="s_10">10dp</dimen>
+    <dimen name="s_1">1dp</dimen>
 </resources>

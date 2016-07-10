@@ -3,14 +3,15 @@
     android:id="@+id/video_inner_container"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:layout_gravity="fill"
     android:background="@android:color/black">
     <com.lt.hm.wovideo.video.WoVideoView
         android:id="@+id/video_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"/>
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        />
 
     <RelativeLayout
         android:id="@+id/rel_dlna_root_layout"
@@ -76,16 +77,18 @@
     </FrameLayout>
     <FrameLayout
         android:id="@+id/video_back_icon"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:padding="10dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true">
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:src="@android:drawable/ic_delete"/>
+            android:src="@drawable/icon_back"/>
     </FrameLayout>
 
     <FrameLayout
@@ -93,6 +96,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
+        android:visibility="gone"
         android:layout_alignParentTop="true">
 
         <TextView
@@ -103,35 +107,121 @@
             android:text="广告计时文字"
             />
     </FrameLayout>
+
     <FrameLayout
-        android:id="@+id/video_close_view"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:visibility="gone"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true">
+        android:id="@+id/operation_volume_brightness"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="#00000000"
+        android:orientation="horizontal"
+        android:padding="0dip"
+        android:visibility="invisible" >
 
         <ImageView
+            android:id="@+id/operation_bg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/biz_news_list_ad_video_close_btn"/>
+            android:src="@drawable/video_volumn_bg" />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:paddingBottom="25dip" >
+
+            <ImageView
+                android:id="@+id/operation_full"
+                android:layout_width="94dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:src="@drawable/video_num_bg" />
+
+            <ImageView
+                android:id="@+id/operation_percent"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:scaleType="matrix"
+                android:src="@drawable/video_num_front" />
+        </FrameLayout>
     </FrameLayout>
 
+
     <FrameLayout
-        android:id="@+id/video_share_tv_view"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentTop="true"
-        android:layout_toLeftOf="@id/video_close_view"
-        android:visibility="gone">
+        android:id="@+id/operation_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:background="#00000000"
+        android:orientation="horizontal"
+        android:padding="0dip"
+        android:visibility="invisible" >
 
         <ImageView
+            android:id="@+id/progress_bg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:src="@drawable/icon_tv_small"/>
+            />
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|center_horizontal"
+            android:paddingBottom="25dip" >
+
+            <ImageView
+                android:id="@+id/operation_progress_forward"
+                android:layout_width="94dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:src="@drawable/icon_forward"
+                />
+
+            <ImageView
+                android:id="@+id/operation_progress_rewind"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:scaleType="matrix"
+                android:src="@drawable/icon_rewind" />
+        </FrameLayout>
     </FrameLayout>
+
+    <!--<FrameLayout-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content">-->
+
+        <!--<RelativeLayout-->
+            <!--android:id="@+id/gesture_progress_layout"-->
+            <!--android:layout_width="120dip"-->
+            <!--android:layout_height="80dip"-->
+            <!--android:layout_centerInParent="true"-->
+            <!--android:background="@drawable/souhu_player_gesture_bg"-->
+            <!--android:gravity="center"-->
+            <!--android:visibility="invisible" >-->
+
+            <!--<ImageView-->
+                <!--android:id="@+id/gesture_iv_progress"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_centerHorizontal="true"-->
+                <!--android:src="@drawable/souhu_player_backward" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/geture_tv_progress_time"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_below="@id/gesture_iv_progress"-->
+                <!--android:layout_centerHorizontal="true"-->
+                <!--android:gravity="right"-->
+                <!--android:text="00:35/24:89"-->
+                <!--android:textColor="#ffececec" />-->
+        <!--</RelativeLayout>-->
+    <!--</FrameLayout>-->
+
 
 
 </RelativeLayout>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:id="@+id/choice_top_main">
+
+    <ImageView android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/logo"
+        android:padding="10dp"
+        android:src="@drawable/top_logo"
+        android:layout_alignTop="@+id/person_center"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        app:layout_widthPercent="60%"
+        android:layout_height="0dp"
+        app:layout_heightPercent="5%"
+        android:orientation="horizontal"
+        android:id="@+id/choice_search_layout"
+        android:background="@drawable/circle_linear_back"
+        android:gravity="center"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_toRightOf="@+id/logo"
+        android:layout_toLeftOf="@id/person_center"
+        android:layout_toEndOf="@+id/logo">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/icon_search"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/plz_search_hint"
+            />
+    </LinearLayout>
+
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/qr_scan"
+        android:padding="10dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/icon_scan"
+        android:layout_alignParentRight="true"
+        />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/person_center"
+        android:padding="10dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/person_selecter"
+        android:layout_toLeftOf="@id/qr_scan"
+        />
+</android.support.percent.PercentRelativeLayout>

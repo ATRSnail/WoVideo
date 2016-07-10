@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <include layout="@layout/second_head"/>
+    <!--<include layout="@layout/second_head"/>-->
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/integral_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/my_integral"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/left_arrow" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -11,7 +22,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/img_4"
+            android:src="@drawable/bg_integral"
             />
         <LinearLayout
             android:layout_width="wrap_content"
@@ -22,37 +33,59 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="积分数"
+                android:text="80"
+                android:gravity="center"
+                android:textSize="60sp"
+                android:textColor="@color/white"
                 android:id="@+id/mine_integral"
                 />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="当前积分"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:textColor="@color/white"
                 />
         </LinearLayout>
 
-        <Button
+        <FrameLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/icon_tv"
-            android:text="积分规则"
             android:layout_gravity="right|top"
             android:id="@+id/integral_rules"
-            />
+            android:layout_marginTop="10dp"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bg_integral_rule"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center"
+                android:paddingRight="6dip"
+                android:textColor="@android:color/holo_blue_bright"
+                android:text="积分规则"
+                />
+        </FrameLayout>
+
     </FrameLayout>
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="收支明细"
+        android:background="@color/white"
         />
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1.0"
+        android:background="@color/white"
         android:id="@+id/integral_list"
         />
-
-
 </LinearLayout>

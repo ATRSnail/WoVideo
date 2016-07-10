@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
-            android:src="@drawable/biz_video_play"/>
+            android:src="@drawable/ic_media_play"/>
 
         <RelativeLayout
             android:id="@+id/click_layout"
@@ -65,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/biz_video_expand"
+                android:src="@drawable/ic_media_fullscreen_stretch"
                 android:visibility="gone"/>
 
             <ImageView
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center_vertical"
-                android:src="@drawable/biz_video_shrink"
+                android:src="@drawable/ic_media_fullscreen_shrink"
                 android:visibility="visible"/>
         </RelativeLayout>
 

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lt.hm.wovideo.widget.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/login_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/login"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/left_arrow" />
+
+    <android.support.percent.PercentRelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp">
+
+        <android.support.percent.PercentRelativeLayout
+            android:id="@+id/login_account_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/white"
+            android:gravity="left|center_vertical"
+            android:padding="15dp"
+            app:layout_heightPercent="10%">
+
+            <ImageView
+                android:id="@+id/login_person_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingRight="20dp"
+                android:src="@drawable/icon_account" />
+
+            <EditText
+                android:id="@+id/et_login_account"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@id/login_person_icon"
+                android:background="@null"
+                android:hint="@string/hint_login_account" />
+        </android.support.percent.PercentRelativeLayout>
+
+        <View
+            android:id="@+id/divider_layout"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@id/login_account_layout"
+            android:background="@android:color/darker_gray" />
+
+
+        <android.support.percent.PercentRelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/divider_layout"
+            android:background="@color/white"
+            android:gravity="left|center_vertical"
+            android:padding="15dp"
+            app:layout_heightPercent="10%">
+
+            <ImageView
+                android:id="@+id/login_pwd_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingRight="20dp"
+                android:src="@drawable/icon_pwd" />
+
+            <EditText
+                android:id="@+id/et_login_pwd"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_toRightOf="@id/login_pwd_icon"
+                android:background="@null"
+                android:hint="@string/hint_login_pwd"
+                android:inputType="textPassword" />
+        </android.support.percent.PercentRelativeLayout>
+    </android.support.percent.PercentRelativeLayout>
+
+    <Button
+        android:id="@+id/btn_login_submit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:background="@drawable/login_selector" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <TextView
+            android:id="@+id/tv_login_forget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/forget_pwd"
+            android:textColor="@color/blue_btn_bg_color" />
+
+        <TextView
+            android:id="@+id/tv_login_regist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="@string/regist_account"
+            android:textColor="@color/blue_btn_bg_color" />
+
+
+    </RelativeLayout>
+
+
+</com.lt.hm.wovideo.widget.PercentLinearLayout>

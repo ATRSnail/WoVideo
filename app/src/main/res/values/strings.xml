@@ -16,7 +16,7 @@
     <!-- Tab String-->
     <string name="choice_string">推荐</string>
     <string name="classes_string">分类</string>
-    <string name="vip_string">VIP分区</string>
+    <string name="vip_string">VIP会员</string>
     <string name="event_string">活动</string>
     <string name="title_activity_main">MainActivity</string>
 
@@ -32,5 +32,84 @@
     <string name="login">登录</string>
     <string name="regist">注册</string>
     <string name="search_hint">请输入搜索内容</string>
+    <string name="collect">收藏</string>
+
+    <!--开通vip-->
+    <string name="open_vip">开通VIP</string>
+    <string name="username">帐号:189****2323</string>
+    <string name="validity">有效期:2016-08-01</string>
+    <string name="day_of_vip">订购沃视频会员</string>
+    <string name="price">￥8.00/月</string>
+    <string name="buying">购买</string>
+    <string name="abort_service">终止服务</string>
+    <!-- 活动-->
+    <string name="tv_name">会员免费抢流量</string>
+    <string name="tv_time">2016-06-11-2016-06-11</string>
+    <!--关于 -->
+    <string name="about">关于</string>
+    <string name="service_number">400-009-090</string>
+    <string name="version_hint">版本号</string>
+    <!--设置-->
+    <string name="set_top">设置</string>
+    <string name="skin_manager">皮肤管理</string>
+    <string name="clean_cache">清除缓存</string>
+    <string name="opinion_reback">意见反馈</string>
+    <string name="about_us">关于我们</string>
+    <string name="logout">退出登录</string>
+    <string name="about_bottom_hint">联通公司版权所有@ 1998-2006</string>
+    <string name="share">分享</string>
+    <string name="projection">投屏</string>
+    <string name="anthology">选集</string>
+    <string name="recommend">推荐</string>
+    <string name="movie">电影</string>
+    <string name="sport">体育</string>
+    <string name="live">直播</string>
+    <string name="teleplay">电视剧</string>
+    <string name="variety">综艺</string>
+    <string name="hint_login_account">请输入您的手机号</string>
+    <string name="forget_pwd">忘记密码</string>
+    <string name="regist_account">注册账号</string>
+    <string name="hint_login_pwd">请输入密码</string>
+    <string name="hint_regist_validate">验证码</string>
+    <string name="get_validate">获取验证码</string>
+    <string name="hint_regist_pwd_t">重复密码</string>
+    <string name="regist_bottom_hint">注册即视为同意</string>
+    <string name="regist_protocal_name">App用户协议</string>
+    <string name="p_logo" >头像</string>
+    <string name="nick_name">昵称</string>
+    <string name="sex_string">性别</string>
+    <string name="male">男</string>
+    <string name="email_string">邮箱</string>
+    <string name="unbind_email">暂未绑定邮箱</string>
+    <string name="modify_pwd">修改密码</string>
+    <string name="person_info_top">个人信息</string>
+    <string name="recallback_hint">我们的进步离不开您的每一个建议，期待您的声音。</string>
+    <string name="callback_count_hint">0/200</string>
+    <string name="callback_contact_way">请输入您的手机/QQ/邮箱，方便我们联系你</string>
+    <string name="bref_string">简介</string>
+    <string name="director">导演:</string>
+    <string name="program_string">节目单</string>
+    <string name="program">频道</string>
+
+    <string name="scan_text">将二维码放入框内, 即可自动扫描</string>
+    <string name="cancel_string">取消</string>
+    <string name="all_string">全部</string>
+    <string name="search_result_string">搜索结果</string>
+    <string name="type_string">类型</string>
+
+    <!--Video 相关-->
+    <string name="storage_permission_denied">存储读取权限被拒绝</string>
+
+    <string name="lockscreen_transport_play_description">Play</string>
+    <string name="lockscreen_transport_pause_description">Pause</string>
+    <string name="description">description</string>
+    <string name="had_account_str">已有账号</string>
+    <string name="hint_regist_pwd">密码 (4-16位)</string>
+    <string name="localTv">地方台</string>
+    <string name="sinatv">卫视</string>
+    <string name="cctv">央视</string>
+    <string name="other_string">其他</string>
+    <string name="unlogin_hint">尚未登录</string>
+    <string name="plz_search_hint">请输入搜索内容</string>
 
 </resources>

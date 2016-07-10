@@ -10,6 +10,9 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:screenOrientation">portrait</item>
+        <item name="android:listDivider">@drawable/divider_bg</item>
+        <item name="android:windowAnimationStyle">@style/activityAnimation</item>
+
     </style>
 
 
@@ -54,5 +57,59 @@
         <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="set_menu_img">
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">20dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerInParent">true</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:src">@drawable/right_arrow</item>
+    </style>
+
+
+    <declare-styleable name="secondTopbar">
+        <attr name="leftTextColor" format="color"/>
+        <!-- BackGround属性可以颜色，也可以是一个资源文件 -->
+        <!-- 所以BackGround是 format="reference|color"-->
+        <attr name="leftBackGround" format="reference|color"/>
+        <attr name="leftText" format="string"/>
+
+        <attr name="Customtoptitle" format="string"/>
+        <attr name="CustomtitleTextSize" format="reference|dimension"/>
+        <attr name="CustomtitleTextColor" format="color"/>
+
+        <attr name="rightTextColor" format="color"/>
+        <attr name="rightBackGround" format="reference|color"/>
+        <attr name="rightText" format="string"/>
+    </declare-styleable>
+    <!-- animation 样式 -->
+    <style name="activityAnimation" parent="@android:style/Animation">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_right_in</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_left_out</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_left_in</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_right_out</item>
+    </style>
+    <!-- RadioButton 样式 待测试-->
+    <!--parent="@android:style/Widget.CompoundButton.RadioButton"-->
+    <style name="radioButton_Style" parent="@android:style/Widget.CompoundButton.RadioButton">
+        <!--<item name="android:button">@null</item>-->
+        <item name="android:layout_width">80dp</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_gravity">center</item>
+        <!--<item name="android:background">@drawable/radio_selector</item>-->
+        <item name="android:padding">5dp</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+
+    <style name="dialog" parent="@android:style/Theme.Dialog">
+        <!-- 可 去除  使用shape 后  四个边角 出现黑色 显示-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <item name="android:windowFrame">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 
 </resources>

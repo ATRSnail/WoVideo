@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <!--<com.lt.hm.wovideo.widget.SecondTopbar-->
+    <!--android:id="@+id/class_details_topbar"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="@dimen/s_46"-->
+    <!--app:CustomtitleTextColor="@color/black"-->
+    <!--app:CustomtitleTextSize="@dimen/f_16"-->
+    <!--app:Customtoptitle="@string/login"-->
+    <!--app:leftBackGround="@drawable/left_arrow"-->
+    <!--app:rightBackGround="@drawable/icon_choosen" />-->
+    <include
+        android:id="@+id/layout_class_details_head"
+        layout="@layout/layout_class_details_head"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        android:layout_gravity="center_vertical" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/class_refresh_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@color/white"
+                android:orientation="horizontal"
+                android:padding="5dp">
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:id="@+id/details_type_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"></LinearLayout>
+                </HorizontalScrollView>
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/class_details_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1.0" />
+        </LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
+</LinearLayout>

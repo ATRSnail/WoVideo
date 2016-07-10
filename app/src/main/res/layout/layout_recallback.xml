@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/callback_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/set_top"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/left_arrow" />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="256dp"
+        android:layout_marginTop="20dp"
+        >
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:singleLine="false"
+        android:gravity="top|left"
+        android:id="@+id/callback_content"
+        android:background="@color/white"
+        android:hint="@string/recallback_hint"
+        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="right"
+        android:id="@+id/content_count"
+        android:text="@string/callback_count_hint"
+        android:textColor="@color/font_gray"
+        />
+    </FrameLayout>
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/callback_contact_way"
+        android:id="@+id/contact_mathods"
+        />
+
+
+</LinearLayout>

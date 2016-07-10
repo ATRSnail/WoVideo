@@ -1,29 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/vip_person_layout"
+    android:padding="10dp"
+    android:background="@color/white"
     >
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:paddingLeft="40dp"
-        android:paddingRight="20dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="10dp"
         android:gravity="center"
         >
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/icon_person"
+    <com.lt.hm.wovideo.widget.CircleImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/icon_head"
         android:id="@+id/vip_person_logo"
+        app:border_width="1dp"
+        app:border_color="@color/white"
+        app:border_overlay="true"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         />
 
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="账号"
+        android:text="188****1231"
+        android:paddingLeft="10dp"
+        android:layout_centerVertical="true"
         android:layout_toRightOf="@id/vip_person_logo"
         android:id="@+id/vip_person_account"
 
@@ -31,7 +41,8 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/icon_person"
+        android:paddingLeft="20dp"
+        android:src="@drawable/icon_vip_unopened"
         android:layout_centerVertical="true"
         android:id="@+id/vip_person_vipicon"
         android:layout_toRightOf="@id/vip_person_account"
@@ -40,9 +51,10 @@
 
     <ImageView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/icon_person"
+        android:src="@drawable/icon_right"
         android:id="@+id/vip_person_arrow"
         android:layout_centerVertical="true"
         />

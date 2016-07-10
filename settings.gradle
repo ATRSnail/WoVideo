@@ -1,1 +1,1 @@
-include ':app', ':vitamio', ':wkvideoplayer'
+include ':app', ':vitamio', ':wkvideoplayer', ':share_sdk', ':library'

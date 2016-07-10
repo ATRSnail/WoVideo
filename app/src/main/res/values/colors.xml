@@ -8,9 +8,20 @@
     <!-- Tab ChangeColor-->
     <color name="tab_text_normal">#696969</color>
     <color name="tab_text_selected">#ffc800</color>
-
+    <color name="nav_text_selected">#31a5dd</color>
     <color name="divider_color">#cccaca</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
-    <color name="font_gray">#cccaca</color>
+    <color name="font_gray">#e1dfdf</color>
+    <color name="gray_darker">#5F5F5F</color>
+    <color name="class_font_color">#333333</color>
+    <color name="float_button_color">#FF2eaff3</color>
+    <color name="btn_abort_service">#ff495a</color>
+
+    <color name="blue_btn_bg_color">#1e9edc</color>
+
+    <!--二维码扫描-->
+    <color name="result_view">#b0000000</color>
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="possible_result_points">#c0ffff00</color>
 </resources>

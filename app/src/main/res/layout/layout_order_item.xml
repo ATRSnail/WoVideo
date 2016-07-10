@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/white"
+    >
+
+    <com.lt.hm.wovideo.widget.PercentLinearLayout
+        android:id="@+id/order_video_img_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:visibility="gone"
+        android:layout_alignParentLeft="true"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/order_video_img"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/img_1" />
+    </com.lt.hm.wovideo.widget.PercentLinearLayout>
+
+    <com.lt.hm.wovideo.widget.PercentLinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:layout_toRightOf="@id/order_video_img_layout"
+        android:paddingTop="10dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/order_video_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left|top"
+            android:padding="10dp"
+            android:textColor="@color/black"
+            android:text="《我的野蛮女友》"
+             />
+
+        <TextView
+            android:id="@+id/order_video_type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:padding="10dp"
+            android:text="类型: 喜剧|动作"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:layout_gravity="bottom"
+            android:text="￥2元"
+            android:padding="10dp"
+            android:id="@+id/order_video_price"
+            android:textColor="@android:color/holo_blue_bright"
+            />
+    </com.lt.hm.wovideo.widget.PercentLinearLayout>
+
+
+    <android.support.percent.PercentRelativeLayout
+        android:id="@+id/order_video_status"
+        android:layout_width="wrap_content"
+        android:layout_height="150dp"
+        android:layout_alignBottom="@id/order_video_img_layout"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/order_video_img_layout"
+        android:padding="10dp">
+
+        <Button
+            android:id="@+id/order_video_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:background="@drawable/circle_btn_order"
+            android:visibility="gone"
+            android:text="立即支付"
+            android:textColor="@android:color/holo_blue_dark"
+            android:gravity="center"
+            android:textSize="13sp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            />
+
+        <TextView
+            android:id="@+id/order_video_text_status"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="right|bottom"
+            android:padding="10dp"
+            android:text="支付完成"
+            android:textColor="@color/black" />
+    </android.support.percent.PercentRelativeLayout>
+
+
+</android.support.percent.PercentRelativeLayout>

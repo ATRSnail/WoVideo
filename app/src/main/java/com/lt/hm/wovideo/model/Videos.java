@@ -11,15 +11,15 @@ public class Videos {
     private String desc;
     private String img;
 
-    @Override
-    public String toString() {
-        return "Videos{" +
-                "name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", desc='" + desc + '\'' +
-                ", img='" + img + '\'' +
-                '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "Videos{" +
+//                "name='" + name + '\'' +
+//                ", type='" + type + '\'' +
+//                ", desc='" + desc + '\'' +
+//                ", img='" + img + '\'' +
+//                '}';
+//    }
 
     public String getImg() {
         return img;

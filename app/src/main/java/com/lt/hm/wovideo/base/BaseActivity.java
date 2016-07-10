@@ -2,8 +2,8 @@ package com.lt.hm.wovideo.base;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,7 +19,7 @@ import butterknife.Unbinder;
 /**
  * Created by leonardo on 16/3/21.
  */
-public abstract class BaseActivity extends ActionBarActivity implements BaseViewInterface {
+public abstract class BaseActivity extends FragmentActivity implements BaseViewInterface {
 	protected LayoutInflater mInflater;
 	private boolean _isVisible;
 	private TextView mTvActionTitle;

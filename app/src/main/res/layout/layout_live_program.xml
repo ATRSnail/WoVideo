@@ -37,36 +37,7 @@
                 >
                 <Button
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:background="@color/blue_btn_bg_color"
-                    android:textColor="@color/white"
-                    android:text="@string/sinatv"
-                    android:id="@+id/live_btn_sina"
-                    android:layout_alignParentLeft="true"
-                    />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/font_gray"
-                    />
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:textColor="@color/black"
-                    android:text="@string/localTv"
-                    android:background="@color/white"
-
-                    android:id="@+id/live_btn_local"
-                    android:layout_alignParentLeft="true"
-                    />
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/font_gray"
-                    />
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
                     android:background="@color/white"
                     android:textColor="@color/black"
                     android:text="@string/cctv"
@@ -81,7 +52,36 @@
                     />
                 <Button
                     android:layout_width="match_parent"
-                    android:layout_height="40dp"
+                    android:layout_height="50dp"
+                    android:background="@color/blue_btn_bg_color"
+                    android:textColor="@color/white"
+                    android:text="@string/sinatv"
+                    android:id="@+id/live_btn_sina"
+                    android:layout_alignParentLeft="true"
+                    />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/font_gray"
+                    />
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:textColor="@color/black"
+                    android:text="@string/localTv"
+                    android:background="@color/white"
+
+                    android:id="@+id/live_btn_local"
+                    android:layout_alignParentLeft="true"
+                    />
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/font_gray"
+                    />
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
                     android:background="@color/white"
                     android:textColor="@color/black"
                     android:text="@string/other_string"

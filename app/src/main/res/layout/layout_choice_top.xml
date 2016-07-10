@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:id="@+id/choice_top_main">
+    >
 
     <ImageView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/logo"
         android:padding="10dp"
         android:src="@drawable/top_logo"
-        android:layout_alignTop="@+id/person_center"
+        android:layout_alignTop="@+id/choice_person_center"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
@@ -28,7 +28,7 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:layout_toRightOf="@+id/logo"
-        android:layout_toLeftOf="@id/person_center"
+        android:layout_toLeftOf="@id/choice_person_center"
         android:layout_toEndOf="@+id/logo">
         <ImageView
             android:layout_width="wrap_content"
@@ -47,7 +47,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/qr_scan"
+        android:id="@+id/choice_qr_scan"
         android:padding="10dp"
         android:layout_centerVertical="true"
         android:src="@drawable/icon_scan"
@@ -57,10 +57,10 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/person_center"
+        android:id="@+id/choice_person_center"
         android:padding="10dp"
         android:layout_centerVertical="true"
         android:src="@drawable/person_selecter"
-        android:layout_toLeftOf="@id/qr_scan"
+        android:layout_toLeftOf="@id/choice_qr_scan"
         />
 </android.support.percent.PercentRelativeLayout>

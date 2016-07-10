@@ -24,10 +24,7 @@
         android:layout_width="match_parent"
         android:background="@color/white"
         android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:id="@+id/video_bottom_list"
+        android:id="@+id/video_comment_list"
         />
-
-
 
 </com.lt.hm.wovideo.widget.PercentLinearLayout>

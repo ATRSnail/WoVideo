@@ -16,6 +16,12 @@
         <include layout="@layout/layout_topbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:id="@+id/common_head_layout"
+            />
+        <include layout="@layout/layout_choice_top"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/choice_head_layout"
             />
 
         <FrameLayout

@@ -7,10 +7,7 @@
     android:scrollbars="none"
     android:descendantFocusability="afterDescendants"
     >
-        <include layout="@layout/layout_choice_top"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
+
 
      <android.support.percent.PercentFrameLayout
          android:layout_width="match_parent"

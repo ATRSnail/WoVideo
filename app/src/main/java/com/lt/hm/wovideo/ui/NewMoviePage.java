@@ -164,7 +164,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.layout_movie);
         View root = findViewById(R.id.video_root);
         root.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -208,26 +207,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         mAudioCapabilitiesReceiver.register();
 
-        // List view
-//        mSamples = Sample.getSamples();
-//        ListView playlist = (ListView) findViewById(R.id.playlist);
-//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-//        for (Sample sample : mSamples) {
-//            adapter.add(sample.name);
-//        }
-//        playlist.setAdapter(adapter);
-//        playlist.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                // Reset player and params.
-//                releasePlayer();
-//                mPlayerPosition = 0;
-//                // Set selected sample
-//                setIntent(onSampleSelected(mSamples.get(position)));
-//                // Show Player.
-//                onShown();
-//            }
-//        });
     }
 
     private Intent onUrlGot() {
@@ -795,6 +774,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                     if (videoUrl!=null && video!=null && mVideoFrame !=null){
                         videoUrl.setFormatUrl(resp.getBody().getUrl());
                         video.setmPlayUrl(videoUrl);
+                        // Reset player and params.
+                        releasePlayer();
+                        mPlayerPosition = 0;
                         // Set play URL and play it
                         setIntent(onUrlGot());
                         onShown();

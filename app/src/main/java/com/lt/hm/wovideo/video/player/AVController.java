@@ -428,6 +428,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
   private View.OnClickListener mBackListener = new View.OnClickListener() {
     public void onClick(View v) {
+      if (mPlayer == null) {
+        ((Activity)mContext).finish();
+        return;
+      }
       if (mPlayer.isFullScreen()) {
         doToggleFullscreen();
       } else {

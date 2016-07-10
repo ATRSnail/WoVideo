@@ -795,6 +795,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                     if (videoUrl!=null && video!=null && mVideoFrame !=null){
                         videoUrl.setFormatUrl(resp.getBody().getUrl());
                         video.setmPlayUrl(videoUrl);
+                        // Set play URL and play it
                         setIntent(onUrlGot());
                         onShown();
                     }

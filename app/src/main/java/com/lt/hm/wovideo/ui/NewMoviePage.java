@@ -71,7 +71,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import io.vov.vitamio.LibsChecker;
 import okhttp3.Call;
 
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
@@ -548,8 +547,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        if (!LibsChecker.checkVitamioLibs(this))
-            return;
+//        if (!LibsChecker.checkVitamioLibs(this))
+//            return;
         hideSomething();
 //        videoPlayer.setVideoPlayCallback(mVideoPlayCallback);
         Bundle bundle = getIntent().getExtras();
@@ -742,8 +741,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                 ResponseParser.parse(resp, response, PlayList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     PlayList.PlaysListBean details= resp.getBody().getPlaysList().get(0);
-                    TLog.log("first_url"+details.getStandardUrl());
-                    getRealURL(details.getStandardUrl());
+//                    TLog.log("first_url"+details.getStandardUrl());
+                    getRealURL(details.getFluentUrl());
+//                    getRealURL(details.getStandardUrl());
                 }
             }
         });

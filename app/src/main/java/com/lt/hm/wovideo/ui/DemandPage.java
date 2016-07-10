@@ -74,7 +74,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import io.vov.vitamio.LibsChecker;
 import okhttp3.Call;
 
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
@@ -557,8 +556,8 @@ public class DemandPage extends BaseActivity implements View.OnClickListener,Sur
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        if (!LibsChecker.checkVitamioLibs(this))
-            return;
+//        if (!LibsChecker.checkVitamioLibs(this))
+//            return;
         antholys = new ArrayList<>();
 
         Bundle bundle = getIntent().getExtras();
@@ -627,7 +626,8 @@ public class DemandPage extends BaseActivity implements View.OnClickListener,Sur
             public void onItemClick(View view, int i) {
                 PlayList.PlaysListBean bean = antholys.get(i);
                 vfId = bean.getVfId();
-                getRealURL(bean.getStandardUrl());
+                getRealURL(bean.getFluentUrl());
+//                getRealURL(bean.getStandardUrl());
             }
         });
     }
@@ -756,7 +756,8 @@ public class DemandPage extends BaseActivity implements View.OnClickListener,Sur
                 ResponseParser.parse(resp, response, PlayList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
-                    getRealURL(details.getStandardUrl());
+                    getRealURL(details.getFluentUrl());
+//                    getRealURL(details.getStandardUrl());
                 }
             }
         });

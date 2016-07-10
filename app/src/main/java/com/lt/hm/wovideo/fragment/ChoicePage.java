@@ -1,8 +1,5 @@
 package com.lt.hm.wovideo.fragment;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -44,7 +41,6 @@ import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.RoundImageView;
 import com.lt.hm.wovideo.widget.indicatorView.AutoPlayManager;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
-import com.lt.hm.wovideo.zxing.ui.MipcaActivityCapture;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
@@ -80,20 +76,9 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
     List<BannerList.Banner> banner_list;
     List<RecomList.Videos> h_list;
     AutoPlayManager autoPlayManager;
-    @BindView(R.id.choice_search_layout)
-    LinearLayout choiceSearchLayout;
-    @BindView(R.id.qr_scan)
-    ImageView qrScan;
-    @BindView(R.id.person_center)
-    ImageView personCenter;
+
 
     private PagerAdapter mAdapter;
-    private hideTopBar listener;
-    private final static int SCANNIN_GREQUEST_CODE = 1;
-
-    public void setListener(hideTopBar listener) {
-        this.listener = listener;
-    }
 
     @Nullable
     @Override
@@ -103,9 +88,6 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
         unbinder = ButterKnife.bind(this, view);
         initView(view);
         initData();
-        if (listener != null) {
-            listener.hideTop();
-        }
         return view;
     }
 
@@ -276,18 +258,6 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
                 android.R.color.holo_blue_bright, android.R.color.holo_green_light,
                 android.R.color.holo_orange_light, android.R.color.holo_red_light);
 
-        choiceSearchLayout.setOnClickListener((View v)->{
-            UIHelper.ToSearchPage(getActivity());
-        });
-        qrScan.setOnClickListener((View v)->{
-            Intent intent = new Intent();
-            intent.setClass(getActivity(), MipcaActivityCapture.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
-        });
-        personCenter.setOnClickListener((View v)->{
-            UIHelper.ToPerson(getActivity());
-        });
         floatButton.setOnClickListener((View v) -> {
             Toast.makeText(getApplicationContext(), "签到", Toast.LENGTH_SHORT).show();
         });
@@ -481,25 +451,6 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
         });
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case SCANNIN_GREQUEST_CODE:
-                if(resultCode == Activity.RESULT_OK){
-                    Bundle bundle = data.getExtras();
-                    Toast.makeText(getApplicationContext(),bundle.getString("result"),Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent();
-                    intent.setAction(Intent.ACTION_VIEW);
-                    TLog.log("url"+bundle.getString("result"));
-                    Uri content_url = Uri.parse(bundle.getString("result"));
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.setData(content_url);
-                    startActivity(intent);
-                }
-                break;
-        }
-    }
 
 
     @Override

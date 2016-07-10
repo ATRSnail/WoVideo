@@ -6,8 +6,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.utils.TextViewCount;
@@ -57,10 +55,10 @@ public class StartAdPage extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        Glide.with(StartAdPage.this)
-                .load("http://img.club.pchome.net/kdsarticle/2013/11small/21/fd548da909d64a988da20fa0ec124ef3_1000x750.jpg")
-                .diskCacheStrategy(DiskCacheStrategy.SOURCE).fitCenter().crossFade()
-                .into(adImg);
+//        Glide.with(StartAdPage.this)
+//                .load("http://img.club.pchome.net/kdsarticle/2013/11small/21/fd548da909d64a988da20fa0ec124ef3_1000x750.jpg")
+//                .diskCacheStrategy(DiskCacheStrategy.SOURCE).fitCenter().crossFade()
+//                .into(adImg);
 //        mTotalProgress = displaySecond;
 //        mCurrentProgress = 0;
         countTimeText.setClickable(true);

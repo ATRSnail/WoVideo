@@ -242,5 +242,27 @@ public class HttpApis {
         HttpUtils.formPost("mblCollection/collList", map, callback);
     }
 
+    /**
+     *  评论列表
+     * @param map
+     * @param callback
+     */
+    public static void commentList(HashMap<String, Object> map, StringCallback callback) {
+        HttpUtils.formPost("mblVf/viewComment", map, callback);
+    }
+
+    /**
+     * 提交评论
+     * @param map
+     * @param callback
+     */
+    public static void pushComment(HashMap<String, Object> map, StringCallback callback) {
+        HttpUtils.formPost("mblVf/addComment", map, callback);
+    }
+
+
+
+
+
 
 }

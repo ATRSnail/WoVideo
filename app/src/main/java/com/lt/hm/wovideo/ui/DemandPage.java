@@ -107,8 +107,8 @@ public class DemandPage extends BaseActivity implements View.OnClickListener,Sur
     RecyclerView anthologyList;
     @BindView(R.id.video_bottom_grid)
     RecyclerView videoBottomGrid;
-    @BindView(R.id.video_bottom_list)
-    RecyclerView videoBottomList;
+    @BindView(R.id.video_comment_list)
+    RecyclerView videoCommentList;
     @BindView(R.id.anthology_all)
     Button anthologyALL;
     @BindView(R.id.img_collect)
@@ -683,9 +683,9 @@ public class DemandPage extends BaseActivity implements View.OnClickListener,Sur
         list_adapter = new VideoItemListAdapter(getApplicationContext(), list_list);
         LinearLayoutManager line_manager = new LinearLayoutManager(this);
         line_manager.setOrientation(LinearLayoutManager.VERTICAL);
-        videoBottomList.setHasFixedSize(false);
-        videoBottomList.setLayoutManager(line_manager);
-        videoBottomList.setAdapter(list_adapter);
+//        videoBottomList.setHasFixedSize(false);
+//        videoBottomList.setLayoutManager(line_manager);
+//        videoBottomList.setAdapter(list_adapter);
         list_adapter.notifyDataSetChanged();
         list_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override

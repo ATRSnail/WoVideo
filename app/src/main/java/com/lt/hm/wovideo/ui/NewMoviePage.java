@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -164,7 +165,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.layout_movie);
-        View root = findViewById(R.id.root);
+        View root = findViewById(R.id.video_root);
         root.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -324,7 +325,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_root));
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    Gravity.CENTER
             );
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();

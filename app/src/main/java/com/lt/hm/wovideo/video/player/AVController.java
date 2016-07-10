@@ -1,20 +1,25 @@
 package com.lt.hm.wovideo.video.player;
 
+import android.app.Activity;
 import android.content.Context;
+import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -30,7 +35,7 @@ import java.util.Locale;
  * Created by KECB on 7/6/16.
  */
 
-public class AVController extends FrameLayout {
+public class AVController extends FrameLayout implements AVPlayerGestureListener {
   private static final String TAG = "AVController";
 
   private MediaPlayerControl  mPlayer;
@@ -47,7 +52,7 @@ public class AVController extends FrameLayout {
   private boolean             mUseFastForward;
   private boolean             mFromXml;
   private boolean             mListenersSet;
-  private OnClickListener mNextListener, mPrevListener;
+  private View.OnClickListener mNextListener, mPrevListener;
   StringBuilder               mFormatBuilder;
   Formatter                   mFormatter;
   private ImageButton         mPauseButton;
@@ -56,7 +61,21 @@ public class AVController extends FrameLayout {
   private ImageButton         mNextButton;
   private ImageButton         mPrevButton;
   private ImageButton         mFullscreenButton;
+  private ImageButton         mBackButton;
   private Handler             mHandler = new MessageHandler(this);
+  // Getsutre
+  private GestureDetector mGestureDetector;
+  private AVPlayerGestureListener mVideoGestureListener;
+  // Volume, Brightness controller & view
+  private View mCenterLayout;
+  private ImageView mCenterImage;
+  private ProgressBar mCenterPorgress;
+  private float mCurBrightness;
+  private float mCurVolume;
+  private AudioManager mAudioManager;
+  private int mMaxVolume;
+
+
 
   public AVController(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -102,7 +121,7 @@ public class AVController extends FrameLayout {
   public void setAnchorView(ViewGroup view) {
     mAnchor = view;
 
-    LayoutParams frameParams = new LayoutParams(
+    FrameLayout.LayoutParams frameParams = new FrameLayout.LayoutParams(
         ViewGroup.LayoutParams.MATCH_PARENT,
         ViewGroup.LayoutParams.MATCH_PARENT
     );
@@ -110,6 +129,18 @@ public class AVController extends FrameLayout {
     removeAllViews();
     View v = makeControllerView();
     addView(v, frameParams);
+  }
+
+  /**
+   * set gesture listen to control media player
+   * include screen brightness and volume of video
+   * @param context
+   */
+  public void setGestureListener(Context context){
+    mVideoGestureListener = this;
+    mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+    mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+    mGestureDetector = new GestureDetector(context,new ViewGestureListener(context,mVideoGestureListener));
   }
 
   /**
@@ -128,6 +159,11 @@ public class AVController extends FrameLayout {
   }
 
   private void initControllerView(View v) {
+    mBackButton = (ImageButton) v.findViewById(R.id.back);
+    if (mBackButton != null) {
+      mBackButton.setOnClickListener(mBackListener);
+    }
+
     mPauseButton = (ImageButton) v.findViewById(R.id.pause);
     if (mPauseButton != null) {
       mPauseButton.requestFocus();
@@ -181,6 +217,12 @@ public class AVController extends FrameLayout {
     mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
 
     installPrevNextListeners();
+
+    // Volume & Brightness
+    mCenterLayout = v.findViewById(R.id.layout_center);
+    mCenterLayout.setVisibility(GONE);
+    mCenterImage = (ImageView) v.findViewById(R.id.image_center_bg);
+    mCenterPorgress = (ProgressBar) v.findViewById(R.id.progress_center);
   }
 
   /**
@@ -232,7 +274,7 @@ public class AVController extends FrameLayout {
       }
       disableUnsupportedButtons();
 
-      LayoutParams tlp = new LayoutParams(
+      FrameLayout.LayoutParams tlp = new FrameLayout.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT,
           ViewGroup.LayoutParams.WRAP_CONTENT,
           Gravity.BOTTOM
@@ -319,8 +361,12 @@ public class AVController extends FrameLayout {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
+    if(null != mGestureDetector){
+      mGestureDetector.onTouchEvent(event);
+    }
+    //        toggleContollerView();
     show(sDefaultTimeout);
-    return true;
+    return false;
   }
 
   @Override
@@ -380,14 +426,24 @@ public class AVController extends FrameLayout {
     return super.dispatchKeyEvent(event);
   }
 
-  private OnClickListener mPauseListener = new OnClickListener() {
+  private View.OnClickListener mBackListener = new View.OnClickListener() {
+    public void onClick(View v) {
+      if (mPlayer.isFullScreen()) {
+        doToggleFullscreen();
+      } else {
+        ((Activity)mContext).finish();
+      }
+    }
+  };
+
+  private View.OnClickListener mPauseListener = new View.OnClickListener() {
     public void onClick(View v) {
       doPauseResume();
       show(sDefaultTimeout);
     }
   };
 
-  private OnClickListener mFullscreenListener = new OnClickListener() {
+  private View.OnClickListener mFullscreenListener = new View.OnClickListener() {
     public void onClick(View v) {
       doToggleFullscreen();
       show(sDefaultTimeout);
@@ -400,9 +456,9 @@ public class AVController extends FrameLayout {
     }
 
     if (mPlayer.isPlaying()) {
-      mPauseButton.setImageResource(R.drawable.ic_media_pause);
+      mPauseButton.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
     } else {
-      mPauseButton.setImageResource(R.drawable.ic_media_play);
+      mPauseButton.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
     }
   }
 
@@ -532,7 +588,7 @@ public class AVController extends FrameLayout {
     info.setClassName(AVController.class.getName());
   }
 
-  private OnClickListener mRewListener = new OnClickListener() {
+  private View.OnClickListener mRewListener = new View.OnClickListener() {
     public void onClick(View v) {
       if (mPlayer == null) {
         return;
@@ -547,7 +603,7 @@ public class AVController extends FrameLayout {
     }
   };
 
-  private OnClickListener mFfwdListener = new OnClickListener() {
+  private View.OnClickListener mFfwdListener = new View.OnClickListener() {
     public void onClick(View v) {
       if (mPlayer == null) {
         return;
@@ -574,7 +630,7 @@ public class AVController extends FrameLayout {
     }
   }
 
-  public void setPrevNextListeners(OnClickListener next, OnClickListener prev) {
+  public void setPrevNextListeners(View.OnClickListener next, View.OnClickListener prev) {
     mNextListener = next;
     mPrevListener = prev;
     mListenersSet = true;
@@ -589,6 +645,84 @@ public class AVController extends FrameLayout {
         mPrevButton.setVisibility(View.VISIBLE);
       }
     }
+  }
+
+  @Override public void onSingleTap() {
+    //show(sDefaultTimeout);
+  }
+
+  @Override public void onHorizontalScroll(MotionEvent event, float delta) {
+    Log.i(TAG, delta+"");
+    if (event.getPointerCount() == 1)
+      mPlayer.seekTo(mPlayer.getCurrentPosition() + Math.round(delta));
+  }
+
+  @Override public void onVerticalScroll(MotionEvent event, float delta, int direction) {
+    Log.i(TAG, delta+"");
+    if (event.getPointerCount() == 1) {
+      if (direction == ViewGestureListener.SWIPE_LEFT) {
+        updateBrightness(delta);
+        Log.i(TAG, "onVerticalScroll: Brightness");
+      } else {
+        updateVolume(delta);
+        Log.i(TAG, "onVerticalScroll: Volume");
+      }
+      postDelayed(new Runnable() {
+        @Override
+        public void run() {
+          mCenterLayout.setVisibility(GONE);
+        }
+      },1000);
+    }
+  }
+
+  private void updateVolume(float delta) {
+    mCenterImage.setImageResource(R.drawable.video_volumn_bg);
+    mCenterLayout.setVisibility(VISIBLE);
+    mCurVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+    if(mCurVolume < 0){
+      mCurVolume = 0;
+    }
+
+    Log.e("mCurVolume:",""+mCurVolume);
+    Log.e("delta:",""+delta);
+    int volume = (int) (delta * mMaxVolume/ViewGestureListener.getDeviceHeight(mContext) + mCurVolume);
+    if(volume > mMaxVolume){
+      volume = mMaxVolume;
+    }
+
+    if(volume < 0){
+      volume = 0;
+    }
+    mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+
+    float percent = (float) ((volume * 1.0 / mMaxVolume) * 100);
+    Log.e("volume:",""+volume);
+    Log.e("percent:",""+percent);
+    mCenterPorgress.setProgress((int) percent);
+  }
+
+  private void updateBrightness(float delta) {
+    mCurBrightness = ((Activity) mContext).getWindow().getAttributes().screenBrightness;
+    if (mCurBrightness <= 0.01f) {
+      mCurBrightness = 0.01f;
+    }
+
+    mCenterImage.setImageResource(R.drawable.video_bright_bg);
+    mCenterLayout.setVisibility(VISIBLE);
+
+    WindowManager.LayoutParams layoutParams = ((Activity) mContext).getWindow().getAttributes();
+    layoutParams.screenBrightness =
+        mCurBrightness + delta / ViewGestureListener.getDeviceHeight(mContext);
+    if(layoutParams.screenBrightness >= 1.0f){
+      layoutParams.screenBrightness = 1.0f;
+    }else if(layoutParams.screenBrightness <= 0.01f){
+      layoutParams.screenBrightness = 0.01f;
+    }
+    ((Activity)mContext).getWindow().setAttributes(layoutParams);
+
+    float percent = layoutParams.screenBrightness * 100;
+    mCenterPorgress.setProgress((int) percent);
   }
 
   public interface MediaPlayerControl {

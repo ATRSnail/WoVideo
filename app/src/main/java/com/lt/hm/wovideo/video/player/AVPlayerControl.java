@@ -59,6 +59,8 @@ public class AVPlayerControl implements AVController.MediaPlayerControl {
     }else {
       activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
+    //This is the default value
+    //activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
   }
 
   @Override public int getBufferPercentage() {

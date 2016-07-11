@@ -1,6 +1,8 @@
 package com.lt.hm.wovideo.adapter.vip;
 
 import android.content.Context;
+import android.view.Gravity;
+import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
@@ -32,6 +34,9 @@ public class VipItemAdapter extends BaseQuickAdapter<VideoList.TypeListBean> {
         //Grid
         if (!StringUtils.isNullOrEmpty(typeListBean.getTag())&&typeListBean.getTag().equals("0")){
             baseViewHolder.setText(R.id.home_item_desc, typeListBean.getDesc());
+            TextView  text = (TextView) baseViewHolder.convertView.findViewById(R.id.home_item_title);
+            text.setPadding(0,0,0,0);
+            text.setGravity(Gravity.CENTER);
             baseViewHolder.setVisible(R.id.home_item_desc,false);
             if (typeListBean.getImg() != null) {
                 baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.getImg()));

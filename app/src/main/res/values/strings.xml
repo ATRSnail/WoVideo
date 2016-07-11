@@ -113,5 +113,6 @@
     <string name="plz_search_hint">请输入搜索内容</string>
     <string name="plz_comment_hint">请输入评论</string>
     <string name="comment">评论</string>
+    <string name="no_comment_data">暂无评论</string>
 
 </resources>

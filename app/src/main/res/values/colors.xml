@@ -12,6 +12,12 @@
     <color name="divider_color">#cccaca</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="font_black">#4d4d4e</color>
+    <color name="gray_lighter">#F2F4F5</color>
+    <color name="gray_dark">#eceded</color>
+    <color name="gray_lightest">#f1f1f1</color>
+    <color name="gray_lighter1">#e8e9ea</color>
+    <color name="gray_light">#747576</color>
     <color name="font_gray">#e1dfdf</color>
     <color name="gray_darker">#5F5F5F</color>
     <color name="class_font_color">#333333</color>
@@ -24,4 +30,5 @@
     <color name="result_view">#b0000000</color>
     <color name="viewfinder_mask">#60000000</color>
     <color name="possible_result_points">#c0ffff00</color>
+    <color name="red">#f2192d</color>
 </resources>

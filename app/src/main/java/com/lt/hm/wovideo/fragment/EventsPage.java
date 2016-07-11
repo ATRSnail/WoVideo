@@ -1,7 +1,9 @@
 package com.lt.hm.wovideo.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +22,12 @@ import butterknife.Unbinder;
  * @version 1.0
  * @create_date 16/5/30
  */
-public class EventsPage extends BaseFragment {
+public class EventsPage extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.lv_huodong)
     ListView lvHuodong;
+    @BindView(R.id.event_refresh)
+    SwipeRefreshLayout evnetRefresh;
+
     Unbinder unbinder;
     @Nullable
     @Override
@@ -38,6 +43,10 @@ public class EventsPage extends BaseFragment {
     @Override
     public void initView(View view) {
         super.initView(view);
+        evnetRefresh.setOnRefreshListener(this);
+        evnetRefresh.setColorSchemeResources(
+                android.R.color.holo_blue_bright, android.R.color.holo_green_light,
+                android.R.color.holo_orange_light, android.R.color.holo_red_light);
     }
 
     @Override
@@ -52,6 +61,16 @@ public class EventsPage extends BaseFragment {
         if (unbinder!=null){
             unbinder.unbind();
         }
+    }
+
+    @Override
+    public void onRefresh() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                evnetRefresh.setRefreshing(false);
+            }
+        },3000);
     }
 
     private class myAdapter extends BaseAdapter {

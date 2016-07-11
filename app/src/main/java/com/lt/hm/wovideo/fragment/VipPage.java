@@ -60,6 +60,7 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
     private String sx;
     private String dq;
     private String nd;
+    private boolean shown =false;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -80,7 +81,7 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
         vipSelector.setOnClickListener((View v) -> {
             if (CURRENT_POSITION != -1 && CURRENT_POSITION != 0) {
                 SelectMenuPop pop = new SelectMenuPop(getActivity(),CURRENT_POSITION);
-                pop.showPopupWindow(vipViewIndicator);
+                pop.showPopupWindow(vipViewIndicator,shown);
                 pop.setListener(new SelectMenuPop.OnRadioClickListener() {
                     @Override
                     public void clickListener(String key, String value) {

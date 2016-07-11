@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -56,6 +57,7 @@ import okhttp3.Call;
  * @author leonardo
  * @version 1.0
  * @create_date 16/5/30
+ *
  */
 public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.img_indicator)
@@ -70,6 +72,10 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
     ImageView homeSearchImg;
     @BindView(R.id.refresh_choice)
     SwipeRefreshLayout refreshLayout;
+    @BindView(R.id.h_img_container)
+    LinearLayout h_img_container;
+    @BindView(R.id.choice_h_scroll)
+    HorizontalScrollView choice_h_scroll;
     Unbinder unbinder;
     Bottom_ListAdapter bottom_adapter;
     List<Videos> b_list;
@@ -124,7 +130,8 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
                             list_recommend.add(mList.get(i));
                         }
                     }
-                    initidViewpager(list_viewpager);
+//                    initidViewpager(list_viewpager);
+                    initHorientalScrollView(list_viewpager);
                     initRecyclerView(list_recommend);
                 }
             }
@@ -148,7 +155,35 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
             }
         });
     }
+    private void initHorientalScrollView (List<RecomList.Videos> mList){
+//        h_img_container
+        for (int i = 0; i < mList.size(); i++) {
+            RoundImageView view = new RoundImageView(getActivity());
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ScreenUtils.getScreenWidth(getApplicationContext()) * 2 / 5, LinearLayout.LayoutParams.MATCH_PARENT);
+            params.setMargins(15,0,15,0);
+            view.setBorderRadius(5);
+            view.setType(RoundImageView.TYPE_ROUND);
+            view.setLayoutParams(params);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                view.setElevation(1000f);
+                view.setTranslationZ(200f);
+            }
+//                view.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//                Glide.with(getActivity()).load(HttpUtils.appendUrl(mList.get(position).getImg())).centerCrop().crossFade().into(view);
+            Glide.with(getActivity()).load(HttpUtils.appendUrl(mList.get(i).getImg())).centerCrop().crossFade().into(view);
+//                GlideUtils.getmInstance().LoadContextCircleBitmap(getActivity(),HttpUtils.appendUrl(mList.get(position).getImg()),view);
+            final int finalPosition = i;
+            view.setOnClickListener((View v) -> {
+                getVideoDetails(mList.get(finalPosition).getVfId());
+            });
+            h_img_container.addView(view);
+        }
+    }
 
+    /**
+     * 弃用
+     * @param mList
+     */
     private void initidViewpager(List<RecomList.Videos> mList) {
         idViewpager.setPageMargin(30);
         idViewpager.setOffscreenPageLimit(mList.size());
@@ -298,26 +333,26 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
             }
         });
 
-//        idViewpager.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_MOVE:
-//                        refreshLayout.setEnabled(false);
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        refreshLayout.setEnabled(true);
-//                        break;
-//                    case MotionEvent.ACTION_SCROLL:
-//                        refreshLayout.setEnabled(false);
-//                        break;
-//                    case MotionEvent.ACTION_CANCEL:
-//                        refreshLayout.setEnabled(true);
-//                        break;
-//                }
-//                return false;
-//            }
-//        });
+        choice_h_scroll.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        refreshLayout.setEnabled(false);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        refreshLayout.setEnabled(true);
+                        break;
+                    case MotionEvent.ACTION_SCROLL:
+                        refreshLayout.setEnabled(false);
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        refreshLayout.setEnabled(true);
+                        break;
+                }
+                return false;
+            }
+        });
 
 
     }
@@ -333,7 +368,7 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
     private void loopIndicatorView() {
         autoPlayManager = new AutoPlayManager(imgIndicator);
         autoPlayManager.setBroadcastEnable(true);
-        autoPlayManager.setBroadcastTimeIntevel(3 * 1000, 3 * 1000);//set first play time and interval
+        autoPlayManager.setBroadcastTimeIntevel(3 * 1000, 5 * 1000);//set first play time and interval
         autoPlayManager.loop();
     }
 

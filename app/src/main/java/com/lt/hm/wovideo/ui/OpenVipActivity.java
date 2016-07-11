@@ -51,7 +51,7 @@ public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopb
     @BindView(R.id.tv_price)
     TextView tvPrice;
     @BindView(R.id.btn_buying)
-    ImageView btnBuying;
+    Button btnBuying;
     @BindView(R.id.img_vip_authers)
     ImageView imgVipAuthers;
     @BindView(R.id.btn_abort_service)

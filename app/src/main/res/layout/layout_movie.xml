@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:keepScreenOn="true">
+    android:keepScreenOn="true"
+    >
 
     <FrameLayout
         android:id="@+id/video_root"
@@ -29,6 +30,10 @@
                 android:layout_gravity="center_horizontal"
                 android:visibility="gone"
                 android:background="@android:color/black"/>
+            <master.flame.danmaku.ui.widget.DanmakuView
+                android:id="@+id/sv_danmaku"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
             <!--<com.google.android.exoplayer.text.SubtitleLayout android:id="@+id/subtitles"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content"/>-->
@@ -36,7 +41,9 @@
     </FrameLayout>
 
     <include layout="@layout/video_bottom" />
-
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -57,13 +64,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
                 android:background="@color/font_gray" />
-
             <include
                 layout="@layout/video_page_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1.0" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@color/gray_lighter"
+                />
         </LinearLayout>
     </ScrollView>
 
+        <include layout="@layout/layout_add_comment"
+            android:layout_gravity="bottom"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"/>
+    </FrameLayout>
 </LinearLayout>

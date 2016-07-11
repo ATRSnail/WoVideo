@@ -4,10 +4,11 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/gray_btn_bg_color">
+    android:background="@color/gray_lighter">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="40dp"
+        android:layout_marginTop="@dimen/s_5"
         android:paddingLeft="10dp"
         android:text="@string/recommend"
         android:gravity="center|left"
@@ -20,11 +21,30 @@
         android:id="@+id/video_bottom_grid"
         />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:paddingLeft="10dp"
+        android:text="@string/comment"
+        android:gravity="center|left"
+        android:layout_marginTop="@dimen/s_5"
+        android:background="@color/white"
+        />
+
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:background="@color/white"
         android:layout_height="wrap_content"
         android:id="@+id/video_comment_list"
         />
+    <TextView
+        android:id="@+id/empty_view"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:background="@color/white"
+        android:text="@string/no_comment_data" />
+
 
 </com.lt.hm.wovideo.widget.PercentLinearLayout>

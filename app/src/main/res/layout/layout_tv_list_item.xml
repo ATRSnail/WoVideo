@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="50dp"
     android:gravity="center_vertical"
     android:background="@drawable/listview_selector"
     >
@@ -15,7 +15,7 @@
         android:text="CCTV－1"
         android:singleLine="true"
         android:textSize="15sp"
-        android:paddingLeft="10dp"
+        android:paddingLeft="15dp"
         />
     <TextView
         android:layout_width="wrap_content"
@@ -27,7 +27,7 @@
         android:id="@+id/live_list_item_current_text"
         android:textColor="@color/gray_darker"
         android:textSize="12sp"
-        android:paddingRight="10dp"
+        android:paddingRight="25dp"
         />
 
 </RelativeLayout>

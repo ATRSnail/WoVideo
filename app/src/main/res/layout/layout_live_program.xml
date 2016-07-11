@@ -37,9 +37,9 @@
                 >
                 <Button
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@color/white"
-                    android:textColor="@color/black"
+                    android:layout_height="60dp"
+                    android:background="@color/blue_btn_bg_color"
+                    android:textColor="@color/white"
                     android:text="@string/cctv"
                     android:id="@+id/live_btn_cctv"
 
@@ -48,13 +48,13 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/font_gray"
+                    android:background="@color/gray_lighter1"
                     />
                 <Button
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@color/blue_btn_bg_color"
-                    android:textColor="@color/white"
+                    android:layout_height="60dp"
+                    android:background="@color/gray_lighter"
+                    android:textColor="@color/black"
                     android:text="@string/sinatv"
                     android:id="@+id/live_btn_sina"
                     android:layout_alignParentLeft="true"
@@ -62,14 +62,14 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/font_gray"
+                    android:background="@color/gray_lighter1"
                     />
                 <Button
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="60dp"
                     android:textColor="@color/black"
                     android:text="@string/localTv"
-                    android:background="@color/white"
+                    android:background="@color/gray_lighter"
 
                     android:id="@+id/live_btn_local"
                     android:layout_alignParentLeft="true"
@@ -77,21 +77,21 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/font_gray"
+                    android:background="@color/gray_lighter1"
                     />
                 <Button
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@color/white"
+                    android:layout_height="60dp"
+                    android:background="@color/gray_lighter"
                     android:textColor="@color/black"
                     android:text="@string/other_string"
                     android:id="@+id/live_btn_othertv"
                     android:layout_alignParentLeft="true"
                     />
             </LinearLayout>
-            <View android:layout_width="1dp"
+            <View android:layout_width="2dp"
                 android:layout_height="match_parent"
-                android:background="@color/font_gray"
+                android:background="@color/gray_lighter1"
                 />
 
             <android.support.v7.widget.RecyclerView

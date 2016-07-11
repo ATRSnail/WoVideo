@@ -92,13 +92,28 @@
             android:gravity="center_vertical"
             android:layout_width="wrap_content"
             android:layout_height="match_parent" />
-        <TextView
-            android:id="@+id/tv_price"
-            android:layout_weight="0.2"
-            android:text="@string/price"
-            android:gravity="center_vertical"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent" />
+        <FrameLayout
+            android:layout_width="69dp"
+            android:layout_height="40dp"
+            android:paddingRight="@dimen/s_5"
+            >
+            <TextView
+                android:id="@+id/tv_price"
+                android:layout_weight="0.2"
+                android:text="@string/price"
+                android:gravity="center_vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/s_1"
+                android:layout_gravity="center"
+                android:layout_weight="0.2"
+                android:background="@color/red"
+                />
+        </FrameLayout>
+
+
         <!--<Button-->
             <!--android:id="@+id/btn_buying"-->
             <!--android:background="@android:color/holo_blue_dark"-->
@@ -108,12 +123,14 @@
             <!--android:layout_width="wrap_content"-->
             <!--android:layout_height="wrap_content" />-->
 
-        <ImageView
+        <Button
             android:id="@+id/btn_buying"
-            android:src="@drawable/btn_p_blue"
-            android:layout_width="wrap_content"
-            android:gravity="center_vertical"
-            android:layout_height="wrap_content" />
+            android:textColor="@color/white"
+            android:text="限免"
+            android:background="@color/blue_btn_bg_color"
+            android:layout_width="60dp"
+            android:gravity="center"
+            android:layout_height="40dp" />
 
     </LinearLayout>
 
@@ -122,6 +139,7 @@
         android:layout_height="wrap_content"
         android:src="@drawable/img_vip_opened"
         android:id="@+id/img_vip_authers"
+        android:layout_gravity="center"
         />
 
 

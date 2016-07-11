@@ -18,23 +18,24 @@
             android:scaleType="centerCrop"
             />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:background="@drawable/glass_bg"
-            android:layout_gravity="bottom"
             android:gravity="center"
+            android:layout_gravity="bottom"
             >
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="TITLE"
+                android:text="TITLEdsfasdfasdfads"
+                android:layout_centerHorizontal="true"
                 android:gravity="center"
                 android:textColor="@color/black"
                 android:id="@+id/grid_item_title"
                 />
-        </LinearLayout>
+        </RelativeLayout>
 
         <ImageView
             android:layout_width="wrap_content"

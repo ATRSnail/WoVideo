@@ -47,8 +47,9 @@
     <string name="tv_time">2016-06-11-2016-06-11</string>
     <!--关于 -->
     <string name="about">关于</string>
-    <string name="service_number">400-009-090</string>
+    <string name="service_number">联系电话</string>
     <string name="version_hint">版本号</string>
+
     <!--设置-->
     <string name="set_top">设置</string>
     <string name="skin_manager">皮肤管理</string>

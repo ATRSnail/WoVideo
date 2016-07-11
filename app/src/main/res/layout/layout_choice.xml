@@ -59,6 +59,26 @@
                          <!--android:layout_gravity="bottom|center" />-->
                  </android.support.percent.PercentFrameLayout>
 
+                 <HorizontalScrollView
+                     android:layout_width="match_parent"
+                     android:layout_height="220dp"
+                     android:scrollbars="none"
+                     android:paddingTop="10dp"
+                     android:paddingBottom="10dp"
+                     android:id="@+id/choice_h_scroll"
+                     android:background="@color/font_gray"
+                     >
+                     <LinearLayout
+                         android:layout_marginTop="5dp"
+                         android:layout_marginBottom="5dp"
+                         android:id="@+id/h_img_container"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"
+                         android:orientation="horizontal"
+                         android:gravity="center"
+                         />
+                 </HorizontalScrollView>
+
                  <android.support.percent.PercentFrameLayout
                      android:layout_width="match_parent"
                      android:layout_height="220dp"
@@ -66,6 +86,7 @@
                      android:paddingTop="10dp"
                      android:paddingBottom="10dp"
                      android:layerType="software"
+                     android:visibility="gone"
                      android:layout_centerInParent="true"
                      android:background="@color/font_gray"
                      >
@@ -76,9 +97,12 @@
                          android:layout_marginTop="5dp"
                          android:layout_marginBottom="5dp"
                          android:layout_height="200dp"
+                         android:visibility="gone"
                          android:layout_gravity="center"
                          >
                      </android.support.v4.view.ViewPager>
+
+
 
                  </android.support.percent.PercentFrameLayout>
                  <include layout="@layout/home_bottom"

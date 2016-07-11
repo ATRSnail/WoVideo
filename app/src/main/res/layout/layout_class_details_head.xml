@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="10dp"
-    >
+    android:background="@color/white"
+    tools:showIn="@layout/layout_new_class_details">
 
     <ImageView
         android:layout_width="wrap_content"
@@ -16,11 +20,15 @@
     <Spinner
         android:layout_width="100dp"
         android:layout_height="match_parent"
-        android:layout_centerHorizontal="true"
-        android:id="@+id/class_details_spinner"
-        android:gravity="right"
-        android:paddingRight="1dp"
         android:layout_centerInParent="true"
+        android:id="@+id/class_details_spinner"
+        android:gravity="clip_horizontal"
+        android:paddingEnd="1dp"
+        android:clipToPadding="true"
+        android:clipChildren="false"
+        android:paddingRight="1dp"
+        android:paddingLeft="60dp"
+        android:layout_marginRight="@dimen/s_1"
         android:entries="@array/video_type"
         />
 

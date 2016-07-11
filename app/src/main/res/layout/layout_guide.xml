@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="true"
+    >
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/guide_viewpager"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"/>
+
+    <LinearLayout
+        android:id="@+id/point"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="24.0dip"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:paddingBottom="@dimen/s_20"
+            android:paddingLeft="@dimen/s_10"
+            android:paddingRight="@dimen/s_10"
+            android:src="@drawable/indicator_01"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:paddingBottom="@dimen/s_20"
+            android:paddingLeft="@dimen/s_10"
+            android:paddingRight="@dimen/s_10"
+            android:src="@drawable/indicator_01"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:clickable="true"
+            android:paddingBottom="@dimen/s_20"
+            android:paddingLeft="@dimen/s_10"
+            android:paddingRight="@dimen/s_10"
+            android:src="@drawable/indicator_01"/>
+    </LinearLayout>
+</RelativeLayout>

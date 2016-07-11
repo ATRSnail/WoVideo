@@ -32,6 +32,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="match_parent"
+                android:visibility="gone"
                 android:background="@color/font_gray"/>
 
             <ImageView
@@ -40,6 +41,7 @@
                 android:layout_gravity="right|center_vertical"
                 android:layout_weight="1.0"
                 android:id="@+id/vip_selector"
+                android:visibility="gone"
                 android:src="@drawable/icon_choosen"
                 />
         </LinearLayout>

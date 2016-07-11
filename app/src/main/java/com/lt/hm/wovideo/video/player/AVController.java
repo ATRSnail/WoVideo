@@ -464,6 +464,12 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
      */
   public void toggleBulletScreen(boolean isShow) {};
 
+  public void setTitle(String titleName) {
+    if (mVideoTitle != null) {
+      mVideoTitle.setText(titleName);
+    }
+  }
+
   private View.OnClickListener mBackListener = new View.OnClickListener() {
     public void onClick(View v) {
       if (mPlayer == null) {

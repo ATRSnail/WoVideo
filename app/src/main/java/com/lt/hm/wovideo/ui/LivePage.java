@@ -585,6 +585,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     Gravity.CENTER
             );
+            mMediaController.setTitle(videoName.getText().toString());
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -810,6 +811,11 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         @Override
         public void show() {
             super.show();
+        }
+
+        @Override
+        public void setTitle(String titleName) {
+            super.setTitle(titleName);
         }
 
         @Override

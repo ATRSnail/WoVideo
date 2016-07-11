@@ -165,6 +165,7 @@
         android:id="@+id/quality_switch"
         android:text="高清"
         android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
         style="@style/PlayerMenuText"
         />
 

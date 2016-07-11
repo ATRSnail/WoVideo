@@ -116,7 +116,8 @@ public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopb
             if (StringUtils.isNullOrEmpty(userinfo)) {
                 Toast.makeText(getApplicationContext(), "您尚未登录", Toast.LENGTH_SHORT).show();
             } else {
-                placeOrder();
+                Toast.makeText(getApplicationContext(),"沃视频会员限时免费中",Toast.LENGTH_SHORT).show();
+//                placeOrder();
             }
         });
 

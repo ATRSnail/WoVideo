@@ -6,11 +6,21 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ImageSpan;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -18,8 +28,10 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,21 +46,25 @@ import com.google.android.exoplayer.util.Util;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
+import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
 import com.lt.hm.wovideo.adapter.video.BrefIntroAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.CommentModel;
 import com.lt.hm.wovideo.model.LikeList;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.utils.ShareUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -63,14 +79,34 @@ import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
+import master.flame.danmaku.controller.IDanmakuView;
+import master.flame.danmaku.danmaku.loader.ILoader;
+import master.flame.danmaku.danmaku.loader.IllegalDataException;
+import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
+import master.flame.danmaku.danmaku.model.BaseDanmaku;
+import master.flame.danmaku.danmaku.model.DanmakuTimer;
+import master.flame.danmaku.danmaku.model.IDisplayer;
+import master.flame.danmaku.danmaku.model.android.BaseCacheStuffer;
+import master.flame.danmaku.danmaku.model.android.DanmakuContext;
+import master.flame.danmaku.danmaku.model.android.Danmakus;
+import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
+import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
+import master.flame.danmaku.danmaku.parser.IDataSource;
+import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
+import master.flame.danmaku.danmaku.util.IOUtils;
 import okhttp3.Call;
 
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
@@ -84,7 +120,7 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  */
 public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
         AudioCapabilitiesReceiver.Listener {
-//    @BindView(R.id.video_player)
+    //    @BindView(R.id.video_player)
 //    WoVideoPlayer videoPlayer;
     @BindView(R.id.video_name)
     TextView videoName;
@@ -104,20 +140,21 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     ImageView movieBrefPurch;
     @BindView(R.id.bref_txt1)
     TextView brefTxt1;
-    @BindView(R.id.bref_txt2)
-    TextView brefTxt2;
     @BindView(R.id.bref_expand)
     ImageView brefExpand;
     @BindView(R.id.video_bottom_grid)
     RecyclerView videoBottomGrid;
-
+    @BindView(R.id.free_hint)
+            TextView free_hint;
+    private boolean isCollected;
+    CommentAdapter commentAdapter;
     VideoModel video = new VideoModel();
-    VideoUrl videoUrl= new VideoUrl();
+    VideoUrl videoUrl = new VideoUrl();
     VideoItemGridAdapter grid_adapter;
     BrefIntroAdapter biAdapter;
-    String[] names = new String[]{"导演", "主演"};
+    String[] names = new String[]{"导演", "主演","类型","地区","年份","来源"};
     String[] values = new String[]{"王京", "周润发，刘德华"};
-
+    List<CommentModel.CommentListBean> beans;
     // Video thing
     // For use when launching the demo app using adb.
     private static final String CONTENT_EXT_EXTRA = "type";
@@ -132,6 +169,16 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
     }
 
+    @BindView(R.id.video_comment_list)
+    RecyclerView videoCommentList;
+    @BindView(R.id.empty_view)
+    TextView empty;
+    @BindView(R.id.et_add_comment)
+    EditText etAddComment;
+    @BindView(R.id.add_comment)
+    LinearLayout addComment;
+    @BindView(R.id.img_collect)
+    ImageView img_collect;
     private EventLogger mEventLogger;
     private AVController mMediaController;
     private AspectRatioFrameLayout mVideoFrame;
@@ -148,14 +195,82 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     private int mContentType;
     private String mContentId;
     private String mProvider;
-
+    private String mQualityName;
+    private String img_url;
+    private String share_title;
+    private String share_desc;
+    private String vfId;
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
+    // Bullet Screen
+    private BaseDanmakuParser mParser;
+    private IDanmakuView mDanmakuView;
+    private DanmakuContext mContext;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         mMediaController.onTouchEvent(event);
         return super.onTouchEvent(event);
     }
+
+    private BaseCacheStuffer.Proxy mCacheStufferAdapter = new BaseCacheStuffer.Proxy() {
+
+        private Drawable mDrawable;
+
+        @Override
+        public void prepareDrawing(final BaseDanmaku danmaku, boolean fromWorkerThread) {
+            if (danmaku.text instanceof Spanned) { // 根据你的条件检查是否需要需要更新弹幕
+                // FIXME 这里只是简单启个线程来加载远程url图片，请使用你自己的异步线程池，最好加上你的缓存池
+                new Thread() {
+
+                    @Override
+                    public void run() {
+                        String url = "http://www.bilibili.com/favicon.ico";
+                        InputStream inputStream = null;
+                        Drawable drawable = mDrawable;
+                        if(drawable == null) {
+                            try {
+                                URLConnection urlConnection = new URL(url).openConnection();
+                                inputStream = urlConnection.getInputStream();
+                                drawable = BitmapDrawable.createFromStream(inputStream, "bitmap");
+                                mDrawable = drawable;
+                            } catch (MalformedURLException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            } finally {
+                                IOUtils.closeQuietly(inputStream);
+                            }
+                        }
+                        if (drawable != null) {
+                            drawable.setBounds(0, 0, 100, 100);
+                            SpannableStringBuilder spannable = createSpannable(drawable);
+                            danmaku.text = spannable;
+                            if(mDanmakuView != null) {
+                                mDanmakuView.invalidateDanmaku(danmaku, false);
+                            }
+                            return;
+                        }
+                    }
+                }.start();
+            }
+        }
+
+        @Override
+        public void releaseResource(BaseDanmaku danmaku) {
+            // TODO 重要:清理含有ImageSpan的text中的一些占用内存的资源 例如drawable
+        }
+    };
+
+    private SpannableStringBuilder createSpannable(Drawable drawable) {
+        String text = "bitmap";
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
+        ImageSpan span = new ImageSpan(drawable);//ImageSpan.ALIGN_BOTTOM);
+        spannableStringBuilder.setSpan(span, 0, text.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableStringBuilder.append("图文混排");
+        spannableStringBuilder.setSpan(new BackgroundColorSpan(Color.parseColor("#8A2233B1")), 0, spannableStringBuilder.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        return spannableStringBuilder;
+    }
+
 
     // Activity lifecycle
 
@@ -188,13 +303,15 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         });
 
         mShutterView = findViewById(R.id.shutter);
-
+        mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
         mVideoFrame = (AspectRatioFrameLayout) findViewById(R.id.video_frame);
 
         mSurfaceView = (SurfaceView) findViewById(R.id.surface_view);
         mSurfaceView.getHolder().addCallback(this);
 
-        mMediaController = new KeyCompatibleMediaController(this);
+//        mMediaController = new KeyCompatibleMediaController(this);
+        mMediaController = new KeyCompatibleMediaController(this, mDanmakuView);
+
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         mMediaController.setGestureListener(this);
 
@@ -205,6 +322,102 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
         mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         mAudioCapabilitiesReceiver.register();
+
+        // 设置最大显示行数
+        HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
+        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 3); // 滚动弹幕最大显示5行
+        // 设置是否禁止重叠
+        HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<Integer, Boolean>();
+        overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
+        overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
+
+        mContext = DanmakuContext.create();
+        mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setScrollSpeedFactor(1.2f).setScaleTextSize(1.2f)
+                .setCacheStuffer(new SpannedCacheStuffer(), mCacheStufferAdapter) // 图文混排使用SpannedCacheStuffer
+//        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
+                .setMaximumLines(maxLinesPair)
+                .preventOverlapping(overlappingEnablePair);
+        if (mDanmakuView != null) {
+            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
+            mDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
+                @Override
+                public void updateTimer(DanmakuTimer timer) {
+                }
+
+                @Override
+                public void drawingFinished() {
+
+                }
+
+                @Override
+                public void danmakuShown(BaseDanmaku danmaku) {
+//                    Log.d("DFM", "danmakuShown(): text=" + danmaku.text);
+                }
+
+                @Override
+                public void prepared() {
+                    mDanmakuView.start();
+                }
+            });
+//            mDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
+//                @Override
+//                public void onDanmakuClick(BaseDanmaku latest) {
+//                    Log.d("DFM", "onDanmakuClick text:" + latest.text);
+//                }
+//
+//                @Override
+//                public void onDanmakuClick(IDanmakus danmakus) {
+//                    Log.d("DFM", "onDanmakuClick danmakus size:" + danmakus.size());
+//                }
+//            });
+            mDanmakuView.prepare(mParser, mContext);
+            mDanmakuView.showFPS(false);
+            mDanmakuView.enableDanmakuDrawingCache(true);
+//            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
+//
+//                @Override
+//                public void onClick(View view) {
+//                    mMediaController.setVisibility(View.VISIBLE);
+//                }
+//            });
+            ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                        //toggleControlsVisibility();
+                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                        v.performClick();
+                    }
+                    return false;
+                }
+            });
+        }
+
+
+    }
+
+    private BaseDanmakuParser createParser(InputStream stream) {
+        if (stream == null) {
+            return new BaseDanmakuParser() {
+
+                @Override
+                protected Danmakus parse() {
+                    return new Danmakus();
+                }
+            };
+        }
+
+        ILoader loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
+
+        try {
+            loader.load(stream);
+        } catch (IllegalDataException e) {
+            e.printStackTrace();
+        }
+        BaseDanmakuParser parser = new BiliDanmukuParser();
+        IDataSource<?> dataSource = loader.getDataSource();
+        parser.load(dataSource);
+        return parser;
 
     }
 
@@ -238,6 +451,10 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         if (Util.SDK_INT <= 23 || mPlayer == null) {
             onShown();
         }
+
+        if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
+            mDanmakuView.resume();
+        }
     }
 
     private void onShown() {
@@ -268,6 +485,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         if (Util.SDK_INT <= 23) {
             onHidden();
         }
+        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
+            mDanmakuView.pause();
+        }
     }
 
     @Override
@@ -275,6 +495,11 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         super.onStop();
         if (Util.SDK_INT > 23) {
             onHidden();
+        }
+        if (mDanmakuView != null) {
+            // dont forget release!
+            mDanmakuView.release();
+            mDanmakuView = null;
         }
     }
 
@@ -292,6 +517,11 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         super.onDestroy();
         mAudioCapabilitiesReceiver.unregister();
         releasePlayer();
+        if (mDanmakuView != null) {
+            // dont forget release!
+            mDanmakuView.release();
+            mDanmakuView = null;
+        }
     }
 
     @Override
@@ -306,6 +536,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     Gravity.CENTER
             );
+            mMediaController.setTitle(videoName.getText().toString());
+            mMediaController.setmQualitySwitch(mQualityName);
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -403,32 +635,38 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     // AVPlayer.Listener implementation
 
-    @Override public void onStateChanged(boolean playWhenReady, int playbackState) {
+    @Override
+    public void onStateChanged(boolean playWhenReady, int playbackState) {
 
     }
 
-    @Override public void onError(Exception e) {
+    @Override
+    public void onError(Exception e) {
 
     }
 
-    @Override public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
-                                             float pixelWidthHeightRatio) {
+    @Override
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
+                                   float pixelWidthHeightRatio) {
         mShutterView.setVisibility(View.GONE);
         mVideoFrame.setAspectRatio(
                 height == 0 ? 1 : (width * pixelWidthHeightRatio) / height);
     }
 
-    @Override public void onCues(List<Cue> cues) {
+    @Override
+    public void onCues(List<Cue> cues) {
 
     }
 
-    @Override public void onId3Metadata(List<Id3Frame> id3Frames) {
+    @Override
+    public void onId3Metadata(List<Id3Frame> id3Frames) {
 
     }
 
     // AudioCapabilitiesReceiver.Listener methods
 
-    @Override public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
+    @Override
+    public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
         if (mPlayer == null) {
             return;
         }
@@ -439,13 +677,14 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         mPlayer.setBackgrounded(backgrounded);
     }
 
-    private void toggleControlsVisibility()  {
+    private void toggleControlsVisibility() {
         if (mMediaController.isShowing()) {
             mMediaController.hide();
         } else {
             showControls();
         }
     }
+
     private void showControls() {
         mMediaController.show(0);
     }
@@ -475,7 +714,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     @TargetApi(23)
     private boolean maybeRequestPermission() {
         if (requiresPermission(mContentUri)) {
-            requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
             return true;
         } else {
             return false;
@@ -494,7 +733,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
      * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
      * extension.
      *
-     * @param uri The {@link Uri} of the media.
+     * @param uri           The {@link Uri} of the media.
      * @param fileExtension An overriding file extension.
      * @return The inferred type.
      */
@@ -506,16 +745,38 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     private static final class KeyCompatibleMediaController extends AVController {
 
-        private AVController.MediaPlayerControl playerControl;
+        private MediaPlayerControl playerControl;
+        private IDanmakuView mDanmakuView;
 
-        public KeyCompatibleMediaController(Context context) {
+        public KeyCompatibleMediaController(Context context,IDanmakuView danmakuView) {
             super(context);
+            mDanmakuView = danmakuView;
         }
 
         @Override
-        public void setMediaPlayer(AVController.MediaPlayerControl playerControl) {
+        public void setMediaPlayer(MediaPlayerControl playerControl) {
             super.setMediaPlayer(playerControl);
             this.playerControl = playerControl;
+        }
+
+        @Override
+        public void toggleBulletScreen(boolean isShow) {
+            super.toggleBulletScreen(isShow);
+            if (isShow) {
+                mDanmakuView.show();
+            } else {
+                mDanmakuView.hide();
+            }
+        }
+
+        @Override
+        public void show() {
+            super.show();
+        }
+
+        @Override
+        public void setTitle(String titleName) {
+            super.setTitle(titleName);
         }
 
         @Override
@@ -547,17 +808,78 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void init(Bundle savedInstanceState) {
+
+        beans = new ArrayList<>();
         hideSomething();
 //        videoPlayer.setVideoPlayCallback(mVideoPlayCallback);
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey("id")) {
-            String id = bundle.getString("id");
-            getVideoDetails(id);
-            getFirstURL(id);
+            vfId = bundle.getString("id");
+            getVideoDetails(vfId);
+            getFirstURL(vfId);
+            getCommentList(vfId);
+
         }
+
         getYouLikeDatas(10);
 
     }
+
+
+    private void getCommentList(String vfId) {
+        if (beans.size()>0){
+            beans.clear();
+        }
+        HashMap<String, Object> map = new HashMap<>();
+        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)) {
+            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+            map.put("userId", model.getId());
+            map.put("pageNum", 1);
+            map.put("numPerPage", 50);
+            map.put("vfId", vfId);
+            HttpApis.commentList(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
+
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log(response);
+                    ResponseObj<CommentModel, RespHeader> resp = new ResponseObj<CommentModel, RespHeader>();
+                    ResponseParser.parse(resp, response, CommentModel.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        if (!StringUtils.isNullOrEmpty(resp.getBody().getCommentList()) && resp.getBody().getCommentList().size() > 0) {
+                            empty.setVisibility(View.GONE);
+                            videoCommentList.setVisibility(View.VISIBLE);
+                            beans.addAll(resp.getBody().getCommentList());
+                            commentAdapter = new CommentAdapter(getApplicationContext(), beans);
+                            videoCommentList.setLayoutManager(new LinearLayoutManager(NewMoviePage.this));
+                            videoCommentList.addItemDecoration(new RecycleViewDivider(NewMoviePage.this, LinearLayoutManager.VERTICAL));
+                            videoCommentList.setItemAnimator(new DefaultItemAnimator());
+                            videoCommentList.setAdapter(commentAdapter);
+                            commentAdapter.notifyDataSetChanged();
+                        } else {
+                            //暂无评论内容布局添加
+                            if (videoCommentList!=null){
+                                videoCommentList.setVisibility(View.GONE);
+                            }
+                            empty.setVisibility(View.VISIBLE);
+                        }
+                    } else {
+                        //评论内容获取失败布局添加
+                        videoCommentList.setVisibility(View.GONE);
+                        empty.setVisibility(View.VISIBLE);
+                        empty.setText("获取评论失败,请稍后重试");
+                    }
+                }
+            });
+        } else {
+            UnLoginHandler.unLogin(NewMoviePage.this);
+        }
+    }
+
     private void getYouLikeDatas(int size) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("pageNum", 1);
@@ -565,12 +887,12 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         HttpApis.getYouLikeList(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                TLog.log("error:"+e.getMessage());
+                TLog.log("error:" + e.getMessage());
             }
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log("youlike"+response);
+                TLog.log("youlike" + response);
                 ResponseObj<LikeList, RespHeader> resp = new ResponseObj<LikeList, RespHeader>();
                 ResponseParser.parse(resp, response, LikeList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
@@ -584,12 +906,18 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     }
 
     private void initBottomGrid(List<LikeList.LikeListBean> grid_list) {
+        if (grid_list.size() > 6) {
+            int tmp = grid_list.size() - 6;
+            for (int i = 0; i < tmp; i++) {
+                grid_list.remove(0);
+            }
+        }
         grid_adapter = new VideoItemGridAdapter(NewMoviePage.this, grid_list);
         videoBottomGrid.setHasFixedSize(true);
-        GridLayoutManager manager= new GridLayoutManager(this,3);
+        GridLayoutManager manager = new GridLayoutManager(this, 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
         videoBottomGrid.setLayoutManager(manager);
-        videoBottomGrid.addItemDecoration(new RecycleViewDivider(NewMoviePage.this,GridLayoutManager.HORIZONTAL));
+        videoBottomGrid.addItemDecoration(new RecycleViewDivider(NewMoviePage.this, GridLayoutManager.HORIZONTAL));
         videoBottomGrid.setAdapter(grid_adapter);
         grid_adapter.notifyDataSetChanged();
         grid_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
@@ -600,54 +928,52 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         });
     }
 
-    public void getChangePage(String vfId){
-        HashMap<String,Object> maps = new HashMap<>();
-        maps.put("vfid",vfId);
+    public void getChangePage(String vfId) {
+        HashMap<String, Object> maps = new HashMap<>();
+        maps.put("vfid", vfId);
         maps.put("typeid", VideoType.MOVIE);
         HttpApis.getVideoInfo(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                TLog.log("error:"+e.getMessage());
+                TLog.log("error:" + e.getMessage());
             }
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log("getchange"+response);
-                ResponseObj<VideoDetails,RespHeader> resp= new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp,response,VideoDetails.class,RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
+                TLog.log("getchange" + response);
+                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
 
-                    if (resp.getBody().getVfinfo().getTypeId()== VideoType.MOVIE.getId()){
+                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
                         // TODO: 16/6/14 跳转电影页面
-                        Bundle bundle =  new Bundle();
-                        bundle.putString("id",vfId);
-                        UIHelper.ToMoviePage(NewMoviePage.this,bundle);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        UIHelper.ToMoviePage(NewMoviePage.this, bundle);
                         NewMoviePage.this.finish();
 
-                    }else if (resp.getBody().getVfinfo().getTypeId()==VideoType.TELEPLAY.getId()){
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
                         // TODO: 16/6/14 跳转电视剧页面
-                        Bundle bundle =  new Bundle();
-                        bundle.putString("id",vfId);
-                        UIHelper.ToDemandPage(NewMoviePage.this,bundle);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        UIHelper.ToDemandPage(NewMoviePage.this, bundle);
                         NewMoviePage.this.finish();
 
-                    }else if (resp.getBody().getVfinfo().getTypeId()==VideoType.SPORTS.getId()){
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
                         // TODO: 16/6/14 跳转 体育播放页面
-                        Bundle bundle =  new Bundle();
-                        bundle.putString("id",vfId);
-                        UIHelper.ToDemandPage(NewMoviePage.this,bundle);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        UIHelper.ToDemandPage(NewMoviePage.this, bundle);
                         NewMoviePage.this.finish();
 
-                    }
-                    else if (resp.getBody().getVfinfo().getTypeId()==VideoType.VARIATY.getId()){
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
                         // TODO: 16/6/14 跳转综艺界面
-                        Bundle bundle =  new Bundle();
-                        bundle.putString("id",vfId);
-                        UIHelper.ToDemandPage(NewMoviePage.this,bundle);
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        UIHelper.ToDemandPage(NewMoviePage.this, bundle);
                         NewMoviePage.this.finish();
 
-                    }
-                    else if (resp.getBody().getVfinfo().getTypeId()==VideoType.LIVE.getId()){
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.LIVE.getId()) {
                         UIHelper.ToLivePage(NewMoviePage.this);
                         NewMoviePage.this.finish();
 
@@ -659,6 +985,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     /**
      * 获取视频详情数据
+     *
      * @param id
      */
     public void getVideoDetails(String id) {
@@ -667,20 +994,32 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         HttpApis.getVideoInfo(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                TLog.log("error:"+e.getMessage());
+                TLog.log("error:" + e.getMessage());
             }
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log("video-details"+response);
+                TLog.log("video-details" + response);
                 ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
                 ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    VideoDetails.VfinfoBean details= resp.getBody().getVfinfo();
-                    values= new String[]{details.getDirector(),details.getStars()};
+                    VideoDetails.VfinfoBean details = resp.getBody().getVfinfo();
+                   img_url=details.getImg();
+                    share_title=details.getName();
+                   share_desc=details.getIntroduction();
+                    values = new String[]{details.getDirector(), details.getStars(),details.getLx(),details.getDq(),details.getNd(),details.getCpname()};
                     biAdapter = new BrefIntroAdapter(NewMoviePage.this, names, values);
                     videoBrefIntros.setAdapter(biAdapter);
+                    String userinfo= ACache.get(getApplicationContext()).getAsString("userinfo");
+                    if (!StringUtils.isNullOrEmpty(userinfo)){
+                        UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+                        String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
+                        if (!StringUtils.isNullOrEmpty(tag)) {
+                            free_hint.setText(" "+"已免流");
+                        }
+                    }
                     videoName.setText(details.getName());
+                    brefTxt1.setText(details.getIntroduction());
                     videoPlayNumber.setText(details.getHit());
                     Glide.with(NewMoviePage.this).load(HttpUtils.appendUrl(details.getImg())).centerCrop().crossFade().into(movieBrefImg);
                 }
@@ -693,18 +1032,90 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
      * 在正式项目中需要 解禁
      */
     private void hideSomething() {
-        videoCollect.setVisibility(View.GONE);
-        videoShare.setVisibility(View.GONE);
+        videoCollect.setVisibility(View.VISIBLE);
+        videoShare.setVisibility(View.VISIBLE);
         videoProjection.setVisibility(View.GONE);
-        brefTxt1.setVisibility(View.GONE);
-        brefTxt2.setVisibility(View.GONE);
-        brefExpand.setVisibility(View.GONE);
+        brefTxt1.setVisibility(View.VISIBLE);
+        brefExpand.setVisibility(View.VISIBLE);
         movieBrefPurch.setVisibility(View.GONE);
     }
 
+    boolean text_flag = false;
+
     @Override
     public void initViews() {
+        brefTxt1.setHeight(brefTxt1.getLineHeight() * 3);
 
+        videoShare.setOnClickListener((View v)->{
+            ShareUtils.showShare(this, null, true, share_title,share_desc,HttpUtils.appendUrl(img_url));
+
+        });
+        addComment.setOnClickListener((View v) -> {
+            if (TextUtils.isEmpty(etAddComment.getText().toString())) {
+                Toast.makeText(getApplicationContext(), "评论内容不能为空", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            SendComment(etAddComment.getText().toString());
+        });
+
+        videoCollect.setOnClickListener((View v)->{
+            if (!isCollected){
+                CollectVideo();
+                isCollected=true;
+            }else{
+                Toast.makeText(getApplicationContext(),"取消收藏",Toast.LENGTH_SHORT).show();
+                img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                isCollected=false;
+            }
+        });
+
+
+        brefExpand.setOnClickListener((View v) -> {
+            if (!text_flag) {
+                text_flag = true;
+                brefTxt1.setMaxHeight(100);
+                brefExpand.setImageDrawable(getResources().getDrawable(R.drawable.icon_zoom));
+            } else {
+                text_flag = false;
+                brefExpand.setImageDrawable(getResources().getDrawable(R.drawable.icon_expand));
+                brefTxt1.setMaxLines(2);
+            }
+        });
+    }
+
+    /**
+     * 收藏 视频接口调用
+     */
+    private void CollectVideo() {
+        HashMap<String, Object> map = new HashMap<>();
+        String string = ACache.get(this).getAsString("userinfo");
+        if (!StringUtils.isNullOrEmpty(string)) {
+            UserModel model = new Gson().fromJson(string, UserModel.class);
+            map.put("userid", model.getId());
+            map.put("vfid", vfId);
+            HttpApis.collectVideo(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
+
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log("collect->" + response);
+                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                    }else{
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                    }
+                }
+            });
+        } else {
+            // TODO: 16/7/8 未登录跳转登录页面
+            UnLoginHandler.unLogin(NewMoviePage.this);
+        }
     }
 
     @Override
@@ -713,34 +1124,131 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     }
 
     /**
+     * 添加评论
+     *
+     * @param s
+     */
+    private void SendComment(String s) {
+        HashMap<String, Object> map = new HashMap<>();
+        String string = ACache.get(this).getAsString("userinfo");
+        if (!StringUtils.isNullOrEmpty(string)) {
+            UserModel model = new Gson().fromJson(string, UserModel.class);
+            map.put("userId", model.getId());
+            map.put("vfId", vfId);
+            map.put("comment", s);
+            HttpApis.pushComment(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
+
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log(response);
+                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                    etAddComment.setText("");
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        Toast.makeText(getApplicationContext(), "评论成功", Toast.LENGTH_SHORT).show();
+                        TLog.log("comment_list" + vfId);
+                        getCommentList(vfId);
+                    } else {
+                        if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
+                            Toast.makeText(getApplicationContext(), "评论失败", Toast.LENGTH_SHORT).show();
+                        } else {
+                            TLog.log(resp.getHead().getRspMsg());
+                            Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                }
+            });
+        } else {
+            UnLoginHandler.unLogin(NewMoviePage.this);
+        }
+    }
+    /**
      * 获取 视频播放地址，并播放
+     *
      * @param vfId
      */
     public void getFirstURL(String vfId) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", vfId);
-        String login_info  = ACache.get(this).getAsString("userinfo");
-        if (StringUtils.isNullOrEmpty(login_info)){
+        String login_info = ACache.get(this).getAsString("userinfo");
+        if (StringUtils.isNullOrEmpty(login_info)) {
 
-        }else{
-            UserModel model= new Gson().fromJson(login_info,UserModel.class);
-            maps.put("userid",model.getId());
+        } else {
+            UserModel model = new Gson().fromJson(login_info, UserModel.class);
+            maps.put("userid", model.getId());
         }
         HttpApis.getVideoListInfo(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                TLog.log("error:"+e.getMessage());
+                TLog.log("error:" + e.getMessage());
             }
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log("first-url"+response);
+                TLog.log("first-url" + response);
                 ResponseObj<PlayList, RespHeader> resp = new ResponseObj<PlayList, RespHeader>();
                 ResponseParser.parse(resp, response, PlayList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    PlayList.PlaysListBean details= resp.getBody().getPlaysList().get(0);
+                    PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
 //                    TLog.log("first_url"+details.getStandardUrl());
-                    getRealURL(details.getFluentUrl());
+
+                    VideoModel model = new VideoModel();
+                    ArrayList<VideoUrl> urls= new ArrayList<VideoUrl>();
+                    if (!StringUtils.isNullOrEmpty(details.getFluentUrl())){
+                        VideoUrl url= new VideoUrl();
+                        url.setFormatName("流畅");
+                        url.setFormatUrl(details.getFluentUrl());
+                        urls.add(url);
+                    }
+                    if (!StringUtils.isNullOrEmpty(details.getStandardUrl())){
+                        VideoUrl url= new VideoUrl();
+                        url.setFormatName("标清");
+                        url.setFormatUrl(details.getStandardUrl());
+                        urls.add(url);
+                    }
+                    if (!StringUtils.isNullOrEmpty(details.getBlueUrl())){
+                        VideoUrl url= new VideoUrl();
+                        url.setFormatName("蓝光");
+                        url.setFormatUrl(details.getBlueUrl());
+                        urls.add(url);
+                    }
+                    if (!StringUtils.isNullOrEmpty(details.getHighUrl())){
+                        VideoUrl url= new VideoUrl();
+                        url.setFormatName("高清");
+                        url.setFormatUrl(details.getHighUrl());
+                        urls.add(url);
+                    }
+                    if (!StringUtils.isNullOrEmpty(details.getSuperUrl())){
+                        VideoUrl url= new VideoUrl();
+                        url.setFormatName("超清");
+                        url.setFormatUrl(details.getSuperUrl());
+                        urls.add(url);
+                    }
+                    if (!StringUtils.isNullOrEmpty(details.getFkUrl())){
+                        VideoUrl url= new VideoUrl();
+                        url.setFormatName("4K");
+                        url.setFormatUrl(details.getFkUrl());
+                        urls.add(url);
+                    }
+                    model.setmVideoUrl(urls);
+
+                    mMediaController.setVideoModel(model);
+                    mMediaController.setListener(new AVController.OnQualitySelected() {
+                        @Override
+                        public void onQualitySelect(String key, String value) {
+                            getRealURL(value);
+                        }
+                    });
+                    if (model.getmVideoUrl().size()>0){
+                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl());
+                        mQualityName= model.getmVideoUrl().get(0).getFormatName();
+                    }
+//                    getRealURL(details.getFluentUrl());
 //                    getRealURL(details.getStandardUrl());
                 }
             }
@@ -755,12 +1263,16 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     private void getRealURL(String url) {
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("videoSourceURL", url);
+//        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+//        if (StringUtils.isNullOrEmpty(userinfo)){
+//            return;
+//        }
         maps.put("cellphone", "18513179404");
         maps.put("freetag", 1);
         HttpApis.getVideoRealURL(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                TLog.log("error:"+e.getMessage());
+                TLog.log("error:" + e.getMessage());
             }
 
             @Override
@@ -769,7 +1281,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                 ResponseObj<VideoURL, RespHeader> resp = new ResponseObj<VideoURL, RespHeader>();
                 ResponseParser.parse(resp, response, VideoURL.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    if (videoUrl!=null && video!=null && mVideoFrame !=null){
+                    if (videoUrl != null && video != null && mVideoFrame != null) {
                         videoUrl.setFormatUrl(resp.getBody().getUrl());
                         video.setmPlayUrl(videoUrl);
                         // Reset player and params.

@@ -122,6 +122,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
         loginTag.setOnClickListener(this);
         registTag.setOnClickListener(this);
         order.setOnClickListener(this);
+        integral.setVisibility(View.GONE);
         integral.setOnClickListener(this);
         history.setOnClickListener(this);
         collect.setOnClickListener(this);

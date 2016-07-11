@@ -90,18 +90,20 @@ public class SelectMenuPop extends PopupWindow {
         this.setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
         this.setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         setBackgroundDrawable(new ColorDrawable(0x00000000));
+        setOutsideTouchable(true);
+
     }
 
-    public void showPopupWindow(View parent) {
-        if (!this.isShowing()) {
+    public void showPopupWindow(View parent,boolean shown) {
+        if (!shown) {
             // 以下拉方式显示popupwindow
-            // TODO: 16/7/3 需要调节 弹出尺寸以及 位置以及弹出动画效果 (二次点击 未收起 异常修复)
 //            this.showAsDropDown(parent, parent.getLayoutParams().width / 2, 18);
 //            this.showAtLocation(parent, Gravity.LEFT, 0, -90);
             this.showAsDropDown(parent);
             this.setFocusable(true);
+            shown=true;
         } else {
-
+            shown=false;
             this.dismiss();
         }
     }
@@ -114,6 +116,7 @@ public class SelectMenuPop extends PopupWindow {
         text.setGravity(Gravity.CENTER);
         text.setTextColor(context.getResources().getColor(R.color.black));
         HorizontalScrollView scrollView = new HorizontalScrollView(context);
+        scrollView.setHorizontalScrollBarEnabled(false);
         LinearLayout layout_scroll = new LinearLayout(context);
         layout_scroll.setOrientation(LinearLayout.HORIZONTAL);
         RadioGroup group = new RadioGroup(context);

@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
@@ -68,30 +69,49 @@ public class SearchPage extends BaseActivity {
 
     private boolean editSearch(View v, int keyCode) {
         if (keyCode == KeyEvent.KEYCODE_ENTER) {
-            // TODO: 16/4/17  关闭 输入法软键盘\
             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm.isActive()) {
                 imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
             }
             if (!flag){
-                search();
+                String s = searchEdit.getText().toString();
+                try {
+                    search(s);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 flag=true;
             }
         }
         return true;
     }
 
-    private void search() {
+    private void search(String s) throws JSONException {
         JSONArray array = new JSONArray();
         JSONArray array1 = ACache.get(this).getAsJSONArray("search_history");
-        if (!StringUtils.isNullOrEmpty(array1)) {
-            if (array1.length() > 0) {
-                array = array1;
+        if (StringUtils.isNullOrEmpty(s)){
+            Toast.makeText(getApplicationContext(),"搜索内容不能为空",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!StringUtils.isNullOrEmpty(array1) && array1.length()>0) {
+            array = array1;
+        }else{
+            array.put(s);
+            ACache.get(this).put("search_history", array);
+        }
+        if (array1!=null ){
+            for (int i = 0; i < array1.length(); i++) {
+                String tmp= (String) array1.get(i);
+                if (tmp.equals(s)){
+                    break;
+                }else{
+                    array.put(s);
+                    ACache.get(this).put("search_history", array);
+                    break;
+                }
             }
         }
-        array.put(searchEdit.getText().toString());
-        ACache.get(this).put("search_history", array);
-        // TODO: 16/4/19 跳转到 搜索结果界面，或者在该界面进行 控制是否显示 bu
+
         Bundle bundle= new Bundle();
         bundle.putString("flag",searchEdit.getText().toString());
         UIHelper.ToSearchResultPage(SearchPage.this,bundle);
@@ -132,12 +152,21 @@ public class SearchPage extends BaseActivity {
             searchAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
                 @Override
                 public void onItemClick(View view, int i) {
-                    // TODO: 16/6/29 搜索
+                    try {
+                        search(historys.get(i));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 }
             });
         }else{
             searchHistoryList.setVisibility(View.GONE);
         }
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.finish();
     }
 }

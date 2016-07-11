@@ -8,6 +8,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -98,7 +99,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     private String dq;
     private String nd;
     private boolean first_open = true;
-
+    private boolean shown=false;
     @Override
     protected int getLayoutId() {
         return R.layout.layout_new_class_details;
@@ -207,11 +208,21 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         });
         classDetailsChoose.setOnClickListener((View v) -> {
             SelectMenuPop pop = new SelectMenuPop(this, mId);
-            pop.showPopupWindow(class_details_head);
+            pop.showPopupWindow(class_details_head,shown);
             pop.setListener(new SelectMenuPop.OnRadioClickListener() {
                 @Override
                 public void clickListener(String key, String value) {
                     SearchChecked(key, value);
+                }
+            });
+            pop.setTouchInterceptor(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if(event.getAction()==MotionEvent.ACTION_OUTSIDE){
+                        pop.dismiss();
+                        return true;
+                    }
+                    return false;
                 }
             });
         });
@@ -342,7 +353,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     @Override
     public void rightClick() {
         SelectMenuPop pop = new SelectMenuPop(this, mId);
-        pop.showPopupWindow(class_details_head);
+        pop.showPopupWindow(class_details_head,shown);
         pop.setListener(new SelectMenuPop.OnRadioClickListener() {
             @Override
             public void clickListener(String key, String value) {

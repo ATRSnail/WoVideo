@@ -29,7 +29,7 @@ proguard/
 .idea/
 
 # Gradle
-.gradle
+.gradle/
 build
 out
 

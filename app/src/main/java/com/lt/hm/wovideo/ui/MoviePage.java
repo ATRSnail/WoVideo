@@ -72,7 +72,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import io.vov.vitamio.LibsChecker;
 import okhttp3.Call;
 
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
@@ -559,8 +558,6 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        if (!LibsChecker.checkVitamioLibs(this))
-            return;
         hideSomething();
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey("id")) {

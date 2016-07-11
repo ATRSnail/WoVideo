@@ -74,10 +74,11 @@
           android:textStyle="normal"
           android:paddingTop="4dip"
           android:paddingLeft="4dip"
-          android:layout_gravity="center_horizontal"
+          android:layout_gravity="center_vertical"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:paddingRight="4dip" />
+          android:paddingRight="4dip"
+          android:textColor="@android:color/white"/>
 
       <SeekBar
           android:id="@+id/mediacontroller_progress"
@@ -91,10 +92,11 @@
           android:textStyle="normal"
           android:paddingTop="4dip"
           android:paddingRight="4dip"
-          android:layout_gravity="center_horizontal"
+          android:layout_gravity="center_vertical"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:paddingLeft="4dip" />
+          android:paddingLeft="4dip"
+          android:textColor="@android:color/white"/>
 
       <ImageButton android:id="@+id/fullscreen"
           android:layout_gravity="center"

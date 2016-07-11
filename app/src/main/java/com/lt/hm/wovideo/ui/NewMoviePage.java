@@ -547,8 +547,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     protected void init(Bundle savedInstanceState) {
-//        if (!LibsChecker.checkVitamioLibs(this))
-//            return;
         hideSomething();
 //        videoPlayer.setVideoPlayCallback(mVideoPlayCallback);
         Bundle bundle = getIntent().getExtras();

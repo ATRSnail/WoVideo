@@ -32,11 +32,7 @@
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"
             >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity android:name=".ui.MainPage"
             android:screenOrientation="portrait"
@@ -45,7 +41,13 @@
         <activity android:name=".ui.MainPage2"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"
-            />
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
         <activity android:name="io.vov.vitamio.activity.InitActivity"
             android:launchMode="singleTop"

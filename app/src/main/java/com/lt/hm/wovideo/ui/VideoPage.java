@@ -16,7 +16,6 @@ import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 
 import butterknife.BindView;
-import io.vov.vitamio.LibsChecker;
 import io.vov.vitamio.widget.VideoView;
 
 /**
@@ -76,8 +75,6 @@ public class VideoPage extends BaseActivity{
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        if (!LibsChecker.checkVitamioLibs(this))
-            return;
 //        videoView.setVideoURI(Uri.parse("http://devimages.apple.com/iphone/samples/bipbop/gear1/prog_index.m3u8"));
 //        videoView.setVideoURI(Uri.parse("http://111.206.133.53:9910/if5ax/live/live_xpt/index.m3u8?vkey=4E36E4353070E6ECC78CADC43354B1DEFE83B110106A2&vid=Z-2oTN5kQ9ad_cJINnfZmA&apptype=web&pid=8031006300&portalid=319&preview=1&spid=21170&spip=111.206.133.39&spport=9910&tag=12&userid=18510509670&userip=61.148.116.190&videoname=abc&tradeid=ce28f8dcb3aae21394064e8a68b6c505&lsttm=20160602210740&enkey=2ce3c35d412af6e20be7385b186fb47f"));
         VideoModel video = new VideoModel();

@@ -565,8 +565,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 //        liveProgramList.addItemDecoration(new SpaceItemDecoration(10));
 //        liveProgramList.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         hideSomething();
-//        if (!LibsChecker.checkVitamioLibs(this))
-//            return;
     }
 
     private void hideSomething() {

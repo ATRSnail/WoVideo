@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merger version="3"><dataSet config="main"><source path="/Users/leonardo/AndroidStudioProjects/WoVideo/library/src/main/shaders"/></dataSet><dataSet config="release"><source path="/Users/leonardo/AndroidStudioProjects/WoVideo/library/src/release/shaders"/></dataSet></merger>
+<merger version="3"><dataSet config="main"><source path="/Users/KECB/Projects/Android/2016/WoVideo/library/src/main/shaders"/></dataSet><dataSet config="release"><source path="/Users/KECB/Projects/Android/2016/WoVideo/library/src/release/shaders"/></dataSet></merger>

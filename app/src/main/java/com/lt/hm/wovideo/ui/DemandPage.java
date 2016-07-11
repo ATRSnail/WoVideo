@@ -556,8 +556,6 @@ public class DemandPage extends BaseActivity implements View.OnClickListener,Sur
 
     @Override
     protected void init(Bundle savedInstanceState) {
-//        if (!LibsChecker.checkVitamioLibs(this))
-//            return;
         antholys = new ArrayList<>();
 
         Bundle bundle = getIntent().getExtras();

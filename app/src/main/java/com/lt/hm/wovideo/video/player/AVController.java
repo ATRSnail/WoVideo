@@ -17,6 +17,8 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -55,6 +57,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private View.OnClickListener mNextListener, mPrevListener;
   StringBuilder               mFormatBuilder;
   Formatter                   mFormatter;
+  private TextView            mVideoTitle;
+  private TextView            mQualitySwitch;
+  private CheckBox            mBulletSwitch;
   private ImageButton         mPauseButton;
   private ImageButton         mFfwdButton;
   private ImageButton         mRewButton;
@@ -159,6 +164,18 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   }
 
   private void initControllerView(View v) {
+    mVideoTitle = (TextView) v.findViewById(R.id.video_title);
+
+    mQualitySwitch = (TextView) v.findViewById(R.id.quality_switch);
+    if (mQualitySwitch != null) {
+      mQualitySwitch.setOnClickListener(mQualitySwitchListener);
+    }
+
+    mBulletSwitch = (CheckBox) v.findViewById(R.id.bullet_switch);
+    if (mBulletSwitch != null) {
+      mBulletSwitch.setOnCheckedChangeListener(mBulletSwitchListener);
+    }
+
     mBackButton = (ImageButton) v.findViewById(R.id.back);
     if (mBackButton != null) {
       mBackButton.setOnClickListener(mBackListener);
@@ -425,6 +442,27 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     show(sDefaultTimeout);
     return super.dispatchKeyEvent(event);
   }
+
+  private OnClickListener mQualitySwitchListener = new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      //TODO show qulity listview
+    }
+  };
+
+  private CompoundButton.OnCheckedChangeListener mBulletSwitchListener = new CompoundButton.OnCheckedChangeListener() {
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+      //TODO
+      toggleBulletScreen(isChecked);
+    }
+  };
+
+  /**
+   * for override
+   * @param isShow
+     */
+  public void toggleBulletScreen(boolean isShow) {};
 
   private View.OnClickListener mBackListener = new View.OnClickListener() {
     public void onClick(View v) {

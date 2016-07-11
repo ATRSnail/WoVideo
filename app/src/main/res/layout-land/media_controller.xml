@@ -161,11 +161,22 @@
         android:text="May the Force be with You!"
         style="@style/PlayerMenuText"/>
 
-    <TextView android:id="@+id/quality_switcher"
+    <TextView
+        android:id="@+id/quality_switch"
         android:text="高清"
         android:layout_alignParentRight="true"
         style="@style/PlayerMenuText"
         />
+
+    <CheckBox
+        android:id="@+id/bullet_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@id/quality_switch"
+        android:layout_centerVertical="true"
+        android:textColor="@android:color/white"
+        android:text="弹幕"/>
+
   </RelativeLayout>
 
 </RelativeLayout>

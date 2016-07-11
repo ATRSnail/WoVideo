@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import com.google.android.exoplayer.ExoPlayer;
 
+import master.flame.danmaku.controller.IDanmakuView;
+
 /**
  * An implementation of {@link AVController.MediaPlayerControl} for controlling an {@link ExoPlayer}
  * instance.

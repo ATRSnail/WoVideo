@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:layout_gravity="top|center_horizontal">
+
             <SurfaceView
                 android:id="@+id/surface_view"
                 android:layout_width="match_parent"
@@ -28,6 +29,10 @@
                 android:layout_gravity="center_horizontal"
                 android:visibility="gone"
                 android:background="@android:color/black"/>
+            <master.flame.danmaku.ui.widget.DanmakuView
+                android:id="@+id/sv_danmaku"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
             <!--<com.google.android.exoplayer.text.SubtitleLayout android:id="@+id/subtitles"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content"/>-->

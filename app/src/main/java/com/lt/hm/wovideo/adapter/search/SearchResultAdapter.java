@@ -17,16 +17,18 @@ import java.util.List;
  */
 public class SearchResultAdapter extends BaseQuickAdapter<SearchResult.VfListBean> {
     public SearchResultAdapter(Context context,List<SearchResult.VfListBean> data) {
-        super(context, R.layout.layout_item_grid, data);
+        super(context, R.layout.layout_home_item, data);
     }
 
     @Override
     protected void convert(BaseViewHolder holder, SearchResult.VfListBean vfListBean) {
-        holder.setText(R.id.grid_item_title, vfListBean.getName());
+        holder.setText(R.id.home_item_title, vfListBean.getName());
+        holder.setText(R.id.home_item_desc, vfListBean.getName());
+
         if (vfListBean.getImg() != null) {
-            holder.setImageUrl(R.id.grid_item_img_bg, HttpUtils.appendUrl(vfListBean.getImg()));
+            holder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(vfListBean.getImg()));
         } else {
-            holder.setImageResource(R.id.grid_item_img_bg, R.drawable.img_4);
+            holder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
         }
         if (!vfListBean.getIsfree().equals("1")){
             holder.setVisible(R.id.item_vip_logo,true);

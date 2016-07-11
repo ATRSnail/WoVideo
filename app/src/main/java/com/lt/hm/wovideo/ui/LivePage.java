@@ -44,7 +44,9 @@ import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.util.Util;
+import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.video.LiveTVListAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
@@ -54,7 +56,9 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.model.LiveTVList;
+import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
@@ -132,6 +136,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     PercentRelativeLayout live_video_bottom;
     @BindView(R.id.live_video_bref)
     LinearLayout live_video_bref;
+    @BindView(R.id.free_hint)
+    TextView free_hint;
     int newIndex = 0;
     int oldIndex = -1;
 
@@ -186,6 +192,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     private String mContentId;
     private String mProvider;
 
+    private String img_url;
+    private String share_title;
+    private String share_desc;
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
 
     // Bullet Screen
@@ -387,7 +396,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         mMediaController = new KeyCompatibleMediaController(this, mDanmakuView);
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         mMediaController.setGestureListener(this);
-
         CookieHandler currentHanlder = CookieHandler.getDefault();
         if (currentHanlder != defaultCookieManager) {
             CookieHandler.setDefault(defaultCookieManager);
@@ -446,7 +454,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 //                }
 //            });
             mDanmakuView.prepare(mParser, mContext);
-            mDanmakuView.showFPS(true);
+            mDanmakuView.showFPS(false);
             mDanmakuView.enableDanmakuDrawingCache(true);
 //            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
 //
@@ -586,6 +594,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     Gravity.CENTER
             );
             mMediaController.setTitle(videoName.getText().toString());
+            mMediaController.setSwitchVisibility(View.INVISIBLE);
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -861,7 +870,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         otherList = new ArrayList<>();
         btns = new Button[]{liveBtnSina, liveBtnLocal, liveBtnCctv, liveBtnOthertv};
         liveProgramList.setLayoutManager(new LinearLayoutManager(this));
-        liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this,LinearLayoutManager.VERTICAL));
+        liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this,LinearLayoutManager.VERTICAL,R.drawable.custom_list_divider));
+//        liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this,LinearLayoutManager.VERTICAL,getResources().getDimensionPixelOffset(3),R.color.gray_lightest));
 //        liveProgramList.addItemDecoration(new SpaceItemDecoration(10));
 //        liveProgramList.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         hideSomething();
@@ -888,6 +898,11 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 ex_flag = true;
             }
         });
+
+//        videoShare.setOnClickListener((View v)->{
+//            ShareUtils.showShare(this, null, true, share_title,share_desc, HttpUtils.appendUrl(img_url));
+//
+//        });
 
         liveBtnSina.setOnClickListener((View v) -> {
             changeState(btns[0]);
@@ -919,8 +934,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         for (int i = 0; i < btns.length; i++) {
             Button tmp= btns[i];
             if (btn!=tmp){
-                tmp.setBackgroundColor(getResources().getColor(R.color.white));
-                tmp.setTextColor(getResources().getColor(R.color.black));
+                tmp.setBackgroundColor(getResources().getColor(R.color.gray_lighter));
+                tmp.setTextColor(getResources().getColor(R.color.font_black));
             }else{
                 tmp.setBackgroundColor(getResources().getColor(R.color.blue_btn_bg_color));
                 tmp.setTextColor(getResources().getColor(R.color.white));
@@ -954,7 +969,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     otherList.addAll(resp.getBody().getOtherTv());
 
 //                    mList.addAll(resp.getBody().getLiveTvList());
-                    initListViews(sinaList);
+                    initListViews(cctvList);
                 }
             }
         });
@@ -971,30 +986,22 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             @Override
             public void onItemClick(View view, int i) {
 
+
                 String url = liveTvList.get(i).getUrl();
+                String userinfo= ACache.get(getApplicationContext()).getAsString("userinfo");
+                if (!StringUtils.isNullOrEmpty(userinfo)){
+                    UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+                    String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
+                    if (!StringUtils.isNullOrEmpty(tag)) {
+                        free_hint.setText(" "+"已免流");
+                    }
+                }
                 videoName.setText(liveTvList.get(i).getTvName());
+
+//                videoName.setText(liveTvList.get(i).getTvName());
                 getRealURL(url);
             }
         });
-//        adapter.setListener(new LiveTVListAdapter.ItemOnClick() {
-//            @Override
-//            public void onClick(BaseViewHolder  holder, int position) {
-////                newIndex = position;
-////                if (oldIndex==-1){
-////                    oldIndex = newIndex;
-////                    holder.setText(R.id.live_list_item_current_text,"正在播放");
-////                }else{
-////                    if (oldIndex!=newIndex){
-////                       TextView view= (TextView) holder.convertView.findViewWithTag("测试"+oldIndex);
-////                        view.setText(liveTvList.get(oldIndex).getNowPro());
-////                    }else{
-////                        holder.setText(R.id.live_list_item_current_text,"正在播放");
-////                    }
-////                }
-//                holder.setText(R.id.live_list_item_current_text,"正在播放");
-//
-//            }
-//        });
     }
 
     private void getRealURL(String url) {

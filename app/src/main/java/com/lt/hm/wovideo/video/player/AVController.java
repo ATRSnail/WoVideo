@@ -28,6 +28,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.video.model.VideoModel;
 
 import java.lang.ref.WeakReference;
 import java.util.Formatter;
@@ -81,6 +82,20 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private int mMaxVolume;
 
 
+    /**
+     * @author leo
+     */
+  private OnQualitySelected listener;
+  private VideoModel videoModel;
+  QualityPopWindow window;
+
+  public void setVideoModel(VideoModel videoModel) {
+    this.videoModel = videoModel;
+  }
+
+  public void setListener(OnQualitySelected listener) {
+    this.listener = listener;
+  }
 
   public AVController(Context context, AttributeSet attrs) {
     super(context, attrs);
@@ -91,6 +106,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     Log.i(TAG, TAG);
   }
+
 
   public AVController(Context context, boolean useFastForward) {
     super(context);
@@ -162,6 +178,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     return mRoot;
   }
+
+
 
   private void initControllerView(View v) {
     mVideoTitle = (TextView) v.findViewById(R.id.video_title);
@@ -240,6 +258,18 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     mCenterLayout.setVisibility(GONE);
     mCenterImage = (ImageView) v.findViewById(R.id.image_center_bg);
     mCenterPorgress = (ProgressBar) v.findViewById(R.id.progress_center);
+  }
+
+  public void setmQualitySwitch(String name) {
+    if (mQualitySwitch!=null){
+      mQualitySwitch.setText(name);
+    }
+  }
+
+  public void setSwitchVisibility(int visibility){
+    if (mQualitySwitch!=null){
+      mQualitySwitch.setVisibility(visibility);
+    }
   }
 
   /**
@@ -443,10 +473,24 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     return super.dispatchKeyEvent(event);
   }
 
+
+  boolean shown=false;
   private OnClickListener mQualitySwitchListener = new OnClickListener() {
     @Override
     public void onClick(View v) {
       //TODO show qulity listview
+      QualityPopWindow  window= new QualityPopWindow(mContext,videoModel);
+      window.showPopupWindow(mQualitySwitch,shown);
+      window.setListener(new QualityPopWindow.OnQulitySelect() {
+        @Override
+        public void selected(String key, String value) {
+          mQualitySwitch.setText(key);
+          // TODO: 16/7/11 ADD CALLBACK TO ACTIVITY TO CHANGE VIDEO
+          if (listener!=null){
+            listener.onQualitySelect(key,value);
+          }
+        }
+      });
     }
   };
 
@@ -834,4 +878,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     }
   }
 
+  public interface  OnQualitySelected{
+    void onQualitySelect(String key,String value);
+  }
 }

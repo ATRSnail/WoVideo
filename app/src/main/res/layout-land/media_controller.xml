@@ -175,6 +175,8 @@
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/quality_switch"
         android:layout_centerVertical="true"
+        android:paddingRight="@dimen/s_10"
+        android:checked="true"
         android:textColor="@android:color/white"
         android:text="弹幕"/>
 

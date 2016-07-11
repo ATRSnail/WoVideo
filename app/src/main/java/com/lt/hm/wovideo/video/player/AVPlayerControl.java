@@ -3,9 +3,8 @@ package com.lt.hm.wovideo.video.player;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import com.google.android.exoplayer.ExoPlayer;
 
-import master.flame.danmaku.controller.IDanmakuView;
+import com.google.android.exoplayer.ExoPlayer;
 
 /**
  * An implementation of {@link AVController.MediaPlayerControl} for controlling an {@link ExoPlayer}

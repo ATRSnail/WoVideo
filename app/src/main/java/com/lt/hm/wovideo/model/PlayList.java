@@ -47,6 +47,13 @@ public class PlayList {
         private String fluentUrl;//流畅地址
         private String sc;//是否收藏 1是0否
 
+        public String getFluentUrl() {
+            return fluentUrl;
+        }
+
+        public void setFluentUrl(String fluentUrl) {
+            this.fluentUrl = fluentUrl;
+        }
 
         public String getId() {
             return id;
@@ -179,7 +186,7 @@ public class PlayList {
         @Override
         public String toString() {
             return "PlaysListBean{" +
-                    ", id='" + id + '\'' +
+                    "id='" + id + '\'' +
                     ", utime=" + utime +
                     ", vfId='" + vfId + '\'' +
                     ", index=" + index +
@@ -194,6 +201,7 @@ public class PlayList {
                     ", highUrl='" + highUrl + '\'' +
                     ", blueUrl='" + blueUrl + '\'' +
                     ", fkUrl='" + fkUrl + '\'' +
+                    ", fluentUrl='" + fluentUrl + '\'' +
                     ", sc='" + sc + '\'' +
                     '}';
         }

@@ -108,8 +108,10 @@
     <string name="localTv">地方台</string>
     <string name="sinatv">卫视</string>
     <string name="cctv">央视</string>
-    <string name="other_string">其他</string>
+    <string name="other_string">专业</string>
     <string name="unlogin_hint">尚未登录</string>
     <string name="plz_search_hint">请输入搜索内容</string>
+    <string name="plz_comment_hint">请输入评论</string>
+    <string name="comment">评论</string>
 
 </resources>

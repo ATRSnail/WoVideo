@@ -49,12 +49,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="io.vov.vitamio.activity.InitActivity"
-            android:launchMode="singleTop"
-            android:theme="@android:style/Theme.NoTitleBar"
-            android:windowSoftInputMode="stateAlwaysHidden"
-            tools:replace="android:configChanges"
-            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"/>
+        <!--<activity android:name="io.vov.vitamio.activity.InitActivity"-->
+            <!--android:launchMode="singleTop"-->
+            <!--android:theme="@android:style/Theme.NoTitleBar"-->
+            <!--android:windowSoftInputMode="stateAlwaysHidden"-->
+            <!--tools:replace="android:configChanges"-->
+            <!--android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"/>-->
         <!--android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden"-->
 
         <activity android:name=".ui.VideoPage"

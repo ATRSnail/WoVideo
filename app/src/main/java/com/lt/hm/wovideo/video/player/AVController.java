@@ -17,7 +17,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -25,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
@@ -60,7 +60,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   Formatter                   mFormatter;
   private TextView            mVideoTitle;
   private TextView            mQualitySwitch;
-  private CheckBox            mBulletSwitch;
+  private Switch              mBulletSwitch;
   private ImageButton         mPauseButton;
   private ImageButton         mFfwdButton;
   private ImageButton         mRewButton;
@@ -189,7 +189,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       mQualitySwitch.setOnClickListener(mQualitySwitchListener);
     }
 
-    mBulletSwitch = (CheckBox) v.findViewById(R.id.bullet_switch);
+    mBulletSwitch = (Switch) v.findViewById(R.id.bullet_switch);
     if (mBulletSwitch != null) {
       mBulletSwitch.setOnCheckedChangeListener(mBulletSwitchListener);
     }

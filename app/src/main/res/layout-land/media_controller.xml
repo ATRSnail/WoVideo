@@ -169,16 +169,16 @@
         style="@style/PlayerMenuText"
         />
 
-    <CheckBox
+    <Switch
         android:id="@+id/bullet_switch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@id/quality_switch"
         android:layout_centerVertical="true"
         android:paddingRight="@dimen/s_10"
-        android:checked="true"
-        android:textColor="@android:color/white"
-        android:text="弹幕"/>
+        android:showText="true"
+        android:textOn="弹"
+        android:textOff="弹"/>
 
   </RelativeLayout>
 

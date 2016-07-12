@@ -19,43 +19,38 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/s_46"
         android:layout_gravity="center_vertical" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        android:padding="5dp">
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="none"
+            >
+
+            <LinearLayout
+                android:id="@+id/details_type_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"></LinearLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/class_refresh_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@color/white"
-                android:orientation="horizontal"
-                android:padding="5dp">
-
-                <HorizontalScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:scrollbars="none"
-                    >
-
-                    <LinearLayout
-                        android:id="@+id/details_type_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="horizontal"></LinearLayout>
-                </HorizontalScrollView>
-            </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/class_details_list"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1.0" />
-        </LinearLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

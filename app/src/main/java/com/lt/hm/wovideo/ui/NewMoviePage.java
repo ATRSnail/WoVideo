@@ -1241,11 +1241,11 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                     mMediaController.setListener(new AVController.OnQualitySelected() {
                         @Override
                         public void onQualitySelect(String key, String value) {
-                            getRealURL(value);
+                            getRealURL(value, true);
                         }
                     });
                     if (model.getmVideoUrl().size()>0){
-                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl());
+                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false);
                         mQualityName= model.getmVideoUrl().get(0).getFormatName();
                     }
 //                    getRealURL(details.getFluentUrl());
@@ -1260,7 +1260,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
      *
      * @param url
      */
-    private void getRealURL(String url) {
+    private void getRealURL(String url, boolean isQualitySwitch) {
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("videoSourceURL", url);
 //        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
@@ -1286,7 +1286,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                         video.setmPlayUrl(videoUrl);
                         // Reset player and params.
                         releasePlayer();
-                        mPlayerPosition = 0;
+                        mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
                         // Set play URL and play it
                         setIntent(onUrlGot());
                         onShown();

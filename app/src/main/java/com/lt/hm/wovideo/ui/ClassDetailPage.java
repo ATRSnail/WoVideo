@@ -33,6 +33,7 @@ import okhttp3.Call;
  * @author leonardo
  * @version 1.0
  * @create_date 16/6/8
+ * @deprecated
  */
 public class ClassDetailPage extends BaseActivity implements SecondTopbar.myTopbarClicklistenter {
 
@@ -182,7 +183,7 @@ public class ClassDetailPage extends BaseActivity implements SecondTopbar.myTopb
     public void rightClick() {
         // TODO: 16/7/3 侦听 当前所在页面为哪一个，然后弹出对应的菜单项
         SelectMenuPop pop = new SelectMenuPop(this, Integer.parseInt(id));
-        pop.showPopupWindow(classDetailsTopbar);
+//        pop.showPopupWindow(classDetailsTopbar);
         pop.setListener(new SelectMenuPop.OnRadioClickListener() {
             @Override
             public void clickListener(String key, String value) {

@@ -97,6 +97,11 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
         });
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        getClassInfos();
+    }
 
 
     private void getClassInfos() {

@@ -411,14 +411,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     if(null != mGestureDetector){
       mGestureDetector.onTouchEvent(event);
     }
-    //        toggleContollerView();
-    show(sDefaultTimeout);
     return false;
   }
 
   @Override
   public boolean onTrackballEvent(MotionEvent ev) {
-    show(sDefaultTimeout);
     return false;
   }
 
@@ -469,7 +466,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       return true;
     }
 
-    show(sDefaultTimeout);
+//    show(sDefaultTimeout);
     return super.dispatchKeyEvent(event);
   }
 
@@ -531,14 +528,14 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private View.OnClickListener mPauseListener = new View.OnClickListener() {
     public void onClick(View v) {
       doPauseResume();
-      show(sDefaultTimeout);
+//      show(sDefaultTimeout);
     }
   };
 
   private View.OnClickListener mFullscreenListener = new View.OnClickListener() {
     public void onClick(View v) {
       doToggleFullscreen();
-      show(sDefaultTimeout);
+//      show(sDefaultTimeout);
     }
   };
 
@@ -635,7 +632,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       mDragging = false;
       setProgress();
       updatePausePlay();
-      show(sDefaultTimeout);
+//      show(sDefaultTimeout);
 
       // Ensure that progress is properly updated in the future,
       // the call to show() does not guarantee this because it is a
@@ -691,7 +688,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       mPlayer.seekTo(pos);
       setProgress();
 
-      show(sDefaultTimeout);
+//      show(sDefaultTimeout);
     }
   };
 
@@ -706,7 +703,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       mPlayer.seekTo(pos);
       setProgress();
 
-      show(sDefaultTimeout);
+//      show(sDefaultTimeout);
     }
   };
 
@@ -740,16 +737,22 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   }
 
   @Override public void onSingleTap() {
-    //show(sDefaultTimeout);
+    if (isShowing()) {
+      hide();
+    } else {
+      show(0);
+    }
   }
 
   @Override public void onHorizontalScroll(MotionEvent event, float delta) {
+    show(sDefaultTimeout);
     Log.i(TAG, delta+"");
     if (event.getPointerCount() == 1)
       mPlayer.seekTo(mPlayer.getCurrentPosition() + Math.round(delta));
   }
 
   @Override public void onVerticalScroll(MotionEvent event, float delta, int direction) {
+    show(sDefaultTimeout);
     Log.i(TAG, delta+"");
     if (event.getPointerCount() == 1) {
       if (direction == ViewGestureListener.SWIPE_LEFT) {

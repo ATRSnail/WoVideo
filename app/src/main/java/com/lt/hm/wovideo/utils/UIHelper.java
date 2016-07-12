@@ -8,6 +8,7 @@ import com.lt.hm.wovideo.ui.AboutPage;
 import com.lt.hm.wovideo.ui.BillsPage;
 import com.lt.hm.wovideo.ui.CollectPage;
 import com.lt.hm.wovideo.ui.DemandPage;
+import com.lt.hm.wovideo.ui.GuidPage;
 import com.lt.hm.wovideo.ui.HistoryPage;
 import com.lt.hm.wovideo.ui.LivePage;
 import com.lt.hm.wovideo.ui.LoginPage;
@@ -190,6 +191,11 @@ public class UIHelper {
 
     public static void ToADPage(Context context) {
         Intent intent = new Intent(context,StartAdPage.class);
+        context.startActivity(intent);
+    }
+
+    public static void ToGuidePage(Context context) {
+        Intent intent = new Intent(context,GuidPage.class);
         context.startActivity(intent);
     }
 }

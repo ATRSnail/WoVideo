@@ -36,7 +36,7 @@ public class BillList {
         private String id;
         private long utime;
         private String goodsId;
-        private int moneys;
+        private float moneys;
         private String orderNo;
         private String userId;
         private String state;//订单状态 1未付款 2已付款 3退订 4已关闭
@@ -77,7 +77,7 @@ public class BillList {
             this.goodsId = goodsId;
         }
 
-        public int getMoneys() {
+        public float getMoneys() {
             return moneys;
         }
 

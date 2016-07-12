@@ -7,7 +7,6 @@ import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.util.concurrent.TimeUnit;
 
-import cn.sharesdk.framework.ShareSDK;
 import okhttp3.OkHttpClient;
 
 /**
@@ -28,9 +27,9 @@ public class AppContext extends BaseApplication {
         instance=this;
         _context = getApplicationContext();
         _resource = _context.getResources();
+//        ShareSDK.initSDK(this);
         Stetho.initializeWithDefaults(this);
         initNetWork();
-        ShareSDK.initSDK(this);
 //        Glide.get(this).register(GlideUrl.class, InputStream.class,
 //                new OkHttpClient.Factory(OkHttpUtils.getInstance()));
     }

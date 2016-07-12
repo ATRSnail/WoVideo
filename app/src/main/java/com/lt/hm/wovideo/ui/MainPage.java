@@ -27,6 +27,7 @@ import butterknife.BindView;
  * @author leonardo
  * @version 1.0
  * @create_date 16/5/26
+ * @deprecated
  */
 public class MainPage extends BaseActivity implements IconTabPageIndicator.OnTabReselectedListener {
     @BindView(R.id.divider)

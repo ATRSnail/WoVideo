@@ -882,7 +882,7 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
 
 
 
-                getRealURL(bean.getFluentUrl());
+                getRealURL(bean.getFluentUrl(), false);
 //                getRealURL(bean.getStandardUrl());
             }
         });
@@ -1079,11 +1079,11 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
                     mMediaController.setListener(new AVController.OnQualitySelected() {
                         @Override
                         public void onQualitySelect(String key, String value) {
-                            getRealURL(value);
+                            getRealURL(value, true);
                         }
                     });
                     if (model.getmVideoUrl().size()>0){
-                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl());
+                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false);
                         mMediaController.setmQualitySwitch(model.getmVideoUrl().get(0).getFormatName());
                     }
 //                    getRealURL(details.getStandardUrl());
@@ -1097,7 +1097,7 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
      *
      * @param url
      */
-    private void getRealURL(String url) {
+    private void getRealURL(String url, boolean isQualitySwitch) {
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("videoSourceURL", url);
         maps.put("cellphone", "18513179404");
@@ -1118,7 +1118,7 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
                     video.setmPlayUrl(videoUrl);
                     // Reset player and params.
                     releasePlayer();
-                    mPlayerPosition = 0;
+                    mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
                     // Set Player
                     setIntent(onUrlGot());
                     onShown();

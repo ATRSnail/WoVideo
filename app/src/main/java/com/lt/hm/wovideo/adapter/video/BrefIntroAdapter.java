@@ -55,7 +55,7 @@ public class BrefIntroAdapter extends BaseAdapter {
         }else{
             holder= (ViewHolder) convertView.getTag();
         }
-        holder.introlName.setText(names[position]);
+        holder.introlName.setText(names[position]+":");
         holder.introlValue.setText(values[position]);
         return convertView;
     }

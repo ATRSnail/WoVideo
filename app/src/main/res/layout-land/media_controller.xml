@@ -173,6 +173,7 @@
         android:id="@+id/bullet_switch"
         android:layout_toLeftOf="@id/quality_switch"
         android:paddingRight="@dimen/s_10"
+        android:checked="true"
         android:showText="true"
         android:textOn="弹"
         android:textOff="弹"

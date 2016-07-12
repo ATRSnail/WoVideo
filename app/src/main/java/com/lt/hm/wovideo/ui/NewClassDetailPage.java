@@ -333,7 +333,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                         // TODO: 16/6/14 跳转 体育播放页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        UIHelper.ToMoviePage(NewClassDetailPage.this, bundle);
+//                        UIHelper.ToMoviePage(NewClassDetailPage.this, bundle);
+                        UIHelper.ToDemandPage(NewClassDetailPage.this, bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
                         // TODO: 16/6/14 跳转综艺界面
                         Bundle bundle = new Bundle();

@@ -3,7 +3,6 @@ package com.lt.hm.wovideo.fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -96,7 +95,6 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
         refreshView.setOnRefreshListener(this);
 
         b_list = new ArrayList<>();
-        List<Fragment> fragments = getFragmentManager().getFragments();
     }
 
     private void getListDatas(int id, String tag) {
@@ -190,7 +188,8 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                         // TODO: 16/6/14 跳转 体育播放页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        UIHelper.ToMoviePage(getActivity(), bundle);
+//                        UIHelper.ToMoviePage(getActivity(), bundle);
+                        UIHelper.ToDemandPage(getActivity(), bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
                         // TODO: 16/6/14 跳转综艺界面
                         Bundle bundle = new Bundle();

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.MediaCodec;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.Surface;
 
 import com.google.android.exoplayer.CodecCounters;
@@ -370,6 +371,14 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
   }
 
   @Override public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+    //TODO add a playback state callback
+    /**
+     * when playbackState is {@link ExoPlayer.STATE_ENDED} tell activity to implement play next
+     * episode feature.
+     */
+    if (playbackState == ExoPlayer.STATE_ENDED) {
+      Log.d("Play State", "onPlayerStateChanged: play ended");
+    }
     maybeReportPlayerState();
   }
 
@@ -418,17 +427,29 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
     }
   }
 
+  private long loadedBytes = 0;
+  private long sumDuration = 0;
   @Override
   public void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format,
       long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
+    //TODO grab the bytesloaded info to tell activity.
+    //125992483(actual is 125938756) bytes fluent using 748404ms loaded
+    loadedBytes += bytesLoaded;
+    sumDuration += loadDurationMs;
+    Log.w("LoadSize", "onLoadCompleted: " + loadedBytes + " bytes"
+            + ", duration is :" + sumDuration + " ms");
     if (mInfoListener != null) {
       mInfoListener.onLoadCompleted(sourceId, bytesLoaded, type, trigger, format, mediaStartTimeMs,
           mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs);
     }
   }
 
+  private long loadedBytesCanceled = 0;
   @Override public void onLoadCanceled(int sourceId, long bytesLoaded) {
     // Do nothing.
+    //TODO grab the bytesloaded info to tell activity.
+    loadedBytesCanceled += bytesLoaded;
+    Log.w("LoadSize", "onLoadCanceled: " + loadedBytesCanceled + " bytes");
   }
 
   @Override public void onLoadError(int sourceId, IOException e) {

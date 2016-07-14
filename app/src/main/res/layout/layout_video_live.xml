@@ -2,10 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:keepScreenOn="true"
-    android:descendantFocusability="blocksDescendants"
-    >
+    android:descendantFocusability="blocksDescendants">
 
     <FrameLayout
         android:id="@+id/video_root"
@@ -35,6 +35,13 @@
                 android:id="@+id/sv_danmaku"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+            <com.victor.loading.rotate.RotateLoading
+                android:id="@+id/loading"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                app:loading_width="5dp"
+                app:loading_color="@color/video_loading"
+                android:layout_gravity="center"/>
             <!--<com.google.android.exoplayer.text.SubtitleLayout android:id="@+id/subtitles"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content"/>-->

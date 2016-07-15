@@ -159,11 +159,11 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.history:
                 // TODO: 16/6/6 观看历史
-//                UIHelper.ToHistoryPage(this);
+                UIHelper.ToHistoryPage(this);
                 break;
             case R.id.collect:
                 // TODO: 16/6/6 我的收藏
-//                UIHelper.ToCollectPage(this);
+                UIHelper.ToCollectPage(this);
                 break;
             case R.id.btn_person_back:
                 PersonCenter.this.finish();

@@ -13,4 +13,17 @@
         app:Customtoptitle="@string/my_collect"
         app:leftBackGround="@drawable/left_arrow"
         app:rightBackGround="@drawable/left_arrow" />
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0"
+        android:id="@+id/collect_refresh"
+        >
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/collect_list"
+            />
+    </android.support.v4.widget.SwipeRefreshLayout>
 </LinearLayout>

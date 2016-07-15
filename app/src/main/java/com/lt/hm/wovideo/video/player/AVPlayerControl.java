@@ -25,6 +25,7 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
 
   // Sensor
   private SensorManager mSensorManager;
+  private boolean isLandScape = false;
 
   public AVPlayerControl(ExoPlayer exoPlayer, Context context) {
     mExoPlayer = exoPlayer;
@@ -59,8 +60,9 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
   }
 
   @Override public boolean isFullScreen() {
-
-    return ((Activity)mContext).getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? true : false ;
+    //TODO depends on accelarate
+//    return ((Activity)mContext).getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE ? true : false ;
+    return isLandScape;
   }
 
   @Override public void toggleFullScreen() {
@@ -68,8 +70,10 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
     mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
     if(isFullScreen()){
       activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+      isLandScape = false;
     }else {
       activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+      isLandScape = true;
     }
     //This is the default value
     //activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);

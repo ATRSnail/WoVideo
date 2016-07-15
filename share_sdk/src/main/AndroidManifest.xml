@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="msgcopy.share_sdk">
+    package="msgcopy.wovideo">
 
     <application
         android:allowBackup="true"

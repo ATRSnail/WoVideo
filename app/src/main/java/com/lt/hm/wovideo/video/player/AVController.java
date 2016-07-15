@@ -577,7 +577,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     updatePausePlay();
   }
 
-  private void doToggleFullscreen() {
+  public void doToggleFullscreen() {
     if (mPlayer == null) {
       return;
     }

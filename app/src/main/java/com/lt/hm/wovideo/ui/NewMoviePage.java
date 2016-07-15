@@ -362,27 +362,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                     mDanmakuView.start();
                 }
             });
-//            mDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
-//                @Override
-//                public void onDanmakuClick(BaseDanmaku latest) {
-//                    Log.d("DFM", "onDanmakuClick text:" + latest.text);
-//                }
-//
-//                @Override
-//                public void onDanmakuClick(IDanmakus danmakus) {
-//                    Log.d("DFM", "onDanmakuClick danmakus size:" + danmakus.size());
-//                }
-//            });
             mDanmakuView.prepare(mParser, mContext);
             mDanmakuView.showFPS(false);
             mDanmakuView.enableDanmakuDrawingCache(true);
-//            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
-//
-//                @Override
-//                public void onClick(View view) {
-//                    mMediaController.setVisibility(View.VISIBLE);
-//                }
-//            });
             ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {

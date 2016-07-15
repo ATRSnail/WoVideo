@@ -39,15 +39,3 @@ dist
 tmp
 
 *.bin
-
-*.bin
-
-*.lock
-
-*.bin
-
-app/src/main/res/drawable-xhdpi/icon_zoom.png
-
-.gradle/2.10/taskArtifacts/fileHashes.bin
-
-*.bin

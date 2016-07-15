@@ -2,6 +2,7 @@ package com.lt.hm.wovideo.video.player;
 
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,6 +65,7 @@ public class QualityPopWindow extends PopupWindow {
                     if (isChecked) {
                         if (listener != null) {
                             QualityPopWindow.this.dismiss();
+                            Log.d("Quality", "onCheckedChanged: " + videoUrl.getFormatName() + ", url " + videoUrl.getFormatUrl());
                             listener.selected(videoUrl.getFormatName(), videoUrl.getFormatUrl());
                         }
                     }

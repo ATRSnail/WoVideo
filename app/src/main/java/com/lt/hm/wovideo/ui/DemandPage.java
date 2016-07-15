@@ -77,6 +77,7 @@ import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
+import com.victor.loading.rotate.RotateLoading;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.io.IOException;
@@ -184,6 +185,7 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
     private AVController mMediaController;
     private AspectRatioFrameLayout mVideoFrame;
     private View mShutterView;
+    private RotateLoading mRotateLoading;
     private SurfaceView mSurfaceView;
 
     private AVPlayer mPlayer;
@@ -311,6 +313,7 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
             }
         });
 
+        mRotateLoading = (RotateLoading) findViewById(R.id.loading);
         mShutterView = findViewById(R.id.shutter);
         mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
 
@@ -546,12 +549,14 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
                     Gravity.CENTER
             );
             mMediaController.setTitle(videoName.getText().toString());
-
+            mMediaController.doToggleFullscreen();
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();
+
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
+            mMediaController.doToggleFullscreen();
         }
 //        if (null == woPlayer) return;
 //        /***
@@ -646,7 +651,13 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
 
     @Override
     public void onStateChanged(boolean playWhenReady, int playbackState) {
+        if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
+            mRotateLoading.stop();
+            //TODO play next if exist.
 
+        } else {
+            mRotateLoading.start();
+        }
     }
 
     @Override

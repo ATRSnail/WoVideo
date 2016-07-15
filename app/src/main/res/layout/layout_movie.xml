@@ -41,7 +41,11 @@
                 app:loading_width="5dp"
                 app:loading_color="@color/video_loading"
                 android:layout_gravity="center"/>
-
+            <TextView
+                android:id="@+id/free_label"
+                android:text="@string/free_network"
+                android:visibility="invisible"
+                style="@style/TextWithRoundedBackground" />
             <!--<com.google.android.exoplayer.text.SubtitleLayout android:id="@+id/subtitles"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content"/>-->

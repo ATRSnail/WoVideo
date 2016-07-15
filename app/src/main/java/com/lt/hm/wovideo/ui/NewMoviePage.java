@@ -146,7 +146,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     @BindView(R.id.video_bottom_grid)
     RecyclerView videoBottomGrid;
     @BindView(R.id.free_hint)
-            TextView free_hint;
+    TextView free_hint;
+    @BindView(R.id.free_label)
+    TextView mFreeLabel;
     private boolean isCollected;
     CommentAdapter commentAdapter;
     VideoModel video = new VideoModel();
@@ -1004,7 +1006,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                         UserModel model = new Gson().fromJson(userinfo,UserModel.class);
                         String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
                         if (!StringUtils.isNullOrEmpty(tag)) {
-                            free_hint.setText(" "+"已免流");
+//                            free_hint.setText(" "+"已免流");
+                            mFreeLabel.setVisibility(View.VISIBLE);
                         }
                     }
                     videoName.setText(details.getName());

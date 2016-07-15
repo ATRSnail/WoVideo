@@ -139,6 +139,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     LinearLayout live_video_bref;
     @BindView(R.id.free_hint)
     TextView free_hint;
+    @BindView(R.id.free_label)
+    TextView mFreeLabel;
     int newIndex = 0;
     int oldIndex = -1;
 
@@ -1000,7 +1002,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     UserModel model = new Gson().fromJson(userinfo,UserModel.class);
                     String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
                     if (!StringUtils.isNullOrEmpty(tag)) {
-                        free_hint.setText(" "+"已免流");
+//                        free_hint.setText(" "+"已免流");
+                        mFreeLabel.setVisibility(View.VISIBLE);
                     }
                 }
                 videoName.setText(liveTvList.get(i).getTvName());

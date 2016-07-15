@@ -161,7 +161,9 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
     @BindView(R.id.empty_view)
     TextView empty;
     @BindView(R.id.free_hint)
-            TextView free_hint;
+    TextView free_hint;
+    @BindView(R.id.free_label)
+    TextView mFreeLabel;
 
     VideoItemListAdapter list_adapter;
     VideoItemGridAdapter grid_adapter;
@@ -549,14 +551,12 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
                     Gravity.CENTER
             );
             mMediaController.setTitle(videoName.getText().toString());
-            mMediaController.doToggleFullscreen();
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
-            mMediaController.doToggleFullscreen();
         }
 //        if (null == woPlayer) return;
 //        /***
@@ -998,7 +998,8 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
                         UserModel model = new Gson().fromJson(userinfo,UserModel.class);
                         String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
                         if (!StringUtils.isNullOrEmpty(tag)) {
-                            free_hint.setText(" "+"已免流");
+//                            free_hint.setText(" "+"已免流");
+                            mFreeLabel.setVisibility(View.VISIBLE);
                         }
                     }
                     videoName.setText(details.getName());

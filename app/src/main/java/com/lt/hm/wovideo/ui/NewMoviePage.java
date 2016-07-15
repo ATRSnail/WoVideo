@@ -77,6 +77,7 @@ import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.widget.CustomListView;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
+import com.victor.loading.rotate.RotateLoading;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.io.IOException;
@@ -183,6 +184,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     private AVController mMediaController;
     private AspectRatioFrameLayout mVideoFrame;
     private View mShutterView;
+    private RotateLoading mRotateLoading;
     private SurfaceView mSurfaceView;
 
     private AVPlayer mPlayer;
@@ -302,6 +304,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             }
         });
 
+        mRotateLoading = (RotateLoading) findViewById(R.id.loading);
         mShutterView = findViewById(R.id.shutter);
         mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
         mVideoFrame = (AspectRatioFrameLayout) findViewById(R.id.video_frame);
@@ -637,7 +640,11 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     public void onStateChanged(boolean playWhenReady, int playbackState) {
-
+        if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
+            mRotateLoading.stop();
+        } else {
+            mRotateLoading.start();
+        }
     }
 
     @Override

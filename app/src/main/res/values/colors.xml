@@ -31,4 +31,5 @@
     <color name="viewfinder_mask">#60000000</color>
     <color name="possible_result_points">#c0ffff00</color>
     <color name="red">#f2192d</color>
+    <color name="video_loading">#1E88E5</color>
 </resources>

@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.TLog;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.builder.GetBuilder;
 import com.zhy.http.okhttp.builder.PostFileBuilder;
@@ -54,7 +55,7 @@ public class HttpUtils {
                 }
             }
         }
-
+        TLog.log("request_params"+maps.toString());
         builder.build().execute(callback);
     }
 

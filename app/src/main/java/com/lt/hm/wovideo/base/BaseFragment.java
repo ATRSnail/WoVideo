@@ -139,6 +139,8 @@ public class BaseFragment extends Fragment implements BaseFragmentInterface,View
 		super.onDestroyView();
 	}
 
+
+
 	// http://stackoverflow.com/questions/15207305/getting-the-error-java-lang-illegalstateexception-activity-has-been-destroyed
 	@Override
 	public void onDetach() {

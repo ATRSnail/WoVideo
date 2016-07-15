@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:keepScreenOn="true"
-    android:descendantFocusability="blocksDescendants"
     >
 
     <FrameLayout
@@ -40,39 +39,36 @@
             <!--android:layout_height="wrap_content"/>-->
         </com.google.android.exoplayer.AspectRatioFrameLayout>
     </FrameLayout>
+    <include layout="@layout/video_bottom"
+        android:id="@+id/live_video_bottom"
+        />
 
-    <ScrollView
+    <View
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/font_gray"
-        >
+        android:layout_height="5dp"
+        android:background="@color/font_gray" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            >
+    <include layout="@layout/layout_video_live_bref"
+        android:id="@+id/live_video_bref"
+        />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@color/font_gray" />
+    <!--<ScrollView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:orientation="vertical"-->
+        <!--android:background="@color/font_gray"-->
+        <!--&gt;-->
 
-            <include layout="@layout/video_bottom"
-                android:id="@+id/live_video_bottom"
-                />
+        <!--<LinearLayout-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="vertical"-->
+            <!--&gt;-->
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:background="@color/font_gray" />
-
-            <include layout="@layout/layout_video_live_bref"
-                android:id="@+id/live_video_bref"
-
-                />
-
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="10dp"
-                android:background="@color/font_gray" />
             <include layout="@layout/layout_live_program" />
-        </LinearLayout>
-    </ScrollView>
+        <!--</LinearLayout>-->
+    <!--</ScrollView>-->
 </LinearLayout>

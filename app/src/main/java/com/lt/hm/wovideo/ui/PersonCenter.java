@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
@@ -163,7 +164,12 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.collect:
                 // TODO: 16/6/6 我的收藏
-                UIHelper.ToCollectPage(this);
+                String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+                if (StringUtils.isNullOrEmpty(userinfo)){
+                    UnLoginHandler.unLogin(PersonCenter.this);
+                }else{
+                    UIHelper.ToCollectPage(this);
+                }
                 break;
             case R.id.btn_person_back:
                 PersonCenter.this.finish();

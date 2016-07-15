@@ -99,6 +99,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     private String dq;
     private String nd;
     private boolean first_open = true;
+    private boolean spinner_flag= true;
+    private boolean search_first=true;
     private boolean shown=false;
     @Override
     protected int getLayoutId() {
@@ -133,6 +135,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     }
 
     private void addHeadTypeView() {
+        details_type_title.invalidate();
+        details_type_title.removeAllViewsInLayout();
         RadioGroup group = new RadioGroup(this);
         group.setOrientation(RadioGroup.HORIZONTAL);
         Map<String, String> values = new LinkedHashMap<>();
@@ -182,6 +186,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
             }
         }
         details_type_title.addView(group);
+        details_type_title.invalidate();
     }
 
     @Override
@@ -193,13 +198,16 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         classDetailsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!first_open) {
+                if (!spinner_flag) {
                     mId = position + 1;
                     if (b_list != null && b_list.size() > 0) {
                         b_list.clear();
+                        getListDatas(mId);
                     }
-                    getListDatas(mId);
+                }else{
+                    spinner_flag=false;
                 }
+                addHeadTypeView();
             }
 
             @Override
@@ -226,8 +234,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 }
             });
         });
-
         addHeadTypeView();
+
     }
 
     @Override
@@ -236,7 +244,9 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     }
 
     private void getListDatas(int id) {
-        first_open = false;
+        if (b_list != null && b_list.size() > 0) {
+            b_list.clear();
+        }
         HashMap<String, Object> map = new HashMap<>();
         map.put("typeid", id);
         map.put("pageNum", pageNum);
@@ -258,7 +268,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
                 ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    b_list.addAll(resp.getBody().getTypeList());
+                    b_list=resp.getBody().getTypeList();
                     for (int i = 0; i < b_list.size(); i++) {
                         b_list.get(i).setDesc(b_list.get(i).getIntroduction());
                     }
@@ -395,9 +405,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         if (b_list != null && b_list.size() > 0) {
             b_list.clear();
         }
-        if (!first_open) {
-            getListDatas(mId);
-        }
+        getListDatas(mId);
+
     }
 
     @Override
@@ -414,5 +423,17 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 }
             }
         }, 3000);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        first_open=true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        first_open=false;
     }
 }

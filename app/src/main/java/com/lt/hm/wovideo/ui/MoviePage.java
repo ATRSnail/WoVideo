@@ -110,8 +110,8 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
     RecyclerView videoBottomGrid;
     @BindView(R.id.bref_txt1)
     TextView brefTxt1;
-    @BindView(R.id.bref_txt2)
-    TextView brefTxt2;
+//    @BindView(R.id.bref_txt2)
+//    TextView brefTxt2;
     @BindView(R.id.bref_expand)
     ImageView brefExpand;
 
@@ -577,7 +577,7 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
         videoShare.setVisibility(View.GONE);
         videoProjection.setVisibility(View.GONE);
         brefTxt1.setVisibility(View.GONE);
-        brefTxt2.setVisibility(View.GONE);
+//        brefTxt2.setVisibility(View.GONE);
         brefExpand.setVisibility(View.GONE);
         movieBrefPurch.setVisibility(View.GONE);
     }
@@ -696,11 +696,11 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
         movieBrefImg.setLayoutParams(params);
         brefExpand.setOnClickListener((View v) -> {
             if (flag) {
-                brefTxt2.setVisibility(View.GONE);
+//                brefTxt2.setVisibility(View.GONE);
                 brefExpand.setImageResource(R.drawable.icon_expand);
                 flag = false;
             } else {
-                brefTxt2.setVisibility(View.VISIBLE);
+//                brefTxt2.setVisibility(View.VISIBLE);
                 brefExpand.setImageResource(R.drawable.icon_zoom);
                 flag = true;
             }

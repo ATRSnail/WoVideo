@@ -63,8 +63,16 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/bref_txt1"
+            android:id="@+id/bref_txt_short"
+            android:maxLines="3"
+            android:ellipsize="end"
             android:text="有时候我们会遇到这样的情况，为了让布局显得更为精简，会对大段的文本（一般用于人物介绍等地方）进行折叠，用户点击展开。通常都带有一个小图标，随着折叠展开来进行翻转。这种效果是怎么展现的呢，老规矩，先上效果图。用的是genymotion模拟器，确实快了很多，只是电脑太渣，占用很多内存。"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/bref_txt_long"
+            android:visibility="gone"
             />
 
         <ImageView

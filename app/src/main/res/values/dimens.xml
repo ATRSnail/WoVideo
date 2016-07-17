@@ -19,4 +19,6 @@
     <dimen name="s_10">10dp</dimen>
     <dimen name="s_1">1dp</dimen>
     <dimen name="s_5">5dp</dimen>
+    <dimen name="s_30">30dp</dimen>
+    <dimen name="s_40">40dp</dimen>
 </resources>

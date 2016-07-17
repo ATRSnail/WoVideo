@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CompoundButton;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -80,6 +81,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     RecyclerView classDetailsList;
     @BindView(R.id.details_type_title)
     LinearLayout details_type_title;
+    @BindView(R.id.type_container)
+    HorizontalScrollView type_container;
     List<VideoList.TypeListBean> b_list;
     VipItemAdapter bottom_adapter;
     int pageNum = 1;
@@ -216,7 +219,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         });
         classDetailsChoose.setOnClickListener((View v) -> {
             SelectMenuPop pop = new SelectMenuPop(this, mId);
-            pop.showPopupWindow(class_details_head,shown);
+//            pop.showPopupWindow(class_details_head,shown);
+            pop.showPopupWindow(type_container,shown);
             pop.setListener(new SelectMenuPop.OnRadioClickListener() {
                 @Override
                 public void clickListener(String key, String value) {
@@ -364,7 +368,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     @Override
     public void rightClick() {
         SelectMenuPop pop = new SelectMenuPop(this, mId);
-        pop.showPopupWindow(class_details_head,shown);
+//        pop.showPopupWindow(class_details_head,shown);
+        pop.showPopupWindow(type_container,shown);
         pop.setListener(new SelectMenuPop.OnRadioClickListener() {
             @Override
             public void clickListener(String key, String value) {

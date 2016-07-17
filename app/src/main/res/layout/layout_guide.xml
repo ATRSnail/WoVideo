@@ -28,7 +28,7 @@
             android:paddingBottom="@dimen/s_20"
             android:paddingLeft="@dimen/s_10"
             android:paddingRight="@dimen/s_10"
-            android:src="@drawable/indicator_01"/>
+            android:src="@drawable/icon_circle_full"/>
 
         <ImageView
             android:layout_width="wrap_content"
@@ -38,7 +38,7 @@
             android:paddingBottom="@dimen/s_20"
             android:paddingLeft="@dimen/s_10"
             android:paddingRight="@dimen/s_10"
-            android:src="@drawable/indicator_01"/>
+            android:src="@drawable/icon_circle_n_full"/>
 
         <ImageView
             android:layout_width="wrap_content"
@@ -48,6 +48,6 @@
             android:paddingBottom="@dimen/s_20"
             android:paddingLeft="@dimen/s_10"
             android:paddingRight="@dimen/s_10"
-            android:src="@drawable/indicator_01"/>
+            android:src="@drawable/icon_circle_n_full"/>
     </LinearLayout>
 </RelativeLayout>

@@ -55,6 +55,7 @@ public class GuidPage extends BaseActivity implements ViewPager.OnPageChangeList
         mAdapter = new ViewPagerAdapter(views, this);
         guide_viewpager = (ViewPager) findViewById(R.id.guide_viewpager);
         guide_viewpager.setAdapter(mAdapter);
+        initPoint(views.size());
         guide_viewpager.setOnPageChangeListener(this);
     }
 
@@ -78,13 +79,23 @@ public class GuidPage extends BaseActivity implements ViewPager.OnPageChangeList
 
     @Override
     public void onPageSelected(int position) {
-//        setCurDot(position);
+        setCurDot(position);
         if (position == 3) {
             UIHelper.ToMain2(this);
             GuidPage.this.finish();
         } else {
 
             guide_viewpager.setCurrentItem(position);
+        }
+    }
+
+    private void setCurDot(int position) {
+        for (int i = 0; i < points.length; i++) {
+            if (i==position){
+                points[i].setImageDrawable(getResources().getDrawable(R.drawable.icon_circle_full));
+            }else{
+                points[i].setImageDrawable(getResources().getDrawable(R.drawable.icon_circle_n_full));
+            }
         }
     }
 
@@ -128,6 +139,31 @@ public class GuidPage extends BaseActivity implements ViewPager.OnPageChangeList
             return (view == object);
 
         }
+    }
+
+    /**
+     * 初始化底部小点
+     */
+    private void initPoint(int views) {
+        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.point);
+
+        points = new ImageView[views];
+
+        //循环取得小点图片
+        for (int i = 0; i < views; i++) {
+            //得到一个LinearLayout下面的每一个子元素
+            points[i] = (ImageView) linearLayout.getChildAt(i);
+            //默认都设为灰色
+            points[i].setEnabled(true);
+            //给每个小点设置监听
+            //设置位置tag，方便取出与当前位置对应
+            points[i].setTag(i);
+        }
+
+        //设置当面默认的位置
+        currentIndex = 0;
+        //设置为白色，即选中状态
+        points[currentIndex].setEnabled(false);
     }
 
 }

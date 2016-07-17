@@ -553,8 +553,11 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
             mMediaController.setTitle(videoName.getText().toString());
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();
-
+            //show status bar
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            //hide status bar
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         }

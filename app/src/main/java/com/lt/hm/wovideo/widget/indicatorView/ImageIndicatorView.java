@@ -13,7 +13,6 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -204,13 +203,21 @@ public class ImageIndicatorView extends RelativeLayout {
 				pageItem.setScaleType(ImageView.ScaleType.CENTER_CROP);
 				frameLayout.addView(pageItem);
 				if (urllist.get(i).getIsvip().equals("1")){
+//					LinearLayout layout= new LinearLayout(getContext());
+//					LinearLayout.LayoutParams params_liner = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//					params_liner.gravity=Gravity.CENTER_HORIZONTAL;
+//					layout.setLayoutParams(params_liner);
+
 					ImageView view= new ImageView(getContext());
 					view.setImageResource(R.drawable.icon_v_vip);
-					LinearLayout.LayoutParams params =new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-					params.gravity= Gravity.RIGHT;
+					FrameLayout.LayoutParams params =new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+					params.gravity= Gravity.TOP|Gravity.RIGHT;
+
+//					layout.addView(view);
 					frameLayout.addView(view,params);
 				}
 				addViewItem(frameLayout);
+
 			}
 		}
 	}
@@ -289,9 +296,9 @@ public class ImageIndicatorView extends RelativeLayout {
 			imageView.setLayoutParams(lp);
 
 			if (this.currentIndex == index) {
-				imageView.setBackgroundResource(R.drawable.image_indicator_dot_focus);
+				imageView.setBackgroundResource(R.drawable.icon_circle_full);
 			} else {
-				imageView.setBackgroundResource(R.drawable.image_indicator_dot);
+				imageView.setBackgroundResource(R.drawable.icon_circle_n_full);
 			}
 		}
 		if (this.onItemChangeListener != null) {// notify item state changed

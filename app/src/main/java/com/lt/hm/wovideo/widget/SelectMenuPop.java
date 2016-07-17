@@ -112,8 +112,9 @@ public class SelectMenuPop extends PopupWindow {
         LinearLayout layout_item = new LinearLayout(context);
         layout_item.setOrientation(LinearLayout.HORIZONTAL);
         TextView text = new TextView(context);
+        text.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
         text.setText(key);
-        text.setGravity(Gravity.CENTER);
+        text.setGravity(Gravity.CENTER_VERTICAL);
         text.setTextColor(context.getResources().getColor(R.color.black));
         HorizontalScrollView scrollView = new HorizontalScrollView(context);
         scrollView.setHorizontalScrollBarEnabled(false);

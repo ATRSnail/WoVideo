@@ -139,8 +139,11 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     CustomListView videoBrefIntros;
     @BindView(R.id.movie_bref_purch)
     ImageView movieBrefPurch;
-    @BindView(R.id.bref_txt1)
-    TextView brefTxt1;
+    @BindView(R.id.bref_txt_short)
+//    TextView brefTxt1;
+    TextView bref_txt_short;
+    @BindView(R.id.bref_txt_long)
+    TextView bref_txt_long;
     @BindView(R.id.bref_expand)
     ImageView brefExpand;
     @BindView(R.id.video_bottom_grid)
@@ -527,7 +530,11 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             mMediaController.setmQualitySwitch(mQualityName);
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();
+            //show status bar
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            //hide status bar
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         }
@@ -1011,7 +1018,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                         }
                     }
                     videoName.setText(details.getName());
-                    brefTxt1.setText(details.getIntroduction());
+                    bref_txt_short.setText(details.getIntroduction());
+                    bref_txt_long.setText(details.getIntroduction());
                     videoPlayNumber.setText(details.getHit());
                     Glide.with(NewMoviePage.this).load(HttpUtils.appendUrl(details.getImg())).centerCrop().crossFade().into(movieBrefImg);
                 }
@@ -1027,7 +1035,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         videoCollect.setVisibility(View.VISIBLE);
         videoShare.setVisibility(View.VISIBLE);
         videoProjection.setVisibility(View.GONE);
-        brefTxt1.setVisibility(View.VISIBLE);
+        bref_txt_short.setVisibility(View.VISIBLE);
         brefExpand.setVisibility(View.VISIBLE);
         movieBrefPurch.setVisibility(View.GONE);
     }
@@ -1036,8 +1044,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     public void initViews() {
-        brefTxt1.setHeight(brefTxt1.getLineHeight() * 3);
-
         videoShare.setOnClickListener((View v)->{
             ShareUtils.showShare(this, null, true, share_title,share_desc,HttpUtils.appendUrl(img_url));
 
@@ -1065,12 +1071,15 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         brefExpand.setOnClickListener((View v) -> {
             if (!text_flag) {
                 text_flag = true;
-                brefTxt1.setMaxHeight(100);
+//                bref_txt_short.setMaxHeight(100);
+                bref_txt_short.setVisibility(View.GONE);
+                bref_txt_long.setVisibility(View.VISIBLE);
                 brefExpand.setImageDrawable(getResources().getDrawable(R.drawable.icon_zoom));
             } else {
                 text_flag = false;
                 brefExpand.setImageDrawable(getResources().getDrawable(R.drawable.icon_expand));
-                brefTxt1.setMaxLines(2);
+                bref_txt_short.setVisibility(View.VISIBLE);
+                bref_txt_long.setVisibility(View.GONE);
             }
         });
     }

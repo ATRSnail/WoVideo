@@ -108,7 +108,7 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
     ImageView movieBrefPurch;
     @BindView(R.id.video_bottom_grid)
     RecyclerView videoBottomGrid;
-    @BindView(R.id.bref_txt1)
+    @BindView(R.id.bref_txt_short)
     TextView brefTxt1;
 //    @BindView(R.id.bref_txt2)
 //    TextView brefTxt2;

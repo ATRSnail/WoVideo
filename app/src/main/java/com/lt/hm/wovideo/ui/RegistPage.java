@@ -2,7 +2,10 @@ package com.lt.hm.wovideo.ui;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.percent.PercentRelativeLayout;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +20,7 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.utils.MD5Utils;
+import com.lt.hm.wovideo.utils.PhoneUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.TimeCountUtil;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -53,6 +57,12 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
     Button validateBtn;
     @BindView(R.id.btn_change_login)
     Button btnChangeLogin;
+    @BindView(R.id.regist_validate_layout)
+    PercentRelativeLayout regist_validate_layout;
+    @BindView(R.id.divider_layout2)
+            View divider_layout2;
+
+    boolean Operators_flag = false;
 
     @Override
     protected int getLayoutId() {
@@ -64,6 +74,36 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
         registTopbar.setRightIsVisible(false);
         registTopbar.setLeftIsVisible(true);
         registTopbar.setOnTopbarClickListenter(this);
+        etResigtAccount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+               if (s.length()==11){
+                   if (PhoneUtils.isPhoneNum(s.toString())){
+                       Operators_flag =true;
+                       regist_validate_layout.setVisibility(View.VISIBLE);
+                       divider_layout2.setVisibility(View.VISIBLE);
+                   }else{
+                       Operators_flag =false;
+                       regist_validate_layout.setVisibility(View.GONE);
+                       divider_layout2.setVisibility(View.GONE);
+                   }
+               }else{
+                   Operators_flag =true;
+                   regist_validate_layout.setVisibility(View.VISIBLE);
+                   divider_layout2.setVisibility(View.VISIBLE);
+               }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     @Override
@@ -74,14 +114,14 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 TLog.log("用户名不能为空");
                 return;
             } else {
-                sendValidateCode();
+                    sendValidateCode();
             }
         });
         btnRegistSubmit.setOnClickListener((View v) -> {
             if (TextUtils.isEmpty(etResigtAccount.getText())) {
                 TLog.log("用户名不能为空");
                 return;
-            } else if (TextUtils.isEmpty(etRegistValidate.getText())) {
+            } else if (Operators_flag&&TextUtils.isEmpty(etRegistValidate.getText())) {
                 TLog.log("验证码不能为空");
                 return;
             } else if (TextUtils.isEmpty(etRegistPwd.getText())) {
@@ -94,7 +134,11 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 TLog.log("两次密码 不一致");
                 return;
             } else {
-                checkValidateCode();
+                if (Operators_flag){
+                    checkValidateCode();
+                }else{
+                    ToRegist();
+                }
             }
 
             // TODO: 16/6/12 自行验证 短信验证码
@@ -180,6 +224,13 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
 
             @Override
             public void onResponse(String response, int id) {
+                ResponseObj<String,RespHeader> resp = new ResponseObj<String, RespHeader>();
+                ResponseParser.parse(resp,response,String.class,RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Error)){
+                    etResigtAccount.setHint(resp.getHead().getRspMsg());
+                    counter.cancel();
+
+                }
                 TLog.log(response);
             }
         });

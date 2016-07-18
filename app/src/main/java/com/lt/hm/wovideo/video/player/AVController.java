@@ -71,6 +71,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private ImageButton         mBackButton;
   private QualityPopWindow    mQualityPopWindow;
   private Handler             mHandler = new MessageHandler(this);
+  private boolean             mIsBulletScreenOn = false;
   // Getsutre
   private GestureDetector mGestureDetector;
   private AVPlayerGestureListener mVideoGestureListener;
@@ -134,6 +135,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     mPlayer = player;
     updatePausePlay();
     updateFullScreen();
+  }
+
+  public void setBulletScreen(boolean isShow) {
+    mIsBulletScreenOn = isShow;
   }
 
   /**
@@ -207,6 +212,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     mBulletSwitch = (SwitchCompat) v.findViewById(R.id.bullet_switch);
     if (mBulletSwitch != null) {
+      mBulletSwitch.setChecked(mIsBulletScreenOn);
       mBulletSwitch.setOnCheckedChangeListener(mBulletSwitchListener);
     }
 
@@ -505,6 +511,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
       //TODO
+      mIsBulletScreenOn = isChecked;
       toggleBulletScreen(isChecked);
     }
   };

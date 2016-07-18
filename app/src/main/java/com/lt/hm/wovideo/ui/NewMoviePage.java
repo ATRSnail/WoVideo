@@ -370,6 +370,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             mDanmakuView.prepare(mParser, mContext);
             mDanmakuView.showFPS(false);
             mDanmakuView.enableDanmakuDrawingCache(true);
+            mDanmakuView.hide();
             ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
@@ -537,6 +538,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
+            // when in portrait screen, turn off bullet screen.
+            mMediaController.setBulletScreen(false);
+            mDanmakuView.hide();
         }
 //        if (null == woPlayer) return;
 //        /***

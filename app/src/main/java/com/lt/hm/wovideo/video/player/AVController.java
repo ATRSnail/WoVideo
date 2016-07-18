@@ -5,6 +5,8 @@ import android.content.Context;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.AppCompatSeekBar;
+import android.support.v7.widget.SwitchCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -24,7 +26,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
@@ -60,7 +61,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   Formatter                   mFormatter;
   private TextView            mVideoTitle;
   private TextView            mQualitySwitch;
-  private Switch              mBulletSwitch;
+  private SwitchCompat              mBulletSwitch;
   private ImageButton         mPauseButton;
   private ImageButton         mFfwdButton;
   private ImageButton         mRewButton;
@@ -189,7 +190,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       mQualitySwitch.setOnClickListener(mQualitySwitchListener);
     }
 
-    mBulletSwitch = (Switch) v.findViewById(R.id.bullet_switch);
+    mBulletSwitch = (SwitchCompat) v.findViewById(R.id.bullet_switch);
     if (mBulletSwitch != null) {
       mBulletSwitch.setOnCheckedChangeListener(mBulletSwitchListener);
     }
@@ -237,10 +238,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       mPrevButton.setVisibility(View.GONE);
     }
 
-    mProgress = (SeekBar) v.findViewById(R.id.mediacontroller_progress);
+    mProgress = (AppCompatSeekBar) v.findViewById(R.id.mediacontroller_progress);
     if (mProgress != null) {
-      if (mProgress instanceof SeekBar) {
-        SeekBar seeker = (SeekBar) mProgress;
+      if (mProgress instanceof AppCompatSeekBar) {
+        AppCompatSeekBar seeker = (AppCompatSeekBar) mProgress;
         seeker.setOnSeekBarChangeListener(mSeekListener);
       }
       mProgress.setMax(1000);

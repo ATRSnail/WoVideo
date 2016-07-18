@@ -17,6 +17,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@android:color/transparent"
     android:orientation="vertical">
 
@@ -80,9 +81,8 @@
           android:paddingRight="4dip"
           android:textColor="@android:color/white"/>
 
-      <SeekBar
+      <android.support.v7.widget.AppCompatSeekBar
           android:id="@+id/mediacontroller_progress"
-          style="?android:attr/progressBarStyleHorizontal"
           android:layout_width="0dip"
           android:layout_weight="1"
           android:layout_height="32dip" />
@@ -169,16 +169,16 @@
         style="@style/PlayerMenuText"
         />
 
-    <Switch
+    <android.support.v7.widget.SwitchCompat
         android:id="@+id/bullet_switch"
         android:layout_toLeftOf="@id/quality_switch"
         android:paddingRight="@dimen/s_10"
         android:checked="true"
-        android:showText="true"
+        app:showText="true"
         android:textOn="弹"
         android:textOff="弹"
         style="@style/Switch"
-        android:switchTextAppearance="@style/SwitchTextAppearance"/>
+        app:switchTextAppearance="@style/SwitchTextAppearance"/>
 
   </RelativeLayout>
 

@@ -83,19 +83,14 @@ public class QualityPopWindow extends PopupWindow {
 
     }
 
-    public void showPopupWindow(View parent, boolean shown) {
-        if (!shown) {
+    public void showPopupWindow(View parent) {
             // 以下拉方式显示popupwindow
             this.showAsDropDown(parent, parent.getLayoutParams().width / 2, 18);
 //            this.showAtLocation(parent, Gravity.LEFT, 0, -90);
 //            this.showAsDropDown(parent);
             this.setFocusable(true);
-            shown=true;
-        } else {
-            shown=false;
-            this.dismiss();
-        }
     }
+
 
     public  interface  OnQulitySelect{
         void selected(String key,String value);

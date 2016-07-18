@@ -61,7 +61,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   Formatter                   mFormatter;
   private TextView            mVideoTitle;
   private TextView            mQualitySwitch;
-  private SwitchCompat              mBulletSwitch;
+  private SwitchCompat        mBulletSwitch;
   private ImageButton         mPauseButton;
   private ImageButton         mFfwdButton;
   private ImageButton         mRewButton;
@@ -69,6 +69,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private ImageButton         mPrevButton;
   private ImageButton         mFullscreenButton;
   private ImageButton         mBackButton;
+  private QualityPopWindow    mQualityPopWindow;
   private Handler             mHandler = new MessageHandler(this);
   // Getsutre
   private GestureDetector mGestureDetector;
@@ -190,6 +191,20 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       mQualitySwitch.setOnClickListener(mQualitySwitchListener);
     }
 
+    // Quality
+    mQualityPopWindow= new QualityPopWindow(mContext,videoModel);
+    mQualityPopWindow.setOutsideTouchable(true);
+    mQualityPopWindow.setListener(new QualityPopWindow.OnQulitySelect() {
+      @Override
+      public void selected(String key, String value) {
+        mQualitySwitch.setText(key);
+        // TODO: 16/7/11 ADD CALLBACK TO ACTIVITY TO CHANGE VIDEO
+        if (listener!=null){
+          listener.onQualitySelect(key,value);
+        }
+      }
+    });
+
     mBulletSwitch = (SwitchCompat) v.findViewById(R.id.bullet_switch);
     if (mBulletSwitch != null) {
       mBulletSwitch.setOnCheckedChangeListener(mBulletSwitchListener);
@@ -259,6 +274,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     mCenterLayout.setVisibility(GONE);
     mCenterImage = (ImageView) v.findViewById(R.id.image_center_bg);
     mCenterPorgress = (ProgressBar) v.findViewById(R.id.progress_center);
+
   }
 
   public void setmQualitySwitch(String name) {
@@ -477,18 +493,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     @Override
     public void onClick(View v) {
       //TODO show qulity listview
-      QualityPopWindow  window= new QualityPopWindow(mContext,videoModel);
-      window.showPopupWindow(mQualitySwitch,shown);
-      window.setListener(new QualityPopWindow.OnQulitySelect() {
-        @Override
-        public void selected(String key, String value) {
-          mQualitySwitch.setText(key);
-          // TODO: 16/7/11 ADD CALLBACK TO ACTIVITY TO CHANGE VIDEO
-          if (listener!=null){
-            listener.onQualitySelect(key,value);
-          }
-        }
-      });
+      if (!mQualityPopWindow.isShowing()) {
+        mQualityPopWindow.showPopupWindow(mQualitySwitch);
+      } else {
+        mQualityPopWindow.dismiss();
+      }
     }
   };
 

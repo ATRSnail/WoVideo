@@ -131,7 +131,7 @@
         <item name="android:layout_centerVertical">true</item>
     </style>
     <style name="SwitchTextAppearance" parent="@android:style/TextAppearance.Holo.Small">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">@drawable/switch_text</item>
     </style>
 
     <style name="TextWithRoundedBackground">

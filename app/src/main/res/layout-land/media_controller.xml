@@ -85,7 +85,8 @@
           android:id="@+id/mediacontroller_progress"
           android:layout_width="0dip"
           android:layout_weight="1"
-          android:layout_height="32dip" />
+          android:layout_height="32dip"
+          android:layout_gravity="center_vertical"/>
 
       <TextView android:id="@+id/time"
           android:textSize="12sp"
@@ -100,9 +101,9 @@
 
       <ImageButton android:id="@+id/fullscreen"
           android:layout_gravity="center"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:src="@drawable/ic_media_fullscreen_stretch"
+          android:layout_width="@dimen/s_40"
+          android:layout_height="@dimen/s_40"
+          android:src="@drawable/ic_media_fullscreen_shrink"
           android:background="@android:color/transparent"
           android:contentDescription="@string/description" />
 

@@ -141,6 +141,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     private IDanmakuView mDanmakuView;
     private DanmakuContext mContext;
 
+    protected String mCurrentVideoId;
+
     /**
      * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
      * extension.
@@ -635,7 +637,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("pageNum", 1);
         maps.put("numPerPage", 10000);
-        maps.put("vfPlayId", "2");
+        maps.put("vfPlayId", mCurrentVideoId == null ? "2" : mCurrentVideoId);
+//        maps.put("vfPlayId", );
         HttpApis.getBulletByVideoId(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {

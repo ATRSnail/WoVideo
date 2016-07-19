@@ -261,13 +261,22 @@ public class HttpApis {
     }
 
     /**
-     * 根据类型获取 视频列表数据
+     * 根据类型获取 弹幕数据
      *
      * @param map
      * @param callback
      */
     public static void getBulletByVideoId(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblVf/viewBarrage", map, callback);
+    }
+
+    /**
+     * 对指定视频添加弹幕
+     * @param map
+     * @param callback
+     */
+    public static void addBullet(HashMap<String, Object> map, StringCallback callback) {
+        HttpUtils.formPost("mblVf/addBarrage", map, callback);
     }
 
 }

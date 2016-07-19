@@ -260,9 +260,14 @@ public class HttpApis {
         HttpUtils.formPost("mblVf/addComment", map, callback);
     }
 
-
-
-
-
+    /**
+     * 根据类型获取 视频列表数据
+     *
+     * @param map
+     * @param callback
+     */
+    public static void getBulletByVideoId(HashMap<String, Object> map, StringCallback callback) {
+        HttpUtils.formPost("mblVf/viewBarrage", map, callback);
+    }
 
 }

@@ -83,9 +83,9 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
     return mExoPlayer.getBufferedPercentage();
   }
 
-  @Override public int getCurrentPosition() {
+  @Override public long getCurrentPosition() {
     return mExoPlayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
-        : (int) mExoPlayer.getCurrentPosition();
+        :  mExoPlayer.getCurrentPosition();
   }
 
   @Override public int getDuration() {
@@ -105,7 +105,7 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
     mExoPlayer.setPlayWhenReady(false);
   }
 
-  @Override public void seekTo(int pos) {
+  @Override public void seekTo(long pos) {
     long seekPosition = mExoPlayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
         : Math.min(Math.max(0, pos), getDuration());
     mExoPlayer.seekTo(seekPosition);

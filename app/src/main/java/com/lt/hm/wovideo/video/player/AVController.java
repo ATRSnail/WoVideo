@@ -389,8 +389,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     mShowing = false;
   }
 
-  private String stringForTime(int timeMs) {
-    int totalSeconds = timeMs / 1000;
+  private String stringForTime(long timeMs) {
+    int totalSeconds = (int)timeMs / 1000;
 
     int seconds = totalSeconds % 60;
     int minutes = (totalSeconds / 60) % 60;
@@ -409,7 +409,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       return 0;
     }
 
-    int position = mPlayer.getCurrentPosition();
+    int position = (int) mPlayer.getCurrentPosition();
     int duration = mPlayer.getDuration();
     if (mProgress != null) {
       if (duration > 0) {
@@ -700,7 +700,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         return;
       }
 
-      int pos = mPlayer.getCurrentPosition();
+      long pos = mPlayer.getCurrentPosition();
       pos -= 5000; // milliseconds
       mPlayer.seekTo(pos);
       setProgress();
@@ -715,7 +715,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         return;
       }
 
-      int pos = mPlayer.getCurrentPosition();
+      long pos = mPlayer.getCurrentPosition();
       pos += 15000; // milliseconds
       mPlayer.seekTo(pos);
       setProgress();
@@ -844,9 +844,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     int getDuration();
 
-    int getCurrentPosition();
+    long getCurrentPosition();
 
-    void seekTo(int pos);
+    void seekTo(long pos);
 
     boolean isPlaying();
 

@@ -663,9 +663,11 @@ public class DemandPage extends BaseActivity implements View.OnClickListener, Su
         if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
             mRotateLoading.stop();
             //TODO play next if exist.
-
+//            mDanmakuView.show();
+//            mDanmakuView.seekTo(mPlayer.getCurrentPosition());
         } else {
             mRotateLoading.start();
+//            mDanmakuView.hide();
         }
     }
 

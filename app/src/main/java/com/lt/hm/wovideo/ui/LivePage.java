@@ -461,6 +461,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             mDanmakuView.prepare(mParser, mContext);
             mDanmakuView.showFPS(false);
             mDanmakuView.enableDanmakuDrawingCache(true);
+            mDanmakuView.hide();
 //            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
 //
 //                @Override

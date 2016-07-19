@@ -493,6 +493,12 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                             getRealURL(value, true);
                         }
                     });
+                    mMediaController.setInterfaceListener(new AVController.OnInterfaceInteract() {
+                        @Override
+                        public void onSendBulletClick() {
+                            addBullet("test send bullet");
+                        }
+                    });
                     if (model.getmVideoUrl().size()>0){
                         getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false);
                         mMediaController.setmQualitySwitch(model.getmVideoUrl().get(0).getFormatName());

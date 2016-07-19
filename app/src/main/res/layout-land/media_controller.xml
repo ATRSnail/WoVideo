@@ -183,4 +183,17 @@
 
   </RelativeLayout>
 
+  <ImageButton
+      android:id="@+id/send_bullet"
+      android:layout_width="@dimen/s_40"
+      android:layout_height="@dimen/s_40"
+      android:background="@drawable/stroke_rounded"
+      android:layout_alignParentRight="true"
+      android:layout_centerVertical="true"/>
+  <TextView
+      android:id="@+id/free_label"
+      android:text="@string/free_network"
+      android:visibility="invisible"
+      style="@style/TextWithRoundedBackground" />
+
 </RelativeLayout>

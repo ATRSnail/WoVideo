@@ -25,6 +25,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.google.android.exoplayer.AspectRatioFrameLayout;
 import com.google.android.exoplayer.audio.AudioCapabilities;
@@ -32,11 +33,14 @@ import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.util.Util;
+import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoAnthologyAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemListAdapter;
+import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
@@ -45,6 +49,7 @@ import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BulletModel;
 import com.lt.hm.wovideo.model.CommentModel;
 import com.lt.hm.wovideo.model.PlayList;
+import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.ui.MoviePage;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -505,27 +510,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mMediaController.setBulletScreen(false);
             mDanmakuView.hide();
         }
-//        if (null == woPlayer) return;
-//        /***
-//         * 根据屏幕方向重新设置播放器的大小
-//         */
-//        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().getDecorView().invalidate();
-//            woPlayer.getLayoutParams().height = ScreenUtils.getScreenHeight(this);
-//            woPlayer.getLayoutParams().width = ScreenUtils.getScreenWidth(this);
-//            getWindow().getDecorView().invalidate();
-//        } else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-//            final WindowManager.LayoutParams attrs = getWindow().getAttributes();
-//            attrs.flags &= (WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().setAttributes(attrs);
-//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-//            float width = DensityUtil.getWidthInPx(this);
-//            float height = DensityUtil.dip2px(this, 200);
-//            woPlayer.getLayoutParams().height = (int) height;
-//            woPlayer.getLayoutParams().width = (int) width;
-//        }
     }
 
     // Surface Life cycle
@@ -665,6 +649,75 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 }
             }
         });
+    }
+
+    /**
+     * 添加弹幕
+     *
+     * @param content 内容
+     */
+    protected void addBullet(String content) {
+        TLog.log("comment_send" + per_Id);
+        HashMap<String, Object> map = new HashMap<>();
+        String string = ACache.get(this).getAsString("userinfo");
+        if (!StringUtils.isNullOrEmpty(string)) {
+            UserModel model = new Gson().fromJson(string, UserModel.class);
+            map.put("userId", model.getId());
+            map.put("vfPlayId", per_Id);
+            map.put("time", mPlayer.getCurrentPosition() / 1000);
+            map.put("context", content);
+            map.put("fontColor", "#118833");
+            map.put("fontSize", 18);
+
+            HttpApis.addBullet(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
+
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log(response);
+                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        Toast.makeText(getApplicationContext(), "弹幕成功", Toast.LENGTH_SHORT).show();
+                        TLog.log("comment_list" + per_Id);
+                        addDanmaku();
+                    } else {
+                        if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
+                            Toast.makeText(getApplicationContext(), "弹幕失败", Toast.LENGTH_SHORT).show();
+                        } else {
+                            TLog.log(resp.getHead().getRspMsg());
+                            Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                }
+            });
+        } else {
+            UnLoginHandler.unLogin(this);
+        }
+    }
+
+    private void addDanmaku() {
+        BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
+        if (danmaku == null || mDanmakuView == null) {
+            return;
+        }
+        // for(int i=0;i<100;i++){
+        // }
+        danmaku.text = "这是一条弹幕" + System.nanoTime();
+        danmaku.padding = 5;
+        danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
+        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
+        danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
+        danmaku.textColor = Color.RED;
+        danmaku.textShadowColor = Color.WHITE;
+        // danmaku.underlineColor = Color.GREEN;
+        danmaku.borderColor = Color.GREEN;
+        mDanmakuView.addDanmaku(danmaku);
+
     }
 
     @Override

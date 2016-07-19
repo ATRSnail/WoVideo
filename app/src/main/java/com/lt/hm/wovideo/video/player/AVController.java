@@ -69,6 +69,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private ImageButton         mPrevButton;
   private ImageButton         mFullscreenButton;
   private ImageButton         mBackButton;
+  private ImageButton         mSendBulletButton;
   private QualityPopWindow    mQualityPopWindow;
   private Handler             mHandler = new MessageHandler(this);
   private boolean             mIsBulletScreenOn = false;
@@ -89,6 +90,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
      * @author leo
      */
   private OnQualitySelected listener;
+  private OnInterfaceInteract mInterfaceListener;
+
   private VideoModel videoModel;
   QualityPopWindow window;
 
@@ -98,6 +101,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
   public void setListener(OnQualitySelected listener) {
     this.listener = listener;
+  }
+
+  public void setInterfaceListener(OnInterfaceInteract interfaceListener) {
+    this.mInterfaceListener = interfaceListener;
   }
 
   public AVController(Context context, AttributeSet attrs) {
@@ -209,6 +216,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
       }
     });
+
+    mSendBulletButton = (ImageButton) v.findViewById(R.id.send_bullet);
+    if (mSendBulletButton != null) {
+      mSendBulletButton.setOnClickListener(mBulletSendListener);
+    }
 
     mBulletSwitch = (SwitchCompat) v.findViewById(R.id.bullet_switch);
     if (mBulletSwitch != null) {
@@ -504,6 +516,13 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       } else {
         mQualityPopWindow.dismiss();
       }
+    }
+  };
+
+  private OnClickListener mBulletSendListener = new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+      mInterfaceListener.onSendBulletClick();
     }
   };
 
@@ -866,6 +885,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     int getAudioSessionId();
 
     boolean isFullScreen();
+
     void    toggleFullScreen();
   }
 
@@ -901,4 +921,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   public interface  OnQualitySelected{
     void onQualitySelect(String key,String value);
   }
+
+  public interface OnInterfaceInteract {
+    void onSendBulletClick();
+  }
+
 }

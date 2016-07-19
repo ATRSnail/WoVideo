@@ -8,24 +8,15 @@ import java.util.regex.Pattern;
  */
 
 public class ZhengZeTools {
-    /**
-     * 正则表达式：验证手机号
-     */
-    public static final String REGEX_MOBILE = "^((13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$";
-
-    /**
-     * 正则表达式：验证邮箱
-     */
-    public static final String REGEX_EMAIL = "^([a-zA-Z0-9]*[-_]?[a-zA-Z0-9]+)*@([a-zA-Z0-9]*[-_]?[a-zA-Z0-9]+)+[\\\\.][A-Za-z]{2,3}([\\\\.][A-Za-z]{2})?$";
 
     public static boolean isMobileNO(String mobiles) {
         Pattern p = Pattern
-                .compile(REGEX_MOBILE);
+                .compile("^((13[0-9])|(15[^4,\\D])|(18[0,5-9]))\\d{8}$");
         Matcher m = p.matcher(mobiles);
         return m.matches();
     }
     public static boolean isEmail(String strEmail) {
-        Pattern p = Pattern.compile(REGEX_EMAIL);
+        Pattern p = Pattern.compile("([a-zA-Z0-9_\\.\\-])+\\@(([a-zA-Z0-9\\-])+\\.)+([a-zA-Z0-9]{2,5})+");
         Matcher m = p.matcher(strEmail);
         return m.matches();
     }

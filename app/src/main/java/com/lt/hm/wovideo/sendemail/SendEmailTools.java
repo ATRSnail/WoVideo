@@ -106,7 +106,7 @@ public class SendEmailTools {
         }
 
         try {
-            Transport.send(message);// 开始发送
+           Transport.send(message);// 开始发送
         } catch (MessagingException e) {
             e.printStackTrace();
         }

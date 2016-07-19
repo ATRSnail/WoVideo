@@ -3,6 +3,7 @@ package com.lt.hm.wovideo.ui;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -93,13 +94,11 @@ public class RecallBackPage extends BaseActivity implements SecondTopbar.myTopba
             Toast.makeText(RecallBackPage.this,  getResources().getString(R.string.option_content_toast), Toast.LENGTH_SHORT).show();
             return;
         }else {
+            Log.e("SCY"," -- -- -  - ");
             if (ZhengZeTools.isMobileNO(phone)||ZhengZeTools.isEmail(phone)||ZhengZeTools.isQQ(phone)){
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-//                        String string = ACache.get(RecallBackPage.this).getAsString("userinfo");
-//                        String phone=new Gson().fromJson(string,UserModel.class).getPhoneNo();
-//                        String name=new Gson().fromJson(string,UserModel.class).getNickName();
                         SendEmailTools.send_mail_file("beijing_shuaidan@163.com",
                                 "beijing_shuaidan@163.com", "SMTP.163.COM",
                                 "beijing_shuaidan@163.com", "123henan123", " 意见反馈 ",

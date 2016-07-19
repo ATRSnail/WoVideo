@@ -116,5 +116,13 @@
     <string name="comment">评论</string>
     <string name="no_comment_data">暂无评论</string>
     <string name="free_network">已免流</string>
+    <string name="no_login_toast">亲,您尚未登陆,请登陆后使用此功能吧!</string>
 
+    <!--一意见征集-->
+    <string name="option_content">输入的内容不能为空哦</string>
+    <string name="option_content_toast">您输入的内容超过200字了</string>
+    <string name="option_phone">输入的联系方式不能为空</string>
+    <string name="option_phone_toast">请输入正确的QQ/电话/邮箱</string>
+    <string name="text_watch">您输入的内容即将超过限制了</string>
+    <string name="success_toast">您的意见已经提交成功,感谢您的参与</string>
 </resources>

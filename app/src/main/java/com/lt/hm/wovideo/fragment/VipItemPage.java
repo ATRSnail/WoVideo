@@ -1,5 +1,7 @@
 package com.lt.hm.wovideo.fragment;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -39,6 +41,8 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import okhttp3.Call;
 
+import static android.nfc.tech.MifareUltralight.PAGE_SIZE;
+
 /**
  * @author leonardo
  * @version 1.0
@@ -61,6 +65,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     private String sx;
     private String dq;
     private String nd;
+    private int mCurrentCounter,TOTAL_COUNTER;
 
 
     @Override
@@ -93,15 +98,14 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
         refreshView.setColorSchemeResources(android.R.color.holo_green_light, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         refreshView.setOnRefreshListener(this);
-
         b_list = new ArrayList<>();
     }
 
-    private void getListDatas(int id, String tag) {
+    private void getListDatas(int id, String tag,int page) {
         first_open = false;
         HashMap<String, Object> map = new HashMap<>();
         map.put("typeid", id);
-        map.put("pageNum", pageNum);
+        map.put("pageNum", page);
         map.put("numPerPage", pageSize);
         map.put("isvip", tag);
         map.put("lx", lx);
@@ -114,6 +118,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                 TLog.log("error:" + e.getMessage());
             }
 
+            @TargetApi(Build.VERSION_CODES.M)
             @Override
             public void onResponse(String response, int id) {
                 TLog.log(response);
@@ -142,15 +147,58 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                             manager.setOrientation(LinearLayoutManager.VERTICAL);
                             vipItemList.setLayoutManager(manager);
                         }
+                        TOTAL_COUNTER=b_list.size();
                         vipItemList.setHasFixedSize(false);
                         vipItemList.setAdapter(bottom_adapter);
                         bottom_adapter.notifyDataSetChanged();
+                        bottom_adapter.setOnLoadMoreListener(PAGE_SIZE, new BaseQuickAdapter.RequestLoadMoreListener() {
+                            @Override
+                            public void onLoadMoreRequested() {
+                                if (b_list.size()%10!=0) {
+                                    vipItemList.post(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            bottom_adapter.isNextLoad(false);
+                                        }
+                                    });
+                                }else {
+                                    if (!StringUtils.isNullOrEmpty(mId)) {
+                                        int pageNum=b_list.size()/10+1;
+                                        if (StringUtils.isNullOrEmpty(isvip)) {
+                                            getListDatas(mId, "0",pageNum);
+                                        } else {
+                                            getListDatas(mId, "1",pageNum);
+                                        }
+                                    }
+                                }
+                            }
+                        });
+//                        bottom_adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+//                            @Override
+//                            public void onLoadMoreRequested() {
+//                                if (!StringUtils.isNullOrEmpty(mId)) {
+//                                    if (b_list.size()%10==0){
+//                                        int pageNum=b_list.size()/10+1;
+//                                        if (StringUtils.isNullOrEmpty(isvip)) {
+//                                            getListDatas(mId, "0",pageNum);
+//                                        } else {
+//                                            getListDatas(mId, "1",pageNum);
+//                                        }
+//                                    }else {
+//                                        if (vipItemList.getScrollState()==RecyclerView.SCROLL_STATE_IDLE)
+//                                                 bottom_adapter.isNextLoad(false);
+//                                    }
+//                                }
+//                            }
+//                        });
                         bottom_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
                             @Override
                             public void onItemClick(View view, int i) {
                                 getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
                             }
                         });
+                    }else {
+                        bottom_adapter.isNextLoad(false);
                     }
 
                 }
@@ -204,7 +252,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     @Override
     public void initData() {
         super.initData();
-        getListDatas(mId, isvip);
+        getListDatas(mId, isvip,1);
     }
 
     @Override
@@ -222,12 +270,12 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                 if (b_list.size() > 0) {
                     b_list.clear();
                 }
-                getListDatas(mId, "0");
+                getListDatas(mId, "0",1);
             } else {
                 if (b_list.size() > 0) {
                     b_list.clear();
                 }
-                getListDatas(mId, "1");
+                getListDatas(mId, "1",1);
             }
         }
         new Handler().postDelayed(new Runnable() {
@@ -274,7 +322,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
             b_list.clear();
         }
         if (!first_open) {
-            getListDatas(mId, "0");
+            getListDatas(mId, "0",1);
         }
     }
 }

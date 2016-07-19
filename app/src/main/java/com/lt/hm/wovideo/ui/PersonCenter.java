@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -143,8 +144,12 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.head_icon:
                 // TODO: 16/6/6  变更头像 上传头像
-                handleSelectPicture();
-
+                String user = ACache.get(getApplicationContext()).getAsString("userinfo");
+                if (StringUtils.isNullOrEmpty(user)){
+                    Toast.makeText(this, getResources().getString(R.string.no_login_toast), Toast.LENGTH_SHORT).show();
+                }else {
+                    handleSelectPicture();
+                }
                 break;
             case R.id.login_tag:
                 UIHelper.ToLogin(this);
@@ -318,7 +323,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
             HashMap<String,Object> map= new HashMap<>();
             String string = ACache.get(this).getAsString("userinfo");
             map.put("phone",new Gson().fromJson(string,UserModel.class).getPhoneNo());
-            map.put("base",img64);
+            map.put("base","image/jpg;base64,"+img64);
             TLog.log(map.toString());
             HttpApis.uploadHeadImg(map, new StringCallback() {
                 @Override

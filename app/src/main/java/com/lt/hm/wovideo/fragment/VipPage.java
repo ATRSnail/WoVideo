@@ -77,7 +77,6 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
     @Override
     public void initView(View view) {
         super.initView(view);
-        getClassInfos();
         vipSelector.setOnClickListener((View v) -> {
             if (CURRENT_POSITION != -1 && CURRENT_POSITION != 0) {
                 SelectMenuPop pop = new SelectMenuPop(getActivity(),CURRENT_POSITION);
@@ -98,9 +97,16 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
     }
 
     @Override
+    public void initData() {
+        super.initData();
+        getClassInfos();
+
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        getClassInfos();
+//        getClassInfos();
     }
 
 
@@ -122,7 +128,8 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
                     if (mClass.size() > 0) {
                         mClass.clear();
                     }
-                    mClass.addAll(resp.getBody().getTypeList());
+//                    mClass.addAll(resp.getBody().getTypeList());
+                    mClass=resp.getBody().getTypeList();
                     initBottom();
 
                 } else {

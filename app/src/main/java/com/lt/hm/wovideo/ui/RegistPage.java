@@ -89,13 +89,11 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                        divider_layout2.setVisibility(View.VISIBLE);
                    }else{
                        Operators_flag =false;
-                       regist_validate_layout.setVisibility(View.GONE);
-                       divider_layout2.setVisibility(View.GONE);
+                       Toast.makeText(getApplicationContext(),"只支持联通手机号登录",Toast.LENGTH_SHORT).show();
+                       return;
+//                       regist_validate_layout.setVisibility(View.GONE);
+//                       divider_layout2.setVisibility(View.GONE);
                    }
-               }else{
-                   Operators_flag =true;
-                   regist_validate_layout.setVisibility(View.VISIBLE);
-                   divider_layout2.setVisibility(View.VISIBLE);
                }
             }
 
@@ -136,8 +134,6 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
             } else {
                 if (Operators_flag){
                     checkValidateCode();
-                }else{
-                    ToRegist();
                 }
             }
 

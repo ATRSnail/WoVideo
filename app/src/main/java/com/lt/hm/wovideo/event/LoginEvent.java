@@ -6,6 +6,7 @@ import com.lt.hm.wovideo.model.UserModel;
  * @author leonardo
  * @version 1.0
  * @create_date 16/6/13
+ * @deprecated
  */
 public class LoginEvent  {
     public UserModel model=null;

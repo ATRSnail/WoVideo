@@ -1,7 +1,9 @@
 package com.lt.hm.wovideo.ui;
 
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +21,7 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.MD5Utils;
+import com.lt.hm.wovideo.utils.PhoneUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.SecondTopbar;
@@ -53,14 +56,43 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
         return R.layout.layout_login;
     }
 
+    boolean Operators_flag = false;
     @Override
     protected void init(Bundle savedInstanceState) {
         aCache= ACache.get(this);
         loginTopbar.setRightIsVisible(false);
         loginTopbar.setLeftIsVisible(true);
         loginTopbar.setOnTopbarClickListenter(this);
-        etLoginAccount.setText("18513179404");
-        etLoginPwd.setText("123456");
+//        etLoginAccount.setText("18513179404");
+//        etLoginPwd.setText("123456");
+        etLoginAccount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                if (s.length()==11){
+                    if (PhoneUtils.isPhoneNum(s.toString())){
+                        Operators_flag =true;
+//                        regist_validate_layout.setVisibility(View.VISIBLE);
+//                        divider_layout2.setVisibility(View.VISIBLE);
+                    }else{
+                        Operators_flag =false;
+                        return;
+//                       regist_validate_layout.setVisibility(View.GONE);
+//                       divider_layout2.setVisibility(View.GONE);
+                    }
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     @Override
@@ -71,14 +103,17 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
             }else if (TextUtils.isEmpty(etLoginPwd.getText())){
                 TLog.log("密码不能为空");
             }else{
-                ToLogin();
+                if (Operators_flag){
+                    ToLogin();
+                }else{
+                    Toast.makeText(getApplicationContext(),"只支持联通手机号登录",Toast.LENGTH_SHORT).show();
+                }
             }
         });
         tvLoginForget.setOnClickListener((View v)->{
             // TODO: 16/6/8 忘记密码 
         });
         tvLoginRegist.setOnClickListener((View v)->{
-            // TODO: 16/6/8 注册
             UIHelper.ToRegister(this);
             this.finish();
         });

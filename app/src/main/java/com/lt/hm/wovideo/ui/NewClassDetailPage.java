@@ -102,9 +102,10 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     private String dq;
     private String nd;
     private boolean first_open = true;
-    private boolean spinner_flag= true;
-    private boolean search_first=true;
-    private boolean shown=false;
+    private boolean spinner_flag = true;
+    private boolean search_first = true;
+    private boolean shown = false;
+
     @Override
     protected int getLayoutId() {
         return R.layout.layout_new_class_details;
@@ -207,8 +208,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                         b_list.clear();
                         getListDatas(mId);
                     }
-                }else{
-                    spinner_flag=false;
+                } else {
+                    spinner_flag = false;
                 }
                 addHeadTypeView();
             }
@@ -220,7 +221,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         classDetailsChoose.setOnClickListener((View v) -> {
             SelectMenuPop pop = new SelectMenuPop(this, mId);
 //            pop.showPopupWindow(class_details_head,shown);
-            pop.showPopupWindow(type_container,shown);
+            pop.showPopupWindow(type_container, shown);
             pop.setListener(new SelectMenuPop.OnRadioClickListener() {
                 @Override
                 public void clickListener(String key, String value) {
@@ -230,7 +231,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
             pop.setTouchInterceptor(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    if(event.getAction()==MotionEvent.ACTION_OUTSIDE){
+                    if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
                         pop.dismiss();
                         return true;
                     }
@@ -272,7 +273,10 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
                 ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    b_list=resp.getBody().getTypeList();
+                    b_list = resp.getBody().getTypeList();
+                    if (b_list == null || b_list.size() == 0) {
+                        return;
+                    }
                     for (int i = 0; i < b_list.size(); i++) {
                         b_list.get(i).setDesc(b_list.get(i).getIntroduction());
                     }
@@ -369,7 +373,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     public void rightClick() {
         SelectMenuPop pop = new SelectMenuPop(this, mId);
 //        pop.showPopupWindow(class_details_head,shown);
-        pop.showPopupWindow(type_container,shown);
+        pop.showPopupWindow(type_container, shown);
         pop.setListener(new SelectMenuPop.OnRadioClickListener() {
             @Override
             public void clickListener(String key, String value) {
@@ -433,12 +437,12 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     @Override
     protected void onResume() {
         super.onResume();
-        first_open=true;
+        first_open = true;
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        first_open=false;
+        first_open = false;
     }
 }

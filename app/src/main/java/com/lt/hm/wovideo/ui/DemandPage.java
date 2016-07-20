@@ -745,7 +745,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
     @Override
     public void onDestroy() {
-        videoHistory.setCurrent_positon(123232);
+        videoHistory.setCurrent_positon(getCurrentPosition());
         videoHistory.setFlag("false");
         history.save(videoHistory);
         super.onDestroy();

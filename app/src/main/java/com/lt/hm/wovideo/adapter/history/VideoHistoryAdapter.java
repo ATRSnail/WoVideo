@@ -67,7 +67,7 @@ public class VideoHistoryAdapter extends BaseAdapter {
         }
 
         holder.itemMovieName.setText(list.get(position).getmName());
-        holder.itemCurrentPosition.setText(list.get(position).getCurrent_positon());
+        holder.itemCurrentPosition.setText(list.get(position).getCurrent_positon()+"");
         ImageView img = holder.itemVideoImg;
         Glide.with(context).load(HttpUtils.appendUrl(list.get(position).getImg_url()));
         // 根据flag来设置checkbox的选中状况

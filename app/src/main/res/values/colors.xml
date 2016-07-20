@@ -32,4 +32,14 @@
     <color name="possible_result_points">#c0ffff00</color>
     <color name="red">#f2192d</color>
     <color name="video_loading">#1E88E5</color>
+
+    <!--Bullet-->
+    <color name="darker_gray">#2c3137</color>
+    <color name="red_bullet">#e5313a</color>
+    <color name="purple_bullet">#7b30e3</color>
+    <color name="blue_bullet">#4072f9</color>
+    <color name="green_bullet">#7ecc24</color>
+    <color name="yellow_bullet">#fad32a</color>
+    <color name="orange_bullet">#d36d24</color>
+
 </resources>

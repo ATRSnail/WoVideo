@@ -40,6 +40,8 @@ import java.util.HashMap;
 import butterknife.BindView;
 import okhttp3.Call;
 
+import static com.lt.hm.wovideo.R.id.pc_username;
+
 /**
  * @author leonardo
  * @version 1.0
@@ -72,7 +74,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
     LinearLayout unloginLayout;
     @BindView(R.id.login_layout)
     LinearLayout login_layout;
-    @BindView(R.id.pc_username)
+    @BindView(pc_username)
     TextView tv_username;
     private Uri origUri;
     private Uri cropUri;
@@ -129,6 +131,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
         history.setOnClickListener(this);
         collect.setOnClickListener(this);
         btnPersonBack.setOnClickListener(this);
+        tv_username.setOnClickListener(this);
     }
 
     @Override
@@ -178,6 +181,9 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.btn_person_back:
                 PersonCenter.this.finish();
+                break;
+            case pc_username:
+                UIHelper.ToPersonInfoPage(this);
                 break;
         }
     }

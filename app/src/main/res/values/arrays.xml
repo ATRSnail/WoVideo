@@ -15,4 +15,8 @@
         <item>综艺</item>
         <item>体育</item>
     </string-array>
+    <string-array name="sex_value">
+        <item>男</item>
+        <item>女</item>
+    </string-array>
 </resources>

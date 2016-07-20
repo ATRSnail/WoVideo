@@ -94,7 +94,6 @@ public class RecallBackPage extends BaseActivity implements SecondTopbar.myTopba
             Toast.makeText(RecallBackPage.this,  getResources().getString(R.string.option_content_toast), Toast.LENGTH_SHORT).show();
             return;
         }else {
-            Log.e("SCY"," -- -- -  - ");
             if (ZhengZeTools.isMobileNO(phone)||ZhengZeTools.isEmail(phone)||ZhengZeTools.isQQ(phone)){
                 new Thread(new Runnable() {
                     @Override

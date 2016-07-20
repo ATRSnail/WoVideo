@@ -33,16 +33,25 @@
                 android:layout_alignParentLeft="true"
                 android:paddingLeft="20dp"
                 android:text="@string/p_logo" />
-
             <com.lt.hm.wovideo.widget.CircleImageView
-                android:id="@+id/p_info_logo"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/icon_head"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:src="@drawable/icon_head"
+                android:id="@+id/p_info_logo"
+                app:border_width="1dp"
                 app:border_color="@color/white"
-                app:border_width="2dp" />
+                />
+            <!--<com.lt.hm.wovideo.widget.CircleImageView-->
+                <!--android:id="@+id/p_info_logo"-->
+                <!--android:layout_width="100dp"-->
+                <!--android:layout_height="100dp"-->
+                <!--android:layout_alignParentRight="true"-->
+                <!--android:layout_centerVertical="true"-->
+                <!--android:src="@drawable/icon_head"-->
+                <!--app:border_color="@color/white"-->
+                <!--app:border_width="1dp" />-->
         </RelativeLayout>
 
         <RelativeLayout
@@ -57,14 +66,16 @@
                 android:text="@string/nick_name" />
 
             <ImageView
+                android:visibility="invisible"
                 android:id="@+id/nick_name_arrow"
                 style="@style/set_menu_img" />
 
-            <TextView
+            <EditText
+                android:background="@null"
+                android:id="@+id/nick_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/nick_name_arrow"
-                android:text="doudou"
                 android:layout_centerVertical="true"
                 android:textColor="@color/gray_darker" />
         </RelativeLayout>
@@ -82,16 +93,24 @@
                 android:text="@string/sex_string" />
 
             <ImageView
+                android:visibility="invisible"
                 android:id="@+id/sex_arrow"
                 style="@style/set_menu_img" />
 
             <TextView
+                android:id="@+id/tv_sex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/sex_arrow"
-                android:text="@string/male"
                 android:layout_centerVertical="true"
                 android:textColor="@color/gray_darker" />
+            <Spinner
+                android:spinnerMode="dropdown"
+                android:background="@null"
+                android:id="@+id/spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            </Spinner>
         </RelativeLayout>
 
         <RelativeLayout
@@ -106,20 +125,23 @@
                 android:text="@string/email_string" />
 
             <ImageView
+                android:visibility="invisible"
                 android:id="@+id/email_arrow"
                 style="@style/set_menu_img" />
 
-            <TextView
+            <EditText
+                android:background="@null"
+                android:id="@+id/tv_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/email_arrow"
-                android:text="@string/unbind_email"
                 android:layout_centerVertical="true"
                 android:textColor="@color/gray_darker" />
         </RelativeLayout>
 
 
         <RelativeLayout
+            android:visibility="gone"
             android:id="@+id/modify_pwd"
             android:layout_width="match_parent"
             android:layout_height="50dp">
@@ -136,6 +158,5 @@
 
 
     </com.lt.hm.wovideo.widget.PercentLinearLayout>
-
 
 </LinearLayout>

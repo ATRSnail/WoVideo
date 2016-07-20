@@ -750,6 +750,13 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     }
 
+    protected int getCurrentPosition() {
+        if (mPlayer != null && mPlayer.getPlaybackState() != AVPlayer.STATE_PREPARING) {
+            return (int) mPlayer.getCurrentPosition() / 1000;
+        }
+        return 0;
+    }
+
     @Override
     protected void init(Bundle savedInstanceState) {
 

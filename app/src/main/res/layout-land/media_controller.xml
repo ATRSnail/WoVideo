@@ -149,12 +149,13 @@
       android:layout_height="wrap_content"
       android:background="#CC000000">
 
-    <ImageButton
+    <ImageView
         android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@drawable/icon_back"/>
+        android:layout_width="@dimen/s_40"
+        android:layout_height="@dimen/s_40"
+        android:layout_centerVertical="true"
+        android:padding="5dp"
+        android:src="@drawable/icon_back"/>
 
     <TextView
         android:id="@+id/video_title"
@@ -187,7 +188,7 @@
       android:id="@+id/send_bullet"
       android:layout_width="@dimen/s_40"
       android:layout_height="@dimen/s_40"
-      android:background="@drawable/stroke_rounded"
+      android:background="@drawable/icon_edit"
       android:layout_alignParentRight="true"
       android:layout_centerVertical="true"/>
   <TextView

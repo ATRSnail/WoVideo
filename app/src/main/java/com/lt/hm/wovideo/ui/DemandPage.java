@@ -24,6 +24,7 @@ import com.lt.hm.wovideo.adapter.video.VideoAnthologyAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemListAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
+import com.lt.hm.wovideo.db.HistoryDataBase;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
@@ -36,6 +37,7 @@ import com.lt.hm.wovideo.model.LikeList;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoDetails;
+import com.lt.hm.wovideo.model.VideoHistory;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
 import com.lt.hm.wovideo.utils.ShareUtils;
@@ -115,7 +117,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     private String img_url;
     private String share_title;
     private String share_desc;
-
+    private HistoryDataBase history;
+    private VideoHistory videoHistory;
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -160,8 +163,10 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        history = new HistoryDataBase(getApplicationContext());
         antholys = new ArrayList<>();
         beans = new ArrayList<>();
+        videoHistory = new VideoHistory();
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey("id")) {
             vfId = bundle.getString("id");
@@ -217,6 +222,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                             if (videoCommentList!=null){
                                 videoCommentList.setVisibility(View.GONE);
                             }
+                            if (empty==null)
+                                return;
                             empty.setVisibility(View.VISIBLE);
                         }
                     } else {
@@ -409,6 +416,12 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     } else {
                         anthologyText.setText("完结 共" + details.getJjs() + "集");
                     }
+
+                    videoHistory.setmName(details.getName());
+                    videoHistory.setmId(details.getId());
+                    videoHistory.setCreate_time(System.currentTimeMillis()+"");
+                    videoHistory.setImg_url(details.getImg());
+
                 }
             }
         });
@@ -493,12 +506,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                             getRealURL(value, true);
                         }
                     });
-                    mMediaController.setInterfaceListener(new AVController.OnInterfaceInteract() {
-                        @Override
-                        public void onSendBulletClick() {
-                            addBullet("test send bullet");
-                        }
-                    });
+
                     if (model.getmVideoUrl().size()>0){
                         getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false);
                         mMediaController.setmQualitySwitch(model.getmVideoUrl().get(0).getFormatName());
@@ -676,10 +684,13 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             case R.id.video_share:
                 ShareUtils.showShare(this, null, true, share_title,share_desc, HttpUtils.appendUrl(img_url));
                 break;
-
         }
     }
 
+    /**
+     *跳转页面
+     * @param vfId
+     */
     public void getChangePage(String vfId) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", vfId);
@@ -732,4 +743,12 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         });
     }
 
+    @Override
+    public void onDestroy() {
+        videoHistory.setCurrent_positon(getCurrentPosition());
+        videoHistory.setFlag("false");
+        history.save(videoHistory);
+        super.onDestroy();
+
+    }
 }

@@ -16,14 +16,17 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="256dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/gray_lighter"
         >
     <EditText
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:singleLine="false"
+        android:padding="10dp"
         android:gravity="top|left"
         android:id="@+id/callback_content"
+        android:layout_marginBottom="50dp"
         android:background="@color/white"
         android:hint="@string/recallback_hint"
         />
@@ -32,19 +35,28 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:gravity="right"
+        android:layout_marginBottom="50dp"
         android:id="@+id/content_count"
         android:text="@string/callback_count_hint"
+        android:padding="10dp"
         android:textColor="@color/font_gray"
         />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="@string/callback_contact_way"
+            android:background="@color/white"
+            android:textSize="@dimen/sp_14"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="@dimen/s_10"
+            android:layout_marginTop="@dimen/s_20"
+            android:padding="10dp"
+            android:id="@+id/contact_mathods"
+            />
     </FrameLayout>
 
 
-    <EditText
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/callback_contact_way"
-        android:id="@+id/contact_mathods"
-        />
+
 
 
 </LinearLayout>

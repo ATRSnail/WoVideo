@@ -68,7 +68,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private ImageButton         mNextButton;
   private ImageButton         mPrevButton;
   private ImageButton         mFullscreenButton;
-  private ImageButton         mBackButton;
+  private ImageView         mBackButton;
   private ImageButton         mSendBulletButton;
   private QualityPopWindow    mQualityPopWindow;
   private Handler             mHandler = new MessageHandler(this);
@@ -228,7 +228,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
       mBulletSwitch.setOnCheckedChangeListener(mBulletSwitchListener);
     }
 
-    mBackButton = (ImageButton) v.findViewById(R.id.back);
+    mBackButton = (ImageView) v.findViewById(R.id.back);
     if (mBackButton != null) {
       mBackButton.setOnClickListener(mBackListener);
     }
@@ -522,7 +522,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private OnClickListener mBulletSendListener = new OnClickListener() {
     @Override
     public void onClick(View v) {
-      mInterfaceListener.onSendBulletClick();
+      if (mInterfaceListener!=null){
+        mInterfaceListener.onOpenBulletEditor();
+      }
     }
   };
 
@@ -923,6 +925,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   }
 
   public interface OnInterfaceInteract {
+    void onOpenBulletEditor();
+
     void onSendBulletClick();
   }
 

@@ -2,6 +2,9 @@ package com.lt.hm.wovideo.base;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +20,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -56,6 +60,7 @@ import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.player.AVController;
 import com.lt.hm.wovideo.video.player.AVPlayer;
+import com.lt.hm.wovideo.video.player.BulletSendDialog;
 import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.video.player.WoDanmakuParser;
@@ -454,7 +459,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         if (Util.SDK_INT > 23) {
             onHidden();
         }
-        if (mDanmakuView != null) {
+        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
+            Log.d("Bullet", "onStop: danmu prepared and gonna release");
             // dont forget release!
             mDanmakuView.release();
             mDanmakuView = null;
@@ -475,7 +481,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         super.onDestroy();
         mAudioCapabilitiesReceiver.unregister();
         releasePlayer();
-        if (mDanmakuView != null) {
+        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
+            Log.d("Bullet", "onDestroy: danmu prepared and gonna release");
             // dont forget release!
             mDanmakuView.release();
             mDanmakuView = null;
@@ -594,6 +601,27 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mPlayerNeedsPrepare = true;
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
             mMediaController.setEnabled(true);
+            mMediaController.setInterfaceListener(new AVController.OnInterfaceInteract() {
+                @Override
+                public void onOpenBulletEditor() {
+                    // DialogFragment.show() will take care of adding the fragment
+                    // in a transaction.  We also want to remove any currently showing
+                    // dialog, so make our own transaction and take care of that here.
+                    FragmentTransaction ft = getFragmentManager().beginTransaction();
+                    Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+                    if (prev != null) {
+                        ft.remove(prev);
+                    }
+                    ft.addToBackStack(null);
+                    DialogFragment bulletDialog = BulletSendDialog.newInstance(this);
+                    bulletDialog.show(ft,"dialog");
+                }
+
+                @Override
+                public void onSendBulletClick() {
+                    addBullet("test send bullet");
+                }
+            });
             mEventLogger = new EventLogger();
             mEventLogger.startSession();
             mPlayer.addListener(mEventLogger);
@@ -638,6 +666,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     if (!StringUtils.isNullOrEmpty(resp.getBody().getBarrageList()) && resp.getBody().getBarrageList().size() > 0) {
                         mParser = new WoDanmakuParser();
                         mParser.setmDanmuListData(resp.getBody());
+                        if (mContext == null)
+                            return;
                         mDanmakuView.prepare(mParser, mContext);
                         mDanmakuView.showFPS(false);
                         mDanmakuView.enableDanmakuDrawingCache(true);
@@ -718,6 +748,13 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         danmaku.borderColor = Color.GREEN;
         mDanmakuView.addDanmaku(danmaku);
 
+    }
+
+    protected long getCurrentPosition() {
+        if (mPlayer != null && mPlayer.getPlaybackState() != AVPlayer.STATE_PREPARING) {
+            return  mPlayer.getCurrentPosition() / 1000;
+        }
+        return 0;
     }
 
     @Override

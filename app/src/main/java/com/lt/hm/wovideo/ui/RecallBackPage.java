@@ -55,16 +55,36 @@ public class RecallBackPage extends BaseActivity implements SecondTopbar.myTopba
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s!=null){
+                    int length = s.length();
+                    contentCount.setText(length+""+"/200字");
+                }
 
             }
-
             @Override
             public void afterTextChanged(Editable s) {
-                if (s.toString().length()==190){
-                    Toast.makeText(RecallBackPage.this,  getResources().getString(R.string.option_phone_toast), Toast.LENGTH_SHORT).show();
-                }
+
             }
         });
+
+//        callbackContent.addTextChangedListener(new TextWatcher() {
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+//
+//            }
+//
+//            @Override
+//            public void onTextChanged(CharSequence s, int start, int before, int count) {
+//
+//            }
+//
+//            @Override
+//            public void afterTextChanged(Editable s) {
+//                if (s.toString().length()==190){
+//                    Toast.makeText(RecallBackPage.this,  getResources().getString(R.string.option_phone_toast), Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
     }
 
     @Override

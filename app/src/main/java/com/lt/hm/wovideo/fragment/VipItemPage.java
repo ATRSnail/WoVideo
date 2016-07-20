@@ -65,7 +65,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     private String sx;
     private String dq;
     private String nd;
-    private int mCurrentCounter,TOTAL_COUNTER;
+    private int mCurrentCounter, TOTAL_COUNTER;
 
 
     @Override
@@ -101,7 +101,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
         b_list = new ArrayList<>();
     }
 
-    private void getListDatas(int id, String tag,int page) {
+    private void getListDatas(int id, String tag, int page) {
         first_open = false;
         HashMap<String, Object> map = new HashMap<>();
         map.put("typeid", id);
@@ -147,28 +147,24 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                             manager.setOrientation(LinearLayoutManager.VERTICAL);
                             vipItemList.setLayoutManager(manager);
                         }
-                        TOTAL_COUNTER=b_list.size();
+                        TOTAL_COUNTER = b_list.size();
                         vipItemList.setHasFixedSize(false);
                         vipItemList.setAdapter(bottom_adapter);
                         bottom_adapter.notifyDataSetChanged();
                         bottom_adapter.setOnLoadMoreListener(PAGE_SIZE, new BaseQuickAdapter.RequestLoadMoreListener() {
                             @Override
                             public void onLoadMoreRequested() {
-                                if (b_list.size()%10!=0) {
+                                if (b_list.size() % 10 != 0) {
                                     vipItemList.post(new Runnable() {
                                         @Override
                                         public void run() {
                                             bottom_adapter.isNextLoad(false);
                                         }
                                     });
-                                }else {
+                                } else {
                                     if (!StringUtils.isNullOrEmpty(mId)) {
-                                        int pageNum=b_list.size()/10+1;
-                                        if (StringUtils.isNullOrEmpty(isvip)) {
-                                            getListDatas(mId, "0",pageNum);
-                                        } else {
-                                            getListDatas(mId, "1",pageNum);
-                                        }
+                                        int pageNum = b_list.size() / 10 + 1;
+                                        getListDatas(mId, "1", pageNum);
                                     }
                                 }
                             }
@@ -197,7 +193,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                                 getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
                             }
                         });
-                    }else {
+                    } else {
                         bottom_adapter.isNextLoad(false);
                     }
 
@@ -252,7 +248,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     @Override
     public void initData() {
         super.initData();
-        getListDatas(mId, isvip,1);
+        getListDatas(mId, "1", pageNum);
     }
 
     @Override
@@ -266,17 +262,11 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     @Override
     public void onRefresh() {
         if (!StringUtils.isNullOrEmpty(mId)) {
-            if (StringUtils.isNullOrEmpty(isvip)) {
-                if (b_list.size() > 0) {
-                    b_list.clear();
-                }
-                getListDatas(mId, "0",1);
-            } else {
-                if (b_list.size() > 0) {
-                    b_list.clear();
-                }
-                getListDatas(mId, "1",1);
+            pageNum = 1;
+            if (b_list.size() > 0) {
+                b_list.clear();
             }
+            getListDatas(mId, "1", pageNum);
         }
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -286,43 +276,5 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                 }
             }
         }, 3000);
-    }
-
-    private void SearchChecked(String key, String value) {
-        if (key.equals("类型")) {
-            if (value.equals("0")) {
-                lx = "";
-            } else {
-                lx = value;
-            }
-        }
-        if (key.equals("属性")) {
-            if (value.equals("0")) {
-                sx = "";
-            } else {
-                sx = value;
-            }
-        }
-        if (key.equals("地区")) {
-            if (value.equals("0")) {
-                dq = "";
-            } else {
-                dq = value;
-            }
-        }
-        if (key.equals("年代")) {
-            if (value.equals("0")) {
-                nd = "";
-            } else {
-                nd = value;
-            }
-        }
-        // TODO: 16/7/4  Fragment 与 Activity 的 直接信息传递
-        if (b_list != null && b_list.size() > 0) {
-            b_list.clear();
-        }
-        if (!first_open) {
-            getListDatas(mId, "0",1);
-        }
     }
 }

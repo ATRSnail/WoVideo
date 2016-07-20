@@ -522,7 +522,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private OnClickListener mBulletSendListener = new OnClickListener() {
     @Override
     public void onClick(View v) {
-      mInterfaceListener.onOpenBulletEditor();
+      if (mInterfaceListener!=null){
+        mInterfaceListener.onOpenBulletEditor();
+      }
     }
   };
 

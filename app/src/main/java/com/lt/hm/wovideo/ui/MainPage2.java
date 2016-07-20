@@ -8,6 +8,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -64,6 +65,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
     @BindView(R.id.choice_person_center)
     ImageView choicePersonCenter;
 
+    private long mExitTime = 0;
 
     @Override
     protected int getLayoutId() {
@@ -233,5 +235,22 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
                 }
                 break;
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {//
+                // 如果两次按键时间间隔大于2000毫秒，则不退出
+                Toast.makeText(this, getResources().getString(R.string.second_back_hint), Toast.LENGTH_SHORT).show();
+                mExitTime = System.currentTimeMillis();// 更新mExitTime
+            } else {
+//				aCache.put("first_pay", "");
+                android.os.Process.killProcess(android.os.Process.myPid());
+                System.exit(0);
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

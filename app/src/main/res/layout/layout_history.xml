@@ -4,8 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
-    <com.lt.hm.wovideo.widget.SecondTopbar
+    <com.lt.hm.wovideo.widget.CustomTopbar
         android:id="@+id/history_topbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/s_46"
@@ -13,5 +12,19 @@
         app:CustomtitleTextSize="@dimen/f_16"
         app:Customtoptitle="@string/history_string"
         app:leftBackGround="@drawable/left_arrow"
-        app:rightBackGround="@drawable/left_arrow" />
+         />
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.0"
+        android:background="@color/font_gray"
+        >
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/history_list"
+        />
+    <include layout="@layout/layout_history_bottom"/>
+    </FrameLayout>
+
 </LinearLayout>

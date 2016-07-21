@@ -63,12 +63,11 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
         loginTopbar.setRightIsVisible(false);
         loginTopbar.setLeftIsVisible(true);
         loginTopbar.setOnTopbarClickListenter(this);
-//        etLoginAccount.setText("18513179404");
-//        etLoginPwd.setText("123456");
+        etLoginAccount.setText("18513179404");
+        etLoginPwd.setText("123456");
         etLoginAccount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -103,6 +102,11 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
             }else if (TextUtils.isEmpty(etLoginPwd.getText())){
                 TLog.log("密码不能为空");
             }else{
+                if (PhoneUtils.isPhoneNum(etLoginAccount.getText().toString())){
+                    Operators_flag =true;
+                }else{
+                    Operators_flag =false;
+                }
                 if (Operators_flag){
                     ToLogin();
                 }else{

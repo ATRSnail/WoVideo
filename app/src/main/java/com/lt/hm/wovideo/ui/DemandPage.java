@@ -104,6 +104,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     boolean isCollected = false;
     String vfId;
     String per_Id;//单集Id
+    String collect_tag;//收藏ID
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
     @BindView(R.id.et_add_comment)
@@ -402,6 +403,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                         }
                     }
                     videoName.setText(details.getName());
+                    img_collect.setImageResource(details.getSc() != null && details.getSc().equals("1") ? R.drawable.icon_collect_press : R.drawable.icon_collect);
 
                     videoPlayNumber.setText(details.getHit());
                     if (details.getGxzt().equals("0")) {
@@ -449,6 +451,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
                     per_Id = details.getId();
+                    collect_tag=details.getId();
                     getCommentList(per_Id);
                     // TODO: 16/7/11  ADD PLAY URL SELECTOR
                     VideoModel model = new VideoModel();
@@ -647,7 +650,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
             map.put("userid", model.getId());
-            map.put("vfid", per_Id);
+            map.put("vfid", collect_tag);
             HttpApis.collectVideo(map, new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e, int id) {

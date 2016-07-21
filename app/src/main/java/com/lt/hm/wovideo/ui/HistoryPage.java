@@ -90,19 +90,36 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
         });
 
         history_list.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
-            // 取得ViewHolder对象，这样就省去了通过层层的findViewById去实例化我们需要的cb实例的步骤
-            VideoHistoryAdapter.ViewHolder holder = (VideoHistoryAdapter.ViewHolder) view.getTag();
-            // 改变CheckBox的状态
-            holder.itemCheckBox.toggle();
-            // 将CheckBox的选中状况记录下来
-            // 调整选定条目
-            if (holder.itemCheckBox.isChecked() == true) {
-                list.get(position).setFlag("true");
-                checkNum++;
-            } else {
-                list.get(position).setFlag("false");
-                checkNum--;
+
+            if (top_flag){
+                // 取得ViewHolder对象，这样就省去了通过层层的findViewById去实例化我们需要的cb实例的步骤
+                VideoHistoryAdapter.ViewHolder holder = (VideoHistoryAdapter.ViewHolder) view.getTag();
+                // 改变CheckBox的状态
+                holder.itemCheckBox.toggle();
+                // 将CheckBox的选中状况记录下来
+                // 调整选定条目
+                if (holder.itemCheckBox.isChecked() == true) {
+                    list.get(position).setFlag("true");
+                    checkNum++;
+                } else {
+                    list.get(position).setFlag("false");
+                    checkNum--;
+                }
+            }else{
+                // TODO: 16/7/21 跳转页面 并 切到指定 播放位置
+//                VideoHistory bean = list.get(position);
+//                int typeId = Integer.parseInt(bean.getmId());
+//                if (VideoType.MOVIE.getId()== typeId){
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("id", bean.getmId());
+//                    UIHelper.ToMoviePage(CollectPage.this, bundle);
+//                }else{
+//                    Bundle bundle = new Bundle();
+//                    bundle.putString("id", bean.getIid());
+//                    UIHelper.ToDemandPage(CollectPage.this, bundle);
+//                }
             }
+
         });
     }
 

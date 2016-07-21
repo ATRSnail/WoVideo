@@ -279,6 +279,10 @@ public class HttpApis {
         HttpUtils.formPost("mblVf/addBarrage", map, callback);
     }
 
+    public static void cancelCollect(HashMap<String, Object> map, StringCallback callback){
+        HttpUtils.formPost("mblCollection/cancelMyColls", map, callback);
+    }
+
 
 
 }

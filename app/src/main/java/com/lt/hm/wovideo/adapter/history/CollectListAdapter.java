@@ -14,6 +14,7 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.CollectModel;
 import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.TLog;
 
 import java.util.List;
 
@@ -70,7 +71,8 @@ public class CollectListAdapter extends BaseAdapter {
         holder.itemCurrentPosition.setVisibility(View.GONE);
 //        holder.itemCurrentPosition.setText(list.get(position).getCurrent_positon()+"");
         ImageView img = holder.itemVideoImg;
-        Glide.with(context).load(HttpUtils.appendUrl(list.get(position).getImg()));
+        TLog.log(HttpUtils.appendUrl(list.get(position).getImg()));
+        Glide.with(context).load(HttpUtils.appendUrl(list.get(position).getImg())).centerCrop().into(img);
         // 根据flag来设置checkbox的选中状况
 
         if (!StringUtils.isNullOrEmpty(list.get(position).getFlag())){

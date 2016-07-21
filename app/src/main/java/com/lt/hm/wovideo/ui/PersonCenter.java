@@ -22,6 +22,7 @@ import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
@@ -108,6 +109,12 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
         }
         if (!StringUtils.isNullOrEmpty(string)){
             UserModel model = new Gson().fromJson(string,UserModel.class);
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                TLog.log(HttpUtils.appendUrl(model.getHeadImg().toString()));
+                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(headIcon);
+            }else{
+                headIcon.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+            }
             unloginLayout.setVisibility(View.GONE);
             login_layout.setVisibility(View.VISIBLE);
             String phoneNum = model.getPhoneNo();

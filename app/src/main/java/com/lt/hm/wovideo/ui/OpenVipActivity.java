@@ -16,6 +16,7 @@ import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
@@ -86,6 +87,12 @@ public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopb
             if (FILE_SAVEPATH != null) {
                 Glide.with(this).load(ACache.get(this).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(imgPhotos);
             }
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(imgPhotos);
+            }else{
+                imgPhotos.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+            }
+
             if (model.getIsVip().equals("1")) {
                 imgKing.setImageResource(R.drawable.icon_vip_opened);
                 open_get_vip_layout.setVisibility(View.GONE);

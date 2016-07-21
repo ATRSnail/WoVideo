@@ -11,16 +11,27 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.history.VideoHistoryAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.db.HistoryDataBase;
+import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.RespHeader;
+import com.lt.hm.wovideo.http.ResponseCode;
+import com.lt.hm.wovideo.http.ResponseObj;
+import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoHistory;
+import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.CustomTopbar;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import butterknife.BindView;
+import okhttp3.Call;
 
 /**
  * @author leonardo
@@ -106,18 +117,10 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                     checkNum--;
                 }
             }else{
-                // TODO: 16/7/21 跳转页面 并 切到指定 播放位置
+
 //                VideoHistory bean = list.get(position);
 //                int typeId = Integer.parseInt(bean.getmId());
-//                if (VideoType.MOVIE.getId()== typeId){
-//                    Bundle bundle = new Bundle();
-//                    bundle.putString("id", bean.getmId());
-//                    UIHelper.ToMoviePage(CollectPage.this, bundle);
-//                }else{
-//                    Bundle bundle = new Bundle();
-//                    bundle.putString("id", bean.getIid());
-//                    UIHelper.ToDemandPage(CollectPage.this, bundle);
-//                }
+                getVideoDetails(list.get(position));
             }
 
         });
@@ -174,5 +177,72 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
             adapter.notifyDataSetChanged();
         }
     }
+
+
+    /**
+     * 获取视频详情数据
+     *
+     * @param bean
+     */
+    public void getVideoDetails(VideoHistory bean) {
+        HashMap<String, Object> maps = new HashMap<>();
+        maps.put("vfid", bean.getmId());
+        HttpApis.getVideoInfo(maps, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log(response);
+                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                    getChangePage(resp.getBody().getVfinfo().getId(),bean);
+                }
+            }
+        });
+    }
+
+    /**
+     *跳转页面
+     * @param vfId
+     * @param bean
+     */
+    public void getChangePage(String vfId, VideoHistory bean) {
+        HashMap<String, Object> maps = new HashMap<>();
+        maps.put("vfid", vfId);
+        HttpApis.getVideoInfo(maps, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log(response);
+                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+
+                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putLong("cur_position",bean.getCurrent_positon());
+                        UIHelper.ToMoviePage(HistoryPage.this, bundle);
+                    } else {
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putLong("cur_position",bean.getCurrent_positon());
+                        UIHelper.ToDemandPage(HistoryPage.this, bundle);
+                        HistoryPage.this.finish();
+
+                    }
+                }
+            }
+        });
+    }
+
 
 }

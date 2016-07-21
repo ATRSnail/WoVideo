@@ -168,6 +168,11 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             getAnthologyDatas(vfId);
             getFirstURL(vfId);
         }
+        if (bundle.containsKey("cur_position")){
+            long curposition = bundle.getLong("cur_position");
+            seekTo(curposition);
+        }
+
         getYouLikeDatas();
 
     }
@@ -571,14 +576,22 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         videoShare.setOnClickListener(this);
         videoCollect.setVisibility(View.VISIBLE);
         videoCollect.setOnClickListener((View v) -> {
-            if (!isCollected){
+
+            if (!isCollected) {
                 CollectVideo();
-                isCollected=true;
-            }else{
-                Toast.makeText(getApplicationContext(),"取消收藏",Toast.LENGTH_SHORT).show();
-                isCollected=false;
-                img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                isCollected = true;
+            } else {
+                CancelCollect();
+                isCollected = false;
             }
+//            if (!isCollected){
+//                CollectVideo();
+//                isCollected=true;
+//            }else{
+//                Toast.makeText(getApplicationContext(),"取消收藏",Toast.LENGTH_SHORT).show();
+//                isCollected=false;
+//                img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+//            }
         });
         anthologyALL.setOnClickListener((View v) -> {
             if (expand_flag) {
@@ -673,6 +686,38 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             // TODO: 16/7/8 未登录跳转登录页面
             UnLoginHandler.unLogin(DemandPage.this);
         }
+    }
+
+    /**
+     * 取消收藏
+     */
+    private void CancelCollect() {
+
+        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+        UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("userid", model.getId());
+        map.put("vfids", collect_tag);
+        HttpApis.cancelCollect(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log(e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log("cancel_result" + response);
+                ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                    img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                } else {
+                    img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override

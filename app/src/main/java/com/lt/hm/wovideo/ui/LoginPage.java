@@ -30,7 +30,6 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import java.util.HashMap;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
@@ -105,18 +104,13 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
                 TLog.log("用户名不能为空");
             } else if (TextUtils.isEmpty(etLoginPwd.getText())) {
                 TLog.log("密码不能为空");
-<<<<<<< HEAD
             } else {
-                if (Operators_flag) {
-=======
-            }else{
                 if (PhoneUtils.isPhoneNum(etLoginAccount.getText().toString())){
                     Operators_flag =true;
                 }else{
                     Operators_flag =false;
                 }
                 if (Operators_flag){
->>>>>>> 5888421a50943e2d78f7a76517b1d4ff20e0b343
                     ToLogin();
                 } else {
                     Toast.makeText(getApplicationContext(), "只支持联通手机号登录", Toast.LENGTH_SHORT).show();
@@ -181,14 +175,6 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
     public void rightClick() {
 
     }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.bind(this);
-    }
-
     @OnClick(R.id.tv_login_forget)
     public void onClick() {
         UIHelper.ToFindPwd(this);

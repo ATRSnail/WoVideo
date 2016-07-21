@@ -122,7 +122,6 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         super.onConfigurationChanged(newConfig);
         //Check the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            setVideoTitle(videoName.getText().toString());
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
         }
 //        if (null == woPlayer) return;

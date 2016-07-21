@@ -48,7 +48,6 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BulletModel;
 import com.lt.hm.wovideo.model.UserModel;
-import com.lt.hm.wovideo.ui.MoviePage;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.Bullet;
@@ -367,7 +366,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     }
     protected Intent onUrlGot(VideoModel video) {
-        Intent mpdIntent = new Intent(this, MoviePage.class)
+        Intent mpdIntent = new Intent(this, BaseVideoActivity.class)
                 .setData(Uri.parse(video.getmPlayUrl().getFormatUrl()))
                 .putExtra(CONTENT_ID_EXTRA, video.getmVideoName())
                 .putExtra(CONTENT_TYPE_EXTRA, Util.TYPE_HLS)

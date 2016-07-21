@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/set_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/input_new_pwd"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/left_arrow" />
+    <LinearLayout
+        android:background="@color/password_bg"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_marginTop="30dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+           <TextView
+               android:textColor="@color/class_font_color"
+               android:text="@string/inputpassword"
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content" />
+            <EditText
+                android:inputType="textPassword"
+                android:id="@+id/et_password"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/et_persion"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginTop="15dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="40dp">
+            <TextView
+                android:textColor="@color/class_font_color"
+                android:text="@string/confirmpassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:inputType="textPassword"
+                android:id="@+id/et_comforim_pwd"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:background="@drawable/et_persion"/>
+
+        </LinearLayout>
+        <Button
+            android:id="@+id/btn_finish"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_finish"
+            android:layout_margin="20dp"
+            android:text="@string/finish"
+            android:layout_width="match_parent"
+            android:layout_height="45dp" />
+
+    </LinearLayout>
+</LinearLayout>

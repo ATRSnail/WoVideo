@@ -13,9 +13,12 @@
         app:CustomtitleTextSize="@dimen/f_16"
         app:Customtoptitle="@string/person_info_top"
         app:leftBackGround="@drawable/left_arrow"
-        app:rightBackGround="@drawable/left_arrow" />
+        app:rightBackGround="@drawable/bianji" />
 
-
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="@color/divider_color" />
     <com.lt.hm.wovideo.widget.PercentLinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,7 +56,10 @@
                 <!--app:border_color="@color/white"-->
                 <!--app:border_width="1dp" />-->
         </RelativeLayout>
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="@color/divider_color" />
         <RelativeLayout
             android:id="@+id/nick_layout"
             android:layout_width="match_parent"
@@ -79,7 +85,10 @@
                 android:layout_centerVertical="true"
                 android:textColor="@color/gray_darker" />
         </RelativeLayout>
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="@color/divider_color" />
 
         <RelativeLayout
             android:id="@+id/sex_layout"
@@ -112,7 +121,10 @@
                 android:layout_height="match_parent">
             </Spinner>
         </RelativeLayout>
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="@color/divider_color" />
         <RelativeLayout
             android:id="@+id/email_layout"
             android:layout_width="match_parent"

@@ -221,6 +221,15 @@ public class HttpApis {
     public static void upUsers(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblUser/upUser", map, callback);
     }
+    /**
+     * 请求个人信息
+     *
+     * @param map
+     * @param callback
+     */
+    public static void getUsers(HashMap<String, Object> map, StringCallback callback) {
+        HttpUtils.formPost("mblUser/selUserByid", map, callback);
+    }
 
     /**
      * 收藏
@@ -277,6 +286,14 @@ public class HttpApis {
      */
     public static void addBullet(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblVf/addBarrage", map, callback);
+    }
+    /**
+     * 对指定视频添加弹幕
+     * @param map
+     * @param callback
+     */
+    public static void updatePwd(HashMap<String, Object> map, StringCallback callback) {
+        HttpUtils.formPost("mblUser/upPass", map, callback);
     }
 
 

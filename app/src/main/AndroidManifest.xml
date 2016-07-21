@@ -135,6 +135,12 @@
         <activity android:name=".ui.SearchResultPage"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
+        <activity android:name=".ui.ChangePassword1Aty"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".ui.FindPwdAty"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"/>
         <activity android:name=".zxing.ui.MipcaActivityCapture"/>
 
         <activity

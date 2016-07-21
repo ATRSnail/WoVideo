@@ -11,7 +11,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v7.widget.LinearLayoutManager;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +34,6 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
-import com.lt.hm.wovideo.adapter.search.SearchResultAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
@@ -43,12 +43,12 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.SearchResult;
 import com.lt.hm.wovideo.model.UserModel;
-import com.lt.hm.wovideo.sendemail.ZhengZeTools;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.ImageUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.CircleImageView;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -58,7 +58,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,7 +65,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import okhttp3.Call;
 
-import static android.R.id.edit;
 import static com.lt.hm.wovideo.R.id.p_info_logo;
 
 /**
@@ -113,7 +111,8 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
     private final static int CROP = 500;
     private UserModel model;
     private boolean isEdit = false;
-    private ArrayAdapter<CharSequence> adapter;
+    private ArrayAdapter<String> adapter;
+    private ACache aCache;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -127,6 +126,7 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        aCache= ACache.get(this);
         personInfoTopbar.setRightIsVisible(true);
         personInfoTopbar.setLeftIsVisible(true);
         personInfoTopbar.setOnTopbarClickListenter(this);
@@ -184,6 +184,8 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
     @Override
     public void rightClick() {
         if (!isEdit) {
+            personInfoTopbar.setRightImageResource(R.drawable.wancheng
+            );
             isEdit = true;
             spinner.setClickable(true);
             nickName.setCursorVisible(true);
@@ -193,6 +195,25 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
             }
             nickName.setSelection(nickNameLength);
             nickName.setBackgroundResource(R.drawable.et_persion);
+            nickName.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    if (s.toString().length()>8){
+                        Toast.makeText(PersonInfoPage.this, "昵称最多只能是8个字哦", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
             tvEmail.setCursorVisible(true);
             int emailLength=tvEmail.getText().length();
             if (emailLength==0){
@@ -209,19 +230,20 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
                 tvSex.setText("女");
             }
         } else {
-            isEdit = false;
-            nickName.setCursorVisible(false);
-            nickName.setBackgroundResource(Color.TRANSPARENT);
-            tvEmail.setCursorVisible(false);
-            tvEmail.setBackgroundResource(Color.TRANSPARENT);
-            spinner.setClickable(false);
-            int sex_num = Integer.parseInt(model.getSex());
-            if (sex_num == 0) {
-                tvSex.setText("男");
-            } else if (sex_num == 1) {
-                tvSex.setText("女");
-            }
             if (isCanCommit()){
+                isEdit = false;
+                personInfoTopbar.setRightImageResource(R.drawable.bianji);
+                nickName.setCursorVisible(false);
+                nickName.setBackgroundResource(Color.TRANSPARENT);
+                tvEmail.setCursorVisible(false);
+                tvEmail.setBackgroundResource(Color.TRANSPARENT);
+                spinner.setClickable(false);
+//                int sex_num = Integer.parseInt(model.getSex());
+//                if (sex_num == 0) {
+//                    tvSex.setText("男");
+//                } else if (sex_num == 1) {
+//                    tvSex.setText("女");
+//                }
                 sendEdit();
             }
         }
@@ -236,6 +258,9 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
             return false;
         }else if (nickName.getText().toString().equals("")){
             Toast.makeText(this, "昵称不能为空", Toast.LENGTH_SHORT).show();
+            return false;
+        }else if (nickName.getText().toString().length()>8){
+            Toast.makeText(this, "昵称太长了,试试八个字以内的吧", Toast.LENGTH_SHORT).show();
             return false;
         }else if (email.equals("")){
             Toast.makeText(this, "邮箱不能为空", Toast.LENGTH_SHORT).show();
@@ -265,7 +290,7 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
         }
         maps.put("sex", sex);
         maps.put("nickName", nickName.getText().toString());
-        HttpApis.searchPage(maps, new StringCallback() {
+        HttpApis.upUsers(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log("error:"+e.getMessage());
@@ -279,6 +304,7 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     String toastMsg=resp.getHead().getRspMsg();
                     Toast.makeText(getApplicationContext(), toastMsg, Toast.LENGTH_SHORT).show();
+                    updateUserInfo();
                 } else {
                     Toast.makeText(getApplicationContext(), "修改失败", Toast.LENGTH_SHORT).show();
                 }
@@ -286,21 +312,52 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
             }
         });
     }
+    private void updateUserInfo(){
+        HashMap<String, Object> maps = new HashMap<>();
+        maps.put("userid", model.getId());
+        HttpApis.getUsers(maps, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:"+e.getMessage());
+            }
 
+            @Override
+            public void onResponse(String response, int id) {
+                ResponseObj<UserModel, RespHeader> resp = new ResponseObj<UserModel, RespHeader>();
+                ResponseParser.loginParse(resp,response,UserModel.class,RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
+                    UserModel model = resp.getBody();
+                    String json = new Gson().toJson(model);
+                    cacheUserInfo(json);
+                    finish();
+                }else{
+                    Toast.makeText(getApplicationContext(),resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+    }
+    private void cacheUserInfo(String json) {
+        aCache.put("userinfo",json);
+    }
     private void initSpinner(){
         Resources res = getResources();
-        CharSequence[] platforms = res.getTextArray(R.array.sex_value);
-        adapter = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, platforms) {
+//        CharSequence[] platforms = res.getTextArray(R.array.sex_value);
+        ArrayList<String> strings=new ArrayList<>();
+        int sex_num = Integer.parseInt(model.getSex());
+        if (sex_num == 0) {
+            strings.add("男");
+            strings.add("女");
+        } else if (sex_num == 1) {
+            strings.add("女");
+            strings.add("男");
+        }
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,strings ) {
             @Override
             public View getDropDownView(int position, View convertView, ViewGroup parent) {
                 View view = getLayoutInflater().inflate(R.layout.spinner_adapter, parent, false);
                 TextView label = (TextView) view.findViewById(R.id.label);
                 label.setText(getItem(position));
-                if (0 == position) {
-                    view.setVisibility(View.GONE);
-                }else {
-                    view.setVisibility(View.VISIBLE);
-                }
                 return view;
             }
             @Override

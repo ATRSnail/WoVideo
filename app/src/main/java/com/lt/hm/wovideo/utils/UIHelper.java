@@ -6,8 +6,10 @@ import android.os.Bundle;
 
 import com.lt.hm.wovideo.ui.AboutPage;
 import com.lt.hm.wovideo.ui.BillsPage;
+import com.lt.hm.wovideo.ui.ChangePassword1Aty;
 import com.lt.hm.wovideo.ui.CollectPage;
 import com.lt.hm.wovideo.ui.DemandPage;
+import com.lt.hm.wovideo.ui.FindPwdAty;
 import com.lt.hm.wovideo.ui.GuidPage;
 import com.lt.hm.wovideo.ui.HistoryPage;
 import com.lt.hm.wovideo.ui.LivePage;
@@ -80,6 +82,11 @@ public class UIHelper {
 
     public static void ToSkinManager(Context context) {
         Intent intent = new Intent(context,SkinManager.class);
+        context.startActivity(intent);
+    }
+    public static void ToChangePassword(Context context,String phoneNumber) {
+        Intent intent = new Intent(context,ChangePassword1Aty.class);
+        intent.putExtra("phoneNumber",phoneNumber);
         context.startActivity(intent);
     }
 
@@ -196,6 +203,10 @@ public class UIHelper {
 
     public static void ToGuidePage(Context context) {
         Intent intent = new Intent(context,GuidPage.class);
+        context.startActivity(intent);
+    }
+    public static void ToFindPwd(Context context) {
+        Intent intent = new Intent(context,FindPwdAty.class);
         context.startActivity(intent);
     }
 }

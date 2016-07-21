@@ -15,6 +15,7 @@ import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
@@ -37,6 +38,8 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     RelativeLayout aboutUs;
     @BindView(R.id.logout)
     Button logout;
+    @BindView(R.id.modify_pwd)
+    RelativeLayout modifyPwd;
 
     @Override
     protected int getLayoutId() {
@@ -47,7 +50,7 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     protected void init(Bundle savedInstanceState) {
         setTopbar.setRightIsVisible(false);
         setTopbar.setOnTopbarClickListenter(this);
-        logout.setOnClickListener((View v)->{
+        logout.setOnClickListener((View v) -> {
             ACache.get(this).clear();
             UIHelper.ToPerson(this);
         });
@@ -57,9 +60,11 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     @Override
     public void initViews() {
         String userinfo = ACache.get(this).getAsString("userinfo");
-        if (StringUtils.isNullOrEmpty(userinfo)){
+        if (StringUtils.isNullOrEmpty(userinfo)) {
             logout.setVisibility(View.GONE);
-        }else{
+            modifyPwd.setVisibility(View.GONE);
+        } else {
+            modifyPwd.setVisibility(View.VISIBLE);
             logout.setVisibility(View.VISIBLE);
         }
     }
@@ -76,7 +81,7 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     @OnClick(R.id.clean_cache)
     public void CleanCache() {
         // TODO: 16/6/6  clean cache datas
-        Toast.makeText(getApplicationContext(),"数据已清除",Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "数据已清除", Toast.LENGTH_SHORT).show();
         cacheSize.setText("0.00M");
     }
 
@@ -89,8 +94,9 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     public void ToAbout() {
         UIHelper.ToAboutPage(this);
     }
+
     @OnClick(R.id.logout)
-    public void LogOut(){
+    public void LogOut() {
         // TODO: 16/6/6 注销用户信息。
     }
 
@@ -103,5 +109,17 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     @Override
     public void rightClick() {
 
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO: add setContentView(...) invocation
+        ButterKnife.bind(this);
+    }
+
+    @OnClick(R.id.modify_pwd)
+    public void onClick() {
+        UIHelper.ToChangePassword(this,"");
     }
 }

@@ -140,6 +140,10 @@ public class SecondTopbar extends RelativeLayout {
             rightImage.setVisibility(View.GONE);
         }
     }
+    // 设置右Button是否显示
+    public void setRightImageResource(int imageResource) {
+        rightImage.setImageResource(imageResource);
+    }
 
     public void setTvTitle(String text) {
         tvTitle.setText(text);

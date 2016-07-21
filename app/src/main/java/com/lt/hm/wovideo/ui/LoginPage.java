@@ -30,6 +30,8 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import java.util.HashMap;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import okhttp3.Call;
 
 /**
@@ -46,20 +48,22 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
     EditText etLoginPwd;
     @BindView(R.id.btn_login_submit)
     Button btnLoginSubmit;
-    @BindView(R.id.tv_login_forget)
-    TextView tvLoginForget;
     @BindView(R.id.tv_login_regist)
     TextView tvLoginRegist;
     ACache aCache;
+    @BindView(R.id.tv_login_forget)
+    TextView tvLoginForget;
+
     @Override
     protected int getLayoutId() {
         return R.layout.layout_login;
     }
 
     boolean Operators_flag = false;
+
     @Override
     protected void init(Bundle savedInstanceState) {
-        aCache= ACache.get(this);
+        aCache = ACache.get(this);
         loginTopbar.setRightIsVisible(false);
         loginTopbar.setLeftIsVisible(true);
         loginTopbar.setOnTopbarClickListenter(this);
@@ -74,13 +78,13 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                if (s.length()==11){
-                    if (PhoneUtils.isPhoneNum(s.toString())){
-                        Operators_flag =true;
+                if (s.length() == 11) {
+                    if (PhoneUtils.isPhoneNum(s.toString())) {
+                        Operators_flag = true;
 //                        regist_validate_layout.setVisibility(View.VISIBLE);
 //                        divider_layout2.setVisibility(View.VISIBLE);
-                    }else{
-                        Operators_flag =false;
+                    } else {
+                        Operators_flag = false;
                         return;
 //                       regist_validate_layout.setVisibility(View.GONE);
 //                       divider_layout2.setVisibility(View.GONE);
@@ -97,23 +101,23 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
 
     @Override
     public void initViews() {
-        btnLoginSubmit.setOnClickListener((View v)->{
-            if (TextUtils.isEmpty(etLoginAccount.getText())){
+        btnLoginSubmit.setOnClickListener((View v) -> {
+            if (TextUtils.isEmpty(etLoginAccount.getText())) {
                 TLog.log("用户名不能为空");
-            }else if (TextUtils.isEmpty(etLoginPwd.getText())){
+            } else if (TextUtils.isEmpty(etLoginPwd.getText())) {
                 TLog.log("密码不能为空");
-            }else{
-                if (Operators_flag){
+            } else {
+                if (Operators_flag) {
                     ToLogin();
-                }else{
-                    Toast.makeText(getApplicationContext(),"只支持联通手机号登录",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "只支持联通手机号登录", Toast.LENGTH_SHORT).show();
                 }
             }
         });
-        tvLoginForget.setOnClickListener((View v)->{
+        tvLoginForget.setOnClickListener((View v) -> {
             // TODO: 16/6/8 忘记密码 
         });
-        tvLoginRegist.setOnClickListener((View v)->{
+        tvLoginRegist.setOnClickListener((View v) -> {
             UIHelper.ToRegister(this);
             this.finish();
         });
@@ -122,28 +126,28 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
     private void ToLogin() {
         String account = etLoginAccount.getText().toString();
         String pwd = etLoginPwd.getText().toString();
-        HashMap<String,Object> map= new HashMap<>();
-        map.put("phone",account);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("phone", account);
         map.put("passWord", MD5Utils.getMD5Code(pwd).toLowerCase());
         HttpApis.login(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
-                TLog.log("error:"+e.getMessage());
+                TLog.log("error:" + e.getMessage());
             }
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log("result:"+response);
+                TLog.log("result:" + response);
                 ResponseObj<UserModel, RespHeader> resp = new ResponseObj<UserModel, RespHeader>();
-                ResponseParser.loginParse(resp,response,UserModel.class,RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
+                ResponseParser.loginParse(resp, response, UserModel.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     UserModel model = resp.getBody();
                     String json = new Gson().toJson(model);
                     cacheUserInfo(json);
                     UIHelper.ToMain2(LoginPage.this);
                     LoginPage.this.finish();
-                }else{
-                    Toast.makeText(getApplicationContext(),resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -151,7 +155,7 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
     }
 
     private void cacheUserInfo(String json) {
-      aCache.put("userinfo",json);
+        aCache.put("userinfo", json);
     }
 
     @Override
@@ -167,5 +171,17 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
     @Override
     public void rightClick() {
 
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        // TODO: add setContentView(...) invocation
+        ButterKnife.bind(this);
+    }
+
+    @OnClick(R.id.tv_login_forget)
+    public void onClick() {
+        UIHelper.ToFindPwd(this);
     }
 }

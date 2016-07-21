@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/set_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/find_pwd"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/left_arrow" />
+    <LinearLayout
+        android:background="@color/password_bg"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_marginTop="30dp"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:background="@color/white"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+                <ImageView
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/icon_pwd_change"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:maxLength="11"
+                    android:background="@null"
+                    android:inputType="phone"
+                    android:id="@+id/et_phontnumber"
+                    android:textSize="@dimen/sp_12"
+                    android:hint="@string/find_phone_hint"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    />
+
+            </LinearLayout>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/divider_color"></View>
+        <LinearLayout
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:background="@color/white"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="50dp">
+                <ImageView
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/yanzhengma"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <EditText
+                    android:background="@null"
+                    android:maxLength="11"
+                    android:textSize="@dimen/sp_12"
+                    android:hint="@string/find_yzm"
+                    android:id="@+id/et_yanzhengma"
+                    android:layout_weight="1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginLeft="10dp"
+                    />
+                <Button
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:textSize="12sp"
+                    android:id="@+id/sent_yzm"
+                    android:layout_margin="10dp"
+                    android:textColor="@color/btn_yzm"
+                    android:background="@drawable/btn_send_yzm"
+                    android:text="@string/send_yzm"
+                    android:layout_gravity="center_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+        </LinearLayout>
+        <Button
+            android:id="@+id/btn_finish"
+            android:textColor="@android:color/white"
+            android:background="@drawable/btn_finish"
+            android:layout_margin="20dp"
+            android:text="@string/next"
+            android:layout_width="match_parent"
+            android:layout_height="45dp" />
+
+    </LinearLayout>
+</LinearLayout>

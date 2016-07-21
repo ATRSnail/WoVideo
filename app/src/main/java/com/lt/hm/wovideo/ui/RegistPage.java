@@ -192,7 +192,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            UIHelper.ToLogin(RegistPage.this);
+                            UIHelper.ToMain2(RegistPage.this);
                             RegistPage.this.finish();
                         }
                     }, 1000);

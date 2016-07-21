@@ -747,6 +747,19 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         mVideoId = videoId;
     }
 
+    /**
+     * Seek to certain position, unit is millisecond.
+     * @param positionMs
+     */
+    protected void seekTo(long positionMs) {
+        if (mPlayer != null && mPlayer.getPlaybackState() != AVPlayer.STATE_PREPARING) {
+            mPlayer.seekTo(positionMs);
+        }
+        if (mDanmakuView != null) {
+            mDanmakuView.seekTo(positionMs);
+        }
+    }
+
     @Override
     protected void init(Bundle savedInstanceState) {
 

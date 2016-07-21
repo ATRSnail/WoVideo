@@ -12,8 +12,9 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
-import com.lt.hm.wovideo.model.VideoHistory;
+import com.lt.hm.wovideo.model.CollectModel;
 import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.TLog;
 
 import java.util.List;
 
@@ -25,16 +26,16 @@ import butterknife.ButterKnife;
  * @version 1.0
  * @create_date 16/7/20
  */
-public class VideoHistoryAdapter extends BaseAdapter {
+public class CollectListAdapter extends BaseAdapter {
     // 填充数据的list
-    private List<VideoHistory> list;
+    private List<CollectModel.CollListBean> list;
     // 上下文
     private Context context;
     // 用来导入布局
     private LayoutInflater inflater = null;
 
     // 构造器
-    public VideoHistoryAdapter(List<VideoHistory> list, Context context) {
+    public CollectListAdapter(List<CollectModel.CollListBean> list, Context context) {
         this.context = context;
         this.list = list;
         inflater = LayoutInflater.from(context);
@@ -66,10 +67,12 @@ public class VideoHistoryAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.itemMovieName.setText(list.get(position).getmName());
-        holder.itemCurrentPosition.setText(StringUtils.generateStringPosition(list.get(position).getCurrent_positon()));
+        holder.itemMovieName.setText(list.get(position).getName());
+        holder.itemCurrentPosition.setVisibility(View.GONE);
+//        holder.itemCurrentPosition.setText(list.get(position).getCurrent_positon()+"");
         ImageView img = holder.itemVideoImg;
-        Glide.with(context).load(HttpUtils.appendUrl(list.get(position).getImg_url())).into(img);
+        TLog.log(HttpUtils.appendUrl(list.get(position).getImg()));
+        Glide.with(context).load(HttpUtils.appendUrl(list.get(position).getImg())).centerCrop().into(img);
         // 根据flag来设置checkbox的选中状况
 
         if (!StringUtils.isNullOrEmpty(list.get(position).getFlag())){

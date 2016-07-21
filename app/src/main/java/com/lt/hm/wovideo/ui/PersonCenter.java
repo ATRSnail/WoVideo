@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -23,6 +22,7 @@ import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
@@ -109,6 +109,12 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
         }
         if (!StringUtils.isNullOrEmpty(string)){
             UserModel model = new Gson().fromJson(string,UserModel.class);
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                TLog.log(HttpUtils.appendUrl(model.getHeadImg().toString()));
+                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(headIcon);
+            }else{
+                headIcon.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+            }
             unloginLayout.setVisibility(View.GONE);
             login_layout.setVisibility(View.VISIBLE);
             String phoneNum = model.getPhoneNo();
@@ -149,7 +155,8 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 // TODO: 16/6/6  变更头像 上传头像
                 String user = ACache.get(getApplicationContext()).getAsString("userinfo");
                 if (StringUtils.isNullOrEmpty(user)){
-                    Toast.makeText(this, getResources().getString(R.string.no_login_toast), Toast.LENGTH_SHORT).show();
+                    UnLoginHandler.unLogin(PersonCenter.this);
+//                    Toast.makeText(this, getResources().getString(R.string.no_login_toast), Toast.LENGTH_SHORT).show();
                 }else {
                     handleSelectPicture();
                 }

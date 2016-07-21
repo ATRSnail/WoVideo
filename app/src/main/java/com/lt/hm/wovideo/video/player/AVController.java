@@ -29,6 +29,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.video.model.Bullet;
 import com.lt.hm.wovideo.video.model.VideoModel;
 
 import java.lang.ref.WeakReference;
@@ -927,7 +928,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   public interface OnInterfaceInteract {
     void onOpenBulletEditor();
 
-    void onSendBulletClick();
+    void onSendBulletClick(Bullet bullet);
   }
 
 }

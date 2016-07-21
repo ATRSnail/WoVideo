@@ -145,4 +145,10 @@
         <item name="android:textColor">@android:color/holo_green_light</item>
     </style>
 
+    <style name="collect_checkbox" parent="@android:style/Widget.CompoundButton.CheckBox">
+        <item name="android:button">@drawable/check_selector</item>
+        <item name="android:paddingLeft">10.0dip</item>
+        <item name="android:height">35.0dip</item>
+    </style>
+
 </resources>

@@ -121,6 +121,18 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  */
 public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
         AudioCapabilitiesReceiver.Listener {
+    // Video thing
+    // For use when launching the demo app using adb.
+    private static final String CONTENT_EXT_EXTRA = "type";
+    private static final int MENU_GROUP_TRACKS = 1;
+    private static final int ID_OFFSET = 2;
+    private static final CookieManager defaultCookieManager;
+
+    static {
+        defaultCookieManager = new CookieManager();
+        defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
+    }
+
     //    @BindView(R.id.video_player)
 //    WoVideoPlayer videoPlayer;
     @BindView(R.id.video_name)
@@ -141,7 +153,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     ImageView movieBrefPurch;
     @BindView(R.id.bref_txt_short)
 //    TextView brefTxt1;
-    TextView bref_txt_short;
+            TextView bref_txt_short;
     @BindView(R.id.bref_txt_long)
     TextView bref_txt_long;
     @BindView(R.id.bref_expand)
@@ -152,29 +164,14 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     TextView free_hint;
     @BindView(R.id.free_label)
     TextView mFreeLabel;
-    private boolean isCollected;
     CommentAdapter commentAdapter;
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
     VideoItemGridAdapter grid_adapter;
     BrefIntroAdapter biAdapter;
-    String[] names = new String[]{"导演", "主演","类型","地区","年份","来源"};
+    String[] names = new String[]{"导演", "主演", "类型", "地区", "年份", "来源"};
     String[] values = new String[]{"王京", "周润发，刘德华"};
     List<CommentModel.CommentListBean> beans;
-    // Video thing
-    // For use when launching the demo app using adb.
-    private static final String CONTENT_EXT_EXTRA = "type";
-
-    private static final int MENU_GROUP_TRACKS = 1;
-    private static final int ID_OFFSET = 2;
-
-    private static final CookieManager defaultCookieManager;
-
-    static {
-        defaultCookieManager = new CookieManager();
-        defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
-    }
-
     @BindView(R.id.video_comment_list)
     RecyclerView videoCommentList;
     @BindView(R.id.empty_view)
@@ -185,19 +182,18 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     LinearLayout addComment;
     @BindView(R.id.img_collect)
     ImageView img_collect;
+    boolean text_flag = false;
+    private boolean isCollected;
     private EventLogger mEventLogger;
     private AVController mMediaController;
     private AspectRatioFrameLayout mVideoFrame;
     private View mShutterView;
     private RotateLoading mRotateLoading;
     private SurfaceView mSurfaceView;
-
     private AVPlayer mPlayer;
     private boolean mPlayerNeedsPrepare;
-
     private long mPlayerPosition;
     private boolean mEnableBackgroundAduio = false;
-
     private Uri mContentUri;
     private int mContentType;
     private String mContentId;
@@ -207,18 +203,12 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     private String share_title;
     private String share_desc;
     private String vfId;
+    private String collect_tag;
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
     // Bullet Screen
     private BaseDanmakuParser mParser;
     private IDanmakuView mDanmakuView;
     private DanmakuContext mContext;
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        mMediaController.onTouchEvent(event);
-        return super.onTouchEvent(event);
-    }
-
     private BaseCacheStuffer.Proxy mCacheStufferAdapter = new BaseCacheStuffer.Proxy() {
 
         private Drawable mDrawable;
@@ -234,7 +224,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                         String url = "http://www.bilibili.com/favicon.ico";
                         InputStream inputStream = null;
                         Drawable drawable = mDrawable;
-                        if(drawable == null) {
+                        if (drawable == null) {
                             try {
                                 URLConnection urlConnection = new URL(url).openConnection();
                                 inputStream = urlConnection.getInputStream();
@@ -252,7 +242,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                             drawable.setBounds(0, 0, 100, 100);
                             SpannableStringBuilder spannable = createSpannable(drawable);
                             danmaku.text = spannable;
-                            if(mDanmakuView != null) {
+                            if (mDanmakuView != null) {
                                 mDanmakuView.invalidateDanmaku(danmaku, false);
                             }
                             return;
@@ -268,6 +258,29 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         }
     };
 
+    /**
+     * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
+     * extension.
+     *
+     * @param uri           The {@link Uri} of the media.
+     * @param fileExtension An overriding file extension.
+     * @return The inferred type.
+     */
+    private static int inferContentType(Uri uri, String fileExtension) {
+        String lastPathSegment = !TextUtils.isEmpty(fileExtension) ? "." + fileExtension
+                : uri.getLastPathSegment();
+        return Util.inferContentType(lastPathSegment);
+    }
+
+
+    // Activity lifecycle
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        mMediaController.onTouchEvent(event);
+        return super.onTouchEvent(event);
+    }
+
     private SpannableStringBuilder createSpannable(Drawable drawable) {
         String text = "bitmap";
         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
@@ -277,9 +290,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         spannableStringBuilder.setSpan(new BackgroundColorSpan(Color.parseColor("#8A2233B1")), 0, spannableStringBuilder.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         return spannableStringBuilder;
     }
-
-
-    // Activity lifecycle
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -505,6 +515,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     public void onDestroy() {
+        videoHistory.setCurrent_positon(mPlayerPosition);
+        videoHistory.setFlag("false");
+        history.save(videoHistory);
         super.onDestroy();
         mAudioCapabilitiesReceiver.unregister();
         releasePlayer();
@@ -573,6 +586,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
+    // Internal methods
+
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         // Do nothing...
@@ -585,8 +600,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-    // Internal methods
-
     private AVPlayer.RendererBuilder getRendererBuilder() {
         String userAgent = Util.getUserAgent(this, "AVPlayer");
         switch (mContentType) {
@@ -596,6 +609,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                 throw new IllegalStateException("Unsupported type:" + mContentType);
         }
     }
+
+    // AVPlayer.Listener implementation
 
     private void preparePlayer(boolean playWhenReady) {
         if (mPlayer == null) {
@@ -631,8 +646,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
-    // AVPlayer.Listener implementation
-
     @Override
     public void onStateChanged(boolean playWhenReady, int playbackState) {
         if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
@@ -655,6 +668,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                 height == 0 ? 1 : (width * pixelWidthHeightRatio) / height);
     }
 
+    // AudioCapabilitiesReceiver.Listener methods
+
     @Override
     public void onCues(List<Cue> cues) {
 
@@ -664,8 +679,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     public void onId3Metadata(List<Id3Frame> id3Frames) {
 
     }
-
-    // AudioCapabilitiesReceiver.Listener methods
 
     @Override
     public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
@@ -679,6 +692,8 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         mPlayer.setBackgrounded(backgrounded);
     }
 
+    // Permission request listener method
+
     private void toggleControlsVisibility() {
         if (mMediaController.isShowing()) {
             mMediaController.hide();
@@ -687,11 +702,11 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         }
     }
 
+    // Permission management methods
+
     private void showControls() {
         mMediaController.show(0);
     }
-
-    // Permission request listener method
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
@@ -704,8 +719,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             finish();
         }
     }
-
-    // Permission management methods
 
     /**
      * Checks whether it is necessary to ask for permission to read storage. If necessary, it also
@@ -729,78 +742,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                 && Util.isLocalFileUri(uri)
                 && checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 != PackageManager.PERMISSION_GRANTED;
-    }
-
-    /**
-     * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
-     * extension.
-     *
-     * @param uri           The {@link Uri} of the media.
-     * @param fileExtension An overriding file extension.
-     * @return The inferred type.
-     */
-    private static int inferContentType(Uri uri, String fileExtension) {
-        String lastPathSegment = !TextUtils.isEmpty(fileExtension) ? "." + fileExtension
-                : uri.getLastPathSegment();
-        return Util.inferContentType(lastPathSegment);
-    }
-
-    private static final class KeyCompatibleMediaController extends AVController {
-
-        private MediaPlayerControl playerControl;
-        private IDanmakuView mDanmakuView;
-
-        public KeyCompatibleMediaController(Context context,IDanmakuView danmakuView) {
-            super(context);
-            mDanmakuView = danmakuView;
-        }
-
-        @Override
-        public void setMediaPlayer(MediaPlayerControl playerControl) {
-            super.setMediaPlayer(playerControl);
-            this.playerControl = playerControl;
-        }
-
-        @Override
-        public void toggleBulletScreen(boolean isShow) {
-            super.toggleBulletScreen(isShow);
-            if (isShow) {
-                mDanmakuView.show();
-            } else {
-                mDanmakuView.hide();
-            }
-        }
-
-        @Override
-        public void show() {
-            super.show();
-        }
-
-        @Override
-        public void setTitle(String titleName) {
-            super.setTitle(titleName);
-        }
-
-        @Override
-        public boolean dispatchKeyEvent(KeyEvent event) {
-            int keyCode = event.getKeyCode();
-            if (playerControl.canSeekForward() && (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
-                    || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    playerControl.seekTo(playerControl.getCurrentPosition() + 15000); // milliseconds
-                    show();
-                }
-                return true;
-            } else if (playerControl.canSeekBackward() && (keyCode == KeyEvent.KEYCODE_MEDIA_REWIND
-                    || keyCode == KeyEvent.KEYCODE_DPAD_LEFT)) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    playerControl.seekTo(playerControl.getCurrentPosition() - 5000); // milliseconds
-                    show();
-                }
-                return true;
-            }
-            return super.dispatchKeyEvent(event);
-        }
     }
 
     @Override
@@ -829,7 +770,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
 
     private void getCommentList(String vfId) {
-        if (beans.size()>0){
+        if (beans.size() > 0) {
             beans.clear();
         }
         HashMap<String, Object> map = new HashMap<>();
@@ -864,7 +805,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                             commentAdapter.notifyDataSetChanged();
                         } else {
                             //暂无评论内容布局添加
-                            if (videoCommentList!=null){
+                            if (videoCommentList != null) {
                                 videoCommentList.setVisibility(View.GONE);
                             }
                             empty.setVisibility(View.VISIBLE);
@@ -1006,26 +947,33 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                 ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     VideoDetails.VfinfoBean details = resp.getBody().getVfinfo();
-                   img_url=details.getImg();
-                    share_title=details.getName();
-                   share_desc=details.getIntroduction();
-                    values = new String[]{details.getDirector(), details.getStars(),details.getLx(),details.getDq(),details.getNd(),details.getCpname()};
+                    img_url = details.getImg();
+                    share_title = details.getName();
+                    share_desc = details.getIntroduction();
+                    videoHistory.setmName(details.getName());
+                    videoHistory.setmId(details.getId());
+                    videoHistory.setCreate_time(System.currentTimeMillis() + "");
+                    videoHistory.setImg_url(details.getImg());
+                    values = new String[]{details.getDirector(), details.getStars(), details.getLx(), details.getDq(), details.getNd(), details.getCpname()};
                     biAdapter = new BrefIntroAdapter(NewMoviePage.this, names, values);
                     videoBrefIntros.setAdapter(biAdapter);
-                    String userinfo= ACache.get(getApplicationContext()).getAsString("userinfo");
-                    if (!StringUtils.isNullOrEmpty(userinfo)){
-                        UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+                    String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+                    if (!StringUtils.isNullOrEmpty(userinfo)) {
+                        UserModel model = new Gson().fromJson(userinfo, UserModel.class);
                         String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
                         if (!StringUtils.isNullOrEmpty(tag)) {
 //                            free_hint.setText(" "+"已免流");
                             mFreeLabel.setVisibility(View.VISIBLE);
                         }
                     }
+
                     videoName.setText(details.getName());
                     bref_txt_short.setText(details.getIntroduction());
                     bref_txt_long.setText(details.getIntroduction());
                     videoPlayNumber.setText(details.getHit());
                     Glide.with(NewMoviePage.this).load(HttpUtils.appendUrl(details.getImg())).centerCrop().crossFade().into(movieBrefImg);
+
+
                 }
             }
         });
@@ -1044,12 +992,10 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         movieBrefPurch.setVisibility(View.GONE);
     }
 
-    boolean text_flag = false;
-
     @Override
     public void initViews() {
-        videoShare.setOnClickListener((View v)->{
-            ShareUtils.showShare(this, null, true, share_title,share_desc,HttpUtils.appendUrl(img_url));
+        videoShare.setOnClickListener((View v) -> {
+            ShareUtils.showShare(this, null, true, share_title, share_desc, HttpUtils.appendUrl(img_url));
 
         });
         addComment.setOnClickListener((View v) -> {
@@ -1060,14 +1006,13 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             SendComment(etAddComment.getText().toString());
         });
 
-        videoCollect.setOnClickListener((View v)->{
-            if (!isCollected){
+        videoCollect.setOnClickListener((View v) -> {
+            if (!isCollected) {
                 CollectVideo();
-                isCollected=true;
-            }else{
-                Toast.makeText(getApplicationContext(),"取消收藏",Toast.LENGTH_SHORT).show();
-                img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
-                isCollected=false;
+                isCollected = true;
+            } else {
+                CancelCollect();
+                isCollected = false;
             }
         });
 
@@ -1088,6 +1033,35 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         });
     }
 
+    private void CancelCollect() {
+
+        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+        UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("userid", model.getId());
+        map.put("vfids", collect_tag);
+        HttpApis.cancelCollect(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log(e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log("cancel_result" + response);
+                ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                    img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                } else {
+                    img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
     /**
      * 收藏 视频接口调用
      */
@@ -1097,7 +1071,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
             map.put("userid", model.getId());
-            map.put("vfid", vfId);
+            map.put("vfid", collect_tag);
             HttpApis.collectVideo(map, new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e, int id) {
@@ -1112,7 +1086,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                         Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
                         img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
-                    }else{
+                    } else {
                         img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
                     }
                 }
@@ -1172,6 +1146,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
     }
+
     /**
      * 获取 视频播放地址，并播放
      *
@@ -1200,42 +1175,48 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                 ResponseParser.parse(resp, response, PlayList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
-//                    TLog.log("first_url"+details.getStandardUrl());
-
+                    if (details.getSc() != null && details.getSc().equals("1")){
+                        img_collect.setImageResource( R.drawable.icon_collect_press);
+                        isCollected = true;
+                    }else{
+                        img_collect.setImageResource( R.drawable.icon_collect);
+                        isCollected = false;
+                    }
+                    collect_tag = details.getId();
                     VideoModel model = new VideoModel();
-                    ArrayList<VideoUrl> urls= new ArrayList<VideoUrl>();
-                    if (!StringUtils.isNullOrEmpty(details.getFluentUrl())){
-                        VideoUrl url= new VideoUrl();
+                    ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
+                    if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {
+                        VideoUrl url = new VideoUrl();
                         url.setFormatName("流畅");
                         url.setFormatUrl(details.getFluentUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getStandardUrl())){
-                        VideoUrl url= new VideoUrl();
+                    if (!StringUtils.isNullOrEmpty(details.getStandardUrl())) {
+                        VideoUrl url = new VideoUrl();
                         url.setFormatName("标清");
                         url.setFormatUrl(details.getStandardUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getBlueUrl())){
-                        VideoUrl url= new VideoUrl();
+                    if (!StringUtils.isNullOrEmpty(details.getBlueUrl())) {
+                        VideoUrl url = new VideoUrl();
                         url.setFormatName("蓝光");
                         url.setFormatUrl(details.getBlueUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getHighUrl())){
-                        VideoUrl url= new VideoUrl();
+                    if (!StringUtils.isNullOrEmpty(details.getHighUrl())) {
+                        VideoUrl url = new VideoUrl();
                         url.setFormatName("高清");
                         url.setFormatUrl(details.getHighUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getSuperUrl())){
-                        VideoUrl url= new VideoUrl();
+                    if (!StringUtils.isNullOrEmpty(details.getSuperUrl())) {
+                        VideoUrl url = new VideoUrl();
                         url.setFormatName("超清");
                         url.setFormatUrl(details.getSuperUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getFkUrl())){
-                        VideoUrl url= new VideoUrl();
+                    if (!StringUtils.isNullOrEmpty(details.getFkUrl())) {
+                        VideoUrl url = new VideoUrl();
                         url.setFormatName("4K");
                         url.setFormatUrl(details.getFkUrl());
                         urls.add(url);
@@ -1249,9 +1230,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                             getRealURL(value, true);
                         }
                     });
-                    if (model.getmVideoUrl().size()>0){
+                    if (model.getmVideoUrl().size() > 0) {
                         getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false);
-                        mQualityName= model.getmVideoUrl().get(0).getFormatName();
+                        mQualityName = model.getmVideoUrl().get(0).getFormatName();
                     }
 //                    getRealURL(details.getFluentUrl());
 //                    getRealURL(details.getStandardUrl());
@@ -1302,5 +1283,64 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             }
         });
     }
+
+    private static final class KeyCompatibleMediaController extends AVController {
+
+        private MediaPlayerControl playerControl;
+        private IDanmakuView mDanmakuView;
+
+        public KeyCompatibleMediaController(Context context, IDanmakuView danmakuView) {
+            super(context);
+            mDanmakuView = danmakuView;
+        }
+
+        @Override
+        public void setMediaPlayer(MediaPlayerControl playerControl) {
+            super.setMediaPlayer(playerControl);
+            this.playerControl = playerControl;
+        }
+
+        @Override
+        public void toggleBulletScreen(boolean isShow) {
+            super.toggleBulletScreen(isShow);
+            if (isShow) {
+                mDanmakuView.show();
+            } else {
+                mDanmakuView.hide();
+            }
+        }
+
+        @Override
+        public void show() {
+            super.show();
+        }
+
+        @Override
+        public void setTitle(String titleName) {
+            super.setTitle(titleName);
+        }
+
+        @Override
+        public boolean dispatchKeyEvent(KeyEvent event) {
+            int keyCode = event.getKeyCode();
+            if (playerControl.canSeekForward() && (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
+                    || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    playerControl.seekTo(playerControl.getCurrentPosition() + 15000); // milliseconds
+                    show();
+                }
+                return true;
+            } else if (playerControl.canSeekBackward() && (keyCode == KeyEvent.KEYCODE_MEDIA_REWIND
+                    || keyCode == KeyEvent.KEYCODE_DPAD_LEFT)) {
+                if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                    playerControl.seekTo(playerControl.getCurrentPosition() - 5000); // milliseconds
+                    show();
+                }
+                return true;
+            }
+            return super.dispatchKeyEvent(event);
+        }
+    }
+
 
 }

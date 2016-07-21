@@ -296,6 +296,10 @@ public class HttpApis {
         HttpUtils.formPost("mblUser/upPass", map, callback);
     }
 
+    public static void cancelCollect(HashMap<String, Object> map, StringCallback callback){
+        HttpUtils.formPost("mblCollection/cancelMyColls", map, callback);
+    }
+
 
 
 }

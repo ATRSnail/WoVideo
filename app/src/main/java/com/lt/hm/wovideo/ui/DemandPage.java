@@ -24,7 +24,6 @@ import com.lt.hm.wovideo.adapter.video.VideoAnthologyAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemListAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
-import com.lt.hm.wovideo.db.HistoryDataBase;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
@@ -37,7 +36,6 @@ import com.lt.hm.wovideo.model.LikeList;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoDetails;
-import com.lt.hm.wovideo.model.VideoHistory;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
 import com.lt.hm.wovideo.utils.ShareUtils;
@@ -106,6 +104,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     boolean isCollected = false;
     String vfId;
     String per_Id;//单集Id
+    String collect_tag;//收藏ID
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
     @BindView(R.id.et_add_comment)
@@ -117,15 +116,13 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     private String img_url;
     private String share_title;
     private String share_desc;
-    private HistoryDataBase history;
-    private VideoHistory videoHistory;
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         //Check the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            //TODO set title
-            mMediaController.setTitle(videoName.getText().toString());
+            setVideoTitle(videoName.getText().toString());
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
         }
 //        if (null == woPlayer) return;
@@ -163,10 +160,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        history = new HistoryDataBase(getApplicationContext());
         antholys = new ArrayList<>();
         beans = new ArrayList<>();
-        videoHistory = new VideoHistory();
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey("id")) {
             vfId = bundle.getString("id");
@@ -293,11 +288,10 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         anthologyAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int i) {
-                PlayList.PlaysListBean bean = antholys.get(i);
-                vfId = bean.getVfId();
-                per_Id = bean.getId();
+                vfId = antholys.get(i).getVfId();
+                per_Id = antholys.get(i).getId();
 
-                getRealURL(bean.getFluentUrl(), false);
+                getRealURL(antholys.get(i).getFluentUrl(), false, antholys.get(i).getId());
 
 
 //                getRealURL(bean.getStandardUrl());
@@ -409,6 +403,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                         }
                     }
                     videoName.setText(details.getName());
+                    img_collect.setImageResource(details.getSc() != null && details.getSc().equals("1") ? R.drawable.icon_collect_press : R.drawable.icon_collect);
 
                     videoPlayNumber.setText(details.getHit());
                     if (details.getGxzt().equals("0")) {
@@ -456,9 +451,9 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
                     per_Id = details.getId();
+                    collect_tag=details.getId();
                     getCommentList(per_Id);
                     // TODO: 16/7/11  ADD PLAY URL SELECTOR
-
                     VideoModel model = new VideoModel();
                     ArrayList<VideoUrl> urls= new ArrayList<VideoUrl>();
                     if (!StringUtils.isNullOrEmpty(details.getFluentUrl())){
@@ -499,17 +494,17 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     }
                     model.setmVideoUrl(urls);
 
-                    mMediaController.setVideoModel(model);
-                    mMediaController.setListener(new AVController.OnQualitySelected() {
+                    setVideoModel(model);
+                    setQualityListener(new AVController.OnQualitySelected() {
                         @Override
                         public void onQualitySelect(String key, String value) {
-                            getRealURL(value, true);
+                            getRealURL(value, true, "");
                         }
                     });
 
                     if (model.getmVideoUrl().size()>0){
-                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false);
-                        mMediaController.setmQualitySwitch(model.getmVideoUrl().get(0).getFormatName());
+                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, details.getId());
+                        setQualitySwitchText(model.getmVideoUrl().get(0).getFormatName());
                     }
 //                    getRealURL(details.getStandardUrl());
                 }
@@ -521,8 +516,15 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
      * 获取视频播放地址
      *
      * @param url
+     * @param isQualitySwitch
+     * @param videoId
      */
-    private void getRealURL(String url, boolean isQualitySwitch) {
+    private void getRealURL(String url, boolean isQualitySwitch, String videoId) {
+        if (!isQualitySwitch) {
+            TLog.log("Bullet","get real url"+ videoId);
+            setVideoId(videoId); // Set Video Id for Bullet Screen usage
+            getBullets(); // get Bullet list after set Video Id.
+        }
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("videoSourceURL", url);
         maps.put("cellphone", "18513179404");
@@ -648,7 +650,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
             map.put("userid", model.getId());
-            map.put("vfid", vfId);
+            map.put("vfid", collect_tag);
             HttpApis.collectVideo(map, new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e, int id) {

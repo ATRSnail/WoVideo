@@ -139,4 +139,9 @@
     <string name="find_phone_hint">请输入您的手机号</string>
     <string name="find_yzm">请输入验证码</string>
     <string name="send_yzm">发送验证码</string>
+
+    <!--取消收藏-->
+    <string name="cancel_collect_failed">取消收藏失败</string>
+    <string name="cancel_collect_success">取消收藏成功</string>
+
 </resources>

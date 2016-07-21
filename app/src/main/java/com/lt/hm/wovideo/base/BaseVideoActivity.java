@@ -40,10 +40,6 @@ import com.google.android.exoplayer.util.Util;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
-import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
-import com.lt.hm.wovideo.adapter.video.VideoAnthologyAdapter;
-import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
-import com.lt.hm.wovideo.adapter.video.VideoItemListAdapter;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.RespHeader;
@@ -51,12 +47,11 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BulletModel;
-import com.lt.hm.wovideo.model.CommentModel;
-import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.ui.MoviePage;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.video.model.Bullet;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.player.AVController;
 import com.lt.hm.wovideo.video.player.AVPlayer;
@@ -104,7 +99,7 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  */
 
 public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener{
+        AudioCapabilitiesReceiver.Listener, AVController.OnInterfaceInteract{
 
     // Video thing
     // For use when launching the demo app using adb.
@@ -118,22 +113,13 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         defaultCookieManager.setCookiePolicy(CookiePolicy.ACCEPT_ORIGINAL_SERVER);
     }
 
-    VideoItemListAdapter list_adapter;
-    VideoItemGridAdapter grid_adapter;
-    CommentAdapter commentAdapter;
-    List<PlayList.PlaysListBean> antholys;
-    List<CommentModel.CommentListBean> beans;
-    VideoAnthologyAdapter anthologyAdapter;
-    boolean expand_flag = false;
-    boolean isCollected = false;
-    String vfId;
-    String per_Id;//单集Id
+    private String mVideoId;
 
     private EventLogger mEventLogger;
-    protected AVController mMediaController;
+    private AVController mMediaController;
     private AspectRatioFrameLayout mVideoFrame;
     private View mShutterView;
-    protected RotateLoading mRotateLoading;
+    private RotateLoading mRotateLoading;
     private SurfaceView mSurfaceView;
 
     private AVPlayer mPlayer;
@@ -150,8 +136,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     private WoDanmakuParser mParser;
     private IDanmakuView mDanmakuView;
     private DanmakuContext mContext;
-
-    protected String mCurrentVideoId;
 
     /**
      * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
@@ -354,9 +338,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 }
             });
         }
-
-        getBullets();
-
     }
 
 
@@ -601,27 +582,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mPlayerNeedsPrepare = true;
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
             mMediaController.setEnabled(true);
-            mMediaController.setInterfaceListener(new AVController.OnInterfaceInteract() {
-                @Override
-                public void onOpenBulletEditor() {
-                    // DialogFragment.show() will take care of adding the fragment
-                    // in a transaction.  We also want to remove any currently showing
-                    // dialog, so make our own transaction and take care of that here.
-                    FragmentTransaction ft = getFragmentManager().beginTransaction();
-                    Fragment prev = getFragmentManager().findFragmentByTag("dialog");
-                    if (prev != null) {
-                        ft.remove(prev);
-                    }
-                    ft.addToBackStack(null);
-                    DialogFragment bulletDialog = BulletSendDialog.newInstance(this);
-                    bulletDialog.show(ft,"dialog");
-                }
-
-                @Override
-                public void onSendBulletClick() {
-                    addBullet("test send bullet");
-                }
-            });
+            mMediaController.setInterfaceListener(this);
             mEventLogger = new EventLogger();
             mEventLogger.startSession();
             mPlayer.addListener(mEventLogger);
@@ -645,11 +606,15 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mEventLogger = null;
         }
     }
-    private void getBullets() {
+
+    protected void getBullets() {
+        TLog.log("Bullet", "get bullets"+mVideoId);
+        mDanmakuView.release();
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("pageNum", 1);
         maps.put("numPerPage", 10000);
-        maps.put("vfPlayId", mCurrentVideoId == null ? "2" : mCurrentVideoId);
+        maps.put("vfPlayId", mVideoId);
+
 //        maps.put("vfPlayId", );
         HttpApis.getBulletByVideoId(maps, new StringCallback() {
             @Override
@@ -684,20 +649,25 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     /**
      * 添加弹幕
      *
-     * @param content 内容
+     * @param bullet {@link Bullet}
      */
-    protected void addBullet(String content) {
-        TLog.log("comment_send" + per_Id);
+    protected void addBullet(Bullet bullet) {
         HashMap<String, Object> map = new HashMap<>();
         String string = ACache.get(this).getAsString("userinfo");
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
+            //FIXME user id is incorrect!
             map.put("userId", model.getId());
-            map.put("vfPlayId", per_Id);
+            map.put("vfPlayId", mVideoId);
             map.put("time", mPlayer.getCurrentPosition() / 1000);
-            map.put("context", content);
-            map.put("fontColor", "#118833");
-            map.put("fontSize", 18);
+//            map.put("time", bullet.getTime());
+            map.put("context", bullet.getContent());
+            map.put("fontColor", bullet.getFontColor());
+            map.put("fontSize", bullet.getFontSize());
+            TLog.log("Bullet", "userId: " + model.getId()
+                    + "; videoId: " + mVideoId + "; time: " + mPlayer.getCurrentPosition() / 1000
+                    + "; content: " + bullet.getContent() + "; fontColor: " + bullet.getFontColor()
+                    + "; fontSize: " + bullet.getFontSize());
 
             HttpApis.addBullet(map, new StringCallback() {
                 @Override
@@ -712,8 +682,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     ResponseParser.parse(resp, response, String.class, RespHeader.class);
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                         Toast.makeText(getApplicationContext(), "弹幕成功", Toast.LENGTH_SHORT).show();
-                        TLog.log("comment_list" + per_Id);
-                        addDanmaku();
+                        TLog.log("Bullet" + mVideoId);
+                        addDanmaku(bullet);
                     } else {
                         if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
                             Toast.makeText(getApplicationContext(), "弹幕失败", Toast.LENGTH_SHORT).show();
@@ -730,22 +700,22 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         }
     }
 
-    private void addDanmaku() {
+    private void addDanmaku(Bullet bullet) {
         BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
         if (danmaku == null || mDanmakuView == null) {
             return;
         }
         // for(int i=0;i<100;i++){
         // }
-        danmaku.text = "这是一条弹幕" + System.nanoTime();
+        danmaku.text = bullet.getContent();
         danmaku.padding = 5;
         danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
         danmaku.time = mDanmakuView.getCurrentTime() + 1200;
-        danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
-        danmaku.textColor = Color.RED;
+        danmaku.textSize = Float.parseFloat(bullet.getFontSize()) * (mParser.getDisplayer().getDensity() - 0.6f);
+        danmaku.textColor = Color.parseColor(bullet.getFontColor());
         danmaku.textShadowColor = Color.WHITE;
         // danmaku.underlineColor = Color.GREEN;
-        danmaku.borderColor = Color.GREEN;
+//        danmaku.borderColor = Color.GREEN;
         mDanmakuView.addDanmaku(danmaku);
 
     }
@@ -755,6 +725,39 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             return  mPlayer.getCurrentPosition() / 1000;
         }
         return 0;
+    }
+
+    protected void setVideoTitle(String title) {
+        mMediaController.setTitle(title);
+    }
+
+    protected void setVideoModel(VideoModel model) {
+        mMediaController.setVideoModel(model);
+    }
+
+    protected void setQualityListener(AVController.OnQualitySelected listener) {
+        mMediaController.setListener(listener);
+    }
+
+    protected void setQualitySwitchText(String name) {
+        mMediaController.setmQualitySwitch(name);
+    }
+
+    protected void setVideoId(String videoId) {
+        mVideoId = videoId;
+    }
+
+    /**
+     * Seek to certain position, unit is millisecond.
+     * @param positionMs
+     */
+    protected void seekTo(long positionMs) {
+        if (mPlayer != null && mPlayer.getPlaybackState() != AVPlayer.STATE_PREPARING) {
+            mPlayer.seekTo(positionMs);
+        }
+        if (mDanmakuView != null) {
+            mDanmakuView.seekTo(positionMs);
+        }
     }
 
     @Override
@@ -770,6 +773,26 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     public void initDatas() {
 
+    }
+
+    @Override
+    public void onOpenBulletEditor() {
+        // DialogFragment.show() will take care of adding the fragment
+        // in a transaction.  We also want to remove any currently showing
+        // dialog, so make our own transaction and take care of that here.
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        DialogFragment bulletDialog = BulletSendDialog.newInstance(this);
+        bulletDialog.show(ft,"dialog");
+    }
+
+    @Override
+    public void onSendBulletClick(Bullet bullet) {
+        addBullet(bullet);
     }
 
     private static final class KeyCompatibleMediaController extends AVController {

@@ -23,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/history_list"
+        android:divider="@color/gray_dark"
         />
     <include layout="@layout/layout_history_bottom"/>
     </FrameLayout>

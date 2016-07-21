@@ -67,12 +67,11 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
         loginTopbar.setRightIsVisible(false);
         loginTopbar.setLeftIsVisible(true);
         loginTopbar.setOnTopbarClickListenter(this);
-//        etLoginAccount.setText("18513179404");
-//        etLoginPwd.setText("123456");
+        etLoginAccount.setText("18513179404");
+        etLoginPwd.setText("123456");
         etLoginAccount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -106,8 +105,18 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
                 TLog.log("用户名不能为空");
             } else if (TextUtils.isEmpty(etLoginPwd.getText())) {
                 TLog.log("密码不能为空");
+<<<<<<< HEAD
             } else {
                 if (Operators_flag) {
+=======
+            }else{
+                if (PhoneUtils.isPhoneNum(etLoginAccount.getText().toString())){
+                    Operators_flag =true;
+                }else{
+                    Operators_flag =false;
+                }
+                if (Operators_flag){
+>>>>>>> 5888421a50943e2d78f7a76517b1d4ff20e0b343
                     ToLogin();
                 } else {
                     Toast.makeText(getApplicationContext(), "只支持联通手机号登录", Toast.LENGTH_SHORT).show();

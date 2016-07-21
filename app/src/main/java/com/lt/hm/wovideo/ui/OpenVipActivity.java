@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.ui;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -8,12 +9,14 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
@@ -35,7 +38,9 @@ import okhttp3.Call;
  * Created by songchenyu on 16/6/3.
  */
 public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopbarClicklistenter {
-
+    private final static String FILE_SAVEPATH = Environment
+            .getExternalStorageDirectory().getAbsolutePath()
+            + "/WoVideo/Portrait/";
     @BindView(R.id.open_vip_topbar)
     SecondTopbar openVipTopbar;
     @BindView(R.id.img_photos)
@@ -79,6 +84,15 @@ public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopb
             phoneNum = model.getPhoneNo();
             userId = model.getId();
             username.setText("账号：" + phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
+            if (FILE_SAVEPATH != null) {
+                Glide.with(this).load(ACache.get(this).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(imgPhotos);
+            }
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(imgPhotos);
+            }else{
+                imgPhotos.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+            }
+
             if (model.getIsVip().equals("1")) {
                 imgKing.setImageResource(R.drawable.icon_vip_opened);
                 open_get_vip_layout.setVisibility(View.GONE);

@@ -8,11 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.video.model.Bullet;
 
 /**
  * Created by KECB on 7/20/16.
@@ -27,10 +28,8 @@ public class BulletSendDialog extends DialogFragment{
     /**
      */
     public static BulletSendDialog newInstance(AVController.OnInterfaceInteract interfaceInteract) {
-        if (mBulletSendDialog == null) {
-            mBulletSendDialog = new BulletSendDialog();
-            mInterfaceListener = interfaceInteract;
-        }
+        mBulletSendDialog = new BulletSendDialog();
+        mInterfaceListener = interfaceInteract;
         return mBulletSendDialog;
     }
 
@@ -55,13 +54,17 @@ public class BulletSendDialog extends DialogFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.layout_send_bullet, container, false);
 
+        EditText content = (EditText) v.findViewById(R.id.bullet_content);
         TextView send = (TextView) v.findViewById(R.id.send_bullet);
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Send", Toast.LENGTH_SHORT).show();
                 //TODO send the bullet screen
-                mInterfaceListener.onSendBulletClick();
+                Bullet bullet = new Bullet();
+                bullet.setContent(content.getText().toString().trim());
+                bullet.randomFontColor(getResources().getColor(R.color.red_bullet));
+                bullet.randomFontSize();
+                mInterfaceListener.onSendBulletClick(bullet);
                 //TODO reset eidt text
 
                 //TODO close current dialog

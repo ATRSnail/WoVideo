@@ -41,8 +41,6 @@ import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import okhttp3.Call;
 
-import static android.nfc.tech.MifareUltralight.PAGE_SIZE;
-
 /**
  * @author leonardo
  * @version 1.0
@@ -55,7 +53,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     @BindView(R.id.refresh_view)
     SwipeRefreshLayout refreshView;
     int pageNum = 1;
-    int pageSize = 10;
+    int pageSize = 100;
     List<VideoList.TypeListBean> b_list;
     VipItemAdapter bottom_adapter;
     int mId;
@@ -151,24 +149,24 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                         vipItemList.setHasFixedSize(false);
                         vipItemList.setAdapter(bottom_adapter);
                         bottom_adapter.notifyDataSetChanged();
-                        bottom_adapter.setOnLoadMoreListener(PAGE_SIZE, new BaseQuickAdapter.RequestLoadMoreListener() {
-                            @Override
-                            public void onLoadMoreRequested() {
-                                if (b_list.size() % 10 != 0) {
-                                    vipItemList.post(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            bottom_adapter.isNextLoad(false);
-                                        }
-                                    });
-                                } else {
-                                    if (!StringUtils.isNullOrEmpty(mId)) {
-                                        int pageNum = b_list.size() / 10 + 1;
-                                        getListDatas(mId, "1", pageNum);
-                                    }
-                                }
-                            }
-                        });
+//                        bottom_adapter.setOnLoadMoreListener(PAGE_SIZE, new BaseQuickAdapter.RequestLoadMoreListener() {
+//                            @Override
+//                            public void onLoadMoreRequested() {
+//                                if (b_list.size() % 10 != 0) {
+//                                    vipItemList.post(new Runnable() {
+//                                        @Override
+//                                        public void run() {
+//                                            bottom_adapter.isNextLoad(false);
+//                                        }
+//                                    });
+//                                } else {
+//                                    if (!StringUtils.isNullOrEmpty(mId)) {
+//                                        int pageNum = b_list.size() / 10 + 1;
+//                                        getListDatas(mId, "1", pageNum);
+//                                    }
+//                                }
+//                            }
+//                        });
 //                        bottom_adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
 //                            @Override
 //                            public void onLoadMoreRequested() {

@@ -26,7 +26,6 @@ import com.lt.hm.wovideo.ui.SearchResultPage;
 import com.lt.hm.wovideo.ui.SetPage;
 import com.lt.hm.wovideo.ui.SkinManager;
 import com.lt.hm.wovideo.ui.StartAdPage;
-import com.lt.hm.wovideo.ui.VideoPage;
 
 /**
  * @author leonardo
@@ -48,15 +47,6 @@ public class UIHelper {
 
     public static void ToRegister(Context context) {
         Intent intent = new Intent(context, RegistPage.class);
-        context.startActivity(intent);
-    }
-
-    public static void ToVideo(Context context) {
-        Intent intent = new Intent(context, VideoPage.class);
-        context.startActivity(intent);
-    }
-    public static void ToVideo2(Context context) {
-        Intent intent = new Intent(context, com.lt.hm.wovideo.video.VideoPage.class);
         context.startActivity(intent);
     }
 

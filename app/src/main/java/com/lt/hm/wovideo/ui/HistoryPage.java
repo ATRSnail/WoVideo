@@ -79,8 +79,11 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                 VideoHistory temp = iterator.next();
                 if (temp.getFlag().equals("true")) {
                     iterator.remove();
+                    dataBase.delete(temp.getmId());
                 }
             }
+
+
             checkNum = 0;
             // 通知列表数据修改
             dataChanged();

@@ -14,7 +14,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -149,7 +148,8 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 // TODO: 16/6/6  变更头像 上传头像
                 String user = ACache.get(getApplicationContext()).getAsString("userinfo");
                 if (StringUtils.isNullOrEmpty(user)){
-                    Toast.makeText(this, getResources().getString(R.string.no_login_toast), Toast.LENGTH_SHORT).show();
+                    UnLoginHandler.unLogin(PersonCenter.this);
+//                    Toast.makeText(this, getResources().getString(R.string.no_login_toast), Toast.LENGTH_SHORT).show();
                 }else {
                     handleSelectPicture();
                 }

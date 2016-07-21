@@ -50,6 +50,7 @@ public class CollectModel implements Serializable {
         private String blueUrl; //蓝光源地址
         private String highUrl; //高清播放地址
         private String indexs;//第几集
+        private String flag;
 
         public String getIid() {
             return iid;
@@ -153,6 +154,14 @@ public class CollectModel implements Serializable {
 
         public void setIndexs(String indexs) {
             this.indexs = indexs;
+        }
+
+        public String getFlag() {
+            return flag;
+        }
+
+        public void setFlag(String flag) {
+            this.flag = flag;
         }
     }
 }

@@ -24,7 +24,6 @@ import com.lt.hm.wovideo.adapter.video.VideoAnthologyAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemListAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
-import com.lt.hm.wovideo.db.HistoryDataBase;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
@@ -37,7 +36,6 @@ import com.lt.hm.wovideo.model.LikeList;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoDetails;
-import com.lt.hm.wovideo.model.VideoHistory;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
 import com.lt.hm.wovideo.utils.ShareUtils;
@@ -117,8 +115,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     private String img_url;
     private String share_title;
     private String share_desc;
-    private HistoryDataBase history;
-    private VideoHistory videoHistory;
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -163,10 +160,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        history = new HistoryDataBase(getApplicationContext());
         antholys = new ArrayList<>();
         beans = new ArrayList<>();
-        videoHistory = new VideoHistory();
         Bundle bundle = getIntent().getExtras();
         if (bundle.containsKey("id")) {
             vfId = bundle.getString("id");
@@ -648,7 +643,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
             map.put("userid", model.getId());
-            map.put("vfid", vfId);
+            map.put("vfid", per_Id);
             HttpApis.collectVideo(map, new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e, int id) {

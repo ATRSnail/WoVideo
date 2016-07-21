@@ -207,6 +207,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
     private String share_title;
     private String share_desc;
     private String vfId;
+    private String per_Id;
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
     // Bullet Screen
     private BaseDanmakuParser mParser;
@@ -505,6 +506,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
 
     @Override
     public void onDestroy() {
+        videoHistory.setCurrent_positon(mPlayerPosition);
+        videoHistory.setFlag("false");
+        history.save(videoHistory);
         super.onDestroy();
         mAudioCapabilitiesReceiver.unregister();
         releasePlayer();
@@ -1006,9 +1010,14 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                 ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     VideoDetails.VfinfoBean details = resp.getBody().getVfinfo();
-                   img_url=details.getImg();
+                    img_url=details.getImg();
+                    per_Id= details.getId();
                     share_title=details.getName();
-                   share_desc=details.getIntroduction();
+                    share_desc=details.getIntroduction();
+                    videoHistory.setmName(details.getName());
+                    videoHistory.setmId(details.getId());
+                    videoHistory.setCreate_time(System.currentTimeMillis()+"");
+                    videoHistory.setImg_url(details.getImg());
                     values = new String[]{details.getDirector(), details.getStars(),details.getLx(),details.getDq(),details.getNd(),details.getCpname()};
                     biAdapter = new BrefIntroAdapter(NewMoviePage.this, names, values);
                     videoBrefIntros.setAdapter(biAdapter);
@@ -1026,6 +1035,9 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
                     bref_txt_long.setText(details.getIntroduction());
                     videoPlayNumber.setText(details.getHit());
                     Glide.with(NewMoviePage.this).load(HttpUtils.appendUrl(details.getImg())).centerCrop().crossFade().into(movieBrefImg);
+
+
+
                 }
             }
         });
@@ -1097,7 +1109,7 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
             map.put("userid", model.getId());
-            map.put("vfid", vfId);
+            map.put("vfid", per_Id);
             HttpApis.collectVideo(map, new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e, int id) {
@@ -1302,5 +1314,6 @@ public class NewMoviePage extends BaseActivity implements SurfaceHolder.Callback
             }
         });
     }
+
 
 }

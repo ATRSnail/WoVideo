@@ -31,7 +31,7 @@ public class HistoryDataBase {
     public void insert(VideoHistory data) {
         String sql = "insert into " + DataBaseHelper.HISTORY_TABLE_NAME;
 
-        sql += "(vid, create_time, img_url, current_position, name) values("+data.getmId()+",'"+
+        sql += "(vid, create_time, img_url, current_position, name) values('"+data.getmId()+"','"+
                 data.getCreate_time()+"','"+
                 data.getImg_url()+"',"+data.getCurrent_positon()+",'"+data.getmName()+"')";
 
@@ -48,10 +48,10 @@ public class HistoryDataBase {
      *
      * @param id
      */
-    public void delete(int id) {
+    public void delete(String id) {
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
         String sql = ("delete from " + DataBaseHelper.HISTORY_TABLE_NAME + " where vid=?");
-        sqlite.execSQL(sql, new Integer[]{id});
+        sqlite.execSQL(sql, new String[]{id});
         sqlite.close();
     }
 
@@ -60,11 +60,11 @@ public class HistoryDataBase {
      *
      * @param ids
      */
-    public void deleteList(List<Integer> ids) {
+    public void deleteList(List<String> ids) {
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
         String sql = ("delete from " + DataBaseHelper.HISTORY_TABLE_NAME + " where vid=?");
         for (int i = 0; i < ids.size(); i++) {
-            sqlite.execSQL(sql, new Integer[]{ids.get(i)});
+            sqlite.execSQL(sql, new String[]{ids.get(i)});
         }
         sqlite.close();
     }
@@ -80,7 +80,7 @@ public class HistoryDataBase {
 //    (vid, create_time, img_url, current_position, name)
         String sql = ("update " + DataBaseHelper.HISTORY_TABLE_NAME + " set vid=?, create_time=?, img_url=?, current_position=?, name=? where vid=?");
         sqlite.execSQL(sql,
-                new String[]{data.getmId() + "", data.getCurrent_positon() + "", data.getImg_url() + "",
+                new String[]{data.getmId() + "", data.getCreate_time() + "", data.getImg_url() + "",
                         data.getCurrent_positon() +
                                 "", data.getmName() + "",
                         data.getmId() + ""});

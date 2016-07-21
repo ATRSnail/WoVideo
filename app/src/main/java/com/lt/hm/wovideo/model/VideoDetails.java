@@ -35,7 +35,7 @@ public class VideoDetails {
         private long ctime;
         private String gxzt;//更新状态  0更新1完结
         private int jjs;//总集数
-        private String id;
+        private String id;//视频ID
         private String hit; //点击量
         private String stars; //演员
         private String name;//视频名称

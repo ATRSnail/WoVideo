@@ -3,7 +3,6 @@ package com.lt.hm.wovideo.ui;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -12,7 +11,7 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.sendemail.SendEmailTools;
 import com.lt.hm.wovideo.sendemail.ZhengZeTools;
-import com.lt.hm.wovideo.widget.SecondTopbar;
+import com.lt.hm.wovideo.widget.CustomTopbar;
 
 import butterknife.BindView;
 
@@ -23,9 +22,9 @@ import static com.lt.hm.wovideo.R.id.callback_content;
  * @version 1.0
  * @create_date 16/6/6
  */
-public class RecallBackPage extends BaseActivity implements SecondTopbar.myTopbarClicklistenter {
+public class RecallBackPage extends BaseActivity implements CustomTopbar.myTopbarClicklistenter {
     @BindView(R.id.callback_topbar)
-    SecondTopbar callbackTopbar;
+    CustomTopbar callbackTopbar;
     @BindView(callback_content)
     EditText callbackContent;
     @BindView(R.id.content_count)
@@ -42,6 +41,7 @@ public class RecallBackPage extends BaseActivity implements SecondTopbar.myTopba
     protected void init(Bundle savedInstanceState) {
         callbackTopbar.setRightIsVisible(true);
         callbackTopbar.setLeftIsVisible(true);
+        callbackTopbar.setRightText("发送");
         callbackTopbar.setOnTopbarClickListenter(this);
     }
 

@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <com.lt.hm.wovideo.widget.SecondTopbar
+    <com.lt.hm.wovideo.widget.CustomTopbar
         android:id="@+id/collect_topbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/s_46"
@@ -20,10 +20,12 @@
         android:layout_weight="1.0"
         android:id="@+id/collect_refresh"
         >
-        <android.support.v7.widget.RecyclerView
+        <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/collect_list"
             />
     </android.support.v4.widget.SwipeRefreshLayout>
+    <include layout="@layout/layout_history_bottom"
+        />
 </LinearLayout>

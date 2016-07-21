@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.db.HistoryDataBase;
+import com.lt.hm.wovideo.model.VideoHistory;
 
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -25,7 +27,8 @@ public abstract class BaseActivity extends FragmentActivity implements BaseViewI
 	private TextView mTvActionTitle;
 	private boolean showActionBar=false;
 	Unbinder unbinder;
-
+	protected HistoryDataBase history;
+	protected VideoHistory videoHistory;
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -41,6 +44,8 @@ public abstract class BaseActivity extends FragmentActivity implements BaseViewI
 
 		unbinder=ButterKnife.bind(this);
 		mInflater = getLayoutInflater();
+		history = new HistoryDataBase(getApplicationContext());
+		videoHistory = new VideoHistory();
 		init(savedInstanceState);
 //		//透明状态栏
 //		getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

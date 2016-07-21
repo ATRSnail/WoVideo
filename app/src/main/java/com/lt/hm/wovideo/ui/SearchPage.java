@@ -169,4 +169,22 @@ public class SearchPage extends BaseActivity {
         super.onBackPressed();
         this.finish();
     }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            if ((System.currentTimeMillis() - mExitTime) > 2000) {//
+//                // 如果两次按键时间间隔大于2000毫秒，则不退出
+//                Toast.makeText(this, getResources().getString(R.string.second_back_hint), Toast.LENGTH_SHORT).show();
+//                mExitTime = System.currentTimeMillis();// 更新mExitTime
+//            } else {
+////				aCache.put("first_pay", "");
+//                android.os.Process.killProcess(android.os.Process.myPid());
+//                System.exit(0);
+//            }
+            this.finish();
+        }
+        return false;
+    }
+
 }

@@ -148,6 +148,7 @@ public class FindPwdAty extends BaseActivity implements SecondTopbar.myTopbarCli
                 ResponseParser.parse(resp, response, String.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     UIHelper.ToChangePassword(FindPwdAty.this,etPhontnumber.getText().toString());
+                    finish();
                 }
             }
         });

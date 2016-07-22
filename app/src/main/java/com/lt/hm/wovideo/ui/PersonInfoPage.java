@@ -136,6 +136,11 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
     public void initViews() {
         pInfoLogo.setOnClickListener(this);
         String user = ACache.get(getApplicationContext()).getAsString("userinfo");
+        if (StringUtils.isNullOrEmpty(user)){
+            Toast.makeText(this, "您尚未登陆,无法使用此功能!请登陆后再试!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
         model = new Gson().fromJson(user, UserModel.class);
         String img_url = HttpUtils.HOST + model.getHeadImg();
         Glide.with(this).load(img_url).asBitmap().centerCrop().error(R.drawable.icon_head).into(pInfoLogo);
@@ -284,11 +289,11 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
         maps.put("email", tvEmail.getText().toString());
         int sex=-1;
         if (tvSex.getText().toString().equals("男")){
-            sex=1;
-        }else {
             sex=0;
+        }else {
+            sex=1;
         }
-        maps.put("sex", sex);
+        maps.put("sex", sex+"");
         maps.put("nickName", nickName.getText().toString());
         HttpApis.upUsers(maps, new StringCallback() {
             @Override
@@ -329,7 +334,6 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
                     UserModel model = resp.getBody();
                     String json = new Gson().toJson(model);
                     cacheUserInfo(json);
-                    finish();
                 }else{
                     Toast.makeText(getApplicationContext(),resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
                 }
@@ -527,7 +531,9 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
                 @Override
                 public void onResponse(String response, int id) {
                     TLog.log(response);
+                    updateUserInfo();
                     Glide.with(PersonInfoPage.this).load(ACache.get(PersonInfoPage.this).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(pInfoLogo);
+
                     // TODO: 16/7/6 刷新个人中心头像图片
                 }
             });

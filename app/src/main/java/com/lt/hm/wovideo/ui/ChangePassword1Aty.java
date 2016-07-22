@@ -106,6 +106,7 @@ public class ChangePassword1Aty extends BaseActivity implements SecondTopbar.myT
 
             HashMap<String, Object> maps = new HashMap<>();
             maps.put("phone",phoneNumber);
+            maps.put("oldPassWord","");
             maps.put("passWord", MD5Utils.getMD5Code(etComforimPwd.getText().toString()).toLowerCase());
             HttpApis.updatePwd(maps, new StringCallback() {
                 @Override
@@ -133,7 +134,10 @@ public class ChangePassword1Aty extends BaseActivity implements SecondTopbar.myT
         String confirm_pwd=etComforimPwd.getText().toString();
         int pwd_length=pwd.length();
         int confirm_length=confirm_pwd.length();
-        if (pwd_length<6||pwd_length>16||confirm_length<6||confirm_length>16){
+        if (pwd_length==0||confirm_length==0){
+            Toast.makeText(this, "输入的内容不能为空", Toast.LENGTH_SHORT).show();
+            return false;
+        }else if (pwd_length<6||pwd_length>16||confirm_length<6||confirm_length>16){
             Toast.makeText(this, "密码长度应在6--16之间", Toast.LENGTH_SHORT).show();
             return false;
         }else if (!pwd.equals(confirm_pwd)){

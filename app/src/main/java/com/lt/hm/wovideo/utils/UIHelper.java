@@ -28,6 +28,7 @@ import com.lt.hm.wovideo.ui.SearchResultPage;
 import com.lt.hm.wovideo.ui.SetPage;
 import com.lt.hm.wovideo.ui.SkinManager;
 import com.lt.hm.wovideo.ui.StartAdPage;
+import com.lt.hm.wovideo.ui.UpdatePwdActivity;
 
 /**
  * @author leonardo
@@ -77,6 +78,10 @@ public class UIHelper {
     public static void ToChangePassword(Context context,String phoneNumber) {
         Intent intent = new Intent(context,ChangePassword1Aty.class);
         intent.putExtra("phoneNumber",phoneNumber);
+        context.startActivity(intent);
+    }
+    public static void ToUpdatePassword(Context context) {
+        Intent intent = new Intent(context,UpdatePwdActivity.class);
         context.startActivity(intent);
     }
 

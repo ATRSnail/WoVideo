@@ -122,6 +122,6 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
 
     @OnClick(R.id.modify_pwd)
     public void onClick() {
-        UIHelper.ToChangePassword(this,"");
+        UIHelper.ToUpdatePassword(this);
     }
 }

@@ -127,6 +127,9 @@
         <activity android:name=".ui.FindPwdAty"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
+        <activity android:name=".ui.UpdatePwdActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"/>
         <activity android:name=".zxing.ui.MipcaActivityCapture"/>
 
         <activity

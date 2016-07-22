@@ -79,6 +79,7 @@
             <EditText
                 android:background="@null"
                 android:id="@+id/nick_name"
+                android:maxLength="9"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toLeftOf="@id/nick_name_arrow"
@@ -142,6 +143,7 @@
                 style="@style/set_menu_img" />
 
             <EditText
+                android:maxLength="30"
                 android:background="@null"
                 android:id="@+id/tv_email"
                 android:layout_width="wrap_content"

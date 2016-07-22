@@ -117,9 +117,9 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
                 }
             }
         });
-        tvLoginForget.setOnClickListener((View v) -> {
-            // TODO: 16/6/8 忘记密码 
-        });
+//        tvLoginForget.setOnClickListener((View v) -> {
+//            // TODO: 16/6/8 忘记密码
+//        });
         tvLoginRegist.setOnClickListener((View v) -> {
             UIHelper.ToRegister(this);
             this.finish();

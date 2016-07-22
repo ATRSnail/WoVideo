@@ -131,7 +131,9 @@
     <string name="delete">删除</string>
     <!--修改密码-->
     <string name="input_new_pwd">输入新密码</string>
+    <string name="update_pwd">修改密码</string>
     <string name="inputpassword">输入密码</string>
+    <string name="inputoldpassword">原密码   </string>
     <string name="confirmpassword">确认密码</string>
     <string name="finish">完成</string>
     <string name="next">下一步</string>

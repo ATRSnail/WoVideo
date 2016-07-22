@@ -286,6 +286,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
         newView.setAnimation(inFromTop());
         // Set the text in the new row to a random country.
+        ((TextView) newView.findViewById(R.id.msg_text)).setText("当前流量已使用: "+netUsageDatabase.querySum("")/1024/1024+" MB");
         ((ImageView) newView.findViewById(R.id.img))
                 .setBackgroundDrawable(getResources().getDrawable(R.drawable.img_hd1));
 

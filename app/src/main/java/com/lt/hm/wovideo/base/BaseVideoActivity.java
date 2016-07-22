@@ -47,6 +47,7 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BulletModel;
+import com.lt.hm.wovideo.model.NetUsage;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -94,6 +95,12 @@ import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_TYPE_EXTRA;
 import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
 
 /**
+ * As a base class for all activity which needs to play a video.
+ * Contains all the video control and bullet screen control methods in base activity for easy to maintain.
+ * FIXME: Known issue, current version is messed up by the screen orientation logical, need to clean it.
+ *
+ * @version 1.0
+ * @author KECB
  * Created by KECB on 7/19/16.
  */
 
@@ -135,6 +142,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     private WoDanmakuParser mParser;
     private IDanmakuView mDanmakuView;
     private DanmakuContext mContext;
+
+    private long mLoadedBytes;
 
     /**
      * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
@@ -425,6 +434,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     public void onPause() {
         super.onPause();
+        mLoadedBytes = mPlayer.getLoadedBytes();
         if (Util.SDK_INT <= 23) {
             onHidden();
         }
@@ -459,6 +469,13 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     public void onDestroy() {
         super.onDestroy();
+        NetUsage usage = new NetUsage();
+        usage.setUserId("");
+        usage.setVideoId(mVideoId);
+        usage.setCreateTime(System.currentTimeMillis()+"");
+        usage.setBytes(String.valueOf(mLoadedBytes));
+        netUsageDatabase.insert(usage);
+
         mAudioCapabilitiesReceiver.unregister();
         releasePlayer();
         if (mDanmakuView != null && mDanmakuView.isPrepared()) {
@@ -467,6 +484,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mDanmakuView.release();
             mDanmakuView = null;
         }
+
     }
 
     @Override

@@ -140,9 +140,11 @@ public class UpdatePwdActivity extends BaseActivity implements SecondTopbar.myTo
         int confirm_length = confirm_pwd.length();
         if (oldpwd_length==0){
             Toast.makeText(this, "原密码输入的内容不能为空", Toast.LENGTH_SHORT).show();
+            return false;
         }else if (oldpwd_length < 6 || oldpwd_length > 16){
             etOldpassword.setSelection(oldpwd_length);
             Toast.makeText(this, "原密码长度不符合要求", Toast.LENGTH_SHORT).show();
+            return false;
         } else if (pwd_length == 0 || confirm_length == 0) {
             Toast.makeText(this, "新密码输入的内容不能为空", Toast.LENGTH_SHORT).show();
             return false;

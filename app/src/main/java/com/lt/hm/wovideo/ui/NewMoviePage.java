@@ -668,6 +668,11 @@ public class NewMoviePage extends BaseVideoActivity {
                         // Reset player and params.
                         releasePlayer();
                         mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
+                        if (getIntent().getExtras().containsKey("cur_position")){
+                            long cur_position = getIntent().getExtras().getLong("cur_position");
+                            mPlayerPosition= cur_position;
+                            seekTo(mPlayerPosition);
+                        }
                         // Set play URL and play it
                         setIntent(onUrlGot(video));
                         onShown();
@@ -677,5 +682,13 @@ public class NewMoviePage extends BaseVideoActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onDestroy() {
+        videoHistory.setCurrent_positon(mPlayerPosition);
+        videoHistory.setFlag("false");
+        history.save(videoHistory);
+        super.onDestroy();
     }
 }

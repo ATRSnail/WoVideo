@@ -13,8 +13,8 @@ import com.bumptech.glide.Glide;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.CollectModel;
+import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.StringUtils;
-import com.lt.hm.wovideo.utils.TLog;
 
 import java.util.List;
 
@@ -66,12 +66,19 @@ public class CollectListAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
-        holder.itemMovieName.setText(list.get(position).getName());
+        int typeId = Integer.parseInt(list.get(position).getTypeid());
+        if(VideoType.MOVIE.getId()== typeId){
+            holder.itemMovieName.setText(list.get(position).getName());
+        }else{
+            if (StringUtils.isNullOrEmpty(list.get(position).getIndexs())){
+                holder.itemMovieName.setText(list.get(position).getName());
+            }else{
+                holder.itemMovieName.setText(list.get(position).getName()+" 第"+list.get(position).getIndexs()+"集");
+            }
+        }
         holder.itemCurrentPosition.setVisibility(View.GONE);
 //        holder.itemCurrentPosition.setText(list.get(position).getCurrent_positon()+"");
         ImageView img = holder.itemVideoImg;
-        TLog.log(HttpUtils.appendUrl(list.get(position).getImg()));
         Glide.with(context).load(HttpUtils.appendUrl(list.get(position).getImg())).centerCrop().into(img);
         // 根据flag来设置checkbox的选中状况
 

@@ -168,13 +168,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             getAnthologyDatas(vfId);
             getFirstURL(vfId);
         }
-        if (bundle.containsKey("cur_position")){
-            long curposition = bundle.getLong("cur_position");
-            seekTo(curposition);
-        }
-
         getYouLikeDatas();
-
     }
 
     /**
@@ -456,6 +450,14 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
                     per_Id = details.getId();
                     collect_tag=details.getId();
+                    if (details.getSc() != null && details.getSc().equals("1")){
+                        img_collect.setImageResource( R.drawable.icon_collect_press);
+                        isCollected = true;
+                    }else{
+                        img_collect.setImageResource( R.drawable.icon_collect);
+                        isCollected = false;
+                    }
+
                     getCommentList(per_Id);
                     // TODO: 16/7/11  ADD PLAY URL SELECTOR
                     VideoModel model = new VideoModel();
@@ -549,10 +551,18 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     video.setmPlayUrl(videoUrl);
                     // Reset player and params.
                     releasePlayer();
+
                     mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
+
+                    if (getIntent().getExtras().containsKey("cur_position")){
+                        long cur_position = getIntent().getExtras().getLong("cur_position");
+                        mPlayerPosition= cur_position;
+                        seekTo(mPlayerPosition);
+                    }
                     // Set Player
                     setIntent(onUrlGot(video));
                     onShown();
+
                 } else {
                     TLog.log(resp.getHead().getRspMsg());
                 }
@@ -791,7 +801,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
     @Override
     public void onDestroy() {
-        videoHistory.setCurrent_positon(getCurrentPosition());
+        videoHistory.setCurrent_positon(mPlayerPosition);
         videoHistory.setFlag("false");
         history.save(videoHistory);
         super.onDestroy();

@@ -98,6 +98,8 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     @OnClick(R.id.logout)
     public void LogOut() {
         // TODO: 16/6/6 注销用户信息。
+        ACache.get(getApplicationContext()).put("userinfo","");
+        this.finish();
     }
 
 

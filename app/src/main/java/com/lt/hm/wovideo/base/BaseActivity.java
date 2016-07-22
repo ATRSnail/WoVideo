@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.db.HistoryDataBase;
+import com.lt.hm.wovideo.db.NetUsageDatabase;
 import com.lt.hm.wovideo.model.VideoHistory;
 
 import butterknife.ButterKnife;
@@ -29,6 +30,7 @@ public abstract class BaseActivity extends FragmentActivity implements BaseViewI
 	Unbinder unbinder;
 	protected HistoryDataBase history;
 	protected VideoHistory videoHistory;
+	protected NetUsageDatabase netUsageDatabase;
 	@Override
 	protected void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -46,6 +48,7 @@ public abstract class BaseActivity extends FragmentActivity implements BaseViewI
 		mInflater = getLayoutInflater();
 		history = new HistoryDataBase(getApplicationContext());
 		videoHistory = new VideoHistory();
+		netUsageDatabase = new NetUsageDatabase(this);
 		init(savedInstanceState);
 //		//透明状态栏
 //		getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);

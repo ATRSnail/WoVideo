@@ -429,6 +429,7 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
 
   private long loadedBytes = 0;
   private long sumDuration = 0;
+
   @Override
   public void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format,
       long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
@@ -442,6 +443,10 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
       mInfoListener.onLoadCompleted(sourceId, bytesLoaded, type, trigger, format, mediaStartTimeMs,
           mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs);
     }
+  }
+
+  public long getLoadedBytes() {
+    return loadedBytes;
   }
 
   private long loadedBytesCanceled = 0;

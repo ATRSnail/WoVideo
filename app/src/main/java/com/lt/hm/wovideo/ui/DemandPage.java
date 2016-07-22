@@ -112,6 +112,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     @BindView(R.id.add_comment)
     LinearLayout addComment;
     private int pageSize = 50;
+    private String mQualityName;
 
     private String img_url;
     private String share_title;
@@ -122,7 +123,9 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         super.onConfigurationChanged(newConfig);
         //Check the orientation of the screen
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setVideoTitle(videoName.getText().toString());
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+
         }
 //        if (null == woPlayer) return;
 //        /***
@@ -276,7 +279,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         for (int i = 0; i < length; i++) {
             anthologys.add(i + 1 + "");
         }
-        anthologyAdapter = new VideoAnthologyAdapter(getApplicationContext(), anthologys);
+        anthologyAdapter = new VideoAnthologyAdapter(getApplicationContext(),anthologys);
         LinearLayoutManager manager = new LinearLayoutManager(this.getApplicationContext());
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         anthologyList.addItemDecoration(new RecycleViewDivider(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
@@ -288,8 +291,61 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             public void onItemClick(View view, int i) {
                 vfId = antholys.get(i).getVfId();
                 per_Id = antholys.get(i).getId();
+               PlayList.PlaysListBean details =  antholys.get(i);
+                VideoModel model = new VideoModel();
+                ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
+                if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("流畅");
+                    url.setFormatUrl(details.getFluentUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(details.getStandardUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("标清");
+                    url.setFormatUrl(details.getStandardUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(details.getBlueUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("蓝光");
+                    url.setFormatUrl(details.getBlueUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(details.getHighUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("高清");
+                    url.setFormatUrl(details.getHighUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(details.getSuperUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("超清");
+                    url.setFormatUrl(details.getSuperUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(details.getFkUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("4K");
+                    url.setFormatUrl(details.getFkUrl());
+                    urls.add(url);
+                }
+                model.setmVideoUrl(urls);
 
-                getRealURL(antholys.get(i).getFluentUrl(), false, antholys.get(i).getId());
+                setVideoModel(model);
+
+//                getRealURL(antholys.get(i).getFluentUrl(), false, antholys.get(i).getId());
+
+                setQualityListener(new AVController.OnQualitySelected() {
+                    @Override
+                    public void onQualitySelect(String key, String value) {
+                        getRealURL(value, true, "");
+                    }
+                });
+                if (model.getmVideoUrl().size() > 0) {
+                    getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, details.getId());
+                    mQualityName = model.getmVideoUrl().get(0).getFormatName();
+                }
 
 
 //                getRealURL(bean.getStandardUrl());

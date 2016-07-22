@@ -271,6 +271,7 @@ public class CollectPage extends BaseActivity implements CustomTopbar.myTopbarCl
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
+                if (collectRefresh==null)return;
                 collectRefresh.setRefreshing(false);
             }
         }, 3000);

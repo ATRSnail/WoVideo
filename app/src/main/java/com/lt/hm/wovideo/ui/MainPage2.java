@@ -6,12 +6,17 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,6 +39,7 @@ import com.lt.hm.wovideo.widget.MyFragmentTabHost;
 import com.lt.hm.wovideo.zxing.ui.MipcaActivityCapture;
 
 import butterknife.BindView;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 /**
  * @author leonardo
@@ -52,8 +58,8 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
     FrameLayout tabcontent;
     @BindView(android.R.id.tabhost)
     MyFragmentTabHost tabhost;
-    @BindView(R.id.id_menu)
-    LinearLayout idMenu;
+    @BindView(R.id.main)
+    FrameLayout idMenu;
     @BindView(R.id.common_head_layout)
     RelativeLayout commonHeadLayout;
     @BindView(R.id.choice_head_layout)
@@ -66,6 +72,15 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
     ImageView choicePersonCenter;
 
     private long mExitTime = 0;
+
+    private Handler popHandler = new Handler();
+
+    private Runnable popRun = new Runnable() {
+        @Override
+        public void run() {
+            showPop();
+        }
+    };
 
     @Override
     protected int getLayoutId() {
@@ -86,6 +101,16 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
         initTabs();
 
         checkLoginState();
+
+        popHandler.postDelayed(popRun, 3000);
+
+        new MaterialShowcaseView.Builder(this)
+                .setTarget(choicePersonCenter)
+                .setDismissText(getString(R.string.got_it))
+                .setContentText(getString(R.string.register_hint))
+                .setDelay(500) // optional but starting animations immediately in onCreate can make them choppy
+                .singleUse("register") // provide a unique ID used to ensure it is only shown once
+                .show();
     }
 
     private void checkLoginState() {
@@ -153,7 +178,6 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
         choiceSearchLayout.setOnClickListener((View v) -> {
             UIHelper.ToSearchPage(this);
         });
-
     }
 
     @Override
@@ -252,5 +276,64 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+
+    public void showPop() {
+// Instantiate a new "row" view.
+        final ViewGroup newView = (ViewGroup) LayoutInflater.from(this).inflate(
+                R.layout.layout_popup_promotion, idMenu, false);
+
+
+        newView.setAnimation(inFromTop());
+        // Set the text in the new row to a random country.
+        ((ImageView) newView.findViewById(R.id.img))
+                .setBackgroundDrawable(getResources().getDrawable(R.drawable.img_hd1));
+
+        // Set a click listener for the "X" button in the row that will remove the row.
+        newView.findViewById(R.id.close).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Remove the row from its parent (the container view).
+                // Because mContainerView has android:animateLayoutChanges set to true,
+                // this removal is automatically animated.
+                newView.setAnimation(outToTop());
+                idMenu.removeView(newView);
+            }
+        });
+
+        // Because mContainerView has android:animateLayoutChanges set to true,
+        // adding this view is automatically animated.
+        idMenu.addView(newView);
+
+        Runnable remove = new Runnable() {
+            @Override
+            public void run() {
+                newView.setAnimation(outToTop());
+                idMenu.removeView(newView);
+            }
+        };
+        popHandler.postDelayed(remove, 5000);
+
+    }
+
+    private Animation inFromTop() {
+        Animation inFromTop = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, -1.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f);
+        inFromTop.setDuration(1000);
+        inFromTop.setInterpolator(new AccelerateInterpolator());
+        return inFromTop;
+    }
+    private Animation outToTop() {
+        Animation inFromTop = new TranslateAnimation(
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, 0.0f,
+                Animation.RELATIVE_TO_PARENT, -1.0f);
+        inFromTop.setDuration(1000);
+        inFromTop.setInterpolator(new AccelerateInterpolator());
+        return inFromTop;
     }
 }

@@ -65,8 +65,8 @@ dependencies {
     compile 'cn.pedant.sweetalert:library:1.3'
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'org.greenrobot:eventbus:3.0.0'
-    compile 'com.github.ctiao:DanmakuFlameMaster:0.4.9'
-    //弹幕
+    compile 'com.github.ctiao:DanmakuFlameMaster:0.4.9'//弹幕
+    compile 'com.github.deano2390:MaterialShowcaseView:1.1.0' // Mask View
     compile 'com.victor:lib:1.0.4'
     //loading
     compile files('libs/zxing.jar')

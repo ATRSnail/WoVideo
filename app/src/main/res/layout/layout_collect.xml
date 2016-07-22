@@ -3,7 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/gray_dark"
+    >
+
+
     <com.lt.hm.wovideo.widget.CustomTopbar
         android:id="@+id/collect_topbar"
         android:layout_width="match_parent"
@@ -12,18 +16,21 @@
         app:CustomtitleTextSize="@dimen/f_16"
         app:Customtoptitle="@string/my_collect"
         app:leftBackGround="@drawable/left_arrow"
-        app:rightBackGround="@drawable/left_arrow" />
+        />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1.0"
+        android:layout_marginTop="@dimen/s_5"
         android:id="@+id/collect_refresh"
         >
         <ListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/collect_list"
+            android:divider="@color/gray_dark"
+            android:background="@color/white"
             />
     </android.support.v4.widget.SwipeRefreshLayout>
     <include layout="@layout/layout_history_bottom"

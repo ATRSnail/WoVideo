@@ -73,6 +73,7 @@ public class CustomTopbar extends RelativeLayout {
 //        rightImage.setImageDrawable(rightDrawable);
 //        rightImage.setBackground(getResources().getDrawable(rightDrawable));
         rightImage.setBackgroundColor(getResources().getColor(R.color.white));
+        rightImage.setTextColor(getResources().getColor(R.color.blue_btn_bg_color));
         setBackgroundColor(getResources().getColor(R.color.white));    // 设置背景颜色
 
         //将自定义的控件放到Layout中（以LayoutParams的形式）

@@ -73,7 +73,7 @@
             android:configChanges="orientation|screenSize"/>
         <activity android:name=".ui.DemandPage"
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             />
         <activity android:name=".ui.BillsPage"
             android:screenOrientation="portrait"
@@ -103,7 +103,7 @@
             android:configChanges="orientation|screenSize"/>
         <activity android:name=".ui.NewMoviePage"
             android:configChanges="orientation|screenSize"
-            android:windowSoftInputMode="adjustPan"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             />
         <activity android:name=".ui.NewClassDetailPage"
             android:screenOrientation="portrait"

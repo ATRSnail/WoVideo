@@ -506,13 +506,19 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
                     per_Id = details.getId();
                     collect_tag=details.getId();
-                    if (details.getSc() != null && details.getSc().equals("1")){
-                        img_collect.setImageResource( R.drawable.icon_collect_press);
-                        isCollected = true;
-                    }else{
+                    if (StringUtils.isNullOrEmpty(login_info)){
                         img_collect.setImageResource( R.drawable.icon_collect);
-                        isCollected = false;
+                    }else{
+                        if (details.getSc() != null && details.getSc().equals("1")){
+                            img_collect.setImageResource( R.drawable.icon_collect_press);
+                            isCollected = true;
+                        }else{
+                            img_collect.setImageResource( R.drawable.icon_collect);
+                            isCollected = false;
+                        }
                     }
+
+
 
                     getCommentList(per_Id);
                     // TODO: 16/7/11  ADD PLAY URL SELECTOR
@@ -758,32 +764,36 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
      * 取消收藏
      */
     private void CancelCollect() {
-
         String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
-        UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("userid", model.getId());
-        map.put("vfids", collect_tag);
-        HttpApis.cancelCollect(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log(e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("cancel_result" + response);
-                ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
-                } else {
-                    img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
-                    Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+        if (!StringUtils.isNullOrEmpty(userinfo)){
+            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("userid", model.getId());
+            map.put("vfids", collect_tag);
+            HttpApis.cancelCollect(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log("cancel_result" + response);
+                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                    } else {
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }else{
+            UnLoginHandler.unLogin(DemandPage.this);
+        }
+
     }
 
     @Override

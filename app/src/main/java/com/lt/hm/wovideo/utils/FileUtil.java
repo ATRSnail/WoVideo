@@ -631,4 +631,52 @@ public class FileUtil {
 		savedir = null;
 		return savePath;
 	}
+	/**
+	 * 获取SD Path
+	 */
+	public static String getSDCardPath() {
+		return Environment.getExternalStorageDirectory().getAbsolutePath();
+	}
+
+	public static void cleanCacheData(Context context){
+		cleanDatabases(context);
+		cleanInternalCache(context);
+	}
+
+
+	/**
+	 * 清楚本应用所有数据库
+	 * (/data/data/com.xxx.xxx/databases)
+	 * @param context
+	 */
+	public static void cleanDatabases(Context context) {
+		deleteFilesByDirectory(new File("/data/data/"
+				+ context.getPackageName() + "/databases"));
+	}
+
+	/**
+	 * 删除方法 这里只会删除某个文件夹下的文件，如果传入的directory是个文件，将不做处理
+	 * @param directory
+	 */
+	private static void deleteFilesByDirectory(File directory) {
+		if (directory != null && directory.exists() && directory.isDirectory()) {
+			for (File child : directory.listFiles()) {
+				if (child.isDirectory()) {
+					deleteFilesByDirectory(child);
+				}
+				child.delete();
+			}
+		}
+	}
+
+	/**
+	 * 清除本应用内部缓存
+	 * (/data/data/com.xxx.xxx/cache)
+	 * @param context
+	 */
+	public static void cleanInternalCache(Context context) {
+		deleteFilesByDirectory(context.getCacheDir());
+//		deleteFilesByDirectory(context.getFilesDir());
+	}
+
 }

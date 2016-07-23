@@ -15,7 +15,6 @@ import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 
 import butterknife.BindView;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 
 /**
@@ -75,6 +74,7 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
 
     @OnClick(R.id.skin_manager)
     public void ToSkin() {
+        Toast.makeText(getApplicationContext(), "该功能尚未开发完成，敬请期待", Toast.LENGTH_SHORT).show();
 //        UIHelper.ToSkinManager(this);
     }
 
@@ -111,13 +111,6 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     @Override
     public void rightClick() {
 
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        // TODO: add setContentView(...) invocation
-        ButterKnife.bind(this);
     }
 
     @OnClick(R.id.modify_pwd)

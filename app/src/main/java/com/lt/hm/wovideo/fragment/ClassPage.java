@@ -149,13 +149,13 @@ public class ClassPage extends BaseFragment {
         for (int i = 0; i < typeList.size(); i++) {
             TypeList.TypeListBean bean = typeList.get(i);
             if (bean.getTypeName().equals("电影")){
-                Glide.with(this).load(HttpUtils.appendUrl(bean.getImg())).into(imgMovie);
+                Glide.with(this).load(HttpUtils.appendUrl(bean.getImg())).placeholder(R.drawable.default_vertical).into(imgMovie);
             }else if (bean.getTypeName().equals("电视剧")){
-                Glide.with(this).load(HttpUtils.appendUrl(bean.getImg())).into(imgTeleplay);
+                Glide.with(this).load(HttpUtils.appendUrl(bean.getImg())).placeholder(R.drawable.default_horizental).into(imgTeleplay);
             }else if(bean.getTypeName().equals("体育")){
-                Glide.with(this).load(HttpUtils.appendUrl(bean.getImg())).into(imgSport);
+                Glide.with(this).load(HttpUtils.appendUrl(bean.getImg())).placeholder(R.drawable.default_vertical).into(imgSport);
             }else if(bean.getTypeName().equals("综艺")){
-                Glide.with(this).load(HttpUtils.appendUrl(bean.getImg())).into(imgVariety);
+                Glide.with(this).load(HttpUtils.appendUrl(bean.getImg())).placeholder(R.drawable.default_horizental).into(imgVariety);
             }
         }
     }

@@ -24,7 +24,6 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/img_1"
                 android:id="@+id/img_movie"
                 android:scaleType="centerCrop"
                 />
@@ -51,7 +50,6 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/banner"
                 android:id="@+id/img_sport"
                 android:scaleType="centerCrop"
                 />
@@ -81,8 +79,8 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/banner"
                 android:scaleType="centerCrop"
+                android:src="@drawable/img_live"
                 android:id="@+id/img_live"
                 />
             <TextView
@@ -114,7 +112,6 @@
                 android:layout_height="match_parent"
                 android:id="@+id/img_teleplay"
                 android:scaleType="centerCrop"
-                android:src="@drawable/img_hd1"
                 />
             <TextView
                 android:layout_width="wrap_content"
@@ -141,7 +138,6 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:id="@+id/img_variety"
-                android:src="@drawable/img_hd1"
                 />
             <TextView
                 android:layout_width="wrap_content"

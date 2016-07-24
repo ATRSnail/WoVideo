@@ -18,11 +18,12 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
-import com.bumptech.glide.Glide;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.BannerList;
 import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -199,7 +200,9 @@ public class ImageIndicatorView extends RelativeLayout {
 				FrameLayout frameLayout= new FrameLayout(getContext());
 
 				final ImageView pageItem = new ImageView(getContext());
-				Glide.with(mContext).load(HttpUtils.appendUrl(urllist.get(i).getImg())).crossFade().into(pageItem);
+//				Glide.with(mContext).load(HttpUtils.appendUrl(urllist.get(i).getImg())).crossFade().into(pageItem);
+				ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(pageItem).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(urllist.get(i).getImg())).build());
+
 				pageItem.setScaleType(ImageView.ScaleType.CENTER_CROP);
 				frameLayout.addView(pageItem);
 				if (urllist.get(i).getIsvip().equals("1")){

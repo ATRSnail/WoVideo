@@ -20,7 +20,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.home.Bottom_ListAdapter;
@@ -39,6 +38,8 @@ import com.lt.hm.wovideo.model.Videos;
 import com.lt.hm.wovideo.utils.ScreenUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 import com.lt.hm.wovideo.widget.RoundImageView;
 import com.lt.hm.wovideo.widget.indicatorView.AutoPlayManager;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
@@ -57,7 +58,6 @@ import okhttp3.Call;
  * @author leonardo
  * @version 1.0
  * @create_date 16/5/30
- *
  */
 public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.img_indicator)
@@ -155,12 +155,13 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
             }
         });
     }
-    private void initHorientalScrollView (List<RecomList.Videos> mList){
+
+    private void initHorientalScrollView(List<RecomList.Videos> mList) {
 //        h_img_container
         for (int i = 0; i < mList.size(); i++) {
             RoundImageView view = new RoundImageView(getActivity());
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ScreenUtils.getScreenWidth(getApplicationContext()) * 2 / 5, LinearLayout.LayoutParams.MATCH_PARENT);
-            params.setMargins(15,0,15,0);
+            params.setMargins(15, 0, 15, 0);
             view.setBorderRadius(5);
             view.setType(RoundImageView.TYPE_ROUND);
             view.setLayoutParams(params);
@@ -170,8 +171,7 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
             }
 //                view.setScaleType(ImageView.ScaleType.CENTER_CROP);
 //                Glide.with(getActivity()).load(HttpUtils.appendUrl(mList.get(position).getImg())).centerCrop().crossFade().into(view);
-            Glide.with(getActivity()).load(HttpUtils.appendUrl(mList.get(i).getImg())).centerCrop().crossFade().into(view);
-//                GlideUtils.getmInstance().LoadContextCircleBitmap(getActivity(),HttpUtils.appendUrl(mList.get(position).getImg()),view);
+            ImageLoaderUtil.getInstance().loadImage(getActivity(), new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(mList.get(i).getImg())).build());
             final int finalPosition = i;
             view.setOnClickListener((View v) -> {
                 getVideoDetails(mList.get(finalPosition).getVfId());
@@ -182,6 +182,7 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
 
     /**
      * 弃用
+     *
      * @param mList
      */
     private void initidViewpager(List<RecomList.Videos> mList) {
@@ -209,7 +210,9 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
                 }
 //                view.setScaleType(ImageView.ScaleType.CENTER_CROP);
 //                Glide.with(getActivity()).load(HttpUtils.appendUrl(mList.get(position).getImg())).centerCrop().crossFade().into(view);
-                Glide.with(getActivity()).load(HttpUtils.appendUrl(mList.get(position).getImg())).centerCrop().crossFade().into(view);
+//                Glide.with(getActivity()).load(HttpUtils.appendUrl(mList.get(position).getImg())).centerCrop().crossFade().into(view);
+                ImageLoaderUtil.getInstance().loadImage(getActivity(), new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(mList.get(position).getImg())).build());
+
 //                GlideUtils.getmInstance().LoadContextCircleBitmap(getActivity(),HttpUtils.appendUrl(mList.get(position).getImg()),view);
                 final int finalPosition = position;
                 view.setOnClickListener((View v) -> {
@@ -485,8 +488,6 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
             }
         });
     }
-
-
 
     @Override
     public void onResume() {

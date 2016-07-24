@@ -1,12 +1,15 @@
 package com.lt.hm.wovideo.adapter.video;
 
 import android.content.Context;
+import android.widget.ImageView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.LikeList;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 
 import java.util.List;
 
@@ -23,10 +26,11 @@ public class VideoItemGridAdapter extends BaseQuickAdapter<LikeList.LikeListBean
     @Override
     protected void convert(BaseViewHolder holder, LikeList.LikeListBean likeListBean) {
         holder.setText(R.id.grid_item_title, likeListBean.getName());
+        ImageView view = (ImageView) holder.convertView.findViewById(R.id.grid_item_img_bg);
         if (likeListBean.getImg() != null) {
-            holder.setImageUrl(R.id.grid_item_img_bg, HttpUtils.appendUrl(likeListBean.getImg()));
+            ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(likeListBean.getImg())).build());
         } else {
-            holder.setImageResource(R.id.grid_item_img_bg, R.drawable.img_4);
+            ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(likeListBean.getImg())).build());
         }
         if (!likeListBean.getIsfree().equals("1")){
             holder.setVisible(R.id.item_vip_logo,true);

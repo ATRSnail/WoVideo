@@ -2,6 +2,7 @@ package com.lt.hm.wovideo.adapter.vip;
 
 import android.content.Context;
 import android.view.Gravity;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -10,6 +11,8 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.VideoList;
 import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 
 import java.util.List;
 
@@ -26,10 +29,16 @@ public class VipItemAdapter extends BaseQuickAdapter<VideoList.TypeListBean> {
     @Override
     protected void convert(BaseViewHolder baseViewHolder, VideoList.TypeListBean typeListBean) {
         baseViewHolder.setText(R.id.home_item_title, typeListBean.getName());
+        ImageView view = (ImageView) baseViewHolder.convertView.findViewById(R.id.home_item_img_bg);
         if (typeListBean.getImg() != null) {
-            baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.getImg()));
+            ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(typeListBean.getImg())).build());
+
+
+//            baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.getImg()));
         } else {
-            baseViewHolder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
+            ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(typeListBean.getImg())).build());
+
+//            baseViewHolder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
         }
         //Grid
         if (!StringUtils.isNullOrEmpty(typeListBean.getTag())&&typeListBean.getTag().equals("0")){
@@ -39,17 +48,21 @@ public class VipItemAdapter extends BaseQuickAdapter<VideoList.TypeListBean> {
             text.setGravity(Gravity.CENTER);
             baseViewHolder.setVisible(R.id.home_item_desc,false);
             if (typeListBean.getImg() != null) {
-                baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.getImg()));
+                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(typeListBean.getImg())).build());
+//                baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.getImg()));
             } else {
-                baseViewHolder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
+                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(typeListBean.getImg())).build());
+//                baseViewHolder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
             }
         }else{
             baseViewHolder.setText(R.id.home_item_desc, typeListBean.getDesc());
             baseViewHolder.setVisible(R.id.home_item_desc,true);
             if (typeListBean.gethIMG() != null) {
-                baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.gethIMG()));
+                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(typeListBean.getImg())).build());
+//                baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.gethIMG()));
             } else {
-                baseViewHolder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
+                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(typeListBean.getImg())).build());
+//                baseViewHolder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
             }
         }
         if (!typeListBean.getIsfree().equals("1")){

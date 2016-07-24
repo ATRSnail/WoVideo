@@ -9,11 +9,12 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.VideoHistory;
 import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 
 import java.util.List;
 
@@ -69,7 +70,10 @@ public class VideoHistoryAdapter extends BaseAdapter {
         holder.itemMovieName.setText(list.get(position).getmName());
         holder.itemCurrentPosition.setText(StringUtils.generateStringPosition(list.get(position).getCurrent_positon()));
         ImageView img = holder.itemVideoImg;
-        Glide.with(context).load(HttpUtils.appendUrl(list.get(position).getImg_url())).into(img);
+//        Glide.with(context).load(HttpUtils.appendUrl(list.get(position).getImg_url())).into(img);
+        ImageLoaderUtil.getInstance().loadImage(context, new ImageLoader.Builder().imgView(img).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(list.get(position).getImg_url())).build());
+
+
         // 根据flag来设置checkbox的选中状况
 
         if (!StringUtils.isNullOrEmpty(list.get(position).getFlag())){

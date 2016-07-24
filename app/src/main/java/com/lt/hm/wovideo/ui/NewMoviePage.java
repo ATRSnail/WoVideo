@@ -265,7 +265,7 @@ public class NewMoviePage extends BaseVideoActivity {
     public void getChangePage(String vfId) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", vfId);
-        maps.put("typeid", VideoType.MOVIE);
+        maps.put("typeid", VideoType.MOVIE.getId());
         HttpApis.getVideoInfo(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -362,7 +362,7 @@ public class NewMoviePage extends BaseVideoActivity {
                     bref_txt_short.setText(details.getIntroduction());
                     bref_txt_long.setText(details.getIntroduction());
                     videoPlayNumber.setText(details.getHit());
-                    Glide.with(NewMoviePage.this).load(HttpUtils.appendUrl(details.getImg())).centerCrop().crossFade().into(movieBrefImg);
+                    Glide.with(NewMoviePage.this).load(HttpUtils.appendUrl(details.getImg())).placeholder(R.drawable.default_vertical).centerCrop().crossFade().into(movieBrefImg);
 
 
                 }

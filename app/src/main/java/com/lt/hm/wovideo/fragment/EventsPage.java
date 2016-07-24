@@ -77,7 +77,7 @@ public class EventsPage extends BaseFragment implements SwipeRefreshLayout.OnRef
 
         @Override
         public int getCount() {
-            return 10;
+            return 1;
         }
 
         @Override

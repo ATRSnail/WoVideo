@@ -147,7 +147,7 @@ public class ClassDetailPage extends BaseActivity implements SecondTopbar.myTopb
         HashMap<String, Object> map = new HashMap<>();
         map.put("typeid", id);
         map.put("pageNum", 1);
-        map.put("numPerPage", 20);
+        map.put("numPerPage", 60);
         map.put("isvip", "0");
         map.put("lx", lx);
         map.put("sx", sx);

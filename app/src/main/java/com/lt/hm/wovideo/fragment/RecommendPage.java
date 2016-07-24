@@ -156,6 +156,9 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
                     List<LikeList.LikeListBean> grid_list = new ArrayList<LikeList.LikeListBean>();
                     grid_list.addAll(resp.getBody().getLikeList());
                     LikeList.LikeListBean typeListBean = new LikeList.LikeListBean();
+                    if (grid_list.size()>0){
+                        recommend_container.removeAllViews();
+                    }
                     typeListBean = grid_list.get(0);
                     List<LikeList.LikeListBean> beanList = new ArrayList<LikeList.LikeListBean>();
                     for (int i = 0; i < 3; i++) {

@@ -52,7 +52,7 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
     ImageView vipSelector;
     List<TypeList.TypeListBean> mClass = new ArrayList<>();
     int CURRENT_POSITION;
-    private List<String> mTitles;
+    private List<String> mTitles = new ArrayList<>();
     private List<BaseFragment> fragments = new ArrayList<>();
     private FragmentPagerAdapter mAdapter;
 
@@ -61,16 +61,19 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
     private String dq;
     private String nd;
     private boolean shown =false;
+    private boolean first_init= false;
+    View view;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.layout_vip, container, false);
-        unbinder = ButterKnife.bind(this, view);
-        mTitles = new ArrayList<>();
-        initView(view);
-        initData();
-        view.setTag("vip_page");
+        if (view ==null){
+            view  = inflater.inflate(R.layout.layout_vip, container, false);
+            unbinder = ButterKnife.bind(this, view);
+            initView(view);
+            initData();
+            view.setTag("vip_page");
+        }
         return view;
     }
 
@@ -106,11 +109,13 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
     @Override
     public void onResume() {
         super.onResume();
-//        getClassInfos();
+        getClassInfos();
     }
 
 
     private void getClassInfos() {
+
+
         HashMap<String, Object> map = new HashMap<>();
         HttpApis.getClassesInfo(map, new StringCallback() {
             @Override
@@ -125,11 +130,15 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
                 ResponseParser.parse(resp, response, TypeList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals("0")) {
                     TLog.log(resp.toString());
-                    if (mClass.size() > 0) {
+                    if (mClass.size()>0){
                         mClass.clear();
                     }
+                    if (fragments.size()>0){
+                        fragments.clear();
+                    }
 //                    mClass.addAll(resp.getBody().getTypeList());
-                    mClass=resp.getBody().getTypeList();
+                    mClass.addAll(resp.getBody().getTypeList());
+                    TLog.log("test"+mClass.size());
                     initBottom();
 
                 } else {
@@ -142,12 +151,14 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
 
 
     private void initBottom() {
-        if (mTitles.size() > 0) {
+        if (mTitles.size()>0){
             mTitles.clear();
         }
         for (int i = 0; i < mClass.size(); i++) {
             mTitles.add(mClass.get(i).getTypeName());
         }
+        vipViewPage.removeAllViews();
+
         mTitles.add(0, "推荐");
         for (int i = 0; i < mTitles.size(); i++) {
             BaseFragment fragment;
@@ -198,6 +209,7 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
             }
         });
         vipViewIndicator.setViewPager(vipViewPage, 0);
+        vipViewPage.setOffscreenPageLimit(mTitles.size());
     }
     @Override
     public void onDestroy() {

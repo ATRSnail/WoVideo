@@ -152,11 +152,26 @@ public class NewMoviePage extends BaseVideoActivity {
             getVideoDetails(vfId);
             getFirstURL(vfId);
             getCommentList(vfId);
-
         }
 
         getYouLikeDatas(10);
 
+    }
+
+    private void videoAddHit(String vfId) {
+        HashMap<String,Object> map= new HashMap<>();
+        map.put("playsId",vfId);
+        HttpApis.addVideoHit(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log(e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log("addHit"+response);
+            }
+        });
     }
 
 
@@ -586,6 +601,7 @@ public class NewMoviePage extends BaseVideoActivity {
                         }
                     }
                     collect_tag = details.getId();
+                    videoAddHit(details.getId());
                     VideoModel model = new VideoModel();
                     ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
                     if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {

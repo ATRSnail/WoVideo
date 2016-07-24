@@ -434,6 +434,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     public void onPause() {
         super.onPause();
+        if (mPlayer==null)return;
         mLoadedBytes = mPlayer.getLoadedBytes();
         if (Util.SDK_INT <= 23) {
             onHidden();

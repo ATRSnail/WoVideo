@@ -53,7 +53,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     @BindView(R.id.refresh_view)
     SwipeRefreshLayout refreshView;
     int pageNum = 1;
-    int pageSize = 100;
+    int pageSize = 60;
     List<VideoList.TypeListBean> b_list;
     VipItemAdapter bottom_adapter;
     int mId;
@@ -64,7 +64,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     private String dq;
     private String nd;
     private int mCurrentCounter, TOTAL_COUNTER;
-
+    View view;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -82,8 +82,10 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_vip_item_page, container, false);
-        unbinder = ButterKnife.bind(this, view);
+        if (view==null){
+            view = inflater.inflate(R.layout.layout_vip_item_page, container, false);
+            unbinder = ButterKnife.bind(this, view);
+        }
         initView(view);
         initData();
         return view;
@@ -92,11 +94,11 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
     @Override
     public void initView(View view) {
         super.initView(view);
+        b_list = new ArrayList<>();
 //        refreshView.setAutoLoadMore(false);
         refreshView.setColorSchemeResources(android.R.color.holo_green_light, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         refreshView.setOnRefreshListener(this);
-        b_list = new ArrayList<>();
     }
 
     private void getListDatas(int id, String tag, int page) {
@@ -123,6 +125,9 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
                 ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
                 ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                    if (b_list !=null && b_list.size()>0){
+                        b_list.clear();
+                    }
                     b_list.addAll(resp.getBody().getTypeList());
                     for (int i = 0; i < b_list.size(); i++) {
                         b_list.get(i).setDesc(b_list.get(i).getIntroduction());

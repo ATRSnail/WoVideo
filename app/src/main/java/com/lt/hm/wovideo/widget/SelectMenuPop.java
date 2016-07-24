@@ -62,9 +62,14 @@ public class SelectMenuPop extends PopupWindow {
     };
     public SelectMenuPop(Context context, int id) {
         super(context);
+        updateMenu(context,id);
+    }
+
+    public void updateMenu(Context context,int id){
         initMenuHash(id);
         initViews(context);
     }
+
 
     public void setListener(OnRadioClickListener listener) {
         this.listener = listener;
@@ -137,6 +142,7 @@ public class SelectMenuPop extends PopupWindow {
             radiobutton.setLayoutParams(params1);
             radiobutton.setPadding(20,0,20,0);
             radiobutton.setText(values.get(key_name));
+            radiobutton.setTextColor(context.getResources().getColor(R.color.black));
             radiobutton.setButtonDrawable(null);
             radiobutton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override

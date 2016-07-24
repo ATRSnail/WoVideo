@@ -86,7 +86,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     List<VideoList.TypeListBean> b_list;
     VipItemAdapter bottom_adapter;
     int pageNum = 1;
-    int pageSize = 20;
+    int pageSize = 60;
     int mId;
     @BindView(R.id.class_refresh_layout)
     SwipeRefreshLayout classRefreshLayout;
@@ -105,6 +105,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     private boolean spinner_flag = true;
     private boolean search_first = true;
     private boolean shown = false;
+    SelectMenuPop pop;
 
     @Override
     protected int getLayoutId() {
@@ -195,6 +196,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
 
     @Override
     public void initViews() {
+        pop = new SelectMenuPop(this, mId);
         b_list = new ArrayList<>();
         classDetailsBack.setOnClickListener((View v) -> {
             this.finish();
@@ -219,8 +221,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
             }
         });
         classDetailsChoose.setOnClickListener((View v) -> {
-            SelectMenuPop pop = new SelectMenuPop(this, mId);
-//            pop.showPopupWindow(class_details_head,shown);
+            pop.updateMenu(getApplicationContext(),mId);
             pop.showPopupWindow(type_container, shown);
             pop.setListener(new SelectMenuPop.OnRadioClickListener() {
                 @Override
@@ -281,7 +282,9 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                         b_list.get(i).setDesc(b_list.get(i).getIntroduction());
                     }
                     if (b_list != null && b_list.size() > 0) {
+                        if (classDetailsList==null)return;
                         classDetailsList.setVisibility(View.VISIBLE);
+
                         bottom_adapter = new VipItemAdapter(getApplicationContext(), b_list);
                         if ((mId) == VideoType.MOVIE.getId()) {
                             GridLayoutManager manager = new GridLayoutManager(NewClassDetailPage.this, 3);
@@ -309,6 +312,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                             }
                         });
                     } else {
+                        if (classDetailsList==null)return;
                         classDetailsList.setVisibility(View.INVISIBLE);
                     }
                 }
@@ -432,6 +436,13 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 }
             }
         }, 3000);
+    }
+
+    private void clearTmp(){
+        lx="";
+        sx="";
+        dq="";
+        nd="";
     }
 
     @Override

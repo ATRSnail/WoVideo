@@ -18,7 +18,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-
+                <include
+                    layout="@layout/vip_person_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp" />
                 <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="180dp"
@@ -30,10 +33,7 @@
                         android:layout_height="180dp" />
                 </FrameLayout>
 
-                <include
-                    layout="@layout/vip_person_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp" />
+
 
                 <LinearLayout
                     android:layout_width="match_parent"

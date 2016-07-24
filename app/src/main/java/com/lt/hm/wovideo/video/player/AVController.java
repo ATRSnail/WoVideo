@@ -787,6 +787,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     show(sDefaultTimeout);
     Log.i(TAG, delta+"");
     if (event.getPointerCount() == 1)
+      if (mPlayer==null) return;
       mPlayer.seekTo(mPlayer.getCurrentPosition() + Math.round(delta));
   }
 

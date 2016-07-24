@@ -12,8 +12,10 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:textColor="@color/black"
-        android:text="CCTV－1"
+        android:text="CCTV－1CCTVCCTVCCTVCCTVCCTVCCTVCCTV"
+        android:maxWidth="150dp"
         android:singleLine="true"
+        android:ellipsize="end"
         android:textSize="15sp"
         android:paddingLeft="15dp"
         />
@@ -27,6 +29,7 @@
         android:id="@+id/live_list_item_current_text"
         android:textColor="@color/gray_darker"
         android:textSize="12sp"
+        android:maxWidth="150dp"
         android:paddingRight="25dp"
         />
 

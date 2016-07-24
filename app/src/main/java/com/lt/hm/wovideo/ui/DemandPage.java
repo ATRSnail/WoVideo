@@ -164,6 +164,23 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         getYouLikeDatas();
     }
 
+    private void videoAddHit(String vfId) {
+        HashMap<String,Object> map= new HashMap<>();
+        map.put("playsId",vfId);
+        HttpApis.addVideoHit(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log(e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log("addHit"+response);
+            }
+        });
+    }
+
+
     /**
      * 获取 视频评论列表
      *
@@ -432,6 +449,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
                     per_Id = details.getId();
                     collect_tag=details.getId();
+                    videoAddHit(details.getId());
                     if (StringUtils.isNullOrEmpty(login_info)){
                         img_collect.setImageResource( R.drawable.icon_collect);
                     }else{

@@ -296,8 +296,17 @@ public class HttpApis {
         HttpUtils.formPost("mblUser/upPass", map, callback);
     }
 
+    /**
+     * 取消收藏
+     * @param map
+     * @param callback
+     */
     public static void cancelCollect(HashMap<String, Object> map, StringCallback callback){
         HttpUtils.formPost("mblCollection/cancelMyColls", map, callback);
+    }
+
+    public static void addVideoHit(HashMap<String, Object> map, StringCallback callback){
+        HttpUtils.formPost("mblVf/addHit", map, callback);
     }
 
 

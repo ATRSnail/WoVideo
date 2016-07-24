@@ -32,6 +32,7 @@ import com.lt.hm.wovideo.model.BannerList;
 import com.lt.hm.wovideo.model.LikeList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoType;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -105,14 +106,20 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
         if (FILE_SAVEPATH != null) {
             Glide.with(this).load(ACache.get(getActivity()).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(vipPersonLogo);
         }
-        String userinfo = ACache.get(getActivity()).getAsString("userinfo");
+//        String userinfo = ACache.get(getActivity()).getAsString("userinfo");
+        String userinfo=  SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)){
             UserModel model= new Gson().fromJson(userinfo,UserModel.class);
-            String phoneNum= model.getPhoneNo();
-            vipPersonAccount.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
-            if (model.getIsVip().equals("1")){
-                vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_opened));
+            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                String phoneNum= model.getPhoneNo();
+                vipPersonAccount.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
+                if (model.getIsVip().equals("1")){
+                    vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_opened));
+                }else{
+                    vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
+                }
             }else{
+                vipPersonAccount.setText(getResources().getText(R.string.unlogin_hint));
                 vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
             }
         }else{
@@ -215,7 +222,7 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.s_200));
         view.setLayoutParams(params);
         ImageView bg = (ImageView) view.findViewById(R.id.home_item_img_bg);
-        Glide.with(getActivity()).load(HttpUtils.appendUrl(typeListBean.gethIMG())).crossFade().into(bg);
+        Glide.with(getActivity()).load(HttpUtils.appendUrl(typeListBean.gethIMG())).placeholder(R.drawable.default_horizental).crossFade().into(bg);
         ((TextView) view.findViewById(R.id.home_item_title)).setText(typeListBean.getName());
         ((TextView) view.findViewById(R.id.home_item_desc)).setText(typeListBean.getIntroduction());
         ((ImageView) view.findViewById(R.id.item_vip_logo)).setVisibility(View.VISIBLE);

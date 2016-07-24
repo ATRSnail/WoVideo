@@ -7,12 +7,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.lt.hm.wovideo.AppContext;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.MethodsCompat;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.SecondTopbar;
@@ -44,7 +47,7 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     Button logout;
     @BindView(R.id.modify_pwd)
     RelativeLayout modifyPwd;
-
+    String userinfo;
     @Override
     protected int getLayoutId() {
         return R.layout.layout_setpage;
@@ -52,27 +55,38 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        userinfo= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         setTopbar.setRightIsVisible(false);
         setTopbar.setOnTopbarClickListenter(this);
+        // TODO: 16/6/6  获取缓存尺寸大小 并更新cacheSize
+        caculateCacheSize();
         logout.setOnClickListener((View v) -> {
             ACache.get(this).clear();
+            UserModel model= new Gson().fromJson(userinfo,UserModel.class);
+            model.setIsLogin("false");
+            SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",new Gson().toJson(model,UserModel.class));
             UIHelper.ToPerson(this);
             this.finish();
         });
-        caculateCacheSize();
-
-        // TODO: 16/6/6  获取缓存尺寸大小 并更新cacheSize
     }
 
     @Override
     public void initViews() {
-        String userinfo = ACache.get(this).getAsString("userinfo");
+//        String userinfo = ACache.get(this).getAsString("userinfo");
+        String userinfo= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (StringUtils.isNullOrEmpty(userinfo)) {
             logout.setVisibility(View.GONE);
             modifyPwd.setVisibility(View.GONE);
-        } else {
-            modifyPwd.setVisibility(View.VISIBLE);
-            logout.setVisibility(View.VISIBLE);
+        } else  {
+            UserModel model= new Gson().fromJson(userinfo,UserModel.class);
+            if (model.getIsLogin()!=null &&model.getIsLogin().equals("true")){
+                modifyPwd.setVisibility(View.VISIBLE);
+                logout.setVisibility(View.VISIBLE);
+            }else{
+                logout.setVisibility(View.GONE);
+                modifyPwd.setVisibility(View.GONE);
+            }
+
         }
     }
 
@@ -109,6 +123,9 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
     public void LogOut() {
         // TODO: 16/6/6 注销用户信息。
         ACache.get(getApplicationContext()).put("userinfo","");
+       String userinfo =  SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        UserModel model= new Gson().fromJson(userinfo,UserModel.class);
+        model.setIsLogin("false");
         this.finish();
     }
 

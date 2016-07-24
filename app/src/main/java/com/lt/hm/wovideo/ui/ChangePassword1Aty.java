@@ -8,7 +8,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.RespHeader;
@@ -18,6 +17,7 @@ import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.SearchResult;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.MD5Utils;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.SecondTopbar;
@@ -65,7 +65,8 @@ public class ChangePassword1Aty extends BaseActivity implements SecondTopbar.myT
 
     @Override
     public void initViews() {
-        String user = ACache.get(getApplicationContext()).getAsString("userinfo");
+//        String user = ACache.get(getApplicationContext()).getAsString("userinfo");
+        String user = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         model = new Gson().fromJson(user, UserModel.class);
         if (model!=null){
             phoneNumber=model.getPhoneNo();

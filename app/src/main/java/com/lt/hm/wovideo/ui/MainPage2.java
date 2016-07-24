@@ -27,11 +27,11 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.interf.OnTabReselectListener;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -114,15 +114,25 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
     }
 
     private void checkLoginState() {
-        String info = ACache.get(getApplicationContext()).getAsString("userinfo");
+//        String info = ACache.get(getApplicationContext()).getAsString("userinfo");
+        String info= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (StringUtils.isNullOrEmpty(info)) {
-            UnLoginHandler.unRegist(MainPage2.this);
+            UnLoginHandler.unLogin(MainPage2.this);
         } else {
             UserModel model = new Gson().fromJson(info, UserModel.class);
-            String tag = ACache.get(this).getAsString(model.getId() + "free_tag");
-            if (StringUtils.isNullOrEmpty(tag)) {
-                UnLoginHandler.freeDialog(MainPage2.this, model.getId());
+//            String tag = ACache.get(this).getAsString(model.getId() + "free_tag");
+//            if (StringUtils.isNullOrEmpty(tag)) {
+//                UnLoginHandler.freeDialog(MainPage2.this, model.getId());
+//            }
+            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                if (model.getIsOpen()==null){
+                    UnLoginHandler.freeDialog(MainPage2.this, model);
+                }
+            }else{
+                UnLoginHandler.unLogin(MainPage2.this);
             }
+
+
         }
 
     }

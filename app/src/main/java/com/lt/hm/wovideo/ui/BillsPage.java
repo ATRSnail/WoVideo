@@ -11,7 +11,6 @@ import android.widget.Toast;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.order.BillAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
@@ -21,6 +20,8 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BillList;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
+import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.lt.hm.wovideo.widget.SecondTopbar;
@@ -48,6 +49,7 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
 
     BillAdapter billAdapter;
     List<BillList.OrderListBean> mList;
+    String userinfo;
 
     @Override
     protected int getLayoutId() {
@@ -56,6 +58,7 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        userinfo= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         billsTopbar.setRightIsVisible(false);
         billsTopbar.setLeftIsVisible(true);
         billsTopbar.setOnTopbarClickListenter(this);
@@ -98,31 +101,35 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
     }
 
     private void getBills() {
-        String userinfo = ACache.get(this).getAsString("userinfo");
-        UserModel model= new Gson().fromJson(userinfo,UserModel.class);
-        HashMap<String,Object> map= new HashMap<>();
-        map.put("pageNum",1);
-        map.put("numPerPage",100);
-        map.put("userid",model.getId());
-        HttpApis.getBills(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:"+e.getMessage());
-            }
+//        String userinfo = ACache.get(this).getAsString("userinfo");
+        if (StringUtils.isNullOrEmpty(userinfo)){
 
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<BillList,RespHeader>  resp = new ResponseObj<BillList, RespHeader>();
-                ResponseParser.parse(resp,response,BillList.class,RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
-                    mList.addAll(resp.getBody().getOrderList());
-                    initList(mList);
-                }else{
-                    Toast.makeText(getApplicationContext(),resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
+        }else{
+            UserModel model= new Gson().fromJson(userinfo,UserModel.class);
+            HashMap<String,Object> map= new HashMap<>();
+            map.put("pageNum",1);
+            map.put("numPerPage",100);
+            map.put("userid",model.getId());
+            HttpApis.getBills(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log("error:"+e.getMessage());
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log(response);
+                    ResponseObj<BillList,RespHeader>  resp = new ResponseObj<BillList, RespHeader>();
+                    ResponseParser.parse(resp,response,BillList.class,RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
+                        mList.addAll(resp.getBody().getOrderList());
+                        initList(mList);
+                    }else{
+                        Toast.makeText(getApplicationContext(),resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
 
     @Override
@@ -145,9 +152,8 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
     }
     private void purchOrder(String orderId) {
         HashMap<String,Object> map= new HashMap<>();
-        String string = ACache.get(this).getAsString("userinfo");
+        String string= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         UserModel model = new Gson().fromJson(string,UserModel.class);
-
         map.put("cellphone",model.getPhoneNo());
         map.put("spid",orderId);
         HttpApis.purchOrder(map, new StringCallback() {

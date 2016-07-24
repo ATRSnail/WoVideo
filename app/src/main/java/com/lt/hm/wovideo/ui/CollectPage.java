@@ -23,6 +23,7 @@ import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.CollectModel;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoType;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -196,32 +197,38 @@ public class CollectPage extends BaseActivity implements CustomTopbar.myTopbarCl
     }
 
     private void getCollectList() {
-        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
-        UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("userid", model.getId());
-        map.put("pageNum", pageNum);
-        map.put("numPerPage", pageSize);
-        HttpApis.collectList(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log(e.getMessage());
-            }
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        TLog.log("collectInfo"+userinfo);
+        if (!StringUtils.isNullOrEmpty(userinfo)){
+            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("userid", model.getId());
+                map.put("pageNum", pageNum);
+                map.put("numPerPage", pageSize);
+                HttpApis.collectList(map, new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        TLog.log(e.getMessage());
+                    }
 
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("collect" + response);
-                ResponseObj<CollectModel, RespHeader> resp = new ResponseObj<CollectModel, RespHeader>();
-                ResponseParser.parse(resp, response, CollectModel.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    List<CollectModel.CollListBean> models = resp.getBody().getCollList();
-                    mList.addAll(models);
-                    dataChanged();
-                } else {
-                    TLog.log(resp.getHead().getRspMsg());
-                }
+                    @Override
+                    public void onResponse(String response, int id) {
+                        TLog.log("collect" + response);
+                        ResponseObj<CollectModel, RespHeader> resp = new ResponseObj<CollectModel, RespHeader>();
+                        ResponseParser.parse(resp, response, CollectModel.class, RespHeader.class);
+                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                            List<CollectModel.CollListBean> models = resp.getBody().getCollList();
+                            mList.addAll(models);
+                            dataChanged();
+                        } else {
+                            TLog.log(resp.getHead().getRspMsg());
+                        }
+                    }
+                });
             }
-        });
+        }
+
     }
 
     private void dataChanged() {

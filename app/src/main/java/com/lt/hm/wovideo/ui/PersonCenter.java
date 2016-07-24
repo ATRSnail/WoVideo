@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -27,6 +28,7 @@ import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.ImageUtils;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -102,26 +104,34 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
 
     @Override
     protected void init(Bundle savedInstanceState) {
-       String string = ACache.get(this).getAsString("userinfo");
+        initPersonInfo();
+    }
+
+    private void initPersonInfo() {
+//        String string = ACache.get(this).getAsString("userinfo");
+        String  string= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+
 //        headIcon.setImageBitmap(ImageUtils.getBitmap(getApplicationContext(),protraitPath));
         if (FILE_SAVEPATH!=null){
             Glide.with(this).load(ACache.get(this).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
         }
         if (!StringUtils.isNullOrEmpty(string)){
             UserModel model = new Gson().fromJson(string,UserModel.class);
-            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
-                TLog.log(HttpUtils.appendUrl(model.getHeadImg().toString()));
-                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(headIcon);
+            if (model.getIsLogin().equals("true")){
+                if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                    TLog.log(HttpUtils.appendUrl(model.getHeadImg().toString()));
+                    Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(headIcon);
+                }else{
+                    headIcon.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+                }
+                unloginLayout.setVisibility(View.GONE);
+                login_layout.setVisibility(View.VISIBLE);
+                String phoneNum = model.getPhoneNo();
+                tv_username.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
             }else{
-                headIcon.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+                unloginLayout.setVisibility(View.VISIBLE);
+                login_layout.setVisibility(View.GONE);
             }
-            unloginLayout.setVisibility(View.GONE);
-            login_layout.setVisibility(View.VISIBLE);
-            String phoneNum = model.getPhoneNo();
-            tv_username.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
-        }else{
-            unloginLayout.setVisibility(View.VISIBLE);
-            login_layout.setVisibility(View.GONE);
         }
     }
 
@@ -147,13 +157,16 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
+        String  user= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         switch (v.getId()) {
             case R.id.btn_set:
                 UIHelper.ToSetPage(this);
+                this.finish();
                 break;
             case R.id.head_icon:
                 // TODO: 16/6/6  变更头像 上传头像
-                String user = ACache.get(getApplicationContext()).getAsString("userinfo");
+//                String user = ACache.get(getApplicationContext()).getAsString("userinfo");
+
                 if (StringUtils.isNullOrEmpty(user)){
                     UnLoginHandler.unLogin(PersonCenter.this);
 //                    Toast.makeText(this, getResources().getString(R.string.no_login_toast), Toast.LENGTH_SHORT).show();
@@ -179,11 +192,15 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.collect:
                 // TODO: 16/6/6 我的收藏
-                String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
-                if (StringUtils.isNullOrEmpty(userinfo)){
+                if (StringUtils.isNullOrEmpty(user)){
                     UnLoginHandler.unLogin(PersonCenter.this);
                 }else{
-                    UIHelper.ToCollectPage(this);
+                    UserModel model= new Gson().fromJson(user,UserModel.class);
+                    if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                        UIHelper.ToCollectPage(this);
+                    }else{
+                        Toast.makeText(getApplicationContext(),"您尚未登录",Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
             case R.id.btn_person_back:
@@ -395,4 +412,9 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
     }
 
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initPersonInfo();
+    }
 }

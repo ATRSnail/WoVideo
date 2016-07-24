@@ -143,7 +143,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
         });
         tvRegistProtocal.setOnClickListener((View v) -> {
             // TODO: 16/6/8  查看 协议
-
+            Toast.makeText(getApplicationContext(),"协议起草中,请稍后",Toast.LENGTH_SHORT).show();
         });
 
     }

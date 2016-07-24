@@ -7,7 +7,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -20,7 +23,6 @@ import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
-import com.lt.hm.wovideo.adapter.video.VideoAnthologyAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemListAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
@@ -47,6 +49,9 @@ import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
+import com.lt.hm.wovideo.widget.multiselector.MultiSelector;
+import com.lt.hm.wovideo.widget.multiselector.SingleSelector;
+import com.lt.hm.wovideo.widget.multiselector.SwappingHolder;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
@@ -94,12 +99,16 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     @BindView(R.id.free_label)
     TextView mFreeLabel;
 
+    //
+    private MultiSelector mMultiSelector = new SingleSelector();
+    private ArrayList<String> mEpisodes;
+    private String mCurrentEpisode = "1";
+
     VideoItemListAdapter list_adapter;
     VideoItemGridAdapter grid_adapter;
     CommentAdapter commentAdapter;
     List<PlayList.PlaysListBean> antholys;
     List<CommentModel.CommentListBean> beans;
-    VideoAnthologyAdapter anthologyAdapter;
     boolean expand_flag = false;
     boolean isCollected = false;
     String vfId;
@@ -127,27 +136,6 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
 
         }
-//        if (null == woPlayer) return;
-//        /***
-//         * 根据屏幕方向重新设置播放器的大小
-//         */
-//        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().getDecorView().invalidate();
-//            woPlayer.getLayoutParams().height = ScreenUtils.getScreenHeight(this);
-//            woPlayer.getLayoutParams().width = ScreenUtils.getScreenWidth(this);
-//            getWindow().getDecorView().invalidate();
-//        } else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-//            final WindowManager.LayoutParams attrs = getWindow().getAttributes();
-//            attrs.flags &= (WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().setAttributes(attrs);
-//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-//            float width = DensityUtil.getWidthInPx(this);
-//            float height = DensityUtil.dip2px(this, 200);
-//            woPlayer.getLayoutParams().height = (int) height;
-//            woPlayer.getLayoutParams().width = (int) width;
-//        }
     }
 
     @Override
@@ -275,82 +263,18 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     }
 
     private void initAnthologys(int length) {
-        List<String> anthologys = new ArrayList<>();
+        mEpisodes = new ArrayList<>();
         for (int i = 0; i < length; i++) {
-            anthologys.add(i + 1 + "");
+            mEpisodes.add(i + 1 + "");
         }
-        anthologyAdapter = new VideoAnthologyAdapter(getApplicationContext(),anthologys);
         LinearLayoutManager manager = new LinearLayoutManager(this.getApplicationContext());
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         anthologyList.addItemDecoration(new RecycleViewDivider(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
         anthologyList.setLayoutManager(manager);
-        anthologyList.setAdapter(anthologyAdapter);
-        anthologyAdapter.notifyDataSetChanged();
-        anthologyAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
-            @Override
-            public void onItemClick(View view, int i) {
-                vfId = antholys.get(i).getVfId();
-                per_Id = antholys.get(i).getId();
-               PlayList.PlaysListBean details =  antholys.get(i);
-                VideoModel model = new VideoModel();
-                ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
-                if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("流畅");
-                    url.setFormatUrl(details.getFluentUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(details.getStandardUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("标清");
-                    url.setFormatUrl(details.getStandardUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(details.getBlueUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("蓝光");
-                    url.setFormatUrl(details.getBlueUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(details.getHighUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("高清");
-                    url.setFormatUrl(details.getHighUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(details.getSuperUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("超清");
-                    url.setFormatUrl(details.getSuperUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(details.getFkUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("4K");
-                    url.setFormatUrl(details.getFkUrl());
-                    urls.add(url);
-                }
-                model.setmVideoUrl(urls);
-
-                setVideoModel(model);
-
-//                getRealURL(antholys.get(i).getFluentUrl(), false, antholys.get(i).getId());
-
-                setQualityListener(new AVController.OnQualitySelected() {
-                    @Override
-                    public void onQualitySelect(String key, String value) {
-                        getRealURL(value, true, "");
-                    }
-                });
-                if (model.getmVideoUrl().size() > 0) {
-                    getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, details.getId());
-                    mQualityName = model.getmVideoUrl().get(0).getFormatName();
-                }
-
-
-//                getRealURL(bean.getStandardUrl());
-            }
-        });
+        mMultiSelector.setSelectable(true);
+//        anthologyList.setAdapter(anthologyAdapter);
+        anthologyList.setAdapter(new EpisodeAdapter());
+        mMultiSelector.setSelected(0,0,true);
     }
 
     private void getAnthologyDatas(String vfId) {
@@ -671,6 +595,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                 anthologyList.setLayoutManager(manager);
                 expand_flag = true;
             }
+            anthologyList.scrollToPosition(currentEpisode - 1 > 0 ? currentEpisode - 1 : currentEpisode);
         });
     }
     /**
@@ -862,5 +787,120 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         history.save(videoHistory);
         super.onDestroy();
 
+    }
+
+    int currentEpisode = 0;
+    private void selectEpisode(String episode) {
+        int i = Integer.valueOf(episode) - 1;
+        currentEpisode = i;
+        vfId = antholys.get(i).getVfId();
+        per_Id = antholys.get(i).getId();
+        PlayList.PlaysListBean details =  antholys.get(i);
+        VideoModel model = new VideoModel();
+        ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
+        if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("流畅");
+            url.setFormatUrl(details.getFluentUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getStandardUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("标清");
+            url.setFormatUrl(details.getStandardUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getBlueUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("蓝光");
+            url.setFormatUrl(details.getBlueUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getHighUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("高清");
+            url.setFormatUrl(details.getHighUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getSuperUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("超清");
+            url.setFormatUrl(details.getSuperUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getFkUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("4K");
+            url.setFormatUrl(details.getFkUrl());
+            urls.add(url);
+        }
+        model.setmVideoUrl(urls);
+
+        setVideoModel(model);
+
+//                getRealURL(antholys.get(i).getFluentUrl(), false, antholys.get(i).getId());
+
+        setQualityListener(new AVController.OnQualitySelected() {
+            @Override
+            public void onQualitySelect(String key, String value) {
+                getRealURL(value, true, "");
+            }
+        });
+        if (model.getmVideoUrl().size() > 0) {
+            getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, details.getId());
+            mQualityName = model.getmVideoUrl().get(0).getFormatName();
+        }
+    }
+
+    private class EpisodeHolder extends SwappingHolder implements View.OnClickListener{
+        private final TextView mTitleTextView;
+        private String mEposide;
+
+        public EpisodeHolder(View itemView) {
+            super(itemView, mMultiSelector);
+
+            mTitleTextView = (TextView) itemView.findViewById(R.id.episode_text);
+            itemView.setOnClickListener(this);
+            itemView.setLongClickable(true);
+            itemView.setBackground(getResources().getDrawable(R.color.red));
+        }
+
+        public void bindCrime(String episode) {
+            mEposide = episode;
+            mTitleTextView.setText(episode);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (!mCurrentEpisode.equals(mEposide)) {
+                mCurrentEpisode = mEposide;
+                selectEpisode(mEposide);
+                mMultiSelector.setSelected(this, true);
+            }
+        }
+    }
+
+
+    private class EpisodeAdapter extends RecyclerView.Adapter<EpisodeHolder> {
+        @Override
+        public EpisodeHolder onCreateViewHolder(ViewGroup parent, int pos) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.layout_video_episode_item, parent, false);
+            EpisodeHolder episodeHolder = new EpisodeHolder(view);
+            episodeHolder.setSelectionModeBackgroundDrawable(getResources().getDrawable(R.drawable.episode_selector));
+            return episodeHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(EpisodeHolder holder, int pos) {
+            String episode = mEpisodes.get(pos);
+            holder.bindCrime(episode);
+            Log.d("bind", "binding crime" + episode + "at position" + pos);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mEpisodes.size();
+        }
     }
 }

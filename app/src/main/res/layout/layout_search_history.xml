@@ -22,4 +22,16 @@
         android:textColor="@color/gray_darker"
         android:text="@string/abort_service"
         />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:src="@drawable/close"
+        android:layout_alignParentRight="true"
+        android:gravity="center_vertical"
+        android:padding="@dimen/s_5"
+        android:layout_centerVertical="true"
+        android:id="@+id/search_history_del"
+        />
+
 </RelativeLayout>

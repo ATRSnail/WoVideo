@@ -11,21 +11,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.search.SearchHistoryAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.db.SearchHistoryDataBase;
 import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -50,6 +46,7 @@ public class SearchPage extends BaseActivity {
     @BindView(R.id.search_view_layout)
     LinearLayout searchViewLayout;
     SearchHistoryAdapter searchAdapter;
+    SearchHistoryDataBase searchHistory;
     boolean flag =false;
     @Override
     protected int getLayoutId() {
@@ -58,6 +55,7 @@ public class SearchPage extends BaseActivity {
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        searchHistory= new SearchHistoryDataBase(getApplicationContext());
         searchHead.requestFocus();
         searchEdit.setFocusable(true);
         searchEdit.setOnKeyListener((View v, int keyCode, KeyEvent event) -> {
@@ -75,45 +73,17 @@ public class SearchPage extends BaseActivity {
             }
             if (!flag){
                 String s = searchEdit.getText().toString();
-                try {
-                    search(s);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                search(s);
                 flag=true;
             }
         }
         return true;
     }
 
-    private void search(String s) throws JSONException {
-        JSONArray array = new JSONArray();
-        JSONArray array1 = ACache.get(this).getAsJSONArray("search_history");
-        if (StringUtils.isNullOrEmpty(s)){
-            Toast.makeText(getApplicationContext(),"搜索内容不能为空",Toast.LENGTH_SHORT).show();
-            return;
-        }
-        if (!StringUtils.isNullOrEmpty(array1) && array1.length()>0) {
-            array = array1;
-        }else{
-            array.put(s);
-            ACache.get(this).put("search_history", array);
-        }
-        if (array1!=null ){
-            for (int i = 0; i < array1.length(); i++) {
-                String tmp= (String) array1.get(i);
-                if (tmp.equals(s)){
-                    break;
-                }else{
-                    array.put(s);
-                    ACache.get(this).put("search_history", array);
-                    break;
-                }
-            }
-        }
-
+    private void search(String s){
+        searchHistory.save(s);
         Bundle bundle= new Bundle();
-        bundle.putString("flag",searchEdit.getText().toString());
+        bundle.putString("flag",s);
         UIHelper.ToSearchResultPage(SearchPage.this,bundle);
 
 
@@ -134,17 +104,8 @@ public class SearchPage extends BaseActivity {
 
     @Override
     public void initDatas() {
-        List<String> historys= new ArrayList<>();
-        JSONArray array = ACache.get(this).getAsJSONArray("search_history");
-        if (!StringUtils.isNullOrEmpty(array) && array.length()>0) {
-            for (int i = 0; i < array.length(); i++) {
-                try {
-                    String tag= (String) array.get(i);
-                    historys.add(tag);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
+        List<String> historys=searchHistory.query("");
+        if (!StringUtils.isNullOrEmpty(historys) && historys.size()>0) {
             searchAdapter = new SearchHistoryAdapter(this,historys);
             searchHistoryList.setLayoutManager(new LinearLayoutManager(this));
             searchHistoryList.setAdapter(searchAdapter);
@@ -152,13 +113,18 @@ public class SearchPage extends BaseActivity {
             searchAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
                 @Override
                 public void onItemClick(View view, int i) {
-                    try {
                         search(historys.get(i));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
                 }
             });
+            searchAdapter.setListener(new SearchHistoryAdapter.OnDelete() {
+                @Override
+                public void del(String s) {
+                    TLog.log("delete"+s);
+                    searchHistory.delete(s);
+                    initDatas();
+                }
+            });
+
         }else{
             searchHistoryList.setVisibility(View.GONE);
         }
@@ -187,4 +153,9 @@ public class SearchPage extends BaseActivity {
         return false;
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initDatas();
+    }
 }

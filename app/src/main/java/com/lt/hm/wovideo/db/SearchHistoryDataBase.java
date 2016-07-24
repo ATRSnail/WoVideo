@@ -27,26 +27,26 @@ public class SearchHistoryDataBase {
      * @param data
      */
     public void insert(String data) {
-        String sql = "insert into " + DataBaseHelper.SEARCH_TABLE_NAME;
-
-        sql += "(name) values(?)";
+        String sql = "insert into " + DataBaseHelper.SEARCH_TABLE_NAME +"(name) values('"+data+"')";
 
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
-        sqlite.execSQL(sql, new String[]{data + ""});
+        sqlite.execSQL(sql);
         sqlite.close();
     }
 
     /**
      * 删
      *
-     * @param id
+     * @param name
      */
-    public void delete(int id) {
+    public void delete(String name) {
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
-        String sql = ("delete from " + DataBaseHelper.SEARCH_TABLE_NAME + " where name=?");
-        sqlite.execSQL(sql, new Integer[]{id});
+        String sql = ("delete from " + DataBaseHelper.SEARCH_TABLE_NAME + " where name='"+name+"'");
+        sqlite.execSQL(sql);
         sqlite.close();
     }
+
+
 
     /**
      * 删除多个
@@ -71,9 +71,8 @@ public class SearchHistoryDataBase {
     public void update(String data) {
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
 //    (vid, create_time, img_url, current_position, name)
-        String sql = ("update " + DataBaseHelper.SEARCH_TABLE_NAME + " set name=? where name=?");
-        sqlite.execSQL(sql,
-                new String[]{data + ""});
+        String sql = ("update " + DataBaseHelper.SEARCH_TABLE_NAME + " set name='"+data+"' where name='"+data+"'");
+        sqlite.execSQL(sql);
         sqlite.close();
     }
 
@@ -92,7 +91,6 @@ public class SearchHistoryDataBase {
         for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
             String result = new String();
             result= cursor.getString(1);
-
             data.add(result);
         }
         if (!cursor.isClosed()) {
@@ -108,7 +106,7 @@ public class SearchHistoryDataBase {
      * @param data
      */
     public void save(String data) {
-        List<String> datas = query(" where name=" + data);
+        List<String> datas = query(" where name='" + data+"'");
         if (datas != null && !datas.isEmpty()) {
             update(data);
         } else {

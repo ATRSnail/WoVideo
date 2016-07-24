@@ -3,8 +3,10 @@ package com.lt.hm.wovideo.ui;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Toast;
 
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.search.SearchResultAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
@@ -14,12 +16,14 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.SearchResult;
+import com.lt.hm.wovideo.model.VideoDetails;
+import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -78,21 +82,64 @@ public class SearchResultPage extends BaseActivity implements SecondTopbar.myTop
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log(response);
+                TLog.log("search_result"+response);
                 ResponseObj<SearchResult, RespHeader> resp = new ResponseObj<SearchResult, RespHeader>();
                 ResponseParser.parse(resp, response, SearchResult.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    List<SearchResult.VfListBean> lists = new ArrayList<SearchResult.VfListBean>();
+//                     lists = new ArrayList<SearchResult.VfListBean>();
                     if (!StringUtils.isNullOrEmpty(resp.getBody().getVfList())&& resp.getBody().getVfList().size()>0){
-                        lists.addAll(resp.getBody().getVfList());
+                        List<SearchResult.VfListBean> lists= resp.getBody().getVfList();
                         gridAdapter = new SearchResultAdapter(SearchResultPage.this, lists);
-                        searchResultList.setLayoutManager(new LinearLayoutManager(SearchResultPage.this));
-                        searchResultList.setAdapter(gridAdapter);
+                        if (searchResultList!=null){
+                            searchResultList.setLayoutManager(new LinearLayoutManager(SearchResultPage.this));
+                            searchResultList.setAdapter(gridAdapter);
+                            gridAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+                                @Override
+                                public void onItemClick(View view, int i) {
+                                    getChangePage(lists.get(i).getVfinfo_id());
+
+                                }
+                            });
+                        }
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "暂无数据", Toast.LENGTH_SHORT).show();
                 }
 
+            }
+        });
+    }
+
+
+    public void getChangePage(String vfId) {
+        HashMap<String, Object> maps = new HashMap<>();
+        maps.put("vfid", vfId);
+        maps.put("typeid", VideoType.MOVIE.getId());
+        HttpApis.getVideoInfo(maps, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log("getchange" + response);
+                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+
+                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+                        // TODO: 16/6/14 跳转电影页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        UIHelper.ToMoviePage(SearchResultPage.this, bundle);
+                    } else{
+                        // TODO: 16/6/14 跳转电视剧页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        UIHelper.ToDemandPage(SearchResultPage.this, bundle);
+                    }
+                }
             }
         });
     }

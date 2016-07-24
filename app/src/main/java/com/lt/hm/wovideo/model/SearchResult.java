@@ -55,6 +55,7 @@ public class SearchResult {
         private String lx;
         private String hIMG;
         private String id;
+        private String vfinfo_id;
         private Object cpId;
         private String stars;
         private String nd;
@@ -65,6 +66,22 @@ public class SearchResult {
         private String fname;
         private String introduction;
         private String sx;
+
+        public String gethIMG() {
+            return hIMG;
+        }
+
+        public void sethIMG(String hIMG) {
+            this.hIMG = hIMG;
+        }
+
+        public String getVfinfo_id() {
+            return vfinfo_id;
+        }
+
+        public void setVfinfo_id(String vfinfo_id) {
+            this.vfinfo_id = vfinfo_id;
+        }
 
         public long getUtime() {
             return utime;

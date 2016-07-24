@@ -22,6 +22,7 @@ import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.MD5Utils;
 import com.lt.hm.wovideo.utils.PhoneUtils;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.SecondTopbar;
@@ -66,8 +67,8 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
         loginTopbar.setRightIsVisible(false);
         loginTopbar.setLeftIsVisible(true);
         loginTopbar.setOnTopbarClickListenter(this);
-        etLoginAccount.setText("18513179404");
-        etLoginPwd.setText("123456");
+//        etLoginAccount.setText("18513179404");
+//        etLoginPwd.setText("123456");
         etLoginAccount.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -101,9 +102,11 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
     public void initViews() {
         btnLoginSubmit.setOnClickListener((View v) -> {
             if (TextUtils.isEmpty(etLoginAccount.getText())) {
-                TLog.log("用户名不能为空");
+//                TLog.log("用户名不能为空");
+                Toast.makeText(getApplicationContext(),"用户名不能为空",Toast.LENGTH_SHORT).show();
             } else if (TextUtils.isEmpty(etLoginPwd.getText())) {
-                TLog.log("密码不能为空");
+//                TLog.log("密码不能为空");
+                Toast.makeText(getApplicationContext(),"密码不能为空",Toast.LENGTH_SHORT).show();
             } else {
                 if (PhoneUtils.isPhoneNum(etLoginAccount.getText().toString())){
                     Operators_flag =true;
@@ -145,9 +148,10 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
                 ResponseParser.loginParse(resp, response, UserModel.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     UserModel model = resp.getBody();
+                    model.setIsLogin("true");
                     String json = new Gson().toJson(model);
                     cacheUserInfo(json);
-                    UIHelper.ToMain2(LoginPage.this);
+//                    UIHelper.ToMain2(LoginPage.this);
                     LoginPage.this.finish();
                 } else {
                     Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
@@ -159,6 +163,7 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
 
     private void cacheUserInfo(String json) {
         aCache.put("userinfo", json);
+        SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",json);
     }
 
     @Override

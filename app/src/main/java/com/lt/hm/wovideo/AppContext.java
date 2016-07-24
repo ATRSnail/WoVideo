@@ -3,6 +3,7 @@ package com.lt.hm.wovideo;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.lt.hm.wovideo.base.BaseApplication;
+import com.tencent.bugly.crashreport.CrashReport;
 import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -30,6 +31,7 @@ public class AppContext extends BaseApplication {
 //        ShareSDK.initSDK(this);
         Stetho.initializeWithDefaults(this);
         initNetWork();
+        CrashReport.initCrashReport(getApplicationContext(), "3a002a01fb", false);
 //        Glide.get(this).register(GlideUrl.class, InputStream.class,
 //                new OkHttpClient.Factory(OkHttpUtils.getInstance()));
     }

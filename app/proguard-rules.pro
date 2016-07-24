@@ -23,3 +23,7 @@
   **[] $VALUES;
   public *;
 }
+
+#Bugly Crash collect
+-dontwarn com.tencent.bugly.**
+-keep public class com.tencent.bugly.**{*;}

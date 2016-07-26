@@ -108,6 +108,7 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
         if (FILE_SAVEPATH != null) {
             Glide.with(this).load(ACache.get(getActivity()).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(vipPersonLogo);
         }
+
 //        String userinfo = ACache.get(getActivity()).getAsString("userinfo");
         String userinfo=  SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)){
@@ -120,6 +121,12 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
                 }else{
                     vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
                 }
+                if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                    Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).thumbnail(1f).into(vipPersonLogo);
+                }else{
+                    vipPersonLogo.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+                }
+
             }else{
                 vipPersonAccount.setText(getResources().getText(R.string.unlogin_hint));
                 vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));

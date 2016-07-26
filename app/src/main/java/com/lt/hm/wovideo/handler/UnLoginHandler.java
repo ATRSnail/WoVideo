@@ -104,16 +104,11 @@ public class UnLoginHandler {
                 model.setIsOpen("true");
                 SharedPrefsUtils.setStringPreference(context, "userinfo", new Gson().toJson(model, UserModel.class));
                 Toast.makeText(context, "开通成功", Toast.LENGTH_SHORT).show();
-//                OpenZeroService(model, context);
-
+//                placeOrder(model, context);
                 dialog.dismiss();
             }
         });
         dialog.show();
-    }
-
-    private static void OpenZeroService(UserModel model, Context context) {
-        placeOrder(model, context);
     }
 
     /**
@@ -137,7 +132,7 @@ public class UnLoginHandler {
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log(response);
+                TLog.log("placeOrder_place"+response);
                 ResponseObj<PlaceOrder, RespHeader> resp = new ResponseObj<PlaceOrder, RespHeader>();
                 ResponseParser.parse(resp, response, PlaceOrder.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
@@ -159,7 +154,7 @@ public class UnLoginHandler {
         HashMap<String, Object> map = new HashMap<>();
 
         map.put("cellphone", model.getPhoneNo());
-        map.put("spid", orderId);
+        map.put("spid", "953");
         HttpApis.purchOrder(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -168,7 +163,7 @@ public class UnLoginHandler {
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log(response);
+                TLog.log("placeOrder_pur"+response);
                 ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
                 ResponseParser.parse(resp, response, String.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
@@ -199,7 +194,7 @@ public class UnLoginHandler {
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log(response);
+                TLog.log("placeOrder_finish"+response);
                 ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
                 ResponseParser.parse(resp, response, String.class, RespHeader.class);
                 Toast.makeText(mContext, resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();

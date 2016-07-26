@@ -63,6 +63,9 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
         billsTopbar.setLeftIsVisible(true);
         billsTopbar.setOnTopbarClickListenter(this);
         mList = new ArrayList<>();
+        orderList.addItemDecoration(new RecycleViewDivider(this,LinearLayoutManager.VERTICAL));
+        orderList.setLayoutManager(new LinearLayoutManager(this));
+
 //        for (int i = 0; i < 5; i++) {
 //            Order order = new Order();
 //            order.setName("Name" + i);
@@ -79,8 +82,6 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
 
    private void initList(List<BillList.OrderListBean> mList){
         billAdapter = new BillAdapter(this, mList);
-        orderList.setLayoutManager(new LinearLayoutManager(this));
-        orderList.addItemDecoration(new RecycleViewDivider(this,LinearLayoutManager.VERTICAL));
         orderList.setAdapter(billAdapter);
         billAdapter.notifyDataSetChanged();
         billAdapter.setListener(this);

@@ -43,6 +43,7 @@ import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
 import com.lt.hm.wovideo.utils.ShareUtils;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -390,7 +391,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     share_desc = details.getIntroduction();
                     share_title= details.getName();
                     img_url = details.getImg();
-                    String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+                    String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
                     if (!StringUtils.isNullOrEmpty(userinfo)){
                         UserModel model = new Gson().fromJson(userinfo,UserModel.class);
                         String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");

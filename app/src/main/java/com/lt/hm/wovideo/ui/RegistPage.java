@@ -109,7 +109,8 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
         validateBtn.setOnClickListener((View v) -> {
             // TODO: 16/6/8  获取验证码
             if (TextUtils.isEmpty(etResigtAccount.getText())) {
-                TLog.log("用户名不能为空");
+//                TLog.log("用户名不能为空");
+                Toast.makeText(getApplicationContext(),"用户名不能为空",Toast.LENGTH_SHORT).show();
                 return;
             } else {
                     sendValidateCode();
@@ -118,18 +119,24 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
         btnRegistSubmit.setOnClickListener((View v) -> {
             if (TextUtils.isEmpty(etResigtAccount.getText())) {
                 TLog.log("用户名不能为空");
+                Toast.makeText(getApplicationContext(),"用户名不能为空",Toast.LENGTH_SHORT).show();
                 return;
             } else if (Operators_flag&&TextUtils.isEmpty(etRegistValidate.getText())) {
                 TLog.log("验证码不能为空");
+                Toast.makeText(getApplicationContext(),"验证码不能为空",Toast.LENGTH_SHORT).show();
                 return;
             } else if (TextUtils.isEmpty(etRegistPwd.getText())) {
-                TLog.log("密码不能为空");
+//                TLog.log("密码不能为空");
+                Toast.makeText(getApplicationContext(),"密码不能为空",Toast.LENGTH_SHORT).show();
+
                 return;
             } else if (TextUtils.isEmpty(etRegistPwdT.getText())) {
                 TLog.log("请重新输入密码");
+                Toast.makeText(getApplicationContext(),"请重新输入密码",Toast.LENGTH_SHORT).show();
                 return;
             } else if (!etRegistPwd.getText().toString().equals(etRegistPwdT.getText().toString())) {
                 TLog.log("两次密码 不一致");
+                Toast.makeText(getApplicationContext(),"两次密码 不一致",Toast.LENGTH_SHORT).show();
                 return;
             } else {
                 if (Operators_flag){

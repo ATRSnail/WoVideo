@@ -110,24 +110,28 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
     private void initPersonInfo() {
 //        String string = ACache.get(this).getAsString("userinfo");
         String  string= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-
 //        headIcon.setImageBitmap(ImageUtils.getBitmap(getApplicationContext(),protraitPath));
         if (FILE_SAVEPATH!=null){
             Glide.with(this).load(ACache.get(this).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
         }
         if (!StringUtils.isNullOrEmpty(string)){
             UserModel model = new Gson().fromJson(string,UserModel.class);
-            if (model.getIsLogin().equals("true")){
+            if (model.getIsLogin()!=null &&model.getIsLogin().equals("true")){
                 if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
                     TLog.log(HttpUtils.appendUrl(model.getHeadImg().toString()));
                     Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(headIcon);
                 }else{
                     headIcon.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
                 }
+                if (model.getNickName()!=null ){
+                    tv_username.setText(model.getNickName());
+                }else{
+                    String phoneNum = model.getPhoneNo();
+                    tv_username.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
+                }
                 unloginLayout.setVisibility(View.GONE);
                 login_layout.setVisibility(View.VISIBLE);
-                String phoneNum = model.getPhoneNo();
-                tv_username.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
+
             }else{
                 unloginLayout.setVisibility(View.VISIBLE);
                 login_layout.setVisibility(View.GONE);

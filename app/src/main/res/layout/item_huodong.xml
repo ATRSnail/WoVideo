@@ -61,7 +61,7 @@
                android:id="@+id/item_tv_name"
                android:layout_alignParentLeft="true"
                android:layout_gravity="left|center_horizontal"
-               android:text="观看有礼物"
+               android:text="视频风暴-优酷定性流量大礼包"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content" />
            <TextView
@@ -69,7 +69,7 @@
                android:id="@+id/item_tv_time"
                android:layout_alignParentRight="true"
                android:layout_gravity="right|center_horizontal"
-               android:text="2016-06-11 - 2016-07-01"
+               android:text="6月1日 - 8月1日"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content" />
        </RelativeLayout>

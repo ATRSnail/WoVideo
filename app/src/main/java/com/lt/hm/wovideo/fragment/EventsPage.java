@@ -1,5 +1,6 @@
 package com.lt.hm.wovideo.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -7,11 +8,14 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseFragment;
+import com.lt.hm.wovideo.ui.ThirdActivity;
+import com.lt.hm.wovideo.utils.NoDoubleItemClickListener;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +57,16 @@ public class EventsPage extends BaseFragment implements SwipeRefreshLayout.OnRef
     public void initData() {
         super.initData();
         lvHuodong.setAdapter(new myAdapter());
+        lvHuodong.setOnItemClickListener(new NoDoubleItemClickListener() {
+            @Override
+            public void onNoDoubleItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(getActivity(), ThirdActivity.class);
+                Bundle bundle= new Bundle();
+                bundle.putString("url","ku.17wo.cn");
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

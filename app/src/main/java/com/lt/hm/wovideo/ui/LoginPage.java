@@ -23,6 +23,7 @@ import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.MD5Utils;
 import com.lt.hm.wovideo.utils.PhoneUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
+import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.SecondTopbar;
@@ -148,9 +149,23 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
                 ResponseParser.loginParse(resp, response, UserModel.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     UserModel model = resp.getBody();
-                    model.setIsLogin("true");
-                    String json = new Gson().toJson(model);
-                    cacheUserInfo(json);
+                    String old_user = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+                    if (StringUtils.isNullOrEmpty(old_user)){
+                        model.setIsLogin("true");
+                        String json = new Gson().toJson(model);
+                        cacheUserInfo(json);
+                    }else {
+                        UserModel old_modle = new Gson().fromJson(old_user,UserModel.class);
+                        if (old_modle.getId().equals(model.getId())){
+                            old_modle.setIsLogin("true");
+                            String json = new Gson().toJson(old_modle);
+                            cacheUserInfo(json);
+                        }else{
+                            model.setIsLogin("true");
+                            String json = new Gson().toJson(model);
+                            cacheUserInfo(json);
+                        }
+                    }
 //                    UIHelper.ToMain2(LoginPage.this);
                     LoginPage.this.finish();
                 } else {

@@ -20,7 +20,7 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
-import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
+import com.lt.hm.wovideo.adapter.home.Bottom_ListAdapter;
 import com.lt.hm.wovideo.base.BaseFragment;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
@@ -29,15 +29,16 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BannerList;
-import com.lt.hm.wovideo.model.LikeList;
+import com.lt.hm.wovideo.model.RecomList;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.CircleImageView;
-import com.lt.hm.wovideo.widget.RecycleViewDivider;
+import com.lt.hm.wovideo.widget.SpaceItemDecoration;
 import com.lt.hm.wovideo.widget.indicatorView.AutoPlayManager;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -97,6 +98,7 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
     @Override
     public void initView(View view) {
         super.initView(view);
+
         swipe_refresh.setColorSchemeResources(android.R.color.holo_blue_bright, android.R.color.holo_green_light
                 , android.R.color.holo_red_light, android.R.color.holo_orange_light);
         swipe_refresh.setOnRefreshListener(this);
@@ -140,7 +142,7 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("pageNum", 1);
         maps.put("numPerPage", 10);
-        HttpApis.getYouLikeList(maps, new StringCallback() {
+        HttpApis.getHotRecomm(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log("error:" + e.getMessage());
@@ -149,24 +151,24 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
             @Override
             public void onResponse(String response, int id) {
                 TLog.log(response);
-                ResponseObj<LikeList, RespHeader> resp = new ResponseObj<LikeList, RespHeader>();
-                ResponseParser.parse(resp, response, LikeList.class, RespHeader.class);
+                ResponseObj<RecomList, RespHeader> resp = new ResponseObj<RecomList, RespHeader>();
+                ResponseParser.parse(resp, response, RecomList.class, RespHeader.class);
                 TLog.log(resp.toString());
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    List<LikeList.LikeListBean> grid_list = new ArrayList<LikeList.LikeListBean>();
-                    grid_list.addAll(resp.getBody().getLikeList());
-                    LikeList.LikeListBean typeListBean = new LikeList.LikeListBean();
+                    List<RecomList.Videos> grid_list = new ArrayList<RecomList.Videos>();
+                    grid_list.addAll(resp.getBody().getRecList());
+                    RecomList.Videos typeListBean = new RecomList.Videos();
                     if (grid_list.size()>0){
                         recommend_container.removeAllViews();
                     }
                     typeListBean = grid_list.get(0);
-                    List<LikeList.LikeListBean> beanList = new ArrayList<LikeList.LikeListBean>();
+                    List<RecomList.Videos> beanList = new ArrayList<RecomList.Videos>();
                     for (int i = 0; i < 3; i++) {
-                        beanList.add(grid_list.get(0));
+                        beanList.add(grid_list.get(i+1));
                     }
                     recommend_container.addView(addHViews(typeListBean));
                     recommend_container.addView(addGridViews(beanList));
-                    recommend_container.addView(addHViews(typeListBean));
+                    recommend_container.addView(addHViews(grid_list.get(grid_list.size()-1)));
                     recommend_container.invalidate();
                 }
             }
@@ -199,7 +201,9 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
                     imgIndicatorVip.setOnItemClickListener(new ImageIndicatorView.OnItemClickListener() {
                         @Override
                         public void OnItemClick(View view, int position) {
-//                            changePage(mList.get(position).g,typeListBean.getId());
+//                            changePage(mList.get(position),typeListBean.getId());
+//                            changePage(mList.get(position).getId(),);
+                            getVideoDetails(mList.get(position).getOutid());
                             // TODO: 16/6/29 跳转页面
                         }
                     });
@@ -219,19 +223,19 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
         autoPlayManager.loop();
     }
 
-    private View addHViews(LikeList.LikeListBean typeListBean) {
+    private View addHViews(RecomList.Videos typeListBean) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
         View view = inflater.inflate(R.layout.layout_home_item, null);
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.s_200));
         view.setLayoutParams(params);
         ImageView bg = (ImageView) view.findViewById(R.id.home_item_img_bg);
-        Glide.with(getActivity()).load(HttpUtils.appendUrl(typeListBean.gethIMG())).placeholder(R.drawable.default_horizental).crossFade().into(bg);
+        Glide.with(getActivity()).load(HttpUtils.appendUrl(typeListBean.getHimg())).placeholder(R.drawable.default_horizental).crossFade().into(bg);
         ((TextView) view.findViewById(R.id.home_item_title)).setText(typeListBean.getName());
-        ((TextView) view.findViewById(R.id.home_item_desc)).setText(typeListBean.getIntroduction());
+        ((TextView) view.findViewById(R.id.home_item_desc)).setText(typeListBean.getDes());
         ((ImageView) view.findViewById(R.id.item_vip_logo)).setVisibility(View.VISIBLE);
         view.setOnClickListener((View v) -> {
             // 跳转视频详情页面
-            changePage(typeListBean.getTypeId(), typeListBean.getId());
+            changePage(Integer.parseInt(typeListBean.getTypeId()), typeListBean.getVfId());
         });
 
         return view;
@@ -262,21 +266,22 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
         }
     }
 
-    private View addGridViews(List<LikeList.LikeListBean> b_list) {
+    private View addGridViews(List<RecomList.Videos> b_list) {
         LinearLayout layout = new LinearLayout(getActivity());
         LinearLayout.LayoutParams l_params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        l_params.setMargins(0, 20, 0, 20);
+        l_params.setMargins(0, 10, 0, 10);
         layout.setLayoutParams(l_params);
         RecyclerView recyclerView = new RecyclerView(getActivity());
-        RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.s_180));
+        RecyclerView.LayoutParams params = new RecyclerView.LayoutParams(RecyclerView.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.s_200));
+        int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.divider_width);
 
         recyclerView.setLayoutParams(params);
         GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
-        VideoItemGridAdapter grid_adapter = new VideoItemGridAdapter(getActivity(), b_list);
+        Bottom_ListAdapter grid_adapter = new Bottom_ListAdapter(getActivity(),R.layout.layout_home_item, b_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(manager);
-        recyclerView.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.HORIZONTAL));
+        recyclerView.addItemDecoration(new SpaceItemDecoration(spacingInPixels));
         recyclerView.setAdapter(grid_adapter);
         grid_adapter.notifyDataSetChanged();
         grid_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
@@ -284,7 +289,7 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
             public void onItemClick(View view, int i) {
 //                getChangePage(grid_list.get(i).getId());
                 // TODO: 16/6/28 判断跳转页面
-                changePage(b_list.get(i).getTypeId(), b_list.get(i).getId());
+                changePage(Integer.parseInt(b_list.get(i).getTypeId()), b_list.get(i).getVfId());
             }
         });
         layout.addView(recyclerView);
@@ -300,6 +305,42 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
                 swipe_refresh.setRefreshing(false);
             }
         }, 2000);
+    }
+
+    public void getVideoDetails(String vfId) {
+        HashMap<String, Object> maps = new HashMap<>();
+        maps.put("vfid", vfId);
+        // TODO: 16/6/26 获取app typeId 并填充
+        String typeID = null;
+        maps.put("typeid", typeID);
+        HttpApis.getVideoInfo(maps, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log(response);
+                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+
+                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+                        // TODO: 16/6/14 跳转电影页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        UIHelper.ToMoviePage(getActivity(), bundle);
+                    } else {
+                        // TODO: 16/6/14 跳转电视剧页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        UIHelper.ToDemandPage(getActivity(), bundle);
+
+                    }
+                }
+            }
+        });
     }
 
 

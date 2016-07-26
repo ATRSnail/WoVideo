@@ -2,6 +2,7 @@ package com.lt.hm.wovideo.handler;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Handler;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -34,7 +35,13 @@ public class UnLoginHandler {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 // TODO: 16/7/9 跳转 登录页面 ,根据是否返回 当前页面 进行控制需要传递一些额外参数
-                UIHelper.ToLogin(context);
+                dialog.dismiss();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        UIHelper.ToLogin(context);
+                    }
+                },200);
             }
         });
         dialog.show();
@@ -57,6 +64,7 @@ public class UnLoginHandler {
             public void onClick(DialogInterface dialog, int which) {
                 // TODO: 16/7/9 跳转 登录页面 ,根据是否返回 当前页面 进行控制需要传递一些额外参数
                 UIHelper.ToRegister(context);
+                dialog.dismiss();
             }
         });
         dialog.show();

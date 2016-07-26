@@ -106,7 +106,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     private boolean search_first = true;
     private boolean shown = false;
     SelectMenuPop pop;
-
+    GridLayoutManager manager;
     @Override
     protected int getLayoutId() {
         return R.layout.layout_new_class_details;
@@ -120,6 +120,11 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        manager = new GridLayoutManager(NewClassDetailPage.this, 3);
+        manager.setOrientation(GridLayoutManager.VERTICAL);
+        int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.divider_width);
+        classDetailsList.addItemDecoration(new SpaceItemDecoration(spacingInPixels));
+
         classRefreshLayout.setOnRefreshListener(this);
         classRefreshLayout.setColorSchemeResources(
                 android.R.color.holo_blue_bright, android.R.color.holo_green_light,
@@ -198,8 +203,11 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     public void initViews() {
         pop = new SelectMenuPop(this, mId);
         b_list = new ArrayList<>();
-        classDetailsBack.setOnClickListener((View v) -> {
-            this.finish();
+        classDetailsBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                NewClassDetailPage.this.finish();
+            }
         });
         classDetailsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -287,12 +295,9 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
 
                         bottom_adapter = new VipItemAdapter(getApplicationContext(), b_list);
                         if ((mId) == VideoType.MOVIE.getId()) {
-                            GridLayoutManager manager = new GridLayoutManager(NewClassDetailPage.this, 3);
-                            manager.setOrientation(GridLayoutManager.VERTICAL);
+
                             classDetailsList.setLayoutManager(manager);
 //                        vipItemList.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.VERTICAL));
-                            int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.divider_width);
-                            classDetailsList.addItemDecoration(new SpaceItemDecoration(spacingInPixels));
 //                            classDetailsList.addItemDecoration(new RecycleViewDivider(NewClassDetailPage.this, GridLayoutManager.VERTICAL));
                             for (int i = 0; i < b_list.size(); i++) {
                                 b_list.get(i).setTag("0");

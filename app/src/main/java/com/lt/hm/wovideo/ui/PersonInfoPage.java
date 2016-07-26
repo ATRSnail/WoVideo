@@ -46,9 +46,9 @@ import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.ImageUtils;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
-import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.CircleImageView;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -147,6 +147,8 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
         nickName.setText(model.getNickName());
         nickName.setCursorVisible(false);
         tvEmail.setCursorVisible(false);
+        nickName.setFocusable(false);
+        tvEmail.setFocusable(false);
         if (!model.getSex().equals("")) {
             int sex_num = Integer.parseInt(model.getSex());
             if (sex_num == 0) {
@@ -191,9 +193,16 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
         if (!isEdit) {
             personInfoTopbar.setRightImageResource(R.drawable.wancheng
             );
+
+
             isEdit = true;
+            nickName.setFocusable(true);
+            nickName.setFocusableInTouchMode(true);
+            tvEmail.setFocusable(true);
+            tvEmail.setFocusableInTouchMode(true);
             spinner.setClickable(true);
             nickName.setCursorVisible(true);
+
             int nickNameLength=nickName.getText().length();
             if (nickNameLength==0){
                 nickName.setText(" ");
@@ -239,9 +248,11 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
                 isEdit = false;
                 personInfoTopbar.setRightImageResource(R.drawable.bianji);
                 nickName.setCursorVisible(false);
-                nickName.setBackgroundResource(Color.TRANSPARENT);
+//                nickName.setBackgroundResource(Color.TRANSPARENT);
+                nickName.setBackgroundColor(getResources().getColor(android.R.color.transparent));
                 tvEmail.setCursorVisible(false);
-                tvEmail.setBackgroundResource(Color.TRANSPARENT);
+//                tvEmail.setBackgroundResource(Color.TRANSPARENT);
+                tvEmail.setBackgroundColor(getResources().getColor(android.R.color.transparent));
                 spinner.setClickable(false);
 //                int sex_num = Integer.parseInt(model.getSex());
 //                if (sex_num == 0) {
@@ -332,8 +343,10 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
                 ResponseParser.loginParse(resp,response,UserModel.class,RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
                     UserModel model = resp.getBody();
+                    model.setIsLogin("true");
                     String json = new Gson().toJson(model);
                     cacheUserInfo(json);
+                    initViews();
                 }else{
                     Toast.makeText(getApplicationContext(),resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
                 }
@@ -343,6 +356,7 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
     }
     private void cacheUserInfo(String json) {
         aCache.put("userinfo",json);
+        SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",json);
     }
     private void initSpinner(){
         Resources res = getResources();

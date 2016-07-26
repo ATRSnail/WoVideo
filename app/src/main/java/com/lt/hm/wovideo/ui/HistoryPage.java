@@ -19,6 +19,7 @@ import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoHistory;
 import com.lt.hm.wovideo.model.VideoType;
+import com.lt.hm.wovideo.utils.NoDoubleItemClickListener;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -100,29 +101,30 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
             dataChanged();
         });
 
-        history_list.setOnItemClickListener((AdapterView<?> parent, View view, int position, long id) -> {
-
-            if (top_flag){
-                // 取得ViewHolder对象，这样就省去了通过层层的findViewById去实例化我们需要的cb实例的步骤
-                VideoHistoryAdapter.ViewHolder holder = (VideoHistoryAdapter.ViewHolder) view.getTag();
-                // 改变CheckBox的状态
-                holder.itemCheckBox.toggle();
-                // 将CheckBox的选中状况记录下来
-                // 调整选定条目
-                if (holder.itemCheckBox.isChecked() == true) {
-                    list.get(position).setFlag("true");
-                    checkNum++;
-                } else {
-                    list.get(position).setFlag("false");
-                    checkNum--;
-                }
-            }else{
+        history_list.setOnItemClickListener(new NoDoubleItemClickListener() {
+            @Override
+            public void onNoDoubleItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (top_flag){
+                    // 取得ViewHolder对象，这样就省去了通过层层的findViewById去实例化我们需要的cb实例的步骤
+                    VideoHistoryAdapter.ViewHolder holder = (VideoHistoryAdapter.ViewHolder) view.getTag();
+                    // 改变CheckBox的状态
+                    holder.itemCheckBox.toggle();
+                    // 将CheckBox的选中状况记录下来
+                    // 调整选定条目
+                    if (holder.itemCheckBox.isChecked() == true) {
+                        list.get(position).setFlag("true");
+                        checkNum++;
+                    } else {
+                        list.get(position).setFlag("false");
+                        checkNum--;
+                    }
+                }else{
 
 //                VideoHistory bean = list.get(position);
 //                int typeId = Integer.parseInt(bean.getmId());
-                getVideoDetails(list.get(position));
+                    getVideoDetails(list.get(position));
+                }
             }
-
         });
     }
 
@@ -236,7 +238,6 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                         bundle.putString("id", vfId);
                         bundle.putLong("cur_position",bean.getCurrent_positon());
                         UIHelper.ToDemandPage(HistoryPage.this, bundle);
-                        HistoryPage.this.finish();
 
                     }
                 }

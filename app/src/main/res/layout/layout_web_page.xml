@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/web_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/event_string"
+        app:leftBackGround="@drawable/left_arrow"/>
+    <!--app:rightBackGround="@mipmap/loading_xml"-->
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:max="100"
+        android:layout_width="match_parent"
+        android:layout_height="5px" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_1"
+        android:background="@color/divider_color"/>
+
+    <WebView
+        android:id="@+id/web_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</LinearLayout>

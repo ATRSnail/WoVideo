@@ -143,7 +143,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     TextView mFreeLabel;
     int newIndex = 0;
     int oldIndex = -1;
-
+    private boolean first_open= false;
 
     @BindView(R.id.live_btn_sina)
     Button liveBtnSina;
@@ -994,8 +994,15 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         adapter = new LiveTVListAdapter(getApplicationContext(), liveTvList);
         liveProgramList.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+        if (!first_open){
+
         getRealURL(liveTvList.get(0).getUrl());
-        videoName.setText(liveTvList.get(0).getTvName());
+            videoName.setText(liveTvList.get(0).getTvName());
+
+            first_open=true;
+        }
+
+//        videoName.setText(liveTvList.get(0).getTvName());
 
         adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override

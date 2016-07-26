@@ -138,7 +138,6 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
                     }
 //                    mClass.addAll(resp.getBody().getTypeList());
                     mClass.addAll(resp.getBody().getTypeList());
-                    TLog.log("test"+mClass.size());
                     initBottom();
 
                 } else {

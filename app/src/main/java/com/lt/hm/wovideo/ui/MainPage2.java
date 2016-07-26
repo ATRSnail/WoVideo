@@ -36,10 +36,10 @@ import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.MyFragmentTabHost;
+import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
 import com.lt.hm.wovideo.zxing.ui.MipcaActivityCapture;
 
 import butterknife.BindView;
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 /**
  * @author leonardo
@@ -103,13 +103,23 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
         checkLoginState();
 
 
-        new MaterialShowcaseView.Builder(this)
+        MaterialShowcaseView.Builder builder = new MaterialShowcaseView.Builder(this)
                 .setTarget(choicePersonCenter)
-                .setDismissText(getString(R.string.got_it))
+                .setDismissOnTouch(true)
                 .setContentText(getString(R.string.register_hint))
+                .setMaskColour(getResources().getColor(R.color.mask_color))
                 .setDelay(500) // optional but starting animations immediately in onCreate can make them choppy
-                .singleUse("register") // provide a unique ID used to ensure it is only shown once
-                .show();
+                .singleUse("register"); // provide a unique ID used to ensure it is only shown once
+        builder.setContentTextOnClick(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                builder.hide();
+                Intent intent = new Intent();
+                intent.setClass(MainPage2.this, LoginPage.class);
+                startActivity(intent);
+            }
+        });
+        builder.show();
     }
 
     private void checkLoginState() {

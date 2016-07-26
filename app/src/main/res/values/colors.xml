@@ -45,4 +45,6 @@
     <color name="password_bg">#f5f5f5</color>
     <color name="btn_yzm">#70B3E5</color>
 
+    <color name="mask_color">#dd414141</color>
+
 </resources>

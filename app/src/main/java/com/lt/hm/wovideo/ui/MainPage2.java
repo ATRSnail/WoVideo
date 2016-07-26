@@ -102,7 +102,6 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
         checkLoginState();
 
-        popHandler.postDelayed(popRun, 3000);
 
         new MaterialShowcaseView.Builder(this)
                 .setTarget(choicePersonCenter)
@@ -117,7 +116,8 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 //        String info = ACache.get(getApplicationContext()).getAsString("userinfo");
         String info= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (StringUtils.isNullOrEmpty(info)) {
-            UnLoginHandler.unLogin(MainPage2.this);
+//            UnLoginHandler.unLogin(MainPage2.this);
+            popHandler.postDelayed(popRun, 3000);
         } else {
             UserModel model = new Gson().fromJson(info, UserModel.class);
 //            String tag = ACache.get(this).getAsString(model.getId() + "free_tag");
@@ -129,7 +129,8 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
                     UnLoginHandler.freeDialog(MainPage2.this, model);
                 }
             }else{
-                UnLoginHandler.unLogin(MainPage2.this);
+//                UnLoginHandler.unLogin(MainPage2.this);
+                popHandler.postDelayed(popRun, 3000);
             }
 
 
@@ -296,7 +297,16 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
         newView.setAnimation(inFromTop());
         // Set the text in the new row to a random country.
-        ((TextView) newView.findViewById(R.id.msg_text)).setText("当前流量已使用: "+netUsageDatabase.querySum("")/1024/1024+" MB");
+        TextView login = (TextView) newView.findViewById(R.id.msg_text);
+        login.setText("还没注册么?\n如已注册请登录");
+        login.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(MainPage2.this, LoginPage.class);
+                startActivity(intent);
+            }
+        });
         ((ImageView) newView.findViewById(R.id.img))
                 .setBackgroundDrawable(getResources().getDrawable(R.drawable.img_hd1));
 

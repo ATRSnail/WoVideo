@@ -36,12 +36,11 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"></LinearLayout>
         </HorizontalScrollView>
-
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/class_refresh_layout"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <FrameLayout
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/class_refresh_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <android.support.v7.widget.RecyclerView
@@ -49,16 +48,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="visible"/>
-            <Button
-                android:id="@+id/empty_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:drawableTop="@drawable/empty_state"
-                android:background="@android:color/transparent"
-                android:text="@string/empty_video_list"
-                android:visibility="invisible"/>
-        </FrameLayout>
+        </android.support.v4.widget.SwipeRefreshLayout>
+        <Button
+            android:id="@+id/empty_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:drawableTop="@drawable/empty_state"
+            android:background="@android:color/transparent"
+            android:text="@string/empty_video_list"
+            android:visibility="invisible"/>
+    </FrameLayout>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
 
 </LinearLayout>

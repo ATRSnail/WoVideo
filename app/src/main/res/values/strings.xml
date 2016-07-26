@@ -148,5 +148,6 @@
     <string name="got_it">知道了</string>
     <string name="register_hint">在这里可以进入注册页面,注册后可以xxxx!</string>
     <string name="network">当前使用%d MB流量</string>
+    <string name="empty_video_list">Ops,暂时没有视频,试试别的类别吧</string>
 
 </resources>

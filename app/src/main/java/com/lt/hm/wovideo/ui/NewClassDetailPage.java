@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -83,6 +84,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     LinearLayout details_type_title;
     @BindView(R.id.type_container)
     HorizontalScrollView type_container;
+    @BindView(R.id.empty_view)
+    Button empty_view_button;
     List<VideoList.TypeListBean> b_list;
     VipItemAdapter bottom_adapter;
     int pageNum = 1;
@@ -284,8 +287,11 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     b_list = resp.getBody().getTypeList();
                     if (b_list == null || b_list.size() == 0) {
+                        classDetailsList.setVisibility(View.INVISIBLE);
+                        empty_view_button.setVisibility(View.VISIBLE);
                         return;
                     }
+                    empty_view_button.setVisibility(View.INVISIBLE);
                     for (int i = 0; i < b_list.size(); i++) {
                         b_list.get(i).setDesc(b_list.get(i).getIntroduction());
                     }

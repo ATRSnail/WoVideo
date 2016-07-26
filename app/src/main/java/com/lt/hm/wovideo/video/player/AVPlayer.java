@@ -2,6 +2,8 @@ package com.lt.hm.wovideo.video.player;
 
 import android.content.Context;
 import android.media.MediaCodec;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -29,6 +31,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import static com.tencent.bugly.crashreport.inner.InnerAPI.context;
 
 /**
  * A wrapper around {@link ExoPlayer} that provides a high level interface, based on DemoPlayer.
@@ -433,12 +437,21 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
   @Override
   public void onLoadCompleted(int sourceId, long bytesLoaded, int type, int trigger, Format format,
       long mediaStartTimeMs, long mediaEndTimeMs, long elapsedRealtimeMs, long loadDurationMs) {
-    //TODO grab the bytesloaded info to tell activity.
+    //TODO is free now?
     //125992483(actual is 125938756) bytes fluent using 748404ms loaded
-    loadedBytes += bytesLoaded;
-    sumDuration += loadDurationMs;
-    Log.w("LoadSize", "onLoadCompleted: " + loadedBytes + " bytes"
-            + ", duration is :" + sumDuration + " ms");
+    ConnectivityManager cm =
+            (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+    if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE){
+      loadedBytes += bytesLoaded;
+      sumDuration += loadDurationMs;
+      Log.w("LoadSize", "onLoadCompleted mobile net: " + loadedBytes + " bytes"
+              + ", duration is :" + sumDuration + " ms");
+    } else if (cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isAvailable()) {
+      // wifi
+      Log.w("LoadSize", "onLoadCompleted wifi: " + loadedBytes + " bytes"
+              + ", duration is :" + sumDuration + " ms");
+    }
     if (mInfoListener != null) {
       mInfoListener.onLoadCompleted(sourceId, bytesLoaded, type, trigger, format, mediaStartTimeMs,
           mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs);

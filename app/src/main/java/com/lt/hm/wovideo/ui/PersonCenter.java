@@ -78,6 +78,8 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
     LinearLayout login_layout;
     @BindView(pc_username)
     TextView tv_username;
+    @BindView(R.id.network_usage_text)
+    TextView tv_network_usage;
     private Uri origUri;
     private Uri cropUri;
     private String theLarge;
@@ -152,6 +154,8 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
         collect.setOnClickListener(this);
         btnPersonBack.setOnClickListener(this);
         tv_username.setOnClickListener(this);
+        String text = String.format(getResources().getString(R.string.network), netUsageDatabase.querySum("") / 1024 / 1024);
+        tv_network_usage.setText(text);
     }
 
     @Override

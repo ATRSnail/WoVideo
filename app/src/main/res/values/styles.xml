@@ -41,8 +41,8 @@
     <style name="person_menu_img">
         <item name="android:paddingLeft">15dp</item>
         <item name="android:paddingRight">10dp</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">@dimen/s_40</item>
+        <item name="android:layout_height">@dimen/s_40</item>
         <item name="android:layout_centerInParent">true</item>
         <item name="android:layout_alignParentLeft">true</item>
 

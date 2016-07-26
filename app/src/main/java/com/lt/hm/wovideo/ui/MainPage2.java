@@ -347,4 +347,11 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
         inFromTop.setInterpolator(new AccelerateInterpolator());
         return inFromTop;
     }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        checkLoginState();
+    }
+
 }

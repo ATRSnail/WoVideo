@@ -148,4 +148,8 @@
     <string name="got_it">知道了</string>
     <string name="register_hint">在这里可以进入注册页面,注册后可以xxxx!</string>
 
+
+    <string name="open_success">开通成功</string>
+    <string name="open_failed">开通失败</string>
+
 </resources>

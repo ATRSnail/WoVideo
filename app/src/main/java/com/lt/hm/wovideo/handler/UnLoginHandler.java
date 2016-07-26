@@ -6,12 +6,25 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
+import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.RespHeader;
+import com.lt.hm.wovideo.http.ResponseCode;
+import com.lt.hm.wovideo.http.ResponseObj;
+import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.PlaceOrder;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
+import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.IPhoneDialog;
+import com.zhy.http.okhttp.callback.StringCallback;
+
+import java.util.HashMap;
+
+import okhttp3.Call;
 
 /**
  * @author leonardo
@@ -19,14 +32,14 @@ import com.lt.hm.wovideo.widget.IPhoneDialog;
  * @create_date 16/7/9
  */
 public class UnLoginHandler {
-    public static void unLogin(Context context){
+    public static void unLogin(Context context) {
 //        message,negitive_str,negitive,positive_str,positive
-                String message="您尚未登录，是否立即登录";
-        String negitive_str= "稍后";
-        String positive_str="前往";
+        String message = "您尚未登录，是否立即登录";
+        String negitive_str = "稍后";
+        String positive_str = "前往";
 
 //        Context context, String message, String negitive_str, DialogInterface.OnClickListener negitive, String positive_str, DialogInterface.OnClickListener positive
-        IPhoneDialog dialog= DialogHelp.showDialog(context, message, negitive_str, new DialogInterface.OnClickListener() {
+        IPhoneDialog dialog = DialogHelp.showDialog(context, message, negitive_str, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -41,20 +54,20 @@ public class UnLoginHandler {
                     public void run() {
                         UIHelper.ToLogin(context);
                     }
-                },200);
+                }, 200);
             }
         });
         dialog.show();
     }
 
-    public static void unRegist(Context context){
+    public static void unRegist(Context context) {
 //        message,negitive_str,negitive,positive_str,positive
-        String message="联通用户注册后可享免流量观看视频，赶快注册吧!";
-        String negitive_str= "取消";
-        String positive_str="注册";
+        String message = "联通用户注册后可享免流量观看视频，赶快注册吧!";
+        String negitive_str = "取消";
+        String positive_str = "注册";
 
 //        Context context, String message, String negitive_str, DialogInterface.OnClickListener negitive, String positive_str, DialogInterface.OnClickListener positive
-        IPhoneDialog dialog= DialogHelp.showDialog(context, message, negitive_str, new DialogInterface.OnClickListener() {
+        IPhoneDialog dialog = DialogHelp.showDialog(context, message, negitive_str, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -70,14 +83,14 @@ public class UnLoginHandler {
         dialog.show();
     }
 
-    public static void freeDialog(Context context,UserModel model){
+    public static void freeDialog(Context context, UserModel model) {
 //        message,negitive_str,negitive,positive_str,positive
-        String message="领取0元流量包,免流量观看视频!";
-        String negitive_str= "取消";
-        String positive_str="领取";
+        String message = "领取0元流量包,免流量观看视频!";
+        String negitive_str = "取消";
+        String positive_str = "领取";
 
 //        Context context, String message, String negitive_str, DialogInterface.OnClickListener negitive, String positive_str, DialogInterface.OnClickListener positive
-        IPhoneDialog dialog= DialogHelp.showDialog(context, message, negitive_str, new DialogInterface.OnClickListener() {
+        IPhoneDialog dialog = DialogHelp.showDialog(context, message, negitive_str, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -87,18 +100,119 @@ public class UnLoginHandler {
             public void onClick(DialogInterface dialog, int which) {
                 // TODO: 16/7/9 跳转 登录页面 ,根据是否返回 当前页面 进行控制需要传递一些额外参数
 //                UIHelper.ToRegister(context);
-                ACache.get(context).put(model.getId()+"free_tag","true");
+                ACache.get(context).put(model.getId() + "free_tag", "true");
                 model.setIsOpen("true");
-                SharedPrefsUtils.setStringPreference(context,"userinfo",new Gson().toJson(model,UserModel.class));
-                Toast.makeText(context,"开通成功",Toast.LENGTH_SHORT).show();
+                SharedPrefsUtils.setStringPreference(context, "userinfo", new Gson().toJson(model, UserModel.class));
+                Toast.makeText(context, "开通成功", Toast.LENGTH_SHORT).show();
+//                OpenZeroService(model, context);
+
                 dialog.dismiss();
             }
         });
         dialog.show();
     }
 
+    private static void OpenZeroService(UserModel model, Context context) {
+        placeOrder(model, context);
+    }
+
+    /**
+     * submit order
+     */
+    private static void placeOrder( UserModel model,Context mContext) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("spid", "953");
+        if (model.getId() != null) {
+            map.put("userid", model.getId());
+            TLog.log("userId" + model.getId());
+        } else {
+            UnLoginHandler.unLogin(mContext);
+            return;
+        }
+        HttpApis.getPlaceOrder(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log(response);
+                ResponseObj<PlaceOrder, RespHeader> resp = new ResponseObj<PlaceOrder, RespHeader>();
+                ResponseParser.parse(resp, response, PlaceOrder.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                    purchOrder(resp.getBody().getOrderid(), model, mContext);
+                } else {
+                    Toast.makeText(mContext, resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
 
+    /**
+     * 支付
+     *
+     * @param orderId
+     */
+    private static void purchOrder(String orderId, UserModel model, Context mContext) {
+        HashMap<String, Object> map = new HashMap<>();
 
+        map.put("cellphone", model.getPhoneNo());
+        map.put("spid", orderId);
+        HttpApis.purchOrder(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log(response);
+                ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                    finishOrder(orderId,model, mContext);
+                } else {
+                    Toast.makeText(mContext, resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+    /**
+     * 完成订单接口
+     *
+     * @param orderId
+     * @param model
+     */
+    private static void finishOrder(String orderId, UserModel model, Context mContext) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("orderId", orderId);
+        map.put("userid", model.getId());
+        HttpApis.finishOrder(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log(response);
+                ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                Toast.makeText(mContext, resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                    Toast.makeText(mContext, mContext.getResources().getText(R.string.open_success), Toast.LENGTH_SHORT).show();
+                    model.setIsOpen("true");
+                    SharedPrefsUtils.setStringPreference(mContext, "userinfo", new Gson().toJson(model, UserModel.class));
+                } else {
+                    Toast.makeText(mContext, mContext.getResources().getText(R.string.open_failed), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
 
 }

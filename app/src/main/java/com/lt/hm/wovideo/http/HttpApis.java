@@ -305,10 +305,23 @@ public class HttpApis {
         HttpUtils.formPost("mblCollection/cancelMyColls", map, callback);
     }
 
+    /**
+     * 增加点击量接口
+     * @param map
+     * @param callback
+     */
     public static void addVideoHit(HashMap<String, Object> map, StringCallback callback){
         HttpUtils.formPost("mblVf/addHit", map, callback);
     }
 
+    /**
+     * 评论敏感词校验
+     * @param map
+     * @param callback
+     */
+    public static void CommentVerification(HashMap<String, Object> map, StringCallback callback){
+        HttpUtils.formPost("mblSensitiveWord/filter",map,callback);
+    }
 
 
 }

@@ -36,6 +36,7 @@ import com.lt.hm.wovideo.model.CommentModel;
 import com.lt.hm.wovideo.model.LikeList;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.model.ValidateComment;
 import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
@@ -420,7 +421,7 @@ public class NewMoviePage extends BaseVideoActivity {
             if (imm.isActive()) {
                 imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
             }
-            SendComment(etAddComment.getText().toString());
+           checkCommentValide(etAddComment.getText().toString());
         });
 
         videoCollect.setOnClickListener((View v) -> {
@@ -448,6 +449,35 @@ public class NewMoviePage extends BaseVideoActivity {
                 bref_txt_long.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void checkCommentValide(String s) {
+        HashMap<String,Object> map= new HashMap<>();
+        map.put("context",s);
+        HttpApis.CommentVerification(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log(e.getMessage());
+            }
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log(response);
+                ResponseObj<ValidateComment,RespHeader> resp=new ResponseObj<ValidateComment, RespHeader>();
+                ResponseParser.parse(resp,response,ValidateComment.class,RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
+                    ValidateComment validate = resp.getBody();
+                    if (validate.getIsPass().equals("1")){
+                        //check validate success;
+                        SendComment(etAddComment.getText().toString());
+                    }else{
+                        Toast.makeText(getApplicationContext(),"言论不当，请斟酌发言",Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(getApplicationContext(),resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     private void CancelCollect() {

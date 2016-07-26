@@ -23,6 +23,7 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.PlaceOrder;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.CircleImageView;
@@ -78,42 +79,51 @@ public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopb
         openVipTopbar.setLeftIsVisible(true);
         openVipTopbar.setOnTopbarClickListenter(this);
         tvValidity.setText(StringUtils.getCurrentTime(OpenVipActivity.this));
-        String string = ACache.get(this).getAsString("userinfo");
+//        String string = ACache.get(this).getAsString("userinfo");
+        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
-            phoneNum = model.getPhoneNo();
-            userId = model.getId();
-            username.setText("账号：" + phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
-            if (FILE_SAVEPATH != null) {
-                Glide.with(this).load(ACache.get(this).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(imgPhotos);
-            }
-            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
-                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(imgPhotos);
+            if (model.getIsLogin()!=null&& model.getIsLogin().equals("true")){
+                phoneNum = model.getPhoneNo();
+                userId = model.getId();
+                username.setText("账号：" + phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
+                if (FILE_SAVEPATH != null) {
+                    Glide.with(this).load(ACache.get(this).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(imgPhotos);
+                }
+                if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                    Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(imgPhotos);
+                }else{
+                    imgPhotos.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+                }
+                if (model.getIsVip().equals("1")) {
+                    imgKing.setImageResource(R.drawable.icon_vip_opened);
+                    open_get_vip_layout.setVisibility(View.GONE);
+                    imgVipAuthers.setImageResource(R.drawable.img_vip_opened);
+                    btnAbortService.setVisibility(View.VISIBLE);
+                } else {
+                    imgKing.setImageResource(R.drawable.icon_vip_unopened);
+                    open_get_vip_layout.setVisibility(View.VISIBLE);
+                    imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
+                    btnAbortService.setVisibility(View.GONE);
+                }
             }else{
-                imgPhotos.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
-            }
-
-            if (model.getIsVip().equals("1")) {
-                imgKing.setImageResource(R.drawable.icon_vip_opened);
-                open_get_vip_layout.setVisibility(View.GONE);
-                imgVipAuthers.setImageResource(R.drawable.img_vip_opened);
-                btnAbortService.setVisibility(View.VISIBLE);
-            } else {
-                imgKing.setImageResource(R.drawable.icon_vip_unopened);
-                open_get_vip_layout.setVisibility(View.VISIBLE);
-                imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
-                btnAbortService.setVisibility(View.GONE);
+                UnloginState();
             }
         } else {
-            btnAbortService.setVisibility(View.GONE);
-            imgKing.setImageResource(R.drawable.icon_vip_unopened);
-            open_get_vip_layout.setVisibility(View.VISIBLE);
-            imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
-            username.setText("尚未登录,请先登录");
+            UnloginState();
         }
 
 
 
+    }
+
+    private void UnloginState() {
+        btnAbortService.setVisibility(View.GONE);
+        imgKing.setImageResource(R.drawable.icon_vip_unopened);
+        open_get_vip_layout.setVisibility(View.VISIBLE);
+        imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
+        username.setText("尚未登录,请先登录");
     }
 
     @Override

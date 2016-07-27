@@ -48,6 +48,7 @@ import butterknife.BindView;
  */
 public class MainPage2 extends BaseActivity implements View.OnTouchListener, TabHost.OnTabChangeListener{
     private final static int SCANNIN_GREQUEST_CODE = 1;
+    private final static String FIRST_LAUNCH_KEY = "first launch";
     @BindView(R.id.person_center)
     ImageView personCenter;
     @BindView(R.id.qr_scan)
@@ -102,7 +103,6 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
         checkLoginState();
 
-
         MaterialShowcaseView.Builder builder = new MaterialShowcaseView.Builder(this)
                 .setTarget(choicePersonCenter)
                 .setDismissOnTouch(true)
@@ -125,20 +125,24 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
     private void checkLoginState() {
 //        String info = ACache.get(getApplicationContext()).getAsString("userinfo");
         String info= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        boolean isFirstLaunch = SharedPrefsUtils.getBooleanPreference(this, FIRST_LAUNCH_KEY, true);
+
         if (StringUtils.isNullOrEmpty(info)) {
-//            UnLoginHandler.unLogin(MainPage2.this);
-            popHandler.postDelayed(popRun, 3000);
+            if (!isFirstLaunch) {
+                popHandler.postDelayed(popRun, 3000);
+            }
+            SharedPrefsUtils.setBooleanPreference(this, FIRST_LAUNCH_KEY, false);
         } else {
             UserModel model = new Gson().fromJson(info, UserModel.class);
 //            String tag = ACache.get(this).getAsString(model.getId() + "free_tag");
 //            if (StringUtils.isNullOrEmpty(tag)) {
 //                UnLoginHandler.freeDialog(MainPage2.this, model.getId());
 //            }
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                if (model.getIsOpen()==null){
+            if (model.getIsLogin() != null && model.getIsLogin().equals("true")) {
+                if (model.getIsOpen() == null) {
                     UnLoginHandler.freeDialog(MainPage2.this, model);
                 }
-            }else{
+            } else {
 //                UnLoginHandler.unLogin(MainPage2.this);
                 popHandler.postDelayed(popRun, 3000);
             }
@@ -308,7 +312,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
         newView.setAnimation(inFromTop());
         // Set the text in the new row to a random country.
         TextView login = (TextView) newView.findViewById(R.id.msg_text);
-        login.setText("还没注册么?\n如已注册请登录");
+        login.setText(getResources().getString(R.string.main_page_toast));
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -371,7 +375,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
     @Override
     protected void onRestart() {
         super.onRestart();
-        checkLoginState();
+//        checkLoginState();
     }
 
 }

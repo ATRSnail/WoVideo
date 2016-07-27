@@ -153,5 +153,6 @@
 
     <string name="open_success">开通成功</string>
     <string name="open_failed">开通失败</string>
+    <string name="main_page_toast">注册/登录, 全站免流量观看视频</string>
 
 </resources>

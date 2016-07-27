@@ -237,6 +237,7 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
                         bundle.putLong("cur_position",bean.getCurrent_positon());
+                        bundle.putString("episode",bean.getEpisode());
                         UIHelper.ToDemandPage(HistoryPage.this, bundle);
 
                     }

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.lt.hm.wovideo.model.VideoHistory;
+import com.lt.hm.wovideo.utils.TLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,9 +32,9 @@ public class HistoryDataBase {
     public void insert(VideoHistory data) {
         String sql = "insert into " + DataBaseHelper.HISTORY_TABLE_NAME;
 
-        sql += "(vid, create_time, img_url, current_position, name) values('"+data.getmId()+"','"+
+        sql += "(vid, create_time, img_url, current_position, name,episode) values('"+data.getmId()+"','"+
                 data.getCreate_time()+"','"+
-                data.getImg_url()+"',"+data.getCurrent_positon()+",'"+data.getmName()+"')";
+                data.getImg_url()+"',"+data.getCurrent_positon()+",'"+data.getmName()+"','"+data.getEpisode()+"')";
 
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
 //        sqlite.execSQL(sql, new String[]{data.getmId() + "",
@@ -78,11 +79,11 @@ public class HistoryDataBase {
     public void update(VideoHistory data) {
         SQLiteDatabase sqlite = dbHelper.getWritableDatabase();
 //    (vid, create_time, img_url, current_position, name)
-        String sql = ("update " + DataBaseHelper.HISTORY_TABLE_NAME + " set vid=?, create_time=?, img_url=?, current_position=?, name=? where vid=?");
+        String sql = ("update " + DataBaseHelper.HISTORY_TABLE_NAME + " set vid=?, create_time=?, img_url=?, current_position=?, name=?,episode=? where vid=?");
         sqlite.execSQL(sql,
                 new String[]{data.getmId() + "", data.getCreate_time() + "", data.getImg_url() + "",
                         data.getCurrent_positon() +
-                                "", data.getmName() + "",
+                                "", data.getmName() + "",data.getEpisode()+"",
                         data.getmId() + ""});
         sqlite.close();
     }
@@ -134,11 +135,13 @@ public class HistoryDataBase {
             history.setImg_url(cursor.getString(3));
             history.setCurrent_positon(cursor.getLong(4));
             history.setmName(cursor.getString(5));
+            history.setEpisode(cursor.getString(6));
             data.add(history);
         }
         if (!cursor.isClosed()) {
             cursor.close();
         }
+        TLog.log("history_list"+data.toString());
         sqlite.close();
         return data;
     }

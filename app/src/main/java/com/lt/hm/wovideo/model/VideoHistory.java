@@ -13,6 +13,7 @@ public class VideoHistory {
     private String create_time;//创建时间
     private Long current_positon;//当前播放时间
     private String flag;//批量删除选中状态
+    private String episode;//第几集
 
     public String getFlag() {
         return flag;
@@ -70,16 +71,25 @@ public class VideoHistory {
         this.mId = mId;
     }
 
+    public String getEpisode() {
+        return episode;
+    }
+
+    public void setEpisode(String episode) {
+        this.episode = episode;
+    }
+
     @Override
     public String toString() {
         return "VideoHistory{" +
                 "uId='" + uId + '\'' +
-                ", mId=" + mId +
+                ", mId='" + mId + '\'' +
                 ", mName='" + mName + '\'' +
                 ", img_url='" + img_url + '\'' +
                 ", create_time='" + create_time + '\'' +
-                ", current_positon='" + current_positon + '\'' +
+                ", current_positon=" + current_positon +
                 ", flag='" + flag + '\'' +
+                ", episode=" + episode +
                 '}';
     }
 }

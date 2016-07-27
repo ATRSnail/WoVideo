@@ -294,7 +294,21 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         mMultiSelector.setSelectable(true);
 //        anthologyList.setAdapter(anthologyAdapter);
         anthologyList.setAdapter(new EpisodeAdapter());
-        mMultiSelector.setSelected(0,0,true);
+        if (getIntent().getExtras().containsKey("episode")){
+            if (!getIntent().getExtras().getString("episode").equals("null")){
+                int c_episode = Integer.parseInt(getIntent().getExtras().getString("episode"));
+                mMultiSelector.setSelected(c_episode-1,0,true);
+                selectEpisode(c_episode+"");
+            }else{
+                mMultiSelector.setSelected(0,0,true);
+                selectEpisode("1");
+            }
+        }else{
+            selectEpisode("1");
+            mMultiSelector.setSelected(0,0,true);
+        }
+
+
     }
 
     private void getAnthologyDatas(String vfId) {
@@ -411,9 +425,9 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     }
 
                     videoHistory.setmName(details.getName());
-                    videoHistory.setmId(details.getId());
                     videoHistory.setCreate_time(System.currentTimeMillis()+"");
                     videoHistory.setImg_url(details.getImg());
+                    videoHistory.setmId(details.getId());
 
                 }
             }
@@ -462,7 +476,6 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                             isCollected = false;
                         }
                     }
-
 
 
                     getCommentList(per_Id);
@@ -540,8 +553,23 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         }
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("videoSourceURL", url);
-        maps.put("cellphone", "18513179404");
-        maps.put("freetag", "1");
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)){
+            UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                maps.put("cellphone", model.getPhoneNo());
+                if (model.getIsOpen()!=null && model.getIsOpen().equals("true")){
+                    maps.put("freetag", "1");
+                }else{
+                    maps.put("freetag", "1");
+                }
+            }else{
+                maps.put("cellphone", "18513179404");
+                maps.put("freetag", "1");
+            }
+        }
+//        maps.put("cellphone", "18513179404");
+//        maps.put("freetag", "1");
         HttpApis.getVideoRealURL(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -566,6 +594,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                         mPlayerPosition= cur_position;
                         seekTo(mPlayerPosition);
                     }
+
                     // Set Player
                     setIntent(onUrlGot(video));
                     onShown();
@@ -637,39 +666,43 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     private void SendComment(String s) {
         TLog.log("comment_send" + per_Id);
         HashMap<String, Object> map = new HashMap<>();
-        String string = ACache.get(this).getAsString("userinfo");
+        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
-            map.put("userId", model.getId());
-            map.put("vfId", per_Id);
-            map.put("comment", s);
-            HttpApis.pushComment(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
+            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                map.put("userId", model.getId());
+                map.put("vfId", per_Id);
+                map.put("comment", s);
+                HttpApis.pushComment(map, new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        TLog.log(e.getMessage());
+                    }
 
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log(response);
-                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                    etAddComment.setText("");
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        Toast.makeText(getApplicationContext(), "评论成功", Toast.LENGTH_SHORT).show();
-                        TLog.log("comment_list" + per_Id);
-                        getCommentList(per_Id);
-                    } else {
-                        if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
-                            Toast.makeText(getApplicationContext(), "评论失败", Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onResponse(String response, int id) {
+                        TLog.log(response);
+                        ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                        ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                        etAddComment.setText("");
+                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                            Toast.makeText(getApplicationContext(), "评论成功", Toast.LENGTH_SHORT).show();
+                            TLog.log("comment_list" + per_Id);
+                            getCommentList(per_Id);
                         } else {
-                            TLog.log(resp.getHead().getRspMsg());
-                            Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+                            if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
+                                Toast.makeText(getApplicationContext(), "评论失败", Toast.LENGTH_SHORT).show();
+                            } else {
+                                TLog.log(resp.getHead().getRspMsg());
+                                Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
 
+                            }
                         }
                     }
-                }
-            });
+                });
+            }else{
+                UnLoginHandler.unLogin(DemandPage.this);
+            }
         } else {
             UnLoginHandler.unLogin(DemandPage.this);
         }
@@ -680,30 +713,34 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
      */
     private void CollectVideo() {
         HashMap<String, Object> map = new HashMap<>();
-        String string = ACache.get(this).getAsString("userinfo");
+        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
-            map.put("userid", model.getId());
-            map.put("vfid", collect_tag);
-            HttpApis.collectVideo(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log("collect->" + response);
-                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
-                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
-                    }else{
-                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                map.put("userid", model.getId());
+                map.put("vfid", collect_tag);
+                HttpApis.collectVideo(map, new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        TLog.log(e.getMessage());
                     }
-                }
-            });
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        TLog.log("collect->" + response);
+                        ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                        ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                            Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
+                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                        }else{
+                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                        }
+                    }
+                });
+            }else{
+                UnLoginHandler.unLogin(DemandPage.this);
+            }
         } else {
             // TODO: 16/7/8 未登录跳转登录页面
             UnLoginHandler.unLogin(DemandPage.this);
@@ -714,32 +751,36 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
      * 取消收藏
      */
     private void CancelCollect() {
-        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+        String userinfo =SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)){
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("userid", model.getId());
-            map.put("vfids", collect_tag);
-            HttpApis.cancelCollect(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log("cancel_result" + response);
-                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
-                    } else {
-                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("userid", model.getId());
+                map.put("vfids", collect_tag);
+                HttpApis.cancelCollect(map, new StringCallback() {
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        TLog.log(e.getMessage());
                     }
-                }
-            });
+
+                    @Override
+                    public void onResponse(String response, int id) {
+                        TLog.log("cancel_result" + response);
+                        ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                        ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                        } else {
+                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }else{
+                UnLoginHandler.unLogin(DemandPage.this);
+            }
         }else{
             UnLoginHandler.unLogin(DemandPage.this);
         }
@@ -828,6 +869,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     private void selectEpisode(String episode) {
         int i = Integer.valueOf(episode) - 1;
         currentEpisode = i;
+        videoHistory.setEpisode(episode);
         vfId = antholys.get(i).getVfId();
         per_Id = antholys.get(i).getId();
         PlayList.PlaysListBean details =  antholys.get(i);
@@ -909,6 +951,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         public void onClick(View v) {
             if (!mCurrentEpisode.equals(mEposide)) {
                 mCurrentEpisode = mEposide;
+                videoHistory.setEpisode(mCurrentEpisode);
                 selectEpisode(mEposide);
                 mMultiSelector.setSelected(this, true);
             }

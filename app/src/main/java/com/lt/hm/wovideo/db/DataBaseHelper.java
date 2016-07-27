@@ -18,7 +18,7 @@ public class DataBaseHelper extends SQLiteOpenHelper{
     public static final String CREATE_HISTORY_TABLE = "create table "
             + HISTORY_TABLE_NAME
             + " (_id integer primary key autoincrement,vid varchar(50),"
-            + " create_time varchar(10),img_url varchar(200) ,current_position integer(40), name text)";
+            + " create_time varchar(10),img_url varchar(200) ,current_position integer(40), name text,episode text)";
 
 
     public static final String CREATE_SEARCH_HISTORY_TABLE = "" +

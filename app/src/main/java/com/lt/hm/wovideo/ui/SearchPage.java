@@ -58,8 +58,8 @@ public class SearchPage extends BaseActivity {
         searchHistory= new SearchHistoryDataBase(getApplicationContext());
         searchHead.requestFocus();
         searchEdit.setFocusable(true);
-        searchEdit.setOnKeyListener((View v, int keyCode, KeyEvent event) -> {
 
+        searchEdit.setOnKeyListener((View v, int keyCode, KeyEvent event) -> {
             return editSearch(v, keyCode);
         });
 
@@ -77,7 +77,7 @@ public class SearchPage extends BaseActivity {
                 flag=true;
             }
         }
-        return true;
+        return false;
     }
 
     private void search(String s){

@@ -129,7 +129,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     private String img_url;
     private String share_title;
     private String share_desc;
-
+    private long cur_position;
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -160,8 +160,17 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             vfId = bundle.getString("id");
             getVideoDetails(vfId);
             getAnthologyDatas(vfId);
-            getFirstURL(vfId);
+
+            if (bundle.containsKey("cur_position")){
+                cur_position = bundle.getLong("cur_position");
+                TLog.log("position_cur"+cur_position);
+                mPlayerPosition= cur_position;
+            }else{
+                getFirstURL(vfId);
+            }
         }
+
+
         getYouLikeDatas();
     }
 
@@ -561,11 +570,11 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                 if (model.getIsOpen()!=null && model.getIsOpen().equals("true")){
                     maps.put("freetag", "1");
                 }else{
-                    maps.put("freetag", "1");
+                    maps.put("freetag", "0");
                 }
             }else{
-                maps.put("cellphone", "18513179404");
-                maps.put("freetag", "1");
+                maps.put("cellphone", StringUtils.generateOnlyID());
+                maps.put("freetag", "0");
             }
         }
 //        maps.put("cellphone", "18513179404");
@@ -589,11 +598,16 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
                     mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
 
-                    if (getIntent().getExtras().containsKey("cur_position")){
-                        long cur_position = getIntent().getExtras().getLong("cur_position");
+//                    if (getIntent().getExtras().containsKey("cur_position")){
+//                        long cur_position = getIntent().getExtras().getLong("cur_position");
+//                        TLog.log("position_cur"+cur_position);
+//                        mPlayerPosition= cur_position;
+//                    }
+                    if (cur_position!=0){
                         mPlayerPosition= cur_position;
                         seekTo(mPlayerPosition);
                     }
+
 
                     // Set Player
                     setIntent(onUrlGot(video));

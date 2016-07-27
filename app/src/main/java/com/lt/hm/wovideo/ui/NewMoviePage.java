@@ -720,8 +720,27 @@ public class NewMoviePage extends BaseVideoActivity {
 //            return;
 //        }
         //FIXME: hardcode cellphone freetag
-        maps.put("cellphone", "18513179404");
-        maps.put("freetag", 1);
+//        maps.put("cellphone", "18513179404");
+//        maps.put("freetag", 1);
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)){
+            UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
+                maps.put("cellphone", model.getPhoneNo());
+                if (model.getIsOpen()!=null && model.getIsOpen().equals("true")){
+                    maps.put("freetag", "1");
+                }else{
+                    maps.put("freetag", "0");
+                }
+            }else{
+                maps.put("cellphone", StringUtils.generateOnlyID());
+                maps.put("freetag", "0");
+            }
+        }else{
+            maps.put("cellphone", StringUtils.generateOnlyID());
+            maps.put("freetag", "0");
+        }
+
         HttpApis.getVideoRealURL(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {

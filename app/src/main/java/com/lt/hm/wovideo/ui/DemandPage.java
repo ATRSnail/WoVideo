@@ -8,11 +8,10 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -943,7 +942,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         }
     }
 
-    private class EpisodeHolder extends SwappingHolder implements View.OnClickListener{
+    private class EpisodeHolder extends SwappingHolder {
         private final TextView mTitleTextView;
         private String mEposide;
 
@@ -951,9 +950,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             super(itemView, mMultiSelector);
 
             mTitleTextView = (TextView) itemView.findViewById(R.id.episode_text);
-            itemView.setOnClickListener(this);
             itemView.setLongClickable(true);
-            itemView.setBackground(getResources().getDrawable(R.color.red));
         }
 
         public void bindCrime(String episode) {
@@ -961,25 +958,29 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             mTitleTextView.setText(episode);
         }
 
-        @Override
-        public void onClick(View v) {
-            if (!mCurrentEpisode.equals(mEposide)) {
-                mCurrentEpisode = mEposide;
-                videoHistory.setEpisode(mCurrentEpisode);
-                selectEpisode(mEposide);
-                mMultiSelector.setSelected(this, true);
-            }
-        }
     }
 
 
     private class EpisodeAdapter extends RecyclerView.Adapter<EpisodeHolder> {
+        private int selectedItem = 0;
         @Override
         public EpisodeHolder onCreateViewHolder(ViewGroup parent, int pos) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.layout_video_episode_item, parent, false);
             EpisodeHolder episodeHolder = new EpisodeHolder(view);
-            episodeHolder.setSelectionModeBackgroundDrawable(getResources().getDrawable(R.drawable.episode_selector));
+            episodeHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    notifyItemChanged(selectedItem);
+                    selectedItem = anthologyList.getChildAdapterPosition(v);
+                    notifyItemChanged(selectedItem);
+                    if (!mCurrentEpisode.equals(selectedItem + 1 + "")) {
+                        mCurrentEpisode = selectedItem + 1 + "";
+                        videoHistory.setEpisode(mCurrentEpisode);
+                        selectEpisode(mCurrentEpisode);
+                    }
+                }
+            });
             return episodeHolder;
         }
 
@@ -987,7 +988,12 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         public void onBindViewHolder(EpisodeHolder holder, int pos) {
             String episode = mEpisodes.get(pos);
             holder.bindCrime(episode);
-            Log.d("bind", "binding crime" + episode + "at position" + pos);
+            if (selectedItem == pos) {
+                holder.mTitleTextView.setBackground(getResources().getDrawable(R.color.float_button_color));
+                mMultiSelector.setSelected(holder, true);
+            } else {
+                holder.mTitleTextView.setBackground(getResources().getDrawable(R.color.white));
+            }
         }
 
         @Override

@@ -26,6 +26,9 @@ import com.google.android.exoplayer.metadata.MetadataTrackRenderer;
 import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.upstream.BandwidthMeter;
+import com.google.gson.Gson;
+import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -442,7 +445,9 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
     ConnectivityManager cm =
             (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE){
+    String user = SharedPrefsUtils.getStringPreference(context, "userInfo");
+    UserModel userModel = new Gson().fromJson(user, UserModel.class);
+    if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE && userModel.getIsVip().equals("1")){
       loadedBytes += bytesLoaded;
       sumDuration += loadDurationMs;
       Log.w("LoadSize", "onLoadCompleted mobile net: " + loadedBytes + " bytes"

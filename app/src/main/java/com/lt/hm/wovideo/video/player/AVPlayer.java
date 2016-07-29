@@ -445,7 +445,7 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
     ConnectivityManager cm =
             (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    String user = SharedPrefsUtils.getStringPreference(context, "userInfo");
+    String user = SharedPrefsUtils.getStringPreference(context, "userinfo");
     UserModel userModel = new Gson().fromJson(user, UserModel.class);
     if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE && userModel.getIsVip().equals("1")){
       loadedBytes += bytesLoaded;

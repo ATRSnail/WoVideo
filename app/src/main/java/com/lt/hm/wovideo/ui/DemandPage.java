@@ -317,7 +317,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             if (!getIntent().getExtras().getString("episode").equals("null")){
                 int c_episode = Integer.parseInt(getIntent().getExtras().getString("episode"));
                 mMultiSelector.setSelected(c_episode-1,0,true);
-                adapter.notifyItemChanged(c_episode-1);
+                adapter.setSelectedItem(c_episode - 1);
                 selectEpisode(c_episode+"");
             }else{
                 mMultiSelector.setSelected(0,0,true);
@@ -1033,6 +1033,11 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         @Override
         public int getItemCount() {
             return mEpisodes.size();
+        }
+
+        public void setSelectedItem(int pos) {
+            notifyItemChanged(pos);
+            selectedItem = pos;
         }
     }
 }

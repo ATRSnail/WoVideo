@@ -62,9 +62,7 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
         caculateCacheSize();
         logout.setOnClickListener((View v) -> {
             ACache.get(this).clear();
-            UserModel model= new Gson().fromJson(userinfo,UserModel.class);
-            model.setIsLogin("false");
-            SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",new Gson().toJson(model,UserModel.class));
+            SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo","");
             UIHelper.ToPerson(this);
             this.finish();
         });
@@ -79,14 +77,8 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
             modifyPwd.setVisibility(View.GONE);
         } else  {
             UserModel model= new Gson().fromJson(userinfo,UserModel.class);
-            if (model.getIsLogin()!=null &&model.getIsLogin().equals("true")){
-                modifyPwd.setVisibility(View.VISIBLE);
-                logout.setVisibility(View.VISIBLE);
-            }else{
-                logout.setVisibility(View.GONE);
-                modifyPwd.setVisibility(View.GONE);
-            }
-
+            modifyPwd.setVisibility(View.VISIBLE);
+            logout.setVisibility(View.VISIBLE);
         }
     }
 
@@ -119,15 +111,15 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
         UIHelper.ToAboutPage(this);
     }
 
-    @OnClick(R.id.logout)
-    public void LogOut() {
-        // TODO: 16/6/6 注销用户信息。
-        ACache.get(getApplicationContext()).put("userinfo","");
-       String userinfo =  SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-        UserModel model= new Gson().fromJson(userinfo,UserModel.class);
-        model.setIsLogin("false");
-        this.finish();
-    }
+//    @OnClick(R.id.logout)
+//    public void LogOut() {
+//        // TODO: 16/6/6 注销用户信息。
+//        ACache.get(getApplicationContext()).put("userinfo","");
+//       String userinfo =  SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+//        UserModel model= new Gson().fromJson(userinfo,UserModel.class);
+//        model.setIsLogin("false");
+//        this.finish();
+//    }
 
     /**
      * 计算缓存的大小

@@ -323,5 +323,32 @@ public class HttpApis {
         HttpUtils.formPost("mblSensitiveWord/filter",map,callback);
     }
 
+    /**
+     * 0元购接口返回
+     * @param map
+     * @param callback
+     */
+    public static void GotZeroOrder(HashMap<String, Object> map, StringCallback callback){
+        HttpUtils.formPost("mblOrder/zeroOrder",map,callback);
+    }
+
+    /**
+     * 获取个人信息接口
+     * @param map
+     * @param callback
+     */
+    public static void getPersonInfo(HashMap<String, Object> map, StringCallback callback){
+        HttpUtils.formPost("mblUser/selUserByid",map,callback);
+    }
+
+    /**
+     * 退订接口
+     * @param map
+     * @param callback
+     */
+    public static void cancleOrder(HashMap<String, Object> map, StringCallback callback){
+        HttpUtils.formPost("mblIndex/cancelOrder",map,callback);
+    }
+
 
 }

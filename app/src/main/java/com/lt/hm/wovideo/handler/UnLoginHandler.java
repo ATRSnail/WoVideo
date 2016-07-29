@@ -13,7 +13,6 @@ import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
-import com.lt.hm.wovideo.model.PlaceOrder;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
@@ -101,10 +100,10 @@ public class UnLoginHandler {
                 // TODO: 16/7/9 跳转 登录页面 ,根据是否返回 当前页面 进行控制需要传递一些额外参数
 //                UIHelper.ToRegister(context);
                 ACache.get(context).put(model.getId() + "free_tag", "true");
-                model.setIsOpen("true");
-                SharedPrefsUtils.setStringPreference(context, "userinfo", new Gson().toJson(model, UserModel.class));
-                Toast.makeText(context, "开通成功", Toast.LENGTH_SHORT).show();
-//                placeOrder(model, context);
+//                model.setIsOpen("true");
+//                SharedPrefsUtils.setStringPreference(context, "userinfo", new Gson().toJson(model, UserModel.class));
+//                Toast.makeText(context, "开通成功", Toast.LENGTH_SHORT).show();
+                purchOrder(model, context);
                 dialog.dismiss();
             }
         });
@@ -112,45 +111,11 @@ public class UnLoginHandler {
     }
 
     /**
-     * submit order
-     */
-    private static void placeOrder( UserModel model,Context mContext) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("spid", "953");
-        if (model.getId() != null) {
-            map.put("userid", model.getId());
-            TLog.log("userId" + model.getId());
-        } else {
-            UnLoginHandler.unLogin(mContext);
-            return;
-        }
-        HttpApis.getPlaceOrder(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("placeOrder_place"+response);
-                ResponseObj<PlaceOrder, RespHeader> resp = new ResponseObj<PlaceOrder, RespHeader>();
-                ResponseParser.parse(resp, response, PlaceOrder.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    purchOrder(resp.getBody().getOrderid(), model, mContext);
-                } else {
-                    Toast.makeText(mContext, resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
-
-
-    /**
      * 支付
      *
-     * @param orderId
+     * @param model
      */
-    private static void purchOrder(String orderId, UserModel model, Context mContext) {
+    private static void purchOrder(UserModel model, Context mContext) {
         HashMap<String, Object> map = new HashMap<>();
 
         map.put("cellphone", model.getPhoneNo());
@@ -167,7 +132,7 @@ public class UnLoginHandler {
                 ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
                 ResponseParser.parse(resp, response, String.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    finishOrder(orderId,model, mContext);
+                    finishOrder(model, mContext);
                 } else {
                     Toast.makeText(mContext, resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
                 }
@@ -179,14 +144,13 @@ public class UnLoginHandler {
     /**
      * 完成订单接口
      *
-     * @param orderId
+     * @param mContext
      * @param model
      */
-    private static void finishOrder(String orderId, UserModel model, Context mContext) {
+    private static void finishOrder(UserModel model, Context mContext) {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("orderId", orderId);
         map.put("userid", model.getId());
-        HttpApis.finishOrder(map, new StringCallback() {
+        HttpApis.GotZeroOrder(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log("error:" + e.getMessage());
@@ -201,10 +165,38 @@ public class UnLoginHandler {
 
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     Toast.makeText(mContext, mContext.getResources().getText(R.string.open_success), Toast.LENGTH_SHORT).show();
-                    model.setIsOpen("true");
+                    model.setIsVip("1");
                     SharedPrefsUtils.setStringPreference(mContext, "userinfo", new Gson().toJson(model, UserModel.class));
+                    GetPersonInfo(model,mContext);
+
                 } else {
                     Toast.makeText(mContext, mContext.getResources().getText(R.string.open_failed), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    private static void GetPersonInfo(UserModel model,Context mContext) {
+        HashMap<String,Object> map= new HashMap<>();
+        map.put("userid",model.getId());
+        HttpApis.getPersonInfo(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log(e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log("personInfo"+response);
+                ResponseObj<UserModel,RespHeader> resp = new ResponseObj<UserModel, RespHeader>();
+                ResponseParser.parse(resp,response,UserModel.class,RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
+                    UserModel model1= resp.getBody();
+                    model.setIsVip("1");
+                    TLog.log("got_zero"+model.toString()+":::"+new Gson().toJson(model,UserModel.class));
+                    SharedPrefsUtils.setStringPreference(mContext,"userinfo",new Gson().toJson(model,UserModel.class));
+                }else{
+                    Toast.makeText(mContext,resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
                 }
             }
         });

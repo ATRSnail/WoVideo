@@ -113,24 +113,19 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
         String userinfo=  SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)){
             UserModel model= new Gson().fromJson(userinfo,UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                String phoneNum= model.getPhoneNo();
-                vipPersonAccount.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
-                if (model.getIsVip().equals("1")){
-                    vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_opened));
-                }else{
-                    vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
-                }
-                if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
-                    Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).thumbnail(1f).into(vipPersonLogo);
-                }else{
-                    vipPersonLogo.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
-                }
-
+            String phoneNum= model.getPhoneNo();
+            vipPersonAccount.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
+            if (model.getIsVip().equals("1")){
+                vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_opened));
             }else{
-                vipPersonAccount.setText(getResources().getText(R.string.unlogin_hint));
                 vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
             }
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).thumbnail(1f).into(vipPersonLogo);
+            }else{
+                vipPersonLogo.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+            }
+
         }else{
             vipPersonAccount.setText(getResources().getText(R.string.unlogin_hint));
             vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
@@ -253,22 +248,26 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
             // TODO: 16/6/14 跳转电影页面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
+            bundle.putInt("typeId",VideoType.MOVIE.getId());
             UIHelper.ToMoviePage(getActivity(), bundle);
         } else if (typeId == VideoType.TELEPLAY.getId()) {
             // TODO: 16/6/14 跳转电视剧页面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
+            bundle.putInt("typeId",VideoType.TELEPLAY.getId());
             UIHelper.ToDemandPage(getActivity(), bundle);
 
         } else if (typeId == VideoType.SPORTS.getId()) {
             // TODO: 16/6/14 跳转 体育播放页面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
+            bundle.putInt("typeId",VideoType.SPORTS.getId());
             UIHelper.ToDemandPage(getActivity(), bundle);
         } else if (typeId == VideoType.VARIATY.getId()) {
             // TODO: 16/6/14 跳转综艺界面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
+            bundle.putInt("typeId",VideoType.VARIATY.getId());
             UIHelper.ToDemandPage(getActivity(), bundle);
         }
     }
@@ -337,13 +336,27 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
                         // TODO: 16/6/14 跳转电影页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(getActivity(), bundle);
-                    } else {
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
                         // TODO: 16/6/14 跳转电视剧页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
 
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
+                        // TODO: 16/6/14 跳转 体育播放页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.SPORTS.getId());
+                        UIHelper.ToDemandPage(getActivity(), bundle);
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
+                        // TODO: 16/6/14 跳转综艺界面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.VARIATY.getId());
+                        UIHelper.ToDemandPage(getActivity(), bundle);
                     }
                 }
             }

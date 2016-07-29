@@ -21,4 +21,6 @@
     <dimen name="s_5">5dp</dimen>
     <dimen name="s_30">30dp</dimen>
     <dimen name="s_40">40dp</dimen>
+    <dimen name="s_60">60dp</dimen>
+    <dimen name="s_150">150dp</dimen>
 </resources>

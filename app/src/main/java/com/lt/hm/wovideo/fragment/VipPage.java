@@ -237,25 +237,27 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
                         // TODO: 16/6/14 跳转电影页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(getActivity(), bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
                         // TODO: 16/6/14 跳转电视剧页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
 
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
                         // TODO: 16/6/14 跳转 体育播放页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.SPORTS.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
                         // TODO: 16/6/14 跳转综艺界面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.VARIATY.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.LIVE.getId()) {
-                        UIHelper.ToLivePage(getActivity());
                     }
                 }
             }

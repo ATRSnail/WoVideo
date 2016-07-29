@@ -135,7 +135,7 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
     @Override
     public void initViews() {
         pInfoLogo.setOnClickListener(this);
-        String user = ACache.get(getApplicationContext()).getAsString("userinfo");
+        String user = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (StringUtils.isNullOrEmpty(user)){
             Toast.makeText(this, "您尚未登陆,无法使用此功能!请登陆后再试!", Toast.LENGTH_SHORT).show();
             finish();
@@ -343,7 +343,6 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
                 ResponseParser.loginParse(resp,response,UserModel.class,RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
                     UserModel model = resp.getBody();
-                    model.setIsLogin("true");
                     String json = new Gson().toJson(model);
                     cacheUserInfo(json);
                     initViews();

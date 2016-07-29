@@ -80,6 +80,11 @@
             <!--android:layout_centerVertical="true"-->
             <!--android:visibility="gone"-->
             <!--android:id="@+id/video_player" />-->
+            <include layout="@layout/layout_intro_demand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                />
             <include
                 layout="@layout/video_anthology"
                 android:layout_width="match_parent"

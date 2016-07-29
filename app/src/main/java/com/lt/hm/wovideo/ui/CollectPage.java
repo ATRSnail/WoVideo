@@ -135,15 +135,43 @@ public class CollectPage extends BaseActivity implements CustomTopbar.myTopbarCl
                     // TODO: 16/7/21 跳转页面
                     CollectModel.CollListBean bean = mList.get(position);
                     int typeId = Integer.parseInt(bean.getTypeid());
-                    if (VideoType.MOVIE.getId()== typeId){
+//                    if (VideoType.MOVIE.getId()== typeId){
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", bean.getIid());
+//                        UIHelper.ToMoviePage(CollectPage.this, bundle);
+//                    }else{
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", bean.getIid());
+//                        UIHelper.ToDemandPage(CollectPage.this, bundle);
+//                    }
+                    if (VideoType.MOVIE.getId()== typeId) {
+                        // TODO: 16/6/14 跳转电影页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", bean.getIid());
+                        bundle.putInt("typeId",VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(CollectPage.this, bundle);
-                    }else{
+                    } else if (VideoType.TELEPLAY.getId()== typeId) {
+                        // TODO: 16/6/14 跳转电视剧页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", bean.getIid());
+                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+                        UIHelper.ToDemandPage(CollectPage.this, bundle);
+
+                    } else if (VideoType.SPORTS.getId()== typeId) {
+                        // TODO: 16/6/14 跳转 体育播放页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id",  bean.getIid());
+                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+                        UIHelper.ToDemandPage(CollectPage.this, bundle);
+                    } else if (VideoType.VARIATY.getId()== typeId) {
+                        // TODO: 16/6/14 跳转综艺界面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", bean.getIid());
+                        bundle.putInt("typeId",VideoType.VARIATY.getId());
                         UIHelper.ToDemandPage(CollectPage.this, bundle);
                     }
+
+
                 }
 
 
@@ -201,32 +229,30 @@ public class CollectPage extends BaseActivity implements CustomTopbar.myTopbarCl
         TLog.log("collectInfo"+userinfo);
         if (!StringUtils.isNullOrEmpty(userinfo)){
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("userid", model.getId());
-                map.put("pageNum", pageNum);
-                map.put("numPerPage", pageSize);
-                HttpApis.collectList(map, new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        TLog.log(e.getMessage());
-                    }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("userid", model.getId());
+            map.put("pageNum", pageNum);
+            map.put("numPerPage", pageSize);
+            HttpApis.collectList(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        TLog.log("collect" + response);
-                        ResponseObj<CollectModel, RespHeader> resp = new ResponseObj<CollectModel, RespHeader>();
-                        ResponseParser.parse(resp, response, CollectModel.class, RespHeader.class);
-                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                            List<CollectModel.CollListBean> models = resp.getBody().getCollList();
-                            mList.addAll(models);
-                            dataChanged();
-                        } else {
-                            TLog.log(resp.getHead().getRspMsg());
-                        }
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log("collect" + response);
+                    ResponseObj<CollectModel, RespHeader> resp = new ResponseObj<CollectModel, RespHeader>();
+                    ResponseParser.parse(resp, response, CollectModel.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        List<CollectModel.CollListBean> models = resp.getBody().getCollList();
+                        mList.addAll(models);
+                        dataChanged();
+                    } else {
+                        TLog.log(resp.getHead().getRspMsg());
                     }
-                });
-            }
+                }
+            });
         }
 
     }

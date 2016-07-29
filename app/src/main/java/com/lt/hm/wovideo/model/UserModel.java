@@ -34,8 +34,15 @@ public class UserModel{
     private String passWord;//密码
     private long ctime;//创建时间
     private String introduction;//简介
-    private String isLogin;//登录状态
-    private String isOpen;// 是否开通 服务
+    private String etime;
+
+    public String getEtime() {
+        return etime;
+    }
+
+    public void setEtime(String etime) {
+        this.etime = etime;
+    }
 
     public String getPhoneNo() {
         return phoneNo;
@@ -134,21 +141,6 @@ public class UserModel{
     }
 
 
-    public String getIsLogin() {
-        return isLogin;
-    }
-
-    public void setIsLogin(String isLogin) {
-        this.isLogin = isLogin;
-    }
-
-    public String getIsOpen() {
-        return isOpen;
-    }
-
-    public void setIsOpen(String isOpen) {
-        this.isOpen = isOpen;
-    }
 
     @Override
     public String toString() {
@@ -165,8 +157,7 @@ public class UserModel{
                 ", passWord='" + passWord + '\'' +
                 ", ctime=" + ctime +
                 ", introduction='" + introduction + '\'' +
-                ", isLogin='" + isLogin + '\'' +
-                ", isOpen='" + isOpen + '\'' +
+                ", etime='" + etime + '\'' +
                 '}';
     }
 }

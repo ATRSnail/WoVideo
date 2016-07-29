@@ -315,26 +315,26 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
                 }
             }
         });
-        imgIndicator.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_MOVE:
-                        refreshLayout.setEnabled(false);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                        refreshLayout.setEnabled(false);
-                        break;
-                    case MotionEvent.ACTION_SCROLL:
-                        refreshLayout.setEnabled(false);
-                        break;
-                    case MotionEvent.ACTION_CANCEL:
-                        refreshLayout.setEnabled(true);
-                        break;
-                }
-                return false;
-            }
-        });
+//        imgIndicator.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_MOVE:
+//                        refreshLayout.setEnabled(false);
+//                        break;
+//                    case MotionEvent.ACTION_UP:
+//                        refreshLayout.setEnabled(false);
+//                        break;
+//                    case MotionEvent.ACTION_SCROLL:
+//                        refreshLayout.setEnabled(false);
+//                        break;
+//                    case MotionEvent.ACTION_CANCEL:
+//                        refreshLayout.setEnabled(true);
+//                        break;
+//                }
+//                return false;
+//            }
+//        });
 
         choice_h_scroll.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -464,22 +464,26 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
                         // TODO: 16/6/14 跳转电影页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(getActivity(), bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
                         // TODO: 16/6/14 跳转电视剧页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
 
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
                         // TODO: 16/6/14 跳转 体育播放页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.SPORTS.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
                         // TODO: 16/6/14 跳转综艺界面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.VARIATY.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.LIVE.getId()) {
                         UIHelper.ToLivePage(getActivity());

@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -43,6 +44,8 @@ public class SearchResultPage extends BaseActivity implements SecondTopbar.myTop
     String flag;
     @BindView(R.id.search_result_top)
     SecondTopbar searchResultTop;
+    @BindView(R.id.empty_view)
+    Button empty_view;
 
     @Override
     protected int getLayoutId() {
@@ -90,6 +93,8 @@ public class SearchResultPage extends BaseActivity implements SecondTopbar.myTop
                     if (!StringUtils.isNullOrEmpty(resp.getBody().getVfList())&& resp.getBody().getVfList().size()>0){
                         List<SearchResult.VfListBean> lists= resp.getBody().getVfList();
                         gridAdapter = new SearchResultAdapter(SearchResultPage.this, lists);
+                        searchResultList.setVisibility(View.VISIBLE);
+                        empty_view.setVisibility(View.GONE);
                         if (searchResultList!=null){
                             searchResultList.setLayoutManager(new LinearLayoutManager(SearchResultPage.this));
                             searchResultList.setAdapter(gridAdapter);
@@ -101,8 +106,13 @@ public class SearchResultPage extends BaseActivity implements SecondTopbar.myTop
                                 }
                             });
                         }
+                    }else{
+                        empty_view.setVisibility(View.VISIBLE);
+                        searchResultList.setVisibility(View.GONE);
                     }
                 } else {
+                    empty_view.setVisibility(View.VISIBLE);
+                    searchResultList.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(), "暂无数据", Toast.LENGTH_SHORT).show();
                 }
 
@@ -127,16 +137,42 @@ public class SearchResultPage extends BaseActivity implements SecondTopbar.myTop
                 ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
                 ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
+//                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+//                        // TODO: 16/6/14 跳转电影页面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        UIHelper.ToMoviePage(SearchResultPage.this, bundle);
+//                    } else{
+//                        // TODO: 16/6/14 跳转电视剧页面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        UIHelper.ToDemandPage(SearchResultPage.this, bundle);
+//                    }
                     if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
                         // TODO: 16/6/14 跳转电影页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(SearchResultPage.this, bundle);
-                    } else{
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
                         // TODO: 16/6/14 跳转电视剧页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+                        UIHelper.ToDemandPage(SearchResultPage.this, bundle);
+
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
+                        // TODO: 16/6/14 跳转 体育播放页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.SPORTS.getId());
+                        UIHelper.ToDemandPage(SearchResultPage.this, bundle);
+
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
+                        // TODO: 16/6/14 跳转综艺界面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.VARIATY.getId());
                         UIHelper.ToDemandPage(SearchResultPage.this, bundle);
                     }
                 }

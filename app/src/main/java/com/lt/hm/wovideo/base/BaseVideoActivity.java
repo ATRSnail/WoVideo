@@ -39,7 +39,6 @@ import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.util.Util;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.RespHeader;
@@ -49,6 +48,7 @@ import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BulletModel;
 import com.lt.hm.wovideo.model.NetUsage;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.Bullet;
@@ -290,7 +290,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 //        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
                 .setMaximumLines(maxLinesPair)
                 .preventOverlapping(overlappingEnablePair);
-        if (mDanmakuView != null) {
+        if (mDanmakuView != null){
 //            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
                 @Override
@@ -332,7 +332,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 //                @Override
 //                public void onClick(View view) {
 //                    mMediaController.setVisibility(View.VISIBLE);
-//                }
+                }
 //            });
             ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
                 @Override
@@ -345,7 +345,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     return false;
                 }
             });
-        }
+
     }
 
 
@@ -514,7 +514,9 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
             // when in portrait screen, turn off bullet screen.
             mMediaController.setBulletScreen(false);
-            mDanmakuView.hide();
+            if (mDanmakuView!=null){
+                mDanmakuView.hide();
+            }
         }
     }
 
@@ -627,7 +629,9 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     protected void getBullets() {
         TLog.log("Bullet", "get bullets"+mVideoId);
-        mDanmakuView.release();
+        if (mDanmakuView!=null){
+            mDanmakuView.release();
+        }
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("pageNum", 1);
         maps.put("numPerPage", 10000);
@@ -642,14 +646,14 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log(response);
+                TLog.log("getBullet"+response);
                 ResponseObj<BulletModel, RespHeader> resp = new ResponseObj<BulletModel, RespHeader>();
                 ResponseParser.parse(resp, response, BulletModel.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     if (!StringUtils.isNullOrEmpty(resp.getBody().getBarrageList()) && resp.getBody().getBarrageList().size() > 0) {
                         mParser = new WoDanmakuParser();
                         mParser.setmDanmuListData(resp.getBody());
-                        if (mContext == null)
+                        if (mContext == null||mParser==null)
                             return;
                         mDanmakuView.prepare(mParser, mContext);
                         mDanmakuView.showFPS(false);
@@ -671,7 +675,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
      */
     protected void addBullet(Bullet bullet) {
         HashMap<String, Object> map = new HashMap<>();
-        String string = ACache.get(this).getAsString("userinfo");
+        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
             //FIXME user id is incorrect!
@@ -702,6 +706,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                         Toast.makeText(getApplicationContext(), "弹幕成功", Toast.LENGTH_SHORT).show();
                         TLog.log("Bullet" + mVideoId);
                         addDanmaku(bullet);
+//                            getBullets();
                     } else {
                         if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
                             Toast.makeText(getApplicationContext(), "弹幕失败", Toast.LENGTH_SHORT).show();
@@ -720,21 +725,32 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     private void addDanmaku(Bullet bullet) {
         BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
-        if (danmaku == null || mDanmakuView == null) {
+        if (danmaku == null || mDanmakuView == null|| mParser==null) {
             return;
         }
+
         // for(int i=0;i<100;i++){
         // }
-        danmaku.text = bullet.getContent();
-        danmaku.padding = 5;
-        danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
-        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
-        danmaku.textSize = Float.parseFloat(bullet.getFontSize()) * (mParser.getDisplayer().getDensity() - 0.6f);
-        danmaku.textColor = Color.parseColor(bullet.getFontColor());
-        danmaku.textShadowColor = Color.WHITE;
-        // danmaku.underlineColor = Color.GREEN;
-//        danmaku.borderColor = Color.GREEN;
-        mDanmakuView.addDanmaku(danmaku);
+
+//        mParser = new WoDanmakuParser();
+//        mDanmakuView.resume();
+//        mDanmakuView.showFPS(false);
+//        mDanmakuView.enableDanmakuDrawingCache(true);
+        if (mParser!=null&& mParser.getDisplayer()!=null){
+            danmaku.text = bullet.getContent();
+            danmaku.padding = 100;
+            danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
+            danmaku.time = mDanmakuView.getCurrentTime() + 1200;
+            danmaku.textSize = Float.parseFloat(bullet.getFontSize()) * (mParser.getDisplayer().getDensity() - 0.6f);
+//            danmaku.textSize=20f;
+            danmaku.textColor = Color.parseColor(bullet.getFontColor());
+            danmaku.textShadowColor = Color.WHITE;
+//            danmaku.underlineColor = Color.GREEN;
+//            danmaku.borderColor = Color.GREEN;
+            mDanmakuView.addDanmaku(danmaku);
+//            getBullets();
+        }
+
 
     }
 

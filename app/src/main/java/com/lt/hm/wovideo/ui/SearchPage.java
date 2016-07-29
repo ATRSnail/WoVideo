@@ -157,5 +157,6 @@ public class SearchPage extends BaseActivity {
     protected void onResume() {
         super.onResume();
         initDatas();
+        flag = false;
     }
 }

@@ -161,8 +161,8 @@ public class NewMoviePage extends BaseVideoActivity {
     }
 
     private void videoAddHit(String vfId) {
-        HashMap<String,Object> map= new HashMap<>();
-        map.put("playsId",vfId);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("playsId", vfId);
         HttpApis.addVideoHit(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -171,7 +171,7 @@ public class NewMoviePage extends BaseVideoActivity {
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log("addHit"+response);
+                TLog.log("addHit" + response);
             }
         });
     }
@@ -182,54 +182,50 @@ public class NewMoviePage extends BaseVideoActivity {
             beans.clear();
         }
         HashMap<String, Object> map = new HashMap<>();
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)) {
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                map.put("userId", model.getId());
-                map.put("pageNum", 1);
-                map.put("numPerPage", 50);
-                map.put("vfId", vfId);
-                HttpApis.commentList(map, new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        TLog.log(e.getMessage());
-                    }
+            map.put("userId", model.getId());
+            map.put("pageNum", 1);
+            map.put("numPerPage", 50);
+            map.put("vfId", vfId);
+            HttpApis.commentList(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        TLog.log(response);
-                        ResponseObj<CommentModel, RespHeader> resp = new ResponseObj<CommentModel, RespHeader>();
-                        ResponseParser.parse(resp, response, CommentModel.class, RespHeader.class);
-                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                            if (!StringUtils.isNullOrEmpty(resp.getBody().getCommentList()) && resp.getBody().getCommentList().size() > 0) {
-                                empty.setVisibility(View.GONE);
-                                videoCommentList.setVisibility(View.VISIBLE);
-                                beans.addAll(resp.getBody().getCommentList());
-                                commentAdapter = new CommentAdapter(getApplicationContext(), beans);
-                                videoCommentList.setLayoutManager(new LinearLayoutManager(NewMoviePage.this));
-                                videoCommentList.addItemDecoration(new RecycleViewDivider(NewMoviePage.this, LinearLayoutManager.VERTICAL));
-                                videoCommentList.setItemAnimator(new DefaultItemAnimator());
-                                videoCommentList.setAdapter(commentAdapter);
-                                commentAdapter.notifyDataSetChanged();
-                            } else {
-                                //暂无评论内容布局添加
-                                if (videoCommentList != null) {
-                                    videoCommentList.setVisibility(View.GONE);
-                                }
-                                empty.setVisibility(View.VISIBLE);
-                            }
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log(response);
+                    ResponseObj<CommentModel, RespHeader> resp = new ResponseObj<CommentModel, RespHeader>();
+                    ResponseParser.parse(resp, response, CommentModel.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        if (!StringUtils.isNullOrEmpty(resp.getBody().getCommentList()) && resp.getBody().getCommentList().size() > 0) {
+                            empty.setVisibility(View.GONE);
+                            videoCommentList.setVisibility(View.VISIBLE);
+                            beans.addAll(resp.getBody().getCommentList());
+                            commentAdapter = new CommentAdapter(getApplicationContext(), beans);
+                            videoCommentList.setLayoutManager(new LinearLayoutManager(NewMoviePage.this));
+                            videoCommentList.addItemDecoration(new RecycleViewDivider(NewMoviePage.this, LinearLayoutManager.VERTICAL));
+                            videoCommentList.setItemAnimator(new DefaultItemAnimator());
+                            videoCommentList.setAdapter(commentAdapter);
+                            commentAdapter.notifyDataSetChanged();
                         } else {
-                            //评论内容获取失败布局添加
-                            videoCommentList.setVisibility(View.GONE);
+                            //暂无评论内容布局添加
+                            if (videoCommentList != null) {
+                                videoCommentList.setVisibility(View.GONE);
+                            }
                             empty.setVisibility(View.VISIBLE);
-                            empty.setText("获取评论失败,请稍后重试");
                         }
+                    } else {
+                        //评论内容获取失败布局添加
+                        videoCommentList.setVisibility(View.GONE);
+                        empty.setVisibility(View.VISIBLE);
+                        empty.setText("获取评论失败,请稍后重试");
                     }
-                });
-            }else{
-                UnLoginHandler.unLogin(NewMoviePage.this);
-            }
+                }
+            });
         } else {
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
@@ -239,6 +235,11 @@ public class NewMoviePage extends BaseVideoActivity {
         HashMap<String, Object> map = new HashMap<>();
         map.put("pageNum", 1);
         map.put("numPerPage", size);
+        if (getIntent().getExtras().containsKey("typeId")) {
+            map.put("typeid", getIntent().getExtras().getInt("typeId"));
+        } else {
+            map.put("typeid", 1);
+        }
         HttpApis.getYouLikeList(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -304,13 +305,14 @@ public class NewMoviePage extends BaseVideoActivity {
                         // TODO: 16/6/14 跳转电影页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId", VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(NewMoviePage.this, bundle);
                         NewMoviePage.this.finish();
-
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
                         // TODO: 16/6/14 跳转电视剧页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId", VideoType.TELEPLAY.getId());
                         UIHelper.ToDemandPage(NewMoviePage.this, bundle);
                         NewMoviePage.this.finish();
 
@@ -318,6 +320,7 @@ public class NewMoviePage extends BaseVideoActivity {
                         // TODO: 16/6/14 跳转 体育播放页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId", VideoType.SPORTS.getId());
                         UIHelper.ToDemandPage(NewMoviePage.this, bundle);
                         NewMoviePage.this.finish();
 
@@ -325,13 +328,9 @@ public class NewMoviePage extends BaseVideoActivity {
                         // TODO: 16/6/14 跳转综艺界面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
+                        bundle.putInt("typeId", VideoType.VARIATY.getId());
                         UIHelper.ToDemandPage(NewMoviePage.this, bundle);
                         NewMoviePage.this.finish();
-
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.LIVE.getId()) {
-                        UIHelper.ToLivePage(NewMoviePage.this);
-                        NewMoviePage.this.finish();
-
                     }
                 }
             }
@@ -369,10 +368,10 @@ public class NewMoviePage extends BaseVideoActivity {
                     values = new String[]{details.getDirector(), details.getStars(), details.getLx(), details.getDq(), details.getNd(), details.getCpname()};
                     biAdapter = new BrefIntroAdapter(NewMoviePage.this, names, values);
                     videoBrefIntros.setAdapter(biAdapter);
-                    String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+                    String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
                     if (!StringUtils.isNullOrEmpty(userinfo)) {
                         UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-                        if (model.getIsOpen()!=null && model.getIsOpen().equals("true")){
+                        if (model.getIsVip() != null && model.getIsVip().equals("1")) {
                             mFreeLabel.setVisibility(View.VISIBLE);
                         }
 //                        String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
@@ -421,7 +420,7 @@ public class NewMoviePage extends BaseVideoActivity {
             if (imm.isActive()) {
                 imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
             }
-           checkCommentValide(etAddComment.getText().toString());
+            checkCommentValide(etAddComment.getText().toString());
         });
 
         videoCollect.setOnClickListener((View v) -> {
@@ -452,28 +451,29 @@ public class NewMoviePage extends BaseVideoActivity {
     }
 
     private void checkCommentValide(String s) {
-        HashMap<String,Object> map= new HashMap<>();
-        map.put("context",s);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("context", s);
         HttpApis.CommentVerification(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log(e.getMessage());
             }
+
             @Override
             public void onResponse(String response, int id) {
                 TLog.log(response);
-                ResponseObj<ValidateComment,RespHeader> resp=new ResponseObj<ValidateComment, RespHeader>();
-                ResponseParser.parse(resp,response,ValidateComment.class,RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)){
+                ResponseObj<ValidateComment, RespHeader> resp = new ResponseObj<ValidateComment, RespHeader>();
+                ResponseParser.parse(resp, response, ValidateComment.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     ValidateComment validate = resp.getBody();
-                    if (validate.getIsPass().equals("1")){
+                    if (validate.getIsPass().equals("1")) {
                         //check validate success;
                         SendComment(etAddComment.getText().toString());
-                    }else{
-                        Toast.makeText(getApplicationContext(),"言论不当，请斟酌发言",Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "言论不当，请斟酌发言", Toast.LENGTH_SHORT).show();
                     }
-                }else{
-                    Toast.makeText(getApplicationContext(),resp.getHead().getRspMsg(),Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -482,38 +482,33 @@ public class NewMoviePage extends BaseVideoActivity {
 
     private void CancelCollect() {
 
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)){
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)) {
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("userid", model.getId());
-                map.put("vfids", collect_tag);
-                HttpApis.cancelCollect(map, new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        TLog.log(e.getMessage());
-                    }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("userid", model.getId());
+            map.put("vfids", collect_tag);
+            HttpApis.cancelCollect(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        TLog.log("cancel_result" + response);
-                        ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                        ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
-                        } else {
-                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
-                        }
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log("cancel_result" + response);
+                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                    } else {
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
                     }
-                });
-            }else{
-                UnLoginHandler.unLogin(NewMoviePage.this);
-
-            }
-        }else{
+                }
+            });
+        } else {
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
     }
@@ -523,7 +518,7 @@ public class NewMoviePage extends BaseVideoActivity {
      */
     private void CollectVideo() {
         HashMap<String, Object> map = new HashMap<>();
-        String string = ACache.get(this).getAsString("userinfo");
+        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
             map.put("userid", model.getId());
@@ -547,6 +542,7 @@ public class NewMoviePage extends BaseVideoActivity {
                     }
                 }
             });
+
         } else {
             // TODO: 16/7/8 未登录跳转登录页面
             UnLoginHandler.unLogin(NewMoviePage.this);
@@ -631,14 +627,14 @@ public class NewMoviePage extends BaseVideoActivity {
                 ResponseParser.parse(resp, response, PlayList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
-                    if (StringUtils.isNullOrEmpty(login_info)){
-                        img_collect.setImageResource( R.drawable.icon_collect);
-                    }else{
-                        if (details.getSc() != null && details.getSc().equals("1")){
-                            img_collect.setImageResource( R.drawable.icon_collect_press);
+                    if (StringUtils.isNullOrEmpty(login_info)) {
+                        img_collect.setImageResource(R.drawable.icon_collect);
+                    } else {
+                        if (details.getSc() != null && details.getSc().equals("1")) {
+                            img_collect.setImageResource(R.drawable.icon_collect_press);
                             isCollected = true;
-                        }else{
-                            img_collect.setImageResource( R.drawable.icon_collect);
+                        } else {
+                            img_collect.setImageResource(R.drawable.icon_collect);
                             isCollected = false;
                         }
                     }
@@ -709,7 +705,7 @@ public class NewMoviePage extends BaseVideoActivity {
      */
     private void getRealURL(String url, boolean isQualitySwitch, String videoId) {
         if (!isQualitySwitch) {
-            TLog.log("Bullet","get real url"+ videoId);
+            TLog.log("Bullet", "get real url" + videoId);
             setVideoId(videoId); // Set Video Id for Bullet Screen usage
             getBullets(); // get Bullet list after set Video Id.
         }
@@ -722,21 +718,16 @@ public class NewMoviePage extends BaseVideoActivity {
         //FIXME: hardcode cellphone freetag
 //        maps.put("cellphone", "18513179404");
 //        maps.put("freetag", 1);
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)){
-            UserModel model = new Gson().fromJson(userinfo,UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                maps.put("cellphone", model.getPhoneNo());
-                if (model.getIsOpen()!=null && model.getIsOpen().equals("true")){
-                    maps.put("freetag", "1");
-                }else{
-                    maps.put("freetag", "0");
-                }
-            }else{
-                maps.put("cellphone", StringUtils.generateOnlyID());
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)) {
+            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+            maps.put("cellphone", model.getPhoneNo());
+            if (model.getIsVip() != null && model.getIsVip().equals("1")) {
+                maps.put("freetag", "1");
+            } else {
                 maps.put("freetag", "0");
             }
-        }else{
+        } else {
             maps.put("cellphone", StringUtils.generateOnlyID());
             maps.put("freetag", "0");
         }
@@ -753,15 +744,15 @@ public class NewMoviePage extends BaseVideoActivity {
                 ResponseObj<VideoURL, RespHeader> resp = new ResponseObj<VideoURL, RespHeader>();
                 ResponseParser.parse(resp, response, VideoURL.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    if (videoUrl != null && video != null ) {
+                    if (videoUrl != null && video != null) {
                         videoUrl.setFormatUrl(resp.getBody().getUrl());
                         video.setmPlayUrl(videoUrl);
                         // Reset player and params.
                         releasePlayer();
                         mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
-                        if (getIntent().getExtras().containsKey("cur_position")){
+                        if (getIntent().getExtras().containsKey("cur_position")) {
                             long cur_position = getIntent().getExtras().getLong("cur_position");
-                            mPlayerPosition= cur_position;
+                            mPlayerPosition = cur_position;
                             seekTo(mPlayerPosition);
                         }
                         // Set play URL and play it

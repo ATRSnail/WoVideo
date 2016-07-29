@@ -84,32 +84,30 @@ public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopb
 
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
-            if (model.getIsLogin()!=null&& model.getIsLogin().equals("true")){
-                phoneNum = model.getPhoneNo();
-                userId = model.getId();
-                username.setText("账号：" + phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
-                if (FILE_SAVEPATH != null) {
-                    Glide.with(this).load(ACache.get(this).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(imgPhotos);
-                }
-                if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
-                    Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(imgPhotos);
-                }else{
-                    imgPhotos.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
-                }
-                if (model.getIsVip().equals("1")) {
-                    imgKing.setImageResource(R.drawable.icon_vip_opened);
-                    open_get_vip_layout.setVisibility(View.GONE);
-                    imgVipAuthers.setImageResource(R.drawable.img_vip_opened);
-                    btnAbortService.setVisibility(View.VISIBLE);
-                } else {
-                    imgKing.setImageResource(R.drawable.icon_vip_unopened);
-                    open_get_vip_layout.setVisibility(View.VISIBLE);
-                    imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
-                    btnAbortService.setVisibility(View.GONE);
-                }
-            }else{
-                UnloginState();
+            phoneNum = model.getPhoneNo();
+            userId = model.getId();
+            username.setText("账号：" + phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
+            if (FILE_SAVEPATH != null) {
+                Glide.with(this).load(ACache.get(this).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(imgPhotos);
             }
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(imgPhotos);
+            }else{
+                imgPhotos.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+            }
+            TLog.log("person_"+model.toString());
+            if (model.getIsVip().equals("1")) {
+                imgKing.setImageResource(R.drawable.icon_vip_opened);
+                open_get_vip_layout.setVisibility(View.GONE);
+                imgVipAuthers.setImageResource(R.drawable.img_vip_opened);
+                btnAbortService.setVisibility(View.GONE);
+            } else {
+                imgKing.setImageResource(R.drawable.icon_vip_unopened);
+                open_get_vip_layout.setVisibility(View.VISIBLE);
+                imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
+                btnAbortService.setVisibility(View.GONE);
+            }
+
         } else {
             UnloginState();
         }
@@ -128,13 +126,13 @@ public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopb
 
     @Override
     public void initViews() {
-        if (flag) {
-            imgKing.setImageResource(R.drawable.icon_vip_unopened);
-            imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
-        } else {
-            imgKing.setImageResource(R.drawable.icon_vip_unopened);
-            imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
-        }
+//        if (flag) {
+//            imgKing.setImageResource(R.drawable.icon_vip_unopened);
+//            imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
+//        } else {
+//            imgKing.setImageResource(R.drawable.icon_vip_unopened);
+//            imgVipAuthers.setImageResource(R.drawable.img_vip_unopened);
+//        }
         btnBuying.setOnClickListener((View v) -> {
             String userinfo = ACache.get(this).getAsString("userinfo");
             if (StringUtils.isNullOrEmpty(userinfo)) {

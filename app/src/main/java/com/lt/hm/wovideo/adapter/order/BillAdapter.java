@@ -30,7 +30,7 @@ public class BillAdapter extends BaseQuickAdapter<BillList.OrderListBean> {
     @Override
     protected void convert(BaseViewHolder holder, BillList.OrderListBean order) {
         if (order.getGoodsId().equals("953")){
-            holder.setText(R.id.order_video_name,"订购沃视频会员");
+            holder.setText(R.id.order_video_name,"0元免流量包");
         }else{
             holder.setText(R.id.order_video_name,order.getName());
         }

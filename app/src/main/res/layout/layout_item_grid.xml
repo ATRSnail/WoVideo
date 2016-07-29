@@ -32,6 +32,9 @@
                 android:text="TITLEdsfasdfasdfads"
                 android:layout_centerHorizontal="true"
                 android:gravity="center"
+                android:maxWidth="@dimen/s_180"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:textColor="@color/black"
                 android:id="@+id/grid_item_title"
                 />

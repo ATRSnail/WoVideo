@@ -94,8 +94,6 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                     dataBase.delete(temp.getmId());
                 }
             }
-
-
             checkNum = 0;
             // 通知列表数据修改
             dataChanged();
@@ -130,7 +128,7 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
 
     @Override
     public void initDatas() {
-        list.addAll(dataBase.query(""));
+        list.addAll(dataBase.query(" ORDER BY create_time desc"));
         TLog.log("sql_history"+list.toString());
         if (list != null && list.size() > 0) {
             dataChanged();
@@ -232,6 +230,7 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
                         bundle.putLong("cur_position",bean.getCurrent_positon());
+                        bundle.putInt("typeId",VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(HistoryPage.this, bundle);
                     } else {
                         Bundle bundle = new Bundle();
@@ -239,12 +238,18 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                         bundle.putLong("cur_position",bean.getCurrent_positon());
                         bundle.putString("episode",bean.getEpisode());
                         UIHelper.ToDemandPage(HistoryPage.this, bundle);
-
                     }
                 }
             }
         });
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (list.size()>0){
+            list.clear();
+        }
+        initDatas();
+    }
 }

@@ -138,18 +138,12 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 //            if (StringUtils.isNullOrEmpty(tag)) {
 //                UnLoginHandler.freeDialog(MainPage2.this, model.getId());
 //            }
-            if (model.getIsLogin() != null && model.getIsLogin().equals("true")) {
-                if (model.getIsOpen() == null) {
+                if (model.getIsVip() == null) {
+                    UnLoginHandler.freeDialog(MainPage2.this, model);
+                }else if ( model.getIsVip().equals("0")){
                     UnLoginHandler.freeDialog(MainPage2.this, model);
                 }
-            } else {
-//                UnLoginHandler.unLogin(MainPage2.this);
-                popHandler.postDelayed(popRun, 3000);
             }
-
-
-        }
-
     }
 
     private void initTabs() {

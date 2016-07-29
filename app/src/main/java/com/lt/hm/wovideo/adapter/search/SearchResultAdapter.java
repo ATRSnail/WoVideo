@@ -26,7 +26,7 @@ public class SearchResultAdapter extends BaseQuickAdapter<SearchResult.VfListBea
         holder.setText(R.id.home_item_desc, vfListBean.getName());
 
         if (vfListBean.getImg() != null) {
-            holder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(vfListBean.getImg()));
+            holder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(vfListBean.getHIMG()));
         } else {
             holder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
         }

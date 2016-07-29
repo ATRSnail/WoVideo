@@ -22,7 +22,6 @@ import android.widget.Toast;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemListAdapter;
@@ -101,6 +100,14 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     @BindView(R.id.free_label)
     TextView mFreeLabel;
 
+    @BindView(R.id.demand_intro_simple)
+    TextView demand_intro_simple;
+    @BindView(R.id.demand_intro_expand)
+    TextView demand_intro_expand;
+    @BindView(R.id.demand_intro_all)
+    TextView demand_intro_all;
+
+
     //
     private MultiSelector mMultiSelector = new SingleSelector();
     private ArrayList<String> mEpisodes;
@@ -122,7 +129,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     EditText etAddComment;
     @BindView(R.id.add_comment)
     LinearLayout addComment;
-    private int pageSize = 50;
+    private int pageSize = 60;
     private String mQualityName;
 
     private String img_url;
@@ -159,17 +166,15 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             vfId = bundle.getString("id");
             getVideoDetails(vfId);
             getAnthologyDatas(vfId);
+            getFirstURL(vfId);
+//            if (getIntent().getExtras().containsKey("cur_position")){
+//                cur_position = getIntent().getExtras().getLong("cur_position");
+//                TLog.log("position_cur"+cur_position);
+//            }
+//            else{
+//            }
 
-            if (bundle.containsKey("cur_position")){
-                cur_position = bundle.getLong("cur_position");
-                TLog.log("position_cur"+cur_position);
-                mPlayerPosition= cur_position;
-            }else{
-                getFirstURL(vfId);
-            }
         }
-
-
         getYouLikeDatas();
     }
 
@@ -200,7 +205,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             beans.clear();
         }
         HashMap<String, Object> map = new HashMap<>();
-        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)) {
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
             map.put("userId", model.getId());
@@ -215,7 +220,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
                 @Override
                 public void onResponse(String response, int id) {
-                    TLog.log(response);
+                    TLog.log("comments_"+response);
                     ResponseObj<CommentModel, RespHeader> resp = new ResponseObj<CommentModel, RespHeader>();
                     ResponseParser.parse(resp, response, CommentModel.class, RespHeader.class);
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
@@ -259,6 +264,11 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         HashMap<String, Object> map = new HashMap<>();
         map.put("pageNum", 1);
         map.put("numPerPage", pageSize);
+        if (getIntent().getExtras().containsKey("typeId")){
+            map.put("typeid",getIntent().getExtras().getInt("typeId"));
+        }else{
+            map.put("typeid",2);
+        }
         HttpApis.getYouLikeList(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -267,7 +277,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log(response);
+                TLog.log("you_like"+response);
                 ResponseObj<LikeList, RespHeader> resp = new ResponseObj<LikeList, RespHeader>();
                 ResponseParser.parse(resp, response, LikeList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
@@ -301,20 +311,26 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         anthologyList.setLayoutManager(manager);
         mMultiSelector.setSelectable(true);
 //        anthologyList.setAdapter(anthologyAdapter);
-        anthologyList.setAdapter(new EpisodeAdapter());
+        EpisodeAdapter adapter= new EpisodeAdapter();
+        anthologyList.setAdapter(adapter);
         if (getIntent().getExtras().containsKey("episode")){
             if (!getIntent().getExtras().getString("episode").equals("null")){
                 int c_episode = Integer.parseInt(getIntent().getExtras().getString("episode"));
                 mMultiSelector.setSelected(c_episode-1,0,true);
+                adapter.notifyItemChanged(c_episode-1);
                 selectEpisode(c_episode+"");
             }else{
                 mMultiSelector.setSelected(0,0,true);
+                adapter.notifyItemChanged(0);
                 selectEpisode("1");
             }
         }else{
             selectEpisode("1");
+            adapter.notifyItemChanged(0);
             mMultiSelector.setSelected(0,0,true);
         }
+//        mMultiSelector.setSelected(0,0,true);
+
 
 
     }
@@ -322,13 +338,12 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     private void getAnthologyDatas(String vfId) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", vfId);
-        String login_info = ACache.get(this).getAsString("userinfo");
-        if (StringUtils.isNullOrEmpty(login_info)) {
-
-        } else {
+        String login_info = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        if (!StringUtils.isNullOrEmpty(login_info)){
             UserModel model = new Gson().fromJson(login_info, UserModel.class);
             maps.put("userid", model.getId());
         }
+
         HttpApis.getVideoListInfo(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -405,7 +420,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
             @Override
             public void onResponse(String response, int id) {
-                TLog.log(response);
+                TLog.log("details"+response);
                 ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
                 ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
@@ -413,15 +428,27 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     share_desc = details.getIntroduction();
                     share_title= details.getName();
                     img_url = details.getImg();
+//                    String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+//                    if (!StringUtils.isNullOrEmpty(userinfo)){
+//                        UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+//                        String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
+//                        if (!StringUtils.isNullOrEmpty(tag)) {
+////                            free_hint.setText(" "+"已免流");
+//                            mFreeLabel.setVisibility(View.VISIBLE);
+//                        }
+//                    }
                     String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-                    if (!StringUtils.isNullOrEmpty(userinfo)){
-                        UserModel model = new Gson().fromJson(userinfo,UserModel.class);
-                        String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
-                        if (!StringUtils.isNullOrEmpty(tag)) {
-//                            free_hint.setText(" "+"已免流");
+                    if (!StringUtils.isNullOrEmpty(userinfo)) {
+                        UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+                        if (model.getIsVip()!=null && model.getIsVip().equals("1")){
                             mFreeLabel.setVisibility(View.VISIBLE);
                         }
+//                        String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
+//                        if (!StringUtils.isNullOrEmpty(tag)) {
+////                            free_hint.setText(" "+"已免流");
+//                        }
                     }
+
                     videoName.setText(details.getName());
                     img_collect.setImageResource(details.getSc() != null && details.getSc().equals("1") ? R.drawable.icon_collect_press : R.drawable.icon_collect);
 
@@ -431,7 +458,10 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     } else {
                         anthologyText.setText("完结 共" + details.getJjs() + "集");
                     }
-
+                    demand_intro_simple.setText("来源："+details.getCpname()+"\t\t\t\t\t"+"导演："+details.getDirector()+"\n"
+                        +"地区："+details.getDq()+"\t\t\t\t\t"+"类型："+details.getLx()+"\n"+"年代："+details.getNd()
+                    );
+                    demand_intro_all.setText("简介：\n"+details.getIntroduction());
                     videoHistory.setmName(details.getName());
                     videoHistory.setCreate_time(System.currentTimeMillis()+"");
                     videoHistory.setImg_url(details.getImg());
@@ -450,13 +480,12 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     public void getFirstURL(String vfId) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", vfId);
-        String login_info = ACache.get(this).getAsString("userinfo");
-        if (StringUtils.isNullOrEmpty(login_info)) {
-
-        } else {
+        String login_info = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        if (!StringUtils.isNullOrEmpty(login_info)){
             UserModel model = new Gson().fromJson(login_info, UserModel.class);
             maps.put("userid", model.getId());
         }
+
         HttpApis.getVideoListInfo(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -529,6 +558,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     model.setmVideoUrl(urls);
 
                     setVideoModel(model);
+
+
                     setQualityListener(new AVController.OnQualitySelected() {
                         @Override
                         public void onQualitySelect(String key, String value) {
@@ -564,17 +595,16 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)){
             UserModel model = new Gson().fromJson(userinfo,UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                maps.put("cellphone", model.getPhoneNo());
-                if (model.getIsOpen()!=null && model.getIsOpen().equals("true")){
+            maps.put("cellphone", model.getPhoneNo());
+            if (model.getIsVip()!=null && model.getIsVip().equals("1")){
                     maps.put("freetag", "1");
-                }else{
-                    maps.put("freetag", "0");
-                }
             }else{
-                maps.put("cellphone", StringUtils.generateOnlyID());
                 maps.put("freetag", "0");
             }
+
+        }else{
+            maps.put("cellphone", StringUtils.generateOnlyID());
+            maps.put("freetag", "0");
         }
 //        maps.put("cellphone", "18513179404");
 //        maps.put("freetag", "1");
@@ -597,15 +627,16 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 
                     mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
 
-//                    if (getIntent().getExtras().containsKey("cur_position")){
-//                        long cur_position = getIntent().getExtras().getLong("cur_position");
-//                        TLog.log("position_cur"+cur_position);
-//                        mPlayerPosition= cur_position;
-//                    }
                     if (cur_position!=0){
+//                        TLog.log("position_cur"+cur_position);
                         mPlayerPosition= cur_position;
                         seekTo(mPlayerPosition);
                     }
+//                    if (cur_position!=0){
+//                        TLog.log("ppp"+cur_position);
+//                        mPlayerPosition= cur_position;
+//                        seekTo(mPlayerPosition);
+//                    }
 
 
                     // Set Player
@@ -670,6 +701,21 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             }
             anthologyList.scrollToPosition(currentEpisode - 1 > 0 ? currentEpisode - 1 : currentEpisode);
         });
+        demand_intro_expand.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (demand_intro_expand.getText().equals("展开")){
+                    demand_intro_expand.setText("收起");
+                    demand_intro_all.setVisibility(View.VISIBLE);
+                }else{
+                    demand_intro_expand.setText("展开");
+                    demand_intro_all.setVisibility(View.GONE);
+                }
+
+            }
+        });
+
+
     }
     /**
      * 添加评论
@@ -682,40 +728,36 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         String string = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                map.put("userId", model.getId());
-                map.put("vfId", per_Id);
-                map.put("comment", s);
-                HttpApis.pushComment(map, new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        TLog.log(e.getMessage());
-                    }
+            map.put("userId", model.getId());
+            map.put("vfId", per_Id);
+            map.put("comment", s);
+            HttpApis.pushComment(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        TLog.log(response);
-                        ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                        ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                        etAddComment.setText("");
-                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                            Toast.makeText(getApplicationContext(), "评论成功", Toast.LENGTH_SHORT).show();
-                            TLog.log("comment_list" + per_Id);
-                            getCommentList(per_Id);
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log(response);
+                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                    etAddComment.setText("");
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        Toast.makeText(getApplicationContext(), "评论成功", Toast.LENGTH_SHORT).show();
+                        TLog.log("comment_list" + per_Id);
+                        getCommentList(per_Id);
+                    } else {
+                        if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
+                            Toast.makeText(getApplicationContext(), "评论失败", Toast.LENGTH_SHORT).show();
                         } else {
-                            if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
-                                Toast.makeText(getApplicationContext(), "评论失败", Toast.LENGTH_SHORT).show();
-                            } else {
-                                TLog.log(resp.getHead().getRspMsg());
-                                Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+                            TLog.log(resp.getHead().getRspMsg());
+                            Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
 
-                            }
                         }
                     }
-                });
-            }else{
-                UnLoginHandler.unLogin(DemandPage.this);
-            }
+                }
+            });
         } else {
             UnLoginHandler.unLogin(DemandPage.this);
         }
@@ -729,31 +771,27 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         String string = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                map.put("userid", model.getId());
-                map.put("vfid", collect_tag);
-                HttpApis.collectVideo(map, new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        TLog.log(e.getMessage());
-                    }
+            map.put("userid", model.getId());
+            map.put("vfid", collect_tag);
+            HttpApis.collectVideo(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        TLog.log("collect->" + response);
-                        ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                        ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                            Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
-                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
-                        }else{
-                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
-                        }
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log("collect->" + response);
+                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                    }else{
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
                     }
-                });
-            }else{
-                UnLoginHandler.unLogin(DemandPage.this);
-            }
+                }
+            });
         } else {
             // TODO: 16/7/8 未登录跳转登录页面
             UnLoginHandler.unLogin(DemandPage.this);
@@ -767,33 +805,29 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         String userinfo =SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)){
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            if (model.getIsLogin()!=null && model.getIsLogin().equals("true")){
-                HashMap<String, Object> map = new HashMap<>();
-                map.put("userid", model.getId());
-                map.put("vfids", collect_tag);
-                HttpApis.cancelCollect(map, new StringCallback() {
-                    @Override
-                    public void onError(Call call, Exception e, int id) {
-                        TLog.log(e.getMessage());
-                    }
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("userid", model.getId());
+            map.put("vfids", collect_tag);
+            HttpApis.cancelCollect(map, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log(e.getMessage());
+                }
 
-                    @Override
-                    public void onResponse(String response, int id) {
-                        TLog.log("cancel_result" + response);
-                        ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                        ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                        if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
-                        } else {
-                            img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
-                            Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
-                        }
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log("cancel_result" + response);
+                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
+                    } else {
+                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
                     }
-                });
-            }else{
-                UnLoginHandler.unLogin(DemandPage.this);
-            }
+                }
+            });
         }else{
             UnLoginHandler.unLogin(DemandPage.this);
         }

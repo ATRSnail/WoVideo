@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -231,12 +232,20 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                         bundle.putString("id", vfId);
                         bundle.putLong("cur_position",bean.getCurrent_positon());
                         bundle.putInt("typeId",VideoType.MOVIE.getId());
+                        TLog.log("history_click-"+"id"+vfId+"-cur_position"+bean.getCurrent_positon()
+                        +"-typeId"+VideoType.MOVIE.getId()
+                        );
                         UIHelper.ToMoviePage(HistoryPage.this, bundle);
                     } else {
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
                         bundle.putLong("cur_position",bean.getCurrent_positon());
                         bundle.putString("episode",bean.getEpisode());
+                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+                        TLog.log("history_click-"+"id"+vfId+"-cur_position"+bean.getCurrent_positon()
+                                +"-episode"+bean.getEpisode()
+                                +"-typeId"+VideoType.TELEPLAY.getId()
+                        );
                         UIHelper.ToDemandPage(HistoryPage.this, bundle);
                     }
                 }
@@ -245,11 +254,22 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (list.size()>0){
-            list.clear();
-        }
-        initDatas();
+    protected void onStart() {
+        super.onStart();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (list.size()>0){
+                    list.clear();
+                }
+                initDatas();
+            }
+        },3000);
+
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
     }
 }

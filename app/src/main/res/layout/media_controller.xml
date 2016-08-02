@@ -136,7 +136,23 @@
             android:progressDrawable="@drawable/layer_progress"
             android:visibility="visible" />
     </FrameLayout>
-
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:id="@+id/layout_center_schedule"
+        android:background="@android:color/transparent"
+        android:visibility="invisible"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="test"
+            android:textColor="@color/white"
+            android:id="@+id/schedule_center_text"
+            />
+    </FrameLayout>
 
     <ImageView
         android:id="@+id/back"

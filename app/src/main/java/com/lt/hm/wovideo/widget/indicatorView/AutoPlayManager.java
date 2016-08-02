@@ -137,7 +137,9 @@ public class AutoPlayManager {
 					if (mImageIndicatorView.getCurrentIndex() == mImageIndicatorView
 							.getTotalCount() - 1) {
 						timesCount++;// add loop play times
-						direction = LEFT;
+//						mImageIndicatorView.setCurrentItem(0);
+						mImageIndicatorView.getViewPager().setCurrentItem(0);
+						direction = RIGHT;
 					} else {
 						mImageIndicatorView
 								.getViewPager()

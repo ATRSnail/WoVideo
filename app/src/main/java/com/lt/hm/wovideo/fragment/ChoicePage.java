@@ -16,7 +16,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -68,8 +67,6 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
     RecyclerView homeRecycler;
     @BindView(R.id.float_button)
     FloatingActionButton floatButton;
-    @BindView(R.id.home_search_img)
-    ImageView homeSearchImg;
     @BindView(R.id.refresh_choice)
     SwipeRefreshLayout refreshLayout;
     @BindView(R.id.h_img_container)
@@ -147,6 +144,7 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
         homeRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
         homeRecycler.setHasFixedSize(false);
         homeRecycler.setAdapter(bottom_adapter);
+        bottom_adapter.openLoadAnimation(BaseQuickAdapter.ALPHAIN);
         bottom_adapter.notifyDataSetChanged();
         bottom_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
@@ -300,9 +298,9 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
             Toast.makeText(getApplicationContext(), "签到", Toast.LENGTH_SHORT).show();
         });
 
-        homeSearchImg.setOnClickListener((View v) -> {
-            UIHelper.ToSearchPage(getActivity());
-        });
+//        homeSearchImg.setOnClickListener((View v) -> {
+//            UIHelper.ToSearchPage(getActivity());
+//        });
 
         imgIndicator.setOnItemClickListener(new ImageIndicatorView.OnItemClickListener() {
             @Override
@@ -315,27 +313,21 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
                 }
             }
         });
-//        imgIndicator.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_MOVE:
-//                        refreshLayout.setEnabled(false);
-//                        break;
-//                    case MotionEvent.ACTION_UP:
-//                        refreshLayout.setEnabled(false);
-//                        break;
-//                    case MotionEvent.ACTION_SCROLL:
-//                        refreshLayout.setEnabled(false);
-//                        break;
-//                    case MotionEvent.ACTION_CANCEL:
-//                        refreshLayout.setEnabled(true);
-//                        break;
-//                }
-//                return false;
-//            }
-//        });
-
+        imgIndicator.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_MOVE:
+                        refreshLayout.setEnabled(false);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        refreshLayout.setEnabled(true);
+                        break;
+                }
+                return false;
+            }
+        });
         choice_h_scroll.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {

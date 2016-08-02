@@ -1,6 +1,8 @@
 package com.lt.hm.wovideo.adapter.order;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.View;
 import android.widget.Button;
 
@@ -16,8 +18,13 @@ import java.util.List;
  * @version 1.0
  * @create_date 16/6/7
  */
-public class BillAdapter extends BaseQuickAdapter<BillList.OrderListBean> {
+public class BillAdapter extends BaseQuickAdapter<BillList.OrderListBean>{
     OnPayBtnClick listener;
+    onLongClick longListener;
+
+    public void setLongListener(onLongClick longListener) {
+        this.longListener = longListener;
+    }
 
     public void setListener(OnPayBtnClick listener) {
         this.listener = listener;
@@ -62,10 +69,31 @@ public class BillAdapter extends BaseQuickAdapter<BillList.OrderListBean> {
                 }
             }
         });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                final CharSequence[] items = {"copy"};
 
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 
+                builder.setTitle("copy the orderNo");
+                builder.setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (longListener!=null){
+                            longListener.onLongClick(order);
+                        }
+                    }
+                });
+                builder.show();
+                return true;
+            }
+        });
 
+    }
 
+    public interface  onLongClick{
+        void onLongClick(BillList.OrderListBean order);
     }
 
     public interface  OnPayBtnClick{

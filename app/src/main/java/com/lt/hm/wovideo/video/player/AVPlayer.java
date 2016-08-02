@@ -29,6 +29,7 @@ import com.google.android.exoplayer.upstream.BandwidthMeter;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
+import com.lt.hm.wovideo.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -446,21 +447,24 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
             (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     String user = SharedPrefsUtils.getStringPreference(context, "userinfo");
-    UserModel userModel = new Gson().fromJson(user, UserModel.class);
-    if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE && userModel.getIsVip().equals("1")){
-      loadedBytes += bytesLoaded;
-      sumDuration += loadDurationMs;
-      Log.w("LoadSize", "onLoadCompleted mobile net: " + loadedBytes + " bytes"
-              + ", duration is :" + sumDuration + " ms");
-    } else if (cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isAvailable()) {
-      // wifi
-      Log.w("LoadSize", "onLoadCompleted wifi: " + loadedBytes + " bytes"
-              + ", duration is :" + sumDuration + " ms");
+    if (!StringUtils.isNullOrEmpty(user)){
+      UserModel userModel = new Gson().fromJson(user, UserModel.class);
+      if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE && userModel.getIsVip().equals("1")){
+        loadedBytes += bytesLoaded;
+        sumDuration += loadDurationMs;
+        Log.w("LoadSize", "onLoadCompleted mobile net: " + loadedBytes + " bytes"
+                + ", duration is :" + sumDuration + " ms");
+      } else if (cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isAvailable()) {
+        // wifi
+        Log.w("LoadSize", "onLoadCompleted wifi: " + loadedBytes + " bytes"
+                + ", duration is :" + sumDuration + " ms");
+      }
+      if (mInfoListener != null) {
+        mInfoListener.onLoadCompleted(sourceId, bytesLoaded, type, trigger, format, mediaStartTimeMs,
+                mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs);
+      }
     }
-    if (mInfoListener != null) {
-      mInfoListener.onLoadCompleted(sourceId, bytesLoaded, type, trigger, format, mediaStartTimeMs,
-          mediaEndTimeMs, elapsedRealtimeMs, loadDurationMs);
-    }
+
   }
 
   public long getLoadedBytes() {

@@ -1,5 +1,7 @@
 package com.lt.hm.wovideo.ui;
 
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -65,15 +67,6 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
         mList = new ArrayList<>();
         orderList.addItemDecoration(new RecycleViewDivider(this,LinearLayoutManager.VERTICAL));
         orderList.setLayoutManager(new LinearLayoutManager(this));
-
-//        for (int i = 0; i < 5; i++) {
-//            Order order = new Order();
-//            order.setName("Name" + i);
-//            order.setType("type" + i);
-//            order.setPrice(i + "");
-//            order.setStatus("翼支付");
-//            mList.add(order);
-//        }
         order_refresh_layout.setColorSchemeResources(android.R.color.holo_green_light,android.R.color.holo_blue_bright,android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         order_refresh_layout.setOnRefreshListener(this);
@@ -90,6 +83,15 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
             public void onItemClick(View view, int i) {
             }
         });
+       billAdapter.setLongListener(new BillAdapter.onLongClick() {
+           @Override
+           public void onLongClick(BillList.OrderListBean order) {
+               ClipboardManager clipboard = (ClipboardManager)
+                       getSystemService(Context.CLIPBOARD_SERVICE);
+               clipboard.setText(order.getOrderNo());
+               Toast.makeText(getApplicationContext(),"复制到粘贴板成功",Toast.LENGTH_SHORT).show();
+           }
+       });
     }
     @Override
     public void initViews() {

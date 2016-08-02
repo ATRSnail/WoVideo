@@ -143,7 +143,6 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setVideoTitle(videoName.getText().toString());
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-
         }
     }
 
@@ -166,13 +165,12 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             vfId = bundle.getString("id");
             getVideoDetails(vfId);
             getAnthologyDatas(vfId);
-            getFirstURL(vfId);
-//            if (getIntent().getExtras().containsKey("cur_position")){
-//                cur_position = getIntent().getExtras().getLong("cur_position");
-//                TLog.log("position_cur"+cur_position);
-//            }
-//            else{
-//            }
+            if (getIntent().getExtras().containsKey("cur_position")){
+                cur_position = getIntent().getExtras().getLong("cur_position");
+                TLog.log("position_cur"+cur_position);
+            }else{
+                getFirstURL(vfId);
+            }
 
         }
         getYouLikeDatas();
@@ -465,8 +463,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     videoHistory.setmName(details.getName());
                     videoHistory.setCreate_time(System.currentTimeMillis()+"");
                     videoHistory.setImg_url(details.getImg());
-                    videoHistory.setmId(details.getId());
-
+//                    videoHistory.setmId(details.getId());
                 }
             }
         });
@@ -501,6 +498,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
                     per_Id = details.getId();
                     collect_tag=details.getId();
+                    videoHistory.setmId(details.getVfId());
                     videoAddHit(details.getId());
                     if (StringUtils.isNullOrEmpty(login_info)){
                         img_collect.setImageResource( R.drawable.icon_collect);
@@ -628,17 +626,10 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
 
                     if (cur_position!=0){
-//                        TLog.log("position_cur"+cur_position);
+                        TLog.log("position_cur"+cur_position);
                         mPlayerPosition= cur_position;
                         seekTo(mPlayerPosition);
                     }
-//                    if (cur_position!=0){
-//                        TLog.log("ppp"+cur_position);
-//                        mPlayerPosition= cur_position;
-//                        seekTo(mPlayerPosition);
-//                    }
-
-
                     // Set Player
                     setIntent(onUrlGot(video));
                     onShown();
@@ -920,6 +911,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         vfId = antholys.get(i).getVfId();
         per_Id = antholys.get(i).getId();
         PlayList.PlaysListBean details =  antholys.get(i);
+        videoHistory.setmId(details.getVfId());
         VideoModel model = new VideoModel();
         ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
         if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {
@@ -1009,6 +1001,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     selectedItem = anthologyList.getChildAdapterPosition(v);
                     notifyItemChanged(selectedItem);
                     if (!mCurrentEpisode.equals(selectedItem + 1 + "")) {
+                        cur_position=0;
                         mCurrentEpisode = selectedItem + 1 + "";
                         videoHistory.setEpisode(mCurrentEpisode);
                         selectEpisode(mCurrentEpisode);

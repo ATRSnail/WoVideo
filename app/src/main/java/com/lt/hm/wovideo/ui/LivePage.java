@@ -48,6 +48,7 @@ import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.video.LiveTVListAdapter;
+import com.lt.hm.wovideo.adapter.video.VideoPipAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.RespHeader;
@@ -58,6 +59,7 @@ import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.model.LiveTVList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.VideoModel;
@@ -67,6 +69,7 @@ import com.lt.hm.wovideo.video.player.AVPlayer;
 import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
+import com.lt.hm.wovideo.widget.PipListviwPopuWindow;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.victor.loading.rotate.RotateLoading;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -111,13 +114,15 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  * @create_date 16/6/12
  */
 public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener{
+        AudioCapabilitiesReceiver.Listener,VideoPipAdapter.ItemClickCallBack {
     @BindView(R.id.video_name)
     TextView videoName;
     @BindView(R.id.video_play_number)
     TextView videoPlayNumber;
     @BindView(R.id.video_collect)
     PercentLinearLayout videoCollect;
+    @BindView(R.id.video_Pip)
+    PercentLinearLayout videoPip;
     @BindView(R.id.video_share)
     PercentLinearLayout videoShare;
     @BindView(R.id.video_projection)
@@ -167,6 +172,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     // Video thing
     // For use when launching the demo app using adb.
     private static final String CONTENT_EXT_EXTRA = "type";
+    //画中画urls
+    public  static  final String PIP_URLS="pip_urls";
 
     private static final int MENU_GROUP_TRACKS = 1;
     private static final int ID_OFFSET = 2;
@@ -253,6 +260,20 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             // TODO 重要:清理含有ImageSpan的text中的一些占用内存的资源 例如drawable
         }
     };
+
+
+
+    @Override
+    public void pipBtnCallBack(ArrayList<String> str) {
+        if (str!=null&&str.size()>0){
+            mListPopupWindow.dismiss();
+           Intent intent = new Intent(this,PipActivity.class);
+            Bundle bundle = new Bundle();
+            bundle.putStringArrayList(PIP_URLS,str);
+            intent.putExtras(bundle);
+            startActivity(intent);
+        }
+    }
 
     /**
      * 绘制背景(自定义弹幕样式)
@@ -890,6 +911,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 //        liveProgramList.addItemDecoration(new SpaceItemDecoration(10));
 //        liveProgramList.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         hideSomething();
+
     }
 
     private void hideSomething() {
@@ -898,6 +920,47 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         videoShare.setVisibility(View.GONE);
         videoProjection.setVisibility(View.GONE);
         videoPlayNumber.setVisibility(View.GONE);
+        videoPip.setVisibility(View.VISIBLE);
+
+    }
+
+
+    PipListviwPopuWindow mListPopupWindow;
+    private List<LiveModles> liveModlesList;
+    private final String [] str={"央视","卫士","地方台","专业"};
+    private List<LiveModles> getPipDatas(){
+        liveModlesList=new ArrayList<>();
+            if (cctvList != null) {
+                LiveModles modles = new LiveModles();
+                modles.title = str[0];
+                modles.setSinatv(cctvList);
+                liveModlesList.add(modles);
+            }
+            if (sinaList != null) {
+                LiveModles modles1 = new LiveModles();
+                modles1.title = str[1];
+                modles1.setSinatv(sinaList);
+                liveModlesList.add(modles1);
+            }
+
+
+            if (localList != null) {
+                LiveModles modles2 = new LiveModles();
+                modles2.title = str[2];
+                modles2.setSinatv(localList);
+                liveModlesList.add(modles2);
+            }
+
+
+            if (otherList != null) {
+                LiveModles modles3 = new LiveModles();
+                modles3.title = str[3];
+                modles3.setSinatv(otherList);
+                liveModlesList.add(modles3);
+            }
+
+
+        return liveModlesList;
     }
 
     @Override
@@ -943,6 +1006,17 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 initListViews(otherList);
             }
         });
+        //显示视频画中画弹框
+        videoPip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick( View v) {
+                    mListPopupWindow=new PipListviwPopuWindow(LivePage.this, liveModlesList, LivePage.this);
+                    mListPopupWindow.showAsDropDown(v);
+
+
+            }
+        });
+
     }
 
     private void changeState(Button btn) {
@@ -1025,13 +1099,70 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 getRealURL(url);
             }
         });
+        //初始化画中画弹框
+        liveModlesList  =getPipDatas();
+
     }
 
+//    private void getRealURL(String url) {
+//        HashMap<String, Object> maps = new HashMap<String, Object>();
+//        maps.put("videoSourceURL", url);
+//        maps.put("cellphone", "18513179404");
+//        maps.put("freetag", "1");
+//        HttpApis.getVideoRealURL(maps, new StringCallback() {
+//            @Override
+//            public void onError(Call call, Exception e, int id) {
+//                TLog.log("error:" + e.getMessage());
+//            }
+//
+//            @Override
+//            public void onResponse(String response, int id) {
+//                TLog.log(response);
+//                ResponseObj<VideoURL, RespHeader> resp = new ResponseObj<VideoURL, RespHeader>();
+//                ResponseParser.parse(resp, response, VideoURL.class, RespHeader.class);
+//                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//                    videoUrl.setFormatUrl(resp.getBody().getUrl());
+//                    video.setmPlayUrl(videoUrl);
+//                    // Reset player and params.
+//                    releasePlayer();
+//                    mPlayerPosition = 0;
+//                    // Set play URL and play it
+//                    setIntent(onUrlGot());
+//                    onShown();
+////                    mDanmakuView.show();
+//                } else {
+//                    TLog.log(resp.getHead().getRspMsg());
+//                }
+//            }
+//        });
+//    }
+
+
+
+    /**
+     * 获取视频播放地址
+     *
+     * @param url
+     */
     private void getRealURL(String url) {
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("videoSourceURL", url);
-        maps.put("cellphone", "18513179404");
-        maps.put("freetag", "1");
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)){
+            UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+            maps.put("cellphone", model.getPhoneNo());
+            if (model.getIsVip()!=null && model.getIsVip().equals("1")){
+                maps.put("freetag", "1");
+            }else{
+                maps.put("freetag", "0");
+            }
+
+        }else{
+            maps.put("cellphone", StringUtils.generateOnlyID());
+            maps.put("freetag", "0");
+        }
+//        maps.put("cellphone", "18513179404");
+//        maps.put("freetag", "1");
         HttpApis.getVideoRealURL(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -1048,11 +1179,10 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     video.setmPlayUrl(videoUrl);
                     // Reset player and params.
                     releasePlayer();
-                    mPlayerPosition = 0;
-                    // Set play URL and play it
+                    // Set Player
                     setIntent(onUrlGot());
                     onShown();
-//                    mDanmakuView.show();
+
                 } else {
                     TLog.log(resp.getHead().getRspMsg());
                 }

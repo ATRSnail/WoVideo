@@ -138,7 +138,10 @@
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
         <activity android:name=".zxing.ui.MipcaActivityCapture"/>
-
+      <activity android:name=".ui.PipActivity"
+          android:screenOrientation="landscape"
+          >
+      </activity>
         <activity
             android:name="com.mob.tools.MobUIShell"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"

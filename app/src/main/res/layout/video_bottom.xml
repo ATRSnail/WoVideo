@@ -55,7 +55,6 @@
         </LinearLayout>
 
     </com.lt.hm.wovideo.widget.PercentLinearLayout>
-
     <com.lt.hm.wovideo.widget.PercentLinearLayout
         android:id="@+id/video_collect"
         android:layout_width="wrap_content"
@@ -124,5 +123,21 @@
             android:text="@string/projection" />
     </com.lt.hm.wovideo.widget.PercentLinearLayout>
 
-
+    <com.lt.hm.wovideo.widget.PercentLinearLayout
+        android:id="@+id/video_Pip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:paddingRight="10dp"
+        android:visibility="gone"
+        android:orientation="vertical">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/video_btn_bg"
+            android:textColor="@color/white"
+            android:clickable="false"
+            android:text="画中画" />
+    </com.lt.hm.wovideo.widget.PercentLinearLayout>
 </android.support.percent.PercentRelativeLayout>

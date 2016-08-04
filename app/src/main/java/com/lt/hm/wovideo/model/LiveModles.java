@@ -8,8 +8,8 @@ import java.util.List;
  * @create_date 16/7/9
  */
 public class LiveModles {
-
-    private List<LiveModel> sinatv;
+    public String  title;
+    public List<LiveModel> sinatv;
     private List<LiveModel> localTV;
     private List<LiveModel> cctv;
     private List<LiveModel> otherTv;
@@ -20,6 +20,27 @@ public class LiveModles {
 
     public void setSinatv(List<LiveModel> sinatv) {
         this.sinatv = sinatv;
+    }
+    /**
+     * 当前类别Item总数。Category也需要占用一个Item
+     * @return
+     */
+    public int getItemCount() {
+        return sinatv.size() + 1;
+    }
+    /**
+     *  获取Item内容
+     *
+     * @param pPosition
+     * @return
+     */
+    public Object getItem(int pPosition) {
+        // Category排在第一位
+        if (pPosition == 0) {
+            return title;
+        } else {
+            return sinatv.get(pPosition - 1);
+        }
     }
 
     public List<LiveModel> getLocalTV() {
@@ -46,14 +67,11 @@ public class LiveModles {
         this.otherTv = otherTv;
     }
 
-
     @Override
     public String toString() {
         return "LiveModles{" +
-                "sinatv=" + sinatv +
-                ", localTV=" + localTV +
-                ", cctv=" + cctv +
-                ", otherTv=" + otherTv +
+                "title='" + title + '\'' +
+                ", sinatv=" + sinatv +
                 '}';
     }
 

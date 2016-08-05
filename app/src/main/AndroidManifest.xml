@@ -143,10 +143,10 @@
         <activity android:name=".ui.ThirdPage"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
-        <activity android:name=".ui.ChannelListPage"
+        <activity android:name=".zxing.ui.MipcaActivityCapture"/>
+        <activity android:name=".ui.CityListPage"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
-        <activity android:name=".zxing.ui.MipcaActivityCapture"/>
       <activity android:name=".ui.PipActivity"
           android:screenOrientation="landscape"
           >

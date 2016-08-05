@@ -57,6 +57,14 @@ public class BillAdapter extends BaseQuickAdapter<BillList.OrderListBean>{
             holder.setVisible(R.id.order_video_text_status,true);
             holder.setText(R.id.order_video_text_status,"已付款");
             holder.setVisible(R.id.order_video_btn,false);
+        }else if (order.getState().equals("3")){
+            holder.setVisible(R.id.order_video_text_status,true);
+            holder.setText(R.id.order_video_text_status,"已退订");
+            holder.setVisible(R.id.order_video_btn,false);
+        }else if (order.getState().equals("4")){
+            holder.setVisible(R.id.order_video_text_status,true);
+            holder.setText(R.id.order_video_text_status,"已关闭");
+            holder.setVisible(R.id.order_video_btn,false);
         }
 
                 holder.setText(R.id.order_video_price,"￥"+order.getMoneys()+"元");

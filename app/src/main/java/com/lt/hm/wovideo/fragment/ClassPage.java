@@ -58,14 +58,17 @@ public class ClassPage extends BaseFragment {
     FrameLayout varietyLayout;
     Unbinder unbinder;
     List<TypeList.TypeListBean> mList;
+    View view;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreateView(inflater, container, savedInstanceState);
-        View view = inflater.inflate(R.layout.layout_sort, container, false);
-        unbinder=ButterKnife.bind(this, view);
-        initView(view);
-        initData();
+        if (view==null){
+            view = inflater.inflate(R.layout.layout_sort, container, false);
+            unbinder=ButterKnife.bind(this, view);
+            initView(view);
+            initData();
+        }
         return view;
     }
 

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import com.lt.hm.wovideo.ui.AboutPage;
 import com.lt.hm.wovideo.ui.BillsPage;
 import com.lt.hm.wovideo.ui.ChangePassword1Aty;
-import com.lt.hm.wovideo.ui.ChannelListPage;
 import com.lt.hm.wovideo.ui.CollectPage;
 import com.lt.hm.wovideo.ui.DemandPage;
 import com.lt.hm.wovideo.ui.FindPwdAty;
@@ -215,11 +214,6 @@ public class UIHelper {
 
 	public static void ToFindPwd(Context context) {
 		Intent intent = new Intent(context, FindPwdAty.class);
-		context.startActivity(intent);
-	}
-
-	public static void ToChannelPage(Context context) {
-		Intent intent = new Intent(context, ChannelListPage.class);
 		context.startActivity(intent);
 	}
 

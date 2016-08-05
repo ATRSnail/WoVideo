@@ -121,7 +121,7 @@ public class BillsPage extends BaseActivity implements SecondTopbar.myTopbarClic
 
                 @Override
                 public void onResponse(String response, int id) {
-                    TLog.log(response);
+                    TLog.log("bills_list"+response);
                     ResponseObj<BillList,RespHeader>  resp = new ResponseObj<BillList, RespHeader>();
                     ResponseParser.parse(resp,response,BillList.class,RespHeader.class);
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)){

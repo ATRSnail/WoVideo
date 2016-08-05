@@ -19,7 +19,7 @@ public enum MainTab {
 //            NewChoicePage.class),
 //    CLASSES(1, R.string.live_string, R.drawable.tab_selection_selector, ClassPage.class),
 //    VIP(2, R.string.vip_string, R.drawable.tab_vip_selector, RecommendPage.class),
-    OLYMPIC(2,R.string.olympic_string,R.drawable.tab_classes_selector,OlympicPage.class),
+    OLYMPIC(2,R.string.olympic_string,R.drawable.tab_olympic_selector,OlympicPage.class),
     VIP(2, R.string.vip_string, R.drawable.tab_vip_selector, VipPage.class),
     EVENTS(3, R.string.event_string, R.drawable.tab_events_selector, EventsPage.class);
     private int idx;

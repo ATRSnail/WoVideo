@@ -76,17 +76,24 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 	private int pageSize = 30;
 	private List<VideoList.TypeListBean> oly_list;
 	private int currentCount;
+	View view;
 
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 //		super.onCreateView(inflater, container, savedInstanceState);
-		View view = inflater.inflate(R.layout.layout_olympic, container, false);
-		unbinder = ButterKnife.bind(this, view);
-		oly_list = new ArrayList<>();
-
-		initView(view);
-		initData();
+		if (view==null){
+			view = inflater.inflate(R.layout.layout_olympic, container, false);
+			unbinder = ButterKnife.bind(this, view);
+			oly_list = new ArrayList<>();
+			initView(view);
+			initData();
+		}
+		TLog.log("init_oly");
+//		ViewGroup parent  = (ViewGroup) view.getParent();
+//		if (null!=parent){
+//			parent.removeView(view);
+//		}
 		return view;
 	}
 
@@ -113,7 +120,9 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 						cacheUserInfo(json);
 						if (model.getAy() != null && model.getAy().equals(ORDERED_STATUS)) {
 							orderFiveFlow.setImageDrawable(getResources().getDrawable(R.drawable.icon_o_cancel_order));
-						} else {
+						}else if (model.getAy() != null && model.getAy().equals("2")){
+							orderFiveFlow.setImageDrawable(getResources().getDrawable(R.drawable.icon_o_order_cancled));
+						}else {
 							orderFiveFlow.setImageDrawable(getResources().getDrawable(R.drawable.icon_o_order));
 						}
 					} else {
@@ -122,7 +131,7 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 				}
 			});
 		} else {
-			UnLoginHandler.unLogin(getActivity());
+//			UnLoginHandler.unLogin(getActivity());
 		}
 	}
 
@@ -137,7 +146,7 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 		HttpApis.getListByType(map, new StringCallback() {
 			@Override
 			public void onError(Call call, Exception e, int id) {
-				TLog.log("error"+e.getMessage());
+				TLog.log("error" + e.getMessage());
 			}
 
 			@Override
@@ -175,7 +184,9 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 						oly_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
 							@Override
 							public void onItemClick(View view, int i) {
-								getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
+								if (checkAYStatus()) {
+									getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
+								}
 							}
 						});
 					} else {
@@ -188,8 +199,37 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 		});
 	}
 
+	private void cacheUserInfo(String json) {
+		SharedPrefsUtils.setStringPreference(getApplicationContext(), "userinfo", json);
+	}
+
+	private boolean checkAYStatus() {
+		String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
+		if (StringUtils.isNullOrEmpty(userinfo)) {
+			UnLoginHandler.unLogin(getActivity());
+			return false;
+		} else {
+			UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+			if (model.getAy() != null && model.getAy().equals(ORDERED_STATUS)) {
+				return true;
+			} else if (model.getAy() != null && model.getAy().equals("2")) {
+				return true;
+			} else {
+				IPhoneDialog dialog = DialogHelp.showDialog(getActivity(), "本专题为收费项目,请先点击上方订购按钮,购买沃为你加油5元包月产品", null, null, "确定", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+				dialog.show();
+				return false;
+			}
+		}
+	}
+
 	/**
 	 * 跳转 页面
+	 *
 	 * @param vfId
 	 */
 	public void getVideoDetails(String vfId) {
@@ -212,36 +252,31 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 						// TODO: 16/6/14 跳转电影页面
 						Bundle bundle = new Bundle();
 						bundle.putString("id", vfId);
-						bundle.putInt("typeId",VideoType.MOVIE.getId());
+						bundle.putInt("typeId", VideoType.MOVIE.getId());
 						UIHelper.ToMoviePage(getActivity(), bundle);
 					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
 						// TODO: 16/6/14 跳转电视剧页面
 						Bundle bundle = new Bundle();
 						bundle.putString("id", vfId);
-						bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+						bundle.putInt("typeId", VideoType.TELEPLAY.getId());
 
 						UIHelper.ToDemandPage(getActivity(), bundle);
 					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
 						// TODO: 16/6/14 跳转 体育播放页面
 						Bundle bundle = new Bundle();
 						bundle.putString("id", vfId);
-						bundle.putInt("typeId",VideoType.SPORTS.getId());
+						bundle.putInt("typeId", VideoType.SPORTS.getId());
 						UIHelper.ToDemandPage(getActivity(), bundle);
 					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
 						// TODO: 16/6/14 跳转综艺界面
 						Bundle bundle = new Bundle();
 						bundle.putString("id", vfId);
-						bundle.putInt("typeId",VideoType.VARIATY.getId());
+						bundle.putInt("typeId", VideoType.VARIATY.getId());
 						UIHelper.ToDemandPage(getActivity(), bundle);
 					}
 				}
 			}
 		});
-	}
-
-
-	private void cacheUserInfo(String json) {
-		SharedPrefsUtils.setStringPreference(getApplicationContext(), "userinfo", json);
 	}
 
 	@Override
@@ -270,8 +305,6 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 		olyCctv5Plus.setOnClickListener(this);
 
 
-
-
 	}
 
 	@Override
@@ -285,40 +318,51 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 	@Override
 	public void onClick(View v) {
 		super.onClick(v);
-		Bundle bundle= new Bundle();
-		Intent intent = new Intent(getApplicationContext(),VideoPlayerPage.class);
+		Bundle bundle = new Bundle();
+		Intent intent = new Intent(getApplicationContext(), VideoPlayerPage.class);
+
+
 		switch (v.getId()) {
 			case R.id.oly_cctv1:
 				// TODO: 8/4/16 change the page live horiental page cctv1_url
 				//http://111.206.133.39:9910/live/live_cctv1/index.m3u8
-				bundle.putString("tv_name","CCTV1");
-				bundle.putString("tv_url","http://111.206.133.39:9910/live/live_cctv1/index.m3u8");
-				intent.putExtras(bundle);
-				startActivity(intent);
+				if (checkAYStatus()) {
+					bundle.putString("tv_name", "CCTV1");
+					bundle.putString("tv_url", "http://111.206.133.39:9910/live/live_cctv1hd_800/index.m3u8");
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
 				break;
 			case R.id.oly_cctv2:
 				// TODO: 8/4/16 change the page live horiental page cctv2_url
 				//http://111.206.133.39:9910/live/live_cctv2/index.m3u8
-				bundle.putString("tv_name","CCTV2");
-				bundle.putString("tv_url","http://111.206.133.39:9910/live/live_cctv2/index.m3u8");
-				intent.putExtras(bundle);
-				startActivity(intent);
+				if (checkAYStatus()) {
+
+					bundle.putString("tv_name", "CCTV2");
+					bundle.putString("tv_url", "http://111.206.133.39:9910/live/live_cctv2/index.m3u8");
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
 				break;
 			case R.id.oly_cctv5:
 				// TODO: 8/4/16 change the page live horiental page cctv5_url
 //				http://111.206.133.39:9910/live/live_cctv5/index.m3u8
-				bundle.putString("tv_name","CCTV5");
-				bundle.putString("tv_url","http://111.206.133.39:9910/live/live_cctv5/index.m3u8");
-				intent.putExtras(bundle);
-				startActivity(intent);
+				if (checkAYStatus()) {
+					bundle.putString("tv_name", "CCTV5");
+					bundle.putString("tv_url", "http://111.206.133.39:9910/live/live_cctv5hd_800/index.m3u8");
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
 				break;
 			case R.id.oly_cctv5_plus:
 				// TODO: 8/4/16 change the page live horiental page cctv5_plus_url
 //				http://111.206.133.39:9910/live/live_cctv5p/index.m3u8
-				bundle.putString("tv_name","CCTV5+");
-				bundle.putString("tv_url","http://111.206.133.39:9910/live/live_cctv5p/index.m3u8");
-				intent.putExtras(bundle);
-				startActivity(intent);
+				if (checkAYStatus()) {
+					bundle.putString("tv_name", "CCTV5+");
+					bundle.putString("tv_url", "http://111.206.133.39:9910/live/live_cctv5jhd_800/index.m3u8");
+					intent.putExtras(bundle);
+					startActivity(intent);
+				}
 				break;
 
 		}
@@ -329,7 +373,7 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 		String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
 		if (!StringUtils.isNullOrEmpty(userinfo)) {
 			UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-			if (model.getAy()!=null && model.getAy().equals("1")) {
+			if (model.getAy() != null && model.getAy().equals("1")) {
 				IPhoneDialog dialog = DialogHelp.showDialog(getActivity(), "退订沃为你加油5元包月产品,下月初生效", "取消", new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
@@ -343,6 +387,9 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 					}
 				});
 				dialog.show();
+				checkStatus();
+			} else if (model.getAy() != null && model.getAy().equals("2")) {
+
 			} else {
 				IPhoneDialog dialog = DialogHelp.showDialog(getActivity(), "购买沃为你加油5元包月产品所产生的费用将从您的话费中扣除,并且下月自动续费", "取消", new DialogInterface.OnClickListener() {
 					@Override
@@ -357,6 +404,7 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 					}
 				});
 				dialog.show();
+				checkStatus();
 			}
 
 		} else {
@@ -433,7 +481,8 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 				ResponseParser.parse(resp, response, String.class, RespHeader.class);
 				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
 					Toast.makeText(getActivity(), "退订成功", Toast.LENGTH_SHORT).show();
-					orderFiveFlow.setImageDrawable(getResources().getDrawable(R.drawable.icon_o_order));
+//					orderFiveFlow.setImageDrawable(getResources().getDrawable(R.drawable.icon_o_order));
+					orderFiveFlow.setImageDrawable(getResources().getDrawable(R.drawable.icon_o_order_cancled));
 					checkStatus();
 				} else {
 					Toast.makeText(getActivity(), "退订失败", Toast.LENGTH_SHORT).show();
@@ -463,10 +512,10 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 					Toast.makeText(mContext, "订购成功", Toast.LENGTH_SHORT).show();
 					orderFiveFlow.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_o_cancel_order));
 					model.setAy("1");
-					SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",new Gson().toJson(model));
+					SharedPrefsUtils.setStringPreference(getApplicationContext(), "userinfo", new Gson().toJson(model));
 				} else {
 					model.setAy("0");
-					SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",new Gson().toJson(model));
+					SharedPrefsUtils.setStringPreference(getApplicationContext(), "userinfo", new Gson().toJson(model));
 					Toast.makeText(mContext, "订购失败", Toast.LENGTH_SHORT).show();
 					orderFiveFlow.setImageDrawable(mContext.getResources().getDrawable(R.drawable.icon_o_order));
 				}
@@ -492,6 +541,12 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 				++pageNum;
 
 			}
-		},3000);
+		}, 3000);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		checkStatus();
 	}
 }

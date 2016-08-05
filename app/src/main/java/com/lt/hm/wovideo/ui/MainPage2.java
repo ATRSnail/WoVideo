@@ -103,6 +103,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
 		;
 	};
+	private boolean dialog_showing = false;
 	private AMapLocationClientOption locationOption = null;
 	private long mExitTime = 0;
 	private Handler popHandler = new Handler();
@@ -253,7 +254,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 		choiceSearchLayout.setOnClickListener((View v) -> {
 			UIHelper.ToSearchPage(this);
 		});
-	//检测更新
+		//检测更新
 //		CheckUpdate();
 	}
 
@@ -262,10 +263,12 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 			@Override
 			public void positive() {
 				Toast.makeText(getApplicationContext(), "已后台下载", Toast.LENGTH_SHORT).show();
+				dialog_showing = false;
 			}
 
 			@Override
 			public void negitive() {
+				dialog_showing = false;
 			}
 
 			@Override
@@ -275,6 +278,16 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 						System.exit(0);
 					}
 				}
+			}
+
+			@Override
+			public void isShow() {
+				dialog_showing = true;
+			}
+
+			@Override
+			public void isDismiss() {
+				dialog_showing = false;
 			}
 		});
 	}
@@ -303,6 +316,8 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 		}
 		return consumed;
 	}
+
+
 
 	private Fragment getCurrentFragment() {
 		return getSupportFragmentManager().findFragmentByTag(

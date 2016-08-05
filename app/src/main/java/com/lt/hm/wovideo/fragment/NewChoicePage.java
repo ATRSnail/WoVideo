@@ -18,7 +18,6 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.TypeList;
 import com.lt.hm.wovideo.utils.TLog;
-import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.ViewPagerIndicator;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -156,7 +155,6 @@ public class NewChoicePage extends BaseFragment {
 		vipSelector.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				UIHelper.ToChannelPage(getActivity());
 			}
 		});
 		getClassInfos();

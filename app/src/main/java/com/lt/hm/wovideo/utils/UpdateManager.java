@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.text.Html;
+import android.view.KeyEvent;
 
 import com.lt.hm.wovideo.AppContext;
 import com.lt.hm.wovideo.http.HttpApis;
@@ -99,6 +100,7 @@ public class UpdateManager {
 					dialog.dismiss();
 					if (click != null) {
 						click.negitive();
+						click.isDismiss();
 					}
 				}
 			});
@@ -109,6 +111,7 @@ public class UpdateManager {
 					dialog.dismiss();
 					if (click != null) {
 						click.negitive();
+						click.isDismiss();
 					}
 				}
 			});
@@ -119,29 +122,57 @@ public class UpdateManager {
 				if (click != null) {
 					if (!StringUtils.isNullOrEmpty(model.getLatestVersion().getUrl())) {
 						dialog.dismiss();
+						if (click != null) {
+							click.isDismiss();
+						}
 						DownloadAPK(model, click, model.getLatestVersion().getUpdateType());
 					} else {
 //						ToastUtils.showToast("服务器无法链接");
 						dialog.dismiss();
+						if (click != null) {
+							click.isDismiss();
+						}
 					}
 					click.positive();
 				} else {
 					if (!StringUtils.isNullOrEmpty(model.getLatestVersion().getUrl())) {
 						dialog.dismiss();
+						if (click != null) {
+							click.isDismiss();
+						}
 //						ToastUtils.showToast("后台下载 中");
 						DownloadAPK(model, click, model.getLatestVersion().getUpdateType());
 					} else {
 //						ToastUtils.showToast("服务器无法链接");
 						dialog.dismiss();
+						if (click != null) {
+							click.isDismiss();
+						}
 					}
 				}
 			}
 		});
 		builder.setMessage(Html.fromHtml(strHtml).toString());
 		dialog.setCancelable(false);
+		dialog.setCanceledOnTouchOutside(false);
+		dialog.setOnKeyListener(new DialogInterface.OnKeyListener() {
+			@Override
+			public boolean onKey(DialogInterface dialog, int keyCode, KeyEvent event) {
+				if (keyCode == KeyEvent.KEYCODE_BACK) {
+					return true;
+				}
+				return false;
+			}
+		});
 		dialog = builder.create();
 		dialog.show();
+		if (click!=null){
+			click.isShow();
+		}
+
 	}
+
+
 
 
 	/**
@@ -150,7 +181,8 @@ public class UpdateManager {
 	 * @param model
 	 */
 	private static void DownloadAPK(UpdateModel model, final DialogClick click, final String type) {
-		final String path = AppUtils.getDownloadPath() + "/" + "Huafeigou.apk";
+		final String path = AppUtils.getDownloadPath() + "/" + "woVideo.apk";
+		TLog.log(path);
 		HttpUtils.downFile(model.getLatestVersion().getUrl(), new FileCallBack(AppUtils.getDownloadPath(),"woVideo.apk") {
 			@Override
 			public void onError(Call call, Exception e, int id) {
@@ -185,5 +217,7 @@ public class UpdateManager {
 		void positive();
 		void negitive();
 		void onFinish(boolean flag, String tag);
+		void isShow();
+		void isDismiss();
 	}
 }

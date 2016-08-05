@@ -94,6 +94,8 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
         view4 = findViewById(R.id.pip_video4);
     }
 
+
+
     @Override
     public void initDatas() {
 
@@ -126,12 +128,7 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
             View view1=sparseArray.get(i);
             if (0==i){
                 ImageView imageView= (ImageView)view1.findViewById(R.id.pip_iv_back);
-                imageView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        finish();
-                    }
-                });
+                imageView.setOnClickListener(v -> finish());
             }
             String url = stringLit.get(i);
             if (!TextUtils.isEmpty(url)&&!"".equals(url)) {
@@ -163,7 +160,7 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
         if (!maybeRequestPermission(videoUri)) {
             preparePlayer(videoUri,true,videoFrame,surfaceView, player);
         }
-        else {
+        else if (null!=player){
             player.setBackgrounded(false);
         }
 
@@ -257,7 +254,7 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
 
     class MyCllback implements SurfaceHolder.Callback {
 
-        AVPlayer player;
+        final AVPlayer player;
        MyCllback(int position){
            player = demoPlayerSparseArray.get(position);
        }
@@ -283,7 +280,7 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
     }
 
     class MyPlayListener implements AVPlayer.Listener {
-        AspectRatioFrameLayout mvideoFrame;
+        final AspectRatioFrameLayout mvideoFrame;
 
         MyPlayListener(AspectRatioFrameLayout videoFrame) {
             this.mvideoFrame = videoFrame;
@@ -420,7 +417,7 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
      * @param surfaceView
      */
     private void getRealURL(String url, AspectRatioFrameLayout videoFrame, SurfaceView surfaceView) {
-        HashMap<String, Object> maps = new HashMap<String, Object>();
+        HashMap<String, Object> maps = new HashMap<>();
         maps.put("videoSourceURL", url);
         String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)){

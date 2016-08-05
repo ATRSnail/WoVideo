@@ -272,6 +272,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             bundle.putStringArrayList(PIP_URLS,str);
             intent.putExtras(bundle);
             startActivity(intent);
+        }else{
+            Toast.makeText(this,"请至少选择一个",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1010,10 +1012,11 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         videoPip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick( View v) {
-                    mListPopupWindow=new PipListviwPopuWindow(LivePage.this, liveModlesList, LivePage.this);
+                if (null!=liveModlesList&&liveModlesList.size()>0) {
+                    mListPopupWindow = new PipListviwPopuWindow(LivePage.this, liveModlesList, LivePage.this);
                     mListPopupWindow.showAsDropDown(v);
 
-
+                }
             }
         });
 

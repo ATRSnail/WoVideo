@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.model.LiveModles;
@@ -169,6 +170,9 @@ public class VideoPipAdapter extends BaseAdapter {
                                viewhold.checkbox.setChecked(getIsSelected().get(position));
                                checkNum++;
 
+                           }else if (checkNum==4){
+                               Toast.makeText(mContext,"最能只能选择四个",Toast.LENGTH_SHORT).show();
+
                            }
 
                        }
@@ -194,7 +198,7 @@ public class VideoPipAdapter extends BaseAdapter {
         return convertView;
     }
     public ArrayList<String> getUrls(){
-       ArrayList<String> urls = new ArrayList<>(4);
+       ArrayList<String> urls = new ArrayList<>();
         Iterator iterator = isSelected.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry entry = (Map.Entry)iterator.next();

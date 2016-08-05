@@ -56,7 +56,7 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 16/7/3
  */
-public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myTopbarClicklistenter, SwipeRefreshLayout.OnRefreshListener {
+public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myTopbarClicklistenter, SwipeRefreshLayout.OnRefreshListener{
 
     String[] movie_type_names = new String[]{
             "全部", "剧情", "喜剧", "动作", "恐怖", "动画", "武侠", "警匪", "战争", "爱情",
@@ -285,10 +285,10 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
                 ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    b_list = resp.getBody().getTypeList();
-                    if (b_list == null || b_list.size() == 0) {
+                    b_list.addAll(resp.getBody().getTypeList());
+                    if (b_list == null || b_list.size() == 0||empty_view_button==null) {
                         classDetailsList.setVisibility(View.INVISIBLE);
-                        empty_view_button.setVisibility(View.VISIBLE);
+//                        empty_view_button.setVisibility(View.VISIBLE);
                         return;
                     }
                     empty_view_button.setVisibility(View.INVISIBLE);
@@ -322,6 +322,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                                 getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
                             }
                         });
+
                     } else {
                         if (classDetailsList==null)return;
                         classDetailsList.setVisibility(View.INVISIBLE);
@@ -471,4 +472,5 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         super.onStop();
         first_open = false;
     }
+
 }

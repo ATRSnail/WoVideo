@@ -26,7 +26,8 @@ public class LiveTVListAdapter extends BaseQuickAdapter<LiveModles.LiveModel> {
 //    }
 
     public LiveTVListAdapter(Context context, List<LiveModles.LiveModel> data) {
-        super(context, R.layout.layout_tv_list_item, data);
+        super(R.layout.layout_tv_list_item,data);
+//        super(context, R.layout.layout_tv_list_item, data);
     }
 
     @Override

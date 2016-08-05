@@ -46,5 +46,6 @@
     <color name="btn_yzm">#70B3E5</color>
 
     <color name="mask_color">#dd414141</color>
+    <color name="item_alpha_back">#33000000</color>
 
 </resources>

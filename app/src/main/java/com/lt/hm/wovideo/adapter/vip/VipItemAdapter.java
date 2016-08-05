@@ -23,7 +23,8 @@ import java.util.List;
  */
 public class VipItemAdapter extends BaseQuickAdapter<VideoList.TypeListBean> {
     public VipItemAdapter(Context context, List<VideoList.TypeListBean> data) {
-        super(context, R.layout.layout_home_item, data);
+        super(R.layout.layout_home_item,data);
+//        super(context, R.layout.layout_home_item, data);
     }
 
     @Override

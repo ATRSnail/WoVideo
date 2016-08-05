@@ -21,7 +21,7 @@ import butterknife.BindView;
  * @version 1.0
  * @create_date 16/1/3
  */
-public class ThirdActivity extends BaseActivity implements SecondTopbar.myTopbarClicklistenter {
+public class ThirdPage extends BaseActivity implements SecondTopbar.myTopbarClicklistenter {
 
     @BindView(R.id.web_topbar)
     SecondTopbar webTopbar;

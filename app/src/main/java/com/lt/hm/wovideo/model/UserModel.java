@@ -35,6 +35,7 @@ public class UserModel{
     private long ctime;//创建时间
     private String introduction;//简介
     private String etime;
+    private String ay;//1 已订购 0||“” 未订购  2已退订
 
     public String getEtime() {
         return etime;
@@ -141,6 +142,13 @@ public class UserModel{
     }
 
 
+    public String getAy() {
+        return ay;
+    }
+
+    public void setAy(String ay) {
+        this.ay = ay;
+    }
 
     @Override
     public String toString() {
@@ -158,6 +166,7 @@ public class UserModel{
                 ", ctime=" + ctime +
                 ", introduction='" + introduction + '\'' +
                 ", etime='" + etime + '\'' +
+                ", ay='" + ay + '\'' +
                 '}';
     }
 }

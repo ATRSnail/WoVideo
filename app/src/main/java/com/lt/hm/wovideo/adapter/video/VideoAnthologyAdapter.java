@@ -23,7 +23,8 @@ public class VideoAnthologyAdapter extends BaseQuickAdapter<String> {
     }
 
     public VideoAnthologyAdapter(Context context, List<String> data) {
-        super(context, R.layout.layout_video_anthology_item, data);
+        super(R.layout.layout_video_anthology_item,data);
+//        super(context, R.layout.layout_video_anthology_item, data);
     }
 
     @Override

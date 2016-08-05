@@ -20,7 +20,8 @@ import java.util.List;
  */
 public class VideoItemListAdapter extends BaseQuickAdapter<LikeList.LikeListBean> {
     public VideoItemListAdapter(Context context,List<LikeList.LikeListBean> data) {
-        super(context, R.layout.layout_home_item, data);
+        super(R.layout.layout_home_item,data);
+//        super(context, R.layout.layout_home_item, data);
     }
 
     @Override

@@ -20,7 +20,8 @@ import java.util.List;
  */
 public class VideoItemGridAdapter extends BaseQuickAdapter<LikeList.LikeListBean>{
     public VideoItemGridAdapter(Context context,List<LikeList.LikeListBean> data) {
-        super(context, R.layout.layout_item_grid, data);
+        super(R.layout.layout_item_grid,data);
+//        super(context, R.layout.layout_item_grid, data);
     }
 
     @Override

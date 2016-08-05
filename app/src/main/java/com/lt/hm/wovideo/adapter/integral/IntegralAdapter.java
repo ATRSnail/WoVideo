@@ -17,7 +17,8 @@ import java.util.List;
 public class IntegralAdapter extends BaseQuickAdapter<Integral> {
 
     public IntegralAdapter(Context context, int layoutResId, List<Integral> data) {
-        super(context, layoutResId, data);
+        super(layoutResId,data);
+//        super(context, layoutResId, data);
     }
 
     @Override

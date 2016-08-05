@@ -27,6 +27,7 @@ import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.upstream.BandwidthMeter;
 import com.google.gson.Gson;
+import com.lt.hm.wovideo.AppContext;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
@@ -36,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static com.tencent.bugly.crashreport.inner.InnerAPI.context;
 
 /**
  * A wrapper around {@link ExoPlayer} that provides a high level interface, based on DemoPlayer.
@@ -444,9 +444,9 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
     //TODO is free now?
     //125992483(actual is 125938756) bytes fluent using 748404ms loaded
     ConnectivityManager cm =
-            (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            (ConnectivityManager)AppContext.context().getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-    String user = SharedPrefsUtils.getStringPreference(context, "userinfo");
+    String user = SharedPrefsUtils.getStringPreference(AppContext.context(), "userinfo");
     if (!StringUtils.isNullOrEmpty(user)){
       UserModel userModel = new Gson().fromJson(user, UserModel.class);
       if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE && userModel.getIsVip().equals("1")){

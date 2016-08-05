@@ -172,6 +172,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 //                                }
 //                            }
 //                        });
+                        bottom_adapter.openLoadAnimation();
 //                        bottom_adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
 //                            @Override
 //                            public void onLoadMoreRequested() {

@@ -85,6 +85,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   private float mCurVolume;
   private AudioManager mAudioManager;
   private int mMaxVolume;
+  private View mScheduleLayout;
+  private TextView mScheduleText;
+
 
 
     /**
@@ -147,6 +150,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
   public void setBulletScreen(boolean isShow) {
     mIsBulletScreenOn = isShow;
+  }
+  public boolean getBulletScreen(){
+    if (mBulletSwitch==null) return mIsBulletScreenOn;
+    else
+    return mBulletSwitch.isChecked();
   }
 
   /**
@@ -293,6 +301,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     mCenterLayout.setVisibility(GONE);
     mCenterImage = (ImageView) v.findViewById(R.id.image_center_bg);
     mCenterPorgress = (ProgressBar) v.findViewById(R.id.progress_center);
+    mScheduleLayout = v.findViewById(R.id.layout_center_schedule);
+    mScheduleLayout.setVisibility(GONE);
+    mScheduleText= (TextView) v.findViewById(R.id.schedule_center_text);
+
 
   }
 
@@ -305,6 +317,24 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
   public void setSwitchVisibility(int visibility){
     if (mQualitySwitch!=null){
       mQualitySwitch.setVisibility(visibility);
+    }
+  }
+
+  public void setBulletVisible(int visible){
+    if (mBulletSwitch!=null){
+      mBulletSwitch.setVisibility(visible);
+    }
+  }
+
+  public void setmSendBulletVisible(int visible){
+    if (mSendBulletButton!=null){
+      mSendBulletButton.setVisibility(visible);
+    }
+  }
+
+  public void setmFullscreenVisible(int visible){
+    if (mFullscreenButton!=null){
+      mFullscreenButton.setVisibility(visible);
     }
   }
 
@@ -534,6 +564,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
       //TODO
       mIsBulletScreenOn = isChecked;
+      mBulletSwitch.setChecked(mIsBulletScreenOn);
       toggleBulletScreen(isChecked);
     }
   };
@@ -542,7 +573,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
    * for override
    * @param isShow
      */
-  public void toggleBulletScreen(boolean isShow) {};
+  public void toggleBulletScreen(boolean isShow) {
+    if (mInterfaceListener!=null){
+      mInterfaceListener.onBulletSwitchCheck(isShow);
+    }
+  };
 
   public void setTitle(String titleName) {
     if (mVideoTitle != null) {
@@ -788,7 +823,22 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     Log.i(TAG, delta+"");
     if (event.getPointerCount() == 1)
       if (mPlayer==null) return;
-      mPlayer.seekTo(mPlayer.getCurrentPosition() + Math.round(delta));
+    long toPosition = mPlayer.getCurrentPosition() + Math.round(delta);
+    updateSchedule(toPosition);
+    mPlayer.seekTo(toPosition);
+  }
+
+  private void updateSchedule(long toPosition) {
+    mScheduleLayout.setVisibility(VISIBLE);
+    mCenterLayout.setVisibility(INVISIBLE);
+    mScheduleText.setText(stringForTime(toPosition)+" / "+stringForTime(mPlayer.getDuration()));
+    postDelayed(new Runnable() {
+      @Override
+      public void run() {
+        mScheduleLayout.setVisibility(GONE);
+      }
+    },1000);
+
   }
 
   @Override public void onVerticalScroll(MotionEvent event, float delta, int direction) {
@@ -930,6 +980,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     void onOpenBulletEditor();
 
     void onSendBulletClick(Bullet bullet);
+    void onBulletSwitchCheck(boolean isChecked);
   }
 
 }

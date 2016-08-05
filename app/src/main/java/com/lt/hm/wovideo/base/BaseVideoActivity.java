@@ -122,7 +122,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     private String mVideoId;
 
     private EventLogger mEventLogger;
-    private AVController mMediaController;
+    protected AVController mMediaController;
     private AspectRatioFrameLayout mVideoFrame;
     private View mShutterView;
     private RotateLoading mRotateLoading;
@@ -504,8 +504,10 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 //            mMediaController.setTitle(videoName.getText().toString());
             mVideoFrame.setLayoutParams(lp);
             mVideoFrame.requestLayout();
+            mMediaController.setBulletScreen(true);
+            getBullets();
             //show status bar
-//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
             //show danmu
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             //hide status bar
@@ -566,6 +568,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mDanmakuView.seekTo(mPlayer.getCurrentPosition());
         } else {
             mRotateLoading.start();
+            if (mDanmakuView==null) return;
             mDanmakuView.hide();
         }
     }
@@ -629,43 +632,43 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     protected void getBullets() {
         TLog.log("Bullet", "get bullets"+mVideoId);
-        if (mDanmakuView!=null){
-            mDanmakuView.release();
-        }
-        HashMap<String, Object> maps = new HashMap<String, Object>();
-        maps.put("pageNum", 1);
-        maps.put("numPerPage", 10000);
-        maps.put("vfPlayId", mVideoId);
+            if (mDanmakuView!=null){
+                mDanmakuView.release();
+            }
+            HashMap<String, Object> maps = new HashMap<String, Object>();
+            maps.put("pageNum", 1);
+            maps.put("numPerPage", 10000);
+            maps.put("vfPlayId", mVideoId);
 
 //        maps.put("vfPlayId", );
-        HttpApis.getBulletByVideoId(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("getBullet"+response);
-                ResponseObj<BulletModel, RespHeader> resp = new ResponseObj<BulletModel, RespHeader>();
-                ResponseParser.parse(resp, response, BulletModel.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    if (!StringUtils.isNullOrEmpty(resp.getBody().getBarrageList()) && resp.getBody().getBarrageList().size() > 0) {
-                        mParser = new WoDanmakuParser();
-                        mParser.setmDanmuListData(resp.getBody());
-                        if (mContext == null||mParser==null)
-                            return;
-                        mDanmakuView.prepare(mParser, mContext);
-                        mDanmakuView.showFPS(false);
-                        mDanmakuView.enableDanmakuDrawingCache(true);
-//                        mDanmakuView.hide();
-                    } else {
-                    }
-                } else {
-                    TLog.log(resp.getHead().getRspMsg());
+            HttpApis.getBulletByVideoId(maps, new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    TLog.log("error:" + e.getMessage());
                 }
-            }
-        });
+
+                @Override
+                public void onResponse(String response, int id) {
+                    TLog.log("getBullet"+response);
+                    ResponseObj<BulletModel, RespHeader> resp = new ResponseObj<BulletModel, RespHeader>();
+                    ResponseParser.parse(resp, response, BulletModel.class, RespHeader.class);
+                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                        if (!StringUtils.isNullOrEmpty(resp.getBody().getBarrageList()) && resp.getBody().getBarrageList().size() > 0) {
+                            mParser = new WoDanmakuParser();
+                            mParser.setmDanmuListData(resp.getBody());
+                            if (mContext == null||mParser==null)
+                                return;
+                            mDanmakuView.prepare(mParser, mContext);
+                            mDanmakuView.showFPS(false);
+                            mDanmakuView.enableDanmakuDrawingCache(true);
+//                        mDanmakuView.hide();
+                        } else {
+                        }
+                    } else {
+                        TLog.log(resp.getHead().getRspMsg());
+                    }
+                }
+            });
     }
 
     /**
@@ -738,7 +741,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 //        mDanmakuView.enableDanmakuDrawingCache(true);
         if (mParser!=null&& mParser.getDisplayer()!=null){
             danmaku.text = bullet.getContent();
-            danmaku.padding = 100;
+            danmaku.padding = 1000;
             danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
             danmaku.time = mDanmakuView.getCurrentTime() + 1200;
             danmaku.textSize = Float.parseFloat(bullet.getFontSize()) * (mParser.getDisplayer().getDensity() - 0.6f);
@@ -826,7 +829,21 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     @Override
     public void onSendBulletClick(Bullet bullet) {
-        addBullet(bullet);
+        if (mMediaController.getBulletScreen()){
+            addBullet(bullet);
+        }else{
+            Toast.makeText(getApplicationContext(),"open switch first",Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onBulletSwitchCheck(boolean isChecked) {
+        if (isChecked){
+            mMediaController.setBulletScreen(true);
+            getBullets();
+        }else{
+            mMediaController.setBulletScreen(false);
+        }
     }
 
     private static final class KeyCompatibleMediaController extends AVController {

@@ -21,6 +21,12 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+
+    <!--用于进行网络定位-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"></uses-permission>
+    <!--用于访问GPS定位-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"></uses-permission>
 
     <application
         android:name=".AppContext"
@@ -134,11 +140,18 @@
         <activity android:name=".ui.UpdatePwdActivity"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
-        <activity android:name=".ui.ThirdActivity"
+        <activity android:name=".ui.ThirdPage"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize"/>
+        <activity android:name=".ui.ChannelListPage"
             android:screenOrientation="portrait"
             android:configChanges="orientation|screenSize"/>
         <activity android:name=".zxing.ui.MipcaActivityCapture"/>
       <activity android:name=".ui.PipActivity"
+          android:screenOrientation="landscape"
+          >
+      </activity>
+        <activity android:name=".ui.VideoPlayerPage"
           android:screenOrientation="landscape"
           >
       </activity>
@@ -174,6 +187,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <meta-data android:name="com.amap.api.v2.apikey" android:value="a2a6525af91b35a7792df3d609df69c1"/>
+        <!--高德定位服务-->
+        <service android:name="com.amap.api.location.APSService"></service>
     </application>
 
 </manifest>

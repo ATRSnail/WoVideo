@@ -3,6 +3,7 @@ package com.lt.hm.wovideo.video.player;
 import android.graphics.Color;
 
 import com.lt.hm.wovideo.model.BulletModel;
+import com.lt.hm.wovideo.utils.StringUtils;
 
 import java.util.List;
 
@@ -70,7 +71,12 @@ public class WoDanmakuParser extends BaseDanmakuParser{
              */
             bullet.setFontColor("#669900");
             int color = bullet.getFontColor().equals("") ? Color.BLACK : Color.parseColor(bullet.getFontColor()) ; // 颜色
-            float textSize = Float.parseFloat(bullet.getFontSize()); // 字体大小
+            float textSize = 0;
+            if (!StringUtils.isNullOrEmpty(bullet.getFontSize())){
+                textSize= Float.parseFloat(bullet.getFontSize()); // 字体大小
+            }else{
+                textSize=30f;
+            }
             BaseDanmaku item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
             if (item != null) {
                 item.time = time;

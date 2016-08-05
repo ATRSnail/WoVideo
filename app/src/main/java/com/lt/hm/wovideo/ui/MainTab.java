@@ -12,9 +12,14 @@ import com.lt.hm.wovideo.fragment.VipPage;
  * @create_date 16/5/30
  */
 public enum MainTab {
-    SELECTION(0, R.string.choice_string, R.drawable.tab_selection_selector,
+    SELECTION(0, R.string.choice_string, R.drawable.tab_choice_selector,
             ChoicePage.class),
     CLASSES(1, R.string.classes_string, R.drawable.tab_classes_selector, ClassPage.class),
+//    SELECTION(0, R.string.choice_string, R.drawable.tab_choice_selector,
+//            NewChoicePage.class),
+//    CLASSES(1, R.string.live_string, R.drawable.tab_selection_selector, ClassPage.class),
+//    VIP(2, R.string.vip_string, R.drawable.tab_vip_selector, RecommendPage.class),
+    OLYMPIC(2,R.string.olympic_string,R.drawable.tab_classes_selector,OlympicPage.class),
     VIP(2, R.string.vip_string, R.drawable.tab_vip_selector, VipPage.class),
     EVENTS(3, R.string.event_string, R.drawable.tab_events_selector, EventsPage.class);
     private int idx;

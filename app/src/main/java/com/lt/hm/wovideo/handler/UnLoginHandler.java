@@ -120,6 +120,7 @@ public class UnLoginHandler {
 
         map.put("cellphone", model.getPhoneNo());
         map.put("spid", "953");
+        map.put("ordertype",1);
         HttpApis.purchOrder(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -168,7 +169,6 @@ public class UnLoginHandler {
                     model.setIsVip("1");
                     SharedPrefsUtils.setStringPreference(mContext, "userinfo", new Gson().toJson(model, UserModel.class));
                     GetPersonInfo(model,mContext);
-
                 } else {
                     Toast.makeText(mContext, mContext.getResources().getText(R.string.open_failed), Toast.LENGTH_SHORT).show();
                 }

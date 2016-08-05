@@ -4,6 +4,7 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.fragment.ChoicePage;
 import com.lt.hm.wovideo.fragment.ClassPage;
 import com.lt.hm.wovideo.fragment.EventsPage;
+import com.lt.hm.wovideo.fragment.NewChoicePage;
 import com.lt.hm.wovideo.fragment.VipPage;
 
 /**
@@ -12,11 +13,11 @@ import com.lt.hm.wovideo.fragment.VipPage;
  * @create_date 16/5/30
  */
 public enum MainTab {
-    SELECTION(0, R.string.choice_string, R.drawable.tab_choice_selector,
-            ChoicePage.class),
-    CLASSES(1, R.string.classes_string, R.drawable.tab_classes_selector, ClassPage.class),
 //    SELECTION(0, R.string.choice_string, R.drawable.tab_choice_selector,
-//            NewChoicePage.class),
+//            ChoicePage.class),
+    CLASSES(1, R.string.classes_string, R.drawable.tab_classes_selector, ClassPage.class),
+    SELECTION(0, R.string.choice_string, R.drawable.tab_choice_selector,
+            NewChoicePage.class),
 //    CLASSES(1, R.string.live_string, R.drawable.tab_selection_selector, ClassPage.class),
 //    VIP(2, R.string.vip_string, R.drawable.tab_vip_selector, RecommendPage.class),
     OLYMPIC(2,R.string.olympic_string,R.drawable.tab_olympic_selector,OlympicPage.class),

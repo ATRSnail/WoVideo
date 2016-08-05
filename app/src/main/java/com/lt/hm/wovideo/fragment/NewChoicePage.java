@@ -1,5 +1,6 @@
 package com.lt.hm.wovideo.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -17,6 +18,7 @@ import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.TypeList;
+import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.ViewPagerIndicator;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -155,6 +157,7 @@ public class NewChoicePage extends BaseFragment {
 		vipSelector.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				startActivity(new Intent(getContext(), PersonalitySet.class));
 			}
 		});
 		getClassInfos();

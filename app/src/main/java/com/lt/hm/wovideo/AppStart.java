@@ -15,7 +15,7 @@ import com.lt.hm.wovideo.utils.UIHelper;
 public class AppStart extends BaseActivity {
     @Override
     protected int getLayoutId() {
-        return super.getLayoutId();
+        return R.layout.layout_start;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class AppStart extends BaseActivity {
             UIHelper.ToADPage(this);
             this.finish();
         }else{
-
+            UIHelper.ToMain2(AppStart.this);
         }
 
 //        UIHelper.ToVideo(this);

@@ -108,7 +108,6 @@ public class DialogHelp {
         builder.setPositiveButton(positive_str,positive);
         dialog= builder.create();
         return dialog;
-
     }
 }
 

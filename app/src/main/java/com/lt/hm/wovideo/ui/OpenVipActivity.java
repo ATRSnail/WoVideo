@@ -191,6 +191,7 @@ public class OpenVipActivity extends BaseActivity implements SecondTopbar.myTopb
             UserModel model = new Gson().fromJson(string, UserModel.class);
             map.put("cellphone", model.getPhoneNo());
             map.put("spid", "953");
+            map.put("ordertype",1);
             HttpApis.purchOrder(map, new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e, int id) {

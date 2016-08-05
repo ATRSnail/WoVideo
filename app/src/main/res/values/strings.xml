@@ -15,6 +15,8 @@
     </string>
     <!-- Tab String-->
     <string name="choice_string">推荐</string>
+    <string name="new_choice_string">精选</string>
+    <string name="live_string">直播</string>
     <string name="classes_string">分类</string>
     <string name="vip_string">VIP会员</string>
     <string name="event_string">活动</string>
@@ -156,4 +158,11 @@
     <string name="main_page_toast">注册/登录, 全站免流量观看视频</string>
     <string name="expand">展开</string>
 
+    <!--定位提示-->
+    <string name="notifyTitle">提示</string>
+    <string name="notifyMsg">当前应用缺少必要权限。\n\n请点击\"设置\"-\"权限\"-打开所需权限。</string>
+    <string name="setting">设置</string>
+    <string name="cancel">取消</string>
+    <string name="channel_string">频道列表</string>
+    <string name="olympic_string">奥运</string>
 </resources>

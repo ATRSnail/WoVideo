@@ -339,6 +339,7 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
 
             @Override
             public void onResponse(String response, int id) {
+                TLog.log("userinfo_update"+response);
                 ResponseObj<UserModel, RespHeader> resp = new ResponseObj<UserModel, RespHeader>();
                 ResponseParser.loginParse(resp,response,UserModel.class,RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)){

@@ -202,6 +202,7 @@ public class NewMoviePage extends BaseVideoActivity {
                     ResponseParser.parse(resp, response, CommentModel.class, RespHeader.class);
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                         if (!StringUtils.isNullOrEmpty(resp.getBody().getCommentList()) && resp.getBody().getCommentList().size() > 0) {
+                            if (empty==null) return;
                             empty.setVisibility(View.GONE);
                             videoCommentList.setVisibility(View.VISIBLE);
                             beans.addAll(resp.getBody().getCommentList());

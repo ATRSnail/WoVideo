@@ -20,6 +20,7 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.AppUtils;
 import com.lt.hm.wovideo.utils.MD5Utils;
 import com.lt.hm.wovideo.utils.PhoneUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
@@ -135,6 +136,7 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
         HashMap<String, Object> map = new HashMap<>();
         map.put("phone", account);
         map.put("passWord", MD5Utils.getMD5Code(pwd).toLowerCase());
+        map.put("platform", AppUtils.getPlatForms());
         HttpApis.login(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {

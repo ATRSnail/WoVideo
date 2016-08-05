@@ -31,16 +31,18 @@ public class BillAdapter extends BaseQuickAdapter<BillList.OrderListBean>{
     }
 
     public BillAdapter(Context context, List<BillList.OrderListBean> data) {
-        super(context, R.layout.layout_order_item, data);
+        super(R.layout.layout_order_item,data);
+//        super(context, R.layout.layout_order_item, data);
     }
 
     @Override
     protected void convert(BaseViewHolder holder, BillList.OrderListBean order) {
-        if (order.getGoodsId().equals("953")){
-            holder.setText(R.id.order_video_name,"0元免流量包");
-        }else{
-            holder.setText(R.id.order_video_name,order.getName());
-        }
+//        if (order.getGoodsId().equals("953")){
+//            holder.setText(R.id.order_video_name,"0元免流量包");
+//        }else{
+//            holder.setText(R.id.order_video_name,order.getName());
+//        }
+        holder.setText(R.id.order_video_name,order.getDesc());
 //        holder.setText(R.id.order_video_type,"类别"+order.getType());
 //        holder.setText(R.id.order_video_price,"$"+order.getPrice()+"元");
 //        if (order.get!=null){

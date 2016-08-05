@@ -23,7 +23,8 @@ public class SearchHistoryAdapter extends BaseQuickAdapter<String> {
     }
 
     public SearchHistoryAdapter(Context context, List<String> data) {
-        super(context, R.layout.layout_search_history, data);
+        super(R.layout.layout_search_history,data);
+//        super(context, R.layout.layout_search_history, data);
     }
 
     @Override

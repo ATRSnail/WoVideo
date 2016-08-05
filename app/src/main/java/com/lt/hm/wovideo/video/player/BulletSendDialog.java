@@ -11,8 +11,10 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.video.model.Bullet;
 
 /**
@@ -60,11 +62,15 @@ public class BulletSendDialog extends DialogFragment{
             @Override
             public void onClick(View v) {
                 //TODO send the bullet screen
-                Bullet bullet = new Bullet();
-                bullet.setContent(content.getText().toString().trim());
-                bullet.randomFontColor(getResources().getColor(R.color.red_bullet));
-                bullet.randomFontSize();
-                mInterfaceListener.onSendBulletClick(bullet);
+                if (!StringUtils.isNullOrEmpty(content.getText().toString())){
+                    Bullet bullet = new Bullet();
+                    bullet.setContent(content.getText().toString().trim());
+                    bullet.randomFontColor(getResources().getColor(R.color.red_bullet));
+                    bullet.randomFontSize();
+                    mInterfaceListener.onSendBulletClick(bullet);
+                }else{
+                    Toast.makeText(v.getContext(),"内容不能为空",Toast.LENGTH_SHORT).show();
+                }
                 //TODO reset eidt text
 
                 //TODO close current dialog

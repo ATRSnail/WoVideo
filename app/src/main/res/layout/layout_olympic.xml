@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lt.hm.wovideo.widget.VerticalSwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:scrollbars="none"
+    android:id="@+id/olympic_swipe"
+    >
+
+    <com.lt.hm.wovideo.widget.FastScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:scrollbars="none"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/s_180">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/img_olympic_banner"
+                    android:scaleType="fitXY"
+                    />
+
+                <ImageButton
+                    android:id="@+id/order_five_flow"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|bottom"
+                    android:background="@drawable/icon_o_order"
+                    android:layout_margin="@dimen/s_20"
+                    />
+            </FrameLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:orientation="vertical"
+                android:padding="@dimen/dp_10"
+                >
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal"
+                    >
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/img_cctv1"
+                        android:id="@+id/oly_cctv1"
+                        />
+                    <View
+                        android:layout_width="@dimen/dp_10"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"/>
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/img_cctv2"
+                        android:id="@+id/oly_cctv2"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:paddingTop="@dimen/s_5"
+                    android:gravity="center_horizontal"
+                    >
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/img_cctv5"
+                        android:id="@+id/oly_cctv5"
+                        />
+                    <View
+                        android:layout_width="@dimen/dp_10"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"/>
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/img_cctv5_plus"
+                        android:id="@+id/oly_cctv5_plus"
+                        />
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:gravity="center_horizontal"
+                android:paddingBottom="@dimen/s_20"
+                android:paddingTop="@dimen/s_20"
+                >
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/img_olympic_wonderful"
+                    />
+            </LinearLayout>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/olympic_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1.0"
+                />
+        </LinearLayout>
+    </com.lt.hm.wovideo.widget.FastScrollView>
+</com.lt.hm.wovideo.widget.VerticalSwipeRefreshLayout>

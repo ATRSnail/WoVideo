@@ -491,10 +491,6 @@ public class ChoicePage extends BaseFragment implements SwipeRefreshLayout.OnRef
         loopIndicatorView();
     }
 
-    public interface hideTopBar {
-        void hideTop();
-    }
-
 }
 
 

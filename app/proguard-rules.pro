@@ -27,3 +27,14 @@
 #Bugly Crash collect
 -dontwarn com.tencent.bugly.**
 -keep public class com.tencent.bugly.**{*;}
+
+
+# 高德 location
+-keep class com.amap.api.location.**{*;}
+-keep class com.amap.api.fence.**{*;}
+-keep class com.autonavi.aps.amapapi.model.**{*;}
+
+# ProGuard configurations for NetworkBench Lens -keep class com.networkbench.** { *; }
+-dontwarn com.networkbench.**
+-keepattributes Exceptions, Signature, InnerClasses # End NetworkBench Lens
+-keepattributes SourceFile,LineNumberTable

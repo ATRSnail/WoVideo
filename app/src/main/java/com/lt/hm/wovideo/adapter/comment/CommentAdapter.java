@@ -17,7 +17,8 @@ import java.util.List;
  */
 public class CommentAdapter extends BaseQuickAdapter<CommentModel.CommentListBean> {
     public CommentAdapter(Context context, List<CommentModel.CommentListBean> data) {
-        super(context, R.layout.item_video_comment, data);
+        super(R.layout.item_video_comment,data);
+//        super(context, R.layout.item_video_comment,data);
     }
 
     @Override

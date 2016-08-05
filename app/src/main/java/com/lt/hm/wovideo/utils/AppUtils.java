@@ -20,6 +20,8 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.inputmethod.InputMethodManager;
 
+import com.lt.hm.wovideo.AppContext;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -520,4 +522,27 @@ public class AppUtils {
 
         return toolbarHeight;
     }
+
+    public static int getAppVersionCode(){
+        int versionCode = 0;
+        try {
+            versionCode = AppContext
+                    .context()
+                    .getPackageManager()
+                    .getPackageInfo(AppContext.context().getPackageName(),
+                            0).versionCode;
+        } catch (PackageManager.NameNotFoundException ex) {
+            versionCode = 0;
+        }
+        return versionCode;
+    }
+
+    public  static String getPlatForms(){
+        return "2";
+    }
+
+    public static String getDownloadPath() {
+        return Environment.getExternalStorageDirectory().getAbsolutePath();
+    }
+
 }

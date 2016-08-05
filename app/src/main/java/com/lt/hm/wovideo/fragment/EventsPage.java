@@ -14,7 +14,7 @@ import android.widget.ListView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseFragment;
-import com.lt.hm.wovideo.ui.ThirdActivity;
+import com.lt.hm.wovideo.ui.ThirdPage;
 import com.lt.hm.wovideo.utils.NoDoubleItemClickListener;
 
 import butterknife.BindView;
@@ -60,7 +60,7 @@ public class EventsPage extends BaseFragment implements SwipeRefreshLayout.OnRef
         lvHuodong.setOnItemClickListener(new NoDoubleItemClickListener() {
             @Override
             public void onNoDoubleItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getActivity(), ThirdActivity.class);
+                Intent intent = new Intent(getActivity(), ThirdPage.class);
                 Bundle bundle= new Bundle();
                 bundle.putString("url","ku.17wo.cn");
                 intent.putExtras(bundle);

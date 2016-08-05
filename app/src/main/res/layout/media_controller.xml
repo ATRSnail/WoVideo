@@ -84,8 +84,12 @@
                 android:id="@+id/mediacontroller_progress"
                 android:layout_width="0dip"
                 android:layout_weight="1"
-                android:layout_height="32dip"
-                android:layout_gravity="center_vertical"/>
+                android:layout_height="23dip"
+                android:layout_gravity="center"
+                />
+            <!--android:paddingTop="4dip"-->
+            <!--android:progressDrawable="@drawable/po_seekbar"-->
+            <!--android:thumb="@drawable/seekbar_thumb"-->
 
             <TextView android:id="@+id/time"
                 android:textSize="12sp"

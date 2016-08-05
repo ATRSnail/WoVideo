@@ -11,17 +11,18 @@ import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
 import com.lt.hm.wovideo.model.Category;
 import com.lt.hm.wovideo.widget.CustomTopbar;
+import com.lt.hm.wovideo.widget.SecondTopbar;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 
-public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopbarClicklistenter, OnCateItemListener {
+public class PersonalitySet extends BaseActivity implements SecondTopbar.myTopbarClicklistenter, OnCateItemListener {
 
 
     @BindView(R.id.person_topbar)
-    CustomTopbar personTopbar;
+    SecondTopbar personTopbar;
     @BindView(R.id.recycler_personal_mine)
     RecyclerView mineCateRecycler;
     @BindView(R.id.recycler_personal_all)
@@ -40,7 +41,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     @Override
     protected void init(Bundle savedInstanceState) {
         personTopbar.setLeftIsVisible(true);
-        personTopbar.setRightIsVisible(false);
+        personTopbar.setRightIsVisible(true);
         personTopbar.setOnTopbarClickListenter(this);
     }
 
@@ -76,7 +77,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void rightClick() {
-
+      adapter.toggleCanDelete();
     }
 
     public void btnAddItem(int type) {
@@ -109,6 +110,11 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
         btnRemoveItem(type, pos);
         btnAddItem(type);
         Toast.makeText(this, "---" + pos, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void OnItemLongClick() {
+        adapter.toggleCanDelete();
     }
 
 }

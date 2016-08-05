@@ -5,8 +5,7 @@
     android:layout_height="match_parent"
     android:background="@color/gray_lighter1"
     android:orientation="vertical">
-
-    <com.lt.hm.wovideo.widget.CustomTopbar
+    <com.lt.hm.wovideo.widget.SecondTopbar
         android:id="@+id/person_topbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/s_46"

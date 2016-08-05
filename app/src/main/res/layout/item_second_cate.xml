@@ -8,7 +8,9 @@
         android:id="@+id/second_cate_name"
         android:layout_width="60dp"
         android:layout_height="30dp"
+        android:text="北京"
         android:background="@color/white"
+        android:layout_margin="5dp"
         android:gravity="center"
         android:textSize="20sp" />
 </LinearLayout>

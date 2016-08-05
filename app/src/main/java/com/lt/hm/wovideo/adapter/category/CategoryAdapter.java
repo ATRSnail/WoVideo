@@ -3,6 +3,7 @@ package com.lt.hm.wovideo.adapter.category;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import com.lt.hm.wovideo.R;
@@ -22,8 +23,9 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private LayoutInflater inflater;
     private OnCateItemListener listener;
     private int type;
+    private boolean isCanDel = false;
 
-    public CategoryAdapter(Context ctx, List<Category> categories,OnCateItemListener listener,int type) {
+    public CategoryAdapter(Context ctx, List<Category> categories, OnCateItemListener listener, int type) {
         this.ctx = ctx;
         this.list = categories;
         this.listener = listener;
@@ -33,14 +35,18 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return type == Category.FIRST_TYPE?new FirstViewHolder(inflater.inflate(R.layout.item_first_cate, null, false),listener,type):new SecondViewHolder(inflater.inflate(R.layout.item_second_cate,null,false),listener,type);
+        return type == Category.FIRST_TYPE ?
+                new FirstViewHolder(inflater.inflate(R.layout.item_first_cate, null, false), listener, type) :
+                new SecondViewHolder(inflater.inflate(R.layout.item_second_cate, null, false), listener, type);
     }
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        if (type == Category.FIRST_TYPE){
+        if (type == Category.FIRST_TYPE) {
             FirstViewHolder firstViewHolder = (FirstViewHolder) holder;
             firstViewHolder.firstCategory.setText(list.get(position).getCategoryName());
+            firstViewHolder.deleteImg.setVisibility(isCanDel ? View.VISIBLE : View.GONE);
+            firstViewHolder.setIsCanDel(isCanDel);
             return;
         }
         SecondViewHolder secondViewHolder = (SecondViewHolder) holder;
@@ -50,5 +56,15 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    public void toggleCanDelete() {
+        isCanDel = !isCanDel;
+        notifyDataSetChanged();
+    }
+
+    public void setIsCanDelete(boolean isCanDel) {
+        this.isCanDel = isCanDel;
+        notifyDataSetChanged();
     }
 }

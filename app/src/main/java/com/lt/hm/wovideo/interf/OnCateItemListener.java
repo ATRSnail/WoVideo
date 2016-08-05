@@ -5,4 +5,5 @@ package com.lt.hm.wovideo.interf;
  */
 public interface OnCateItemListener {
     void OnItemClick(int type, int pos);
+    void OnItemLongClick();
 }

@@ -2,16 +2,16 @@ package com.lt.hm.wovideo.base;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
+import android.support.multidex.MultiDexApplication;
 import android.util.DisplayMetrics;
 /**
  * Created by leonardo on 16/3/21.
  */
-public class BaseApplication extends Application {
+public class BaseApplication extends MultiDexApplication {
 	protected static Context _context;
 	protected static Resources _resource;
 	private static String PREF_NAME = "creativelocker.pref";
@@ -23,8 +23,8 @@ public class BaseApplication extends Application {
 		}
 	}
 
-	public static synchronized BaseApplication context() {
-		return (BaseApplication) _context;
+	public static synchronized MultiDexApplication context() {
+		return (MultiDexApplication) _context;
 	}
 
 

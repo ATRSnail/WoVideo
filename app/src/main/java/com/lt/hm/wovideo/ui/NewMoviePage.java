@@ -133,7 +133,6 @@ public class NewMoviePage extends BaseVideoActivity {
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             setVideoTitle(videoName.getText().toString());
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-
         }
     }
 
@@ -154,6 +153,7 @@ public class NewMoviePage extends BaseVideoActivity {
             getVideoDetails(vfId);
             getFirstURL(vfId);
             getCommentList(vfId);
+            mMediaController.setBulletScreen(false);
         }
 
         getYouLikeDatas(10);

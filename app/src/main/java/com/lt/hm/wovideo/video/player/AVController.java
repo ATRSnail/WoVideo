@@ -150,6 +150,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
   public void setBulletScreen(boolean isShow) {
     mIsBulletScreenOn = isShow;
+    mBulletSwitch.setChecked(mIsBulletScreenOn);
   }
   public boolean getBulletScreen(){
     if (mBulletSwitch==null) return mIsBulletScreenOn;

@@ -38,3 +38,11 @@
 -dontwarn com.networkbench.**
 -keepattributes Exceptions, Signature, InnerClasses # End NetworkBench Lens
 -keepattributes SourceFile,LineNumberTable
+
+# share_SDK
+-keep class cn.sharesdk.**{*;}
+-keep class com.sina.**{*;}
+-keep class **.R$* {*;}
+-keep class **.R{*;}
+-dontwarn cn.sharesdk.**
+-dontwarn **.R$*

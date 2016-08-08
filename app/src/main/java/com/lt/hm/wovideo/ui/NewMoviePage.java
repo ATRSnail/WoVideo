@@ -153,7 +153,9 @@ public class NewMoviePage extends BaseVideoActivity {
             getVideoDetails(vfId);
             getFirstURL(vfId);
             getCommentList(vfId);
-            mMediaController.setBulletScreen(false);
+            if (mMediaController!=null){
+                mMediaController.setBulletScreen(false);
+            }
         }
 
         getYouLikeDatas(10);

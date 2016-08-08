@@ -39,6 +39,17 @@
 -keepattributes Exceptions, Signature, InnerClasses # End NetworkBench Lens
 -keepattributes SourceFile,LineNumberTable
 
+#mail proguard configurations
+-keep class com.sun.mail.**{*;}
+-keep class javax.mail.**{*;}
+-keep class myjava.awt.datatransfer.**{*;}
+-keep class org.apache.harmony.**{*;}
+-keep class com.sun.activation.registries.**{*;}
+-keep class java.activation.**{*;}
+
+#Proguard configurations for ZXing
+-keep class com.google.zxing.**{*;}
+#-keepclassmembers
 # share_SDK
 -keep class cn.sharesdk.**{*;}
 -keep class com.sina.**{*;}

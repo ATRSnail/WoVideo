@@ -26,10 +26,13 @@ public class Bottom_ListAdapter extends BaseQuickAdapter<RecomList.Videos> {
 
 	@Override
 	protected void convert(BaseViewHolder baseViewHolder, RecomList.Videos videos) {
-		baseViewHolder.setText(R.id.home_item_title, videos.getName());
-		baseViewHolder.setText(R.id.home_item_desc, videos.getDes());
-//		baseViewHolder.setText(R.id.home_item_type,"视频");
-		ImageView img = (ImageView) baseViewHolder.convertView.findViewById(R.id.home_item_img_bg);
+
+
+		baseViewHolder.setText(R.id.item_title, videos.getName());
+		baseViewHolder.setText(R.id.item_desc, videos.getDes());
+		baseViewHolder.setText(R.id.item_type,"视频");
+
+		ImageView img = (ImageView) baseViewHolder.convertView.findViewById(R.id.item_img_bg);
 		if (videos.getImg() != null) {
 			if (videos.getTag() != null && videos.getTag().equals("h")) {
 				ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(img).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(videos.getHimg())).build());

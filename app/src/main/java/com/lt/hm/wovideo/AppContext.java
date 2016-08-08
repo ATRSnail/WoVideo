@@ -38,7 +38,10 @@ public class AppContext extends BaseApplication {
 //                new OkHttpClient.Factory(OkHttpUtils.getInstance()));
     }
 
-    private void initNewsLens() {
+	/**
+   * NBSAppAgent init
+   */
+  private void initNewsLens() {
         NBSAppAgent nbsAppAgent = null;
         nbsAppAgent= NBSAppAgent.setLicenseKey("471bd7f647cc42c6974ef6594675ccc3").setRedirectHost("111.206.135.48:8081").withLocationServiceEnabled(true);
         nbsAppAgent.setHttpEnabled(true);

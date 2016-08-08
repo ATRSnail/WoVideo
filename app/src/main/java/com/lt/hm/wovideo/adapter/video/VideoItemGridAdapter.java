@@ -20,14 +20,15 @@ import java.util.List;
  */
 public class VideoItemGridAdapter extends BaseQuickAdapter<LikeList.LikeListBean>{
     public VideoItemGridAdapter(Context context,List<LikeList.LikeListBean> data) {
-        super(R.layout.layout_item_grid,data);
+        super(R.layout.layout_new_home_item,data);
 //        super(context, R.layout.layout_item_grid, data);
     }
 
     @Override
     protected void convert(BaseViewHolder holder, LikeList.LikeListBean likeListBean) {
-        holder.setText(R.id.grid_item_title, likeListBean.getName());
-        ImageView view = (ImageView) holder.convertView.findViewById(R.id.grid_item_img_bg);
+        holder.setText(R.id.item_title, likeListBean.getName());
+        holder.setVisible(R.id.item_desc_container,false);
+        ImageView view = (ImageView) holder.convertView.findViewById(R.id.item_img_bg);
         if (likeListBean.getImg() != null) {
             ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(likeListBean.getImg())).build());
         } else {

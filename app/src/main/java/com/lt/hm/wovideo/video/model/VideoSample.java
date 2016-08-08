@@ -10,6 +10,7 @@ import java.util.Locale;
  * @author leonardo
  * @version 1.0
  * @create_date 16/7/8
+ * @deprecated
  */
 public class VideoSample {
     public final String name;

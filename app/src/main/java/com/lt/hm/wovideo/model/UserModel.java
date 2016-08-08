@@ -27,7 +27,7 @@ public class UserModel{
     private Object utime;
     private String sex;//性别
     private String headImg;//头像地址
-    private String isVip;//是否是VIP
+    private String isVip;//是否是VIP 1 VIP 0|| "" 非VIP
     private String nickName;//昵称
     private String email;//电子邮件
     private String state;

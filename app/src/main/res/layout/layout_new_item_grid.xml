@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:paddingLeft="3dp"
+    android:paddingRight="3dp"
+    android:layout_gravity="center"
+    android:background="@color/white"
+    >
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/grid_item_img_bg"
+            android:src="@drawable/img_4"
+            android:scaleType="centerCrop"
+            />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:background="@color/item_alpha_back"
+            >
+            <!--android:background="@drawable/glass_bg"-->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TITLEdsfasdfasdfads"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:maxWidth="@dimen/s_180"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@android:color/white"
+                android:id="@+id/grid_item_title"
+                />
+        </RelativeLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|top"
+            android:src="@drawable/icon_v_vip"
+            android:id="@+id/item_vip_logo"
+            />
+    </FrameLayout>
+
+
+</LinearLayout>

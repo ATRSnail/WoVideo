@@ -227,13 +227,13 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
 
     private View addHViews(RecomList.Videos typeListBean) {
         LayoutInflater inflater = LayoutInflater.from(getActivity());
-        View view = inflater.inflate(R.layout.layout_home_item, null);
+        View view = inflater.inflate(R.layout.layout_new_home_item, null);
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, getResources().getDimensionPixelSize(R.dimen.s_200));
         view.setLayoutParams(params);
-        ImageView bg = (ImageView) view.findViewById(R.id.home_item_img_bg);
+        ImageView bg = (ImageView) view.findViewById(R.id.item_img_bg);
         Glide.with(getActivity()).load(HttpUtils.appendUrl(typeListBean.getHimg())).placeholder(R.drawable.default_horizental).crossFade().into(bg);
-        ((TextView) view.findViewById(R.id.home_item_title)).setText(typeListBean.getName());
-        ((TextView) view.findViewById(R.id.home_item_desc)).setText(typeListBean.getDes());
+        ((TextView) view.findViewById(R.id.item_title)).setText(typeListBean.getName());
+        ((TextView) view.findViewById(R.id.item_desc)).setText(typeListBean.getDes());
         ((ImageView) view.findViewById(R.id.item_vip_logo)).setVisibility(View.VISIBLE);
         view.setOnClickListener((View v) -> {
             // 跳转视频详情页面
@@ -284,7 +284,8 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
         recyclerView.setLayoutParams(params);
         GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
-        Bottom_ListAdapter grid_adapter = new Bottom_ListAdapter(getActivity(),R.layout.layout_home_item, b_list);
+//        Bottom_ListAdapter grid_adapter = new Bottom_ListAdapter(getActivity(),R.layout.layout_home_item, b_list);
+        Bottom_ListAdapter grid_adapter = new Bottom_ListAdapter(getActivity(),R.layout.layout_new_home_item, b_list);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(manager);
         recyclerView.addItemDecoration(new SpaceItemDecoration(spacingInPixels));

@@ -225,6 +225,7 @@
         <meta-data
             android:name="cztchannel"
             android:value="wandoujia" />
+        <!--正式 发布需替换-->
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="a2a6525af91b35a7792df3d609df69c1" />

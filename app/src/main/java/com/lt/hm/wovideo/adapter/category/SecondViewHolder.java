@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
+import com.lt.hm.wovideo.widget.autofittextview.AutofitTextView;
 
 /**
  * Created by Administrator on 2016/8/5.
@@ -20,7 +21,7 @@ public class SecondViewHolder extends RecyclerView.ViewHolder implements View.On
         super(itemView);
         this.listener = listener;
         this.type = type;
-        secondCategory = (TextView) itemView.findViewById(R.id.second_cate_name);
+        secondCategory = (AutofitTextView) itemView.findViewById(R.id.first_cat_name);
         secondCategory.setOnClickListener(this);
     }
 

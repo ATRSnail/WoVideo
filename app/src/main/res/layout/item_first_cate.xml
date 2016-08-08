@@ -9,23 +9,27 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <TextView
+        <com.lt.hm.wovideo.widget.autofittextview.AutofitTextView
             android:id="@+id/first_cat_name"
             android:layout_width="60dp"
             android:layout_height="30dp"
-            android:layout_margin="5dp"
+            android:layout_margin="8dp"
             android:background="@color/white"
             android:gravity="center"
             android:layout_centerInParent="true"
             android:text="北京"
-            android:textSize="20sp" />
+            android:singleLine="true"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            minTextSize="14sp"
+            android:textSize="16sp" />
 
         <ImageView
             android:id="@+id/img_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_alignRight="@+id/first_cat_name"
-            android:src="@drawable/icon_history"
+            android:src="@drawable/close"
             android:visibility="gone" />
 
     </RelativeLayout>

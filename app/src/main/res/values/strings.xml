@@ -168,4 +168,6 @@
 
     <!-- 个性化设置-->
     <string name="personality_set">个性化</string>
+    <string name="mine_set">我的频道</string>
+    <string name="all_set">频道栏目</string>
 </resources>

@@ -32,7 +32,7 @@ public class AppContext extends BaseApplication {
 //        ShareSDK.initSDK(this);
         Stetho.initializeWithDefaults(this);
         initNetWork();
-        initNewsLens();
+//        initNewsLens();
 //        CrashReport.initCrashReport(getApplicationContext(), "3a002a01fb", false);
 //        Glide.get(this).register(GlideUrl.class, InputStream.class,
 //                new OkHttpClient.Factory(OkHttpUtils.getInstance()));

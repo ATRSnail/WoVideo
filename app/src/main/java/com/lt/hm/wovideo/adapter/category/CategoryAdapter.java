@@ -23,7 +23,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     private LayoutInflater inflater;
     private OnCateItemListener listener;
     private int type;
-    private boolean isCanDel = false;
+    public boolean isCanDel = false;
 
     public CategoryAdapter(Context ctx, List<Category> categories, OnCateItemListener listener, int type) {
         this.ctx = ctx;
@@ -37,7 +37,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         return type == Category.FIRST_TYPE ?
                 new FirstViewHolder(inflater.inflate(R.layout.item_first_cate, null, false), listener, type) :
-                new SecondViewHolder(inflater.inflate(R.layout.item_second_cate, null, false), listener, type);
+                new SecondViewHolder(inflater.inflate(R.layout.item_first_cate, null, false), listener, type);
     }
 
     @Override

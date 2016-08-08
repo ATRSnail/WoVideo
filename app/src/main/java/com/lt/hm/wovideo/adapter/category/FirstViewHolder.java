@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
+import com.lt.hm.wovideo.widget.autofittextview.AutofitTextView;
 
 /**
  * Created by Administrator on 2016/8/5.
@@ -23,7 +24,7 @@ public class FirstViewHolder extends RecyclerView.ViewHolder implements View.OnC
         super(itemView);
         this.listener = listener;
         this.type = type;
-        firstCategory = (TextView) itemView.findViewById(R.id.first_cat_name);
+        firstCategory = (AutofitTextView) itemView.findViewById(R.id.first_cat_name);
         deleteImg = (ImageView) itemView.findViewById(R.id.img_delete);
         firstCategory.setOnClickListener(this);
         firstCategory.setOnLongClickListener(this);

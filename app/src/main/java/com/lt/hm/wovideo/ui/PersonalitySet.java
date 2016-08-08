@@ -18,11 +18,11 @@ import java.util.List;
 
 import butterknife.BindView;
 
-public class PersonalitySet extends BaseActivity implements SecondTopbar.myTopbarClicklistenter, OnCateItemListener {
+public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopbarClicklistenter, OnCateItemListener {
 
 
     @BindView(R.id.person_topbar)
-    SecondTopbar personTopbar;
+    CustomTopbar personTopbar;
     @BindView(R.id.recycler_personal_mine)
     RecyclerView mineCateRecycler;
     @BindView(R.id.recycler_personal_all)
@@ -42,6 +42,7 @@ public class PersonalitySet extends BaseActivity implements SecondTopbar.myTopba
     protected void init(Bundle savedInstanceState) {
         personTopbar.setLeftIsVisible(true);
         personTopbar.setRightIsVisible(true);
+        personTopbar.setRightText("编辑");
         personTopbar.setOnTopbarClickListenter(this);
     }
 
@@ -80,16 +81,39 @@ public class PersonalitySet extends BaseActivity implements SecondTopbar.myTopba
       adapter.toggleCanDelete();
     }
 
-    public void btnAddItem(int type) {
+
+    @Override
+    public void OnItemClick(int type, int pos) {
+        btnAddItem(type,pos);
+        btnRemoveItem(type, pos);
+        Toast.makeText(this, "---" + pos, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void OnItemLongClick() {
+        adapter.toggleCanDelete();
+    }
+
+    /**
+     * 添加某项
+     * @param type
+     * @param pos
+     */
+    public void btnAddItem(int type,int pos) {
         if (type == Category.FIRST_TYPE) {
-            allList.add(0, new Category("奶油", 1));
+            allList.add(0, list.get(pos));
             allAdapter.notifyDataSetChanged();
             return;
         }
-        list.add(0, new Category("奶油", 1));
+        list.add(0, allList.get(pos));
         adapter.notifyDataSetChanged();
     }
 
+    /**
+     * 删除某项
+     * @param type
+     * @param pos
+     */
     public void btnRemoveItem(int type, int pos) {
         if (type == Category.FIRST_TYPE){
             if (!list.isEmpty()) {
@@ -105,16 +129,5 @@ public class PersonalitySet extends BaseActivity implements SecondTopbar.myTopba
 
     }
 
-    @Override
-    public void OnItemClick(int type, int pos) {
-        btnRemoveItem(type, pos);
-        btnAddItem(type);
-        Toast.makeText(this, "---" + pos, Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
-    public void OnItemLongClick() {
-        adapter.toggleCanDelete();
-    }
 
 }

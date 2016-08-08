@@ -35,7 +35,7 @@ public class FirstViewHolder extends RecyclerView.ViewHolder implements View.OnC
 
     @Override
     public void onClick(View v) {
-        if (v == null || isCanDel) return;
+        if (v == null || !isCanDel) return;
         int pos = getAdapterPosition();
         listener.OnItemClick(type, pos);
     }

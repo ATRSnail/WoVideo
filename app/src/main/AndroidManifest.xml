@@ -221,6 +221,10 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+        <!-- 渠道商编号 -->
+        <meta-data
+            android:name="cztchannel"
+            android:value="wandoujia" />
         <meta-data
             android:name="com.amap.api.v2.apikey"
             android:value="a2a6525af91b35a7792df3d609df69c1" />

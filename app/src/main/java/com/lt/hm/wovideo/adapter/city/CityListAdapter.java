@@ -1,9 +1,14 @@
 package com.lt.hm.wovideo.adapter.city;
 
+import android.view.View;
+
 import com.chad.library.adapter.base.BaseMultiItemQuickAdapter;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.model.City;
 import com.lt.hm.wovideo.model.CityModel;
+import com.lt.hm.wovideo.widget.MySectionIndexer;
 
 import java.util.List;
 
@@ -12,22 +17,25 @@ import java.util.List;
  * @version 1.0
  * @create_date 8/5/16
  */
-public class CityListAdapter extends BaseMultiItemQuickAdapter<CityModel> {
-	public CityListAdapter(List<CityModel> data) {
-		super(data);
-		addItemType(CityModel.TITLE, R.layout.layout_city_title);
-		addItemType(CityModel.CITY_LIST, R.layout.layout_city_title);
+public class CityListAdapter extends BaseQuickAdapter<City> {
+
+	private MySectionIndexer<City> indexer;
+
+	public CityListAdapter(int layoutResId, List<City> data,MySectionIndexer<City> indexer) {
+		super(layoutResId, data);
+		this.indexer = indexer;
 	}
 
 	@Override
-	protected void convert(BaseViewHolder holder, CityModel cityModel) {
-		switch (holder.getItemViewType()) {
-			case CityModel.TITLE:
-				holder.setText(R.id.city_title, cityModel.getHead());
-				break;
-			case CityModel.CITY_LIST:
-				holder.setText(R.id.city_title, cityModel.getCity().getCity());
-				break;
+	protected void convert(BaseViewHolder holder, City city) {
+     holder.setText(R.id.text_place,city.getCity());
+		int section = indexer.getSectionForPosition(holder.getLayoutPosition());
+		if (holder.getLayoutPosition() == indexer.getPositionForSection(section)) {
+			holder.setText(R.id.sort_key,Character.toUpperCase(city.pyOne.charAt(0)) + "");
+			holder.getView(R.id.sort_key).setVisibility(View.VISIBLE);
+		} else {
+			holder.getView(R.id.sort_key).setVisibility(View.GONE);
 		}
+
 	}
 }

@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.fragment;
 
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,10 +21,14 @@ import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.TypeList;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.ui.PersonalitySet;
+import com.lt.hm.wovideo.utils.FileUtil;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.ViewPagerIndicator;
 import com.zhy.http.okhttp.callback.StringCallback;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +57,6 @@ public class NewChoicePage extends BaseFragment {
 	private List<String> mTitles = new ArrayList<>();
 	private List<BaseFragment> fragments = new ArrayList<>();
 	private FragmentPagerAdapter mAdapter;
-
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

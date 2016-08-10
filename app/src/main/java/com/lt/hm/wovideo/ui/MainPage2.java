@@ -2,6 +2,7 @@ package com.lt.hm.wovideo.ui;
 
 import android.app.TaskStackBuilder;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
@@ -12,6 +13,7 @@ import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,6 +40,7 @@ import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.interf.OnTabReselectListener;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -48,6 +51,9 @@ import com.lt.hm.wovideo.utils.location.Utils;
 import com.lt.hm.wovideo.widget.MyFragmentTabHost;
 import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
 import com.lt.hm.wovideo.zxing.ui.MipcaActivityCapture;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import butterknife.BindView;
 
@@ -298,6 +304,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
 	@Override
 	public void initDatas() {
+
 	}
 
 	@Override
@@ -483,6 +490,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 			mHandler.sendMessage(msg);
 		}
 	}
+
 
 
 }

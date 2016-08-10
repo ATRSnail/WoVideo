@@ -47,6 +47,5 @@
 
     <color name="mask_color">#dd414141</color>
     <color name="item_alpha_back">#33000000</color>
-    <color name="radio_linear_color">#85ffffff</color>
 
 </resources>

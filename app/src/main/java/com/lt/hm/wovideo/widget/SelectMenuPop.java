@@ -61,12 +61,13 @@ public class SelectMenuPop extends PopupWindow {
     String[] time_names = new String[]{
             "全部", "2016", "2015", "2013", "2012", "2010", "00年代", "90年代"
     };
+
     public SelectMenuPop(Context context, int id) {
         super(context);
-        updateMenu(context,id);
+        updateMenu(context, id);
     }
 
-    public void updateMenu(Context context,int id){
+    public void updateMenu(Context context, int id) {
         initMenuHash(id);
         initViews(context);
     }
@@ -99,16 +100,16 @@ public class SelectMenuPop extends PopupWindow {
 
     }
 
-    public void showPopupWindow(View parent,boolean shown) {
+    public void showPopupWindow(View parent, boolean shown) {
         if (!shown) {
             // 以下拉方式显示popupwindow
 //            this.showAsDropDown(parent, parent.getLayoutParams().width / 2, 18);
 //            this.showAtLocation(parent, Gravity.LEFT, 0, -90);
             this.showAsDropDown(parent);
             this.setFocusable(true);
-            shown=true;
+            shown = true;
         } else {
-            shown=false;
+            shown = false;
             this.dismiss();
         }
     }
@@ -116,36 +117,37 @@ public class SelectMenuPop extends PopupWindow {
     private void addViews(LinearLayout layout_container, Context context, String key) {
         LinearLayout layout_item = new LinearLayout(context);
         layout_item.setOrientation(LinearLayout.HORIZONTAL);
-        layout_item.setPadding(15,15,15,15);
-        layout_item.setBackgroundColor(Color.parseColor("#30000000"));
+        layout_item.setPadding(25, 25, 25, 25);
+        layout_item.setBackgroundColor(Color.parseColor("#ccffffff"));
         TextView text = new TextView(context);
         text.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
         text.setText(key);
-        text.setGravity(Gravity.CENTER_VERTICAL);
+        text.setPadding(20, 0, 20, 0);
+        text.setBackgroundColor(context.getResources().getColor(R.color.blue_bullet));
+        text.setGravity(Gravity.CENTER);
         text.setTextColor(context.getResources().getColor(R.color.black));
         HorizontalScrollView scrollView = new HorizontalScrollView(context);
         scrollView.setHorizontalScrollBarEnabled(false);
         LinearLayout layout_scroll = new LinearLayout(context);
         layout_scroll.setOrientation(LinearLayout.HORIZONTAL);
         RadioGroup group = new RadioGroup(context);
-        RadioGroup.LayoutParams params= new RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,100);
+        RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100);
         group.setLayoutParams(params);
+        group.setGravity(Gravity.CENTER_VERTICAL);
         group.setOrientation(RadioGroup.HORIZONTAL);
         Map<String, String> values = movie_container.get(key);
         Set<String> keys = values.keySet();
-        for (String key_name :
-                keys) {
-//            RadioButton radiobutton = new RadioButton(context,null,R.style.radioButton_Style);
+        for (String key_name : keys) {
             RadioButton radiobutton = new RadioButton(context);
             radiobutton.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.anthology_selector));
-            LinearLayout.LayoutParams params1=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params1.leftMargin=20;
-            params1.gravity=Gravity.CENTER;
+            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params1.leftMargin = 20;
+            params1.gravity = Gravity.CENTER;
             radiobutton.setLayoutParams(params1);
-            radiobutton.setPadding(20,0,20,0);
+            radiobutton.setPadding(20, 0, 20, 0);
             radiobutton.setText(values.get(key_name));
             radiobutton.setTextColor(context.getResources().getColor(R.color.black));
-            radiobutton.setButtonDrawable(null);
+            radiobutton.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
             radiobutton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.widget;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
@@ -87,8 +88,7 @@ public class SelectMenuPop extends PopupWindow {
 
         layout_container.setLayoutParams(params);
         Set<String> keys = movie_container.keySet();
-        for (String key :
-                keys) {
+        for (String key : keys) {
             addViews(layout_container, context, key);
         }
         this.setContentView(layout_container);
@@ -116,6 +116,8 @@ public class SelectMenuPop extends PopupWindow {
     private void addViews(LinearLayout layout_container, Context context, String key) {
         LinearLayout layout_item = new LinearLayout(context);
         layout_item.setOrientation(LinearLayout.HORIZONTAL);
+        layout_item.setPadding(15,15,15,15);
+        layout_item.setBackgroundColor(Color.parseColor("#30000000"));
         TextView text = new TextView(context);
         text.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
         text.setText(key);

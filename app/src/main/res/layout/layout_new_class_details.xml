@@ -13,22 +13,17 @@
     <!--app:Customtoptitle="@string/login"-->
     <!--app:leftBackGround="@drawable/left_arrow"-->
     <!--app:rightBackGround="@drawable/icon_choosen" />-->
-    <include
-        android:id="@+id/layout_class_details_head"
-        layout="@layout/layout_class_details_head"
+
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/class_details_topbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/s_46"
-        android:layout_gravity="center_vertical" />
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="@string/personality_set"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/left_arrow" />
 
-    <include layout="@layout/tab_layout"/>
-
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"/>
-    
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

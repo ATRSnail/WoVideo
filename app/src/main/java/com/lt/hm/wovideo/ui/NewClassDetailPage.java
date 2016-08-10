@@ -1,11 +1,10 @@
 package com.lt.hm.wovideo.ui;
 
-import android.graphics.Color;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.TabLayout;
 import android.support.percent.PercentRelativeLayout;
-import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +25,6 @@ import android.widget.Spinner;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.adapter.recommend.TabFragmentAdapter;
 import com.lt.hm.wovideo.adapter.vip.VipItemAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
@@ -77,37 +75,19 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
             "全部", "NBA", "CBA", "中国女篮", "英超", "西甲	", "意甲", "德甲", "欧冠", "中超", "国际足球", "亚冠", "综合", "体育", "网球", "世界杯", "欧洲杯", "奥运会", "竞	速", "格斗", "电子竞技", "排球", "极限", "其他"
     };
 
-//    @BindView(R.id.class_details_topbar)
-//    SecondTopbar classDetailsTopbar;
-
-    @BindView(R.id.layout_class_details_head)
-    PercentRelativeLayout class_details_head;
+    @BindView(R.id.class_details_topbar)
+    SecondTopbar classDetailsTopbar;
     @BindView(R.id.class_details_list)
     RecyclerView classDetailsList;
-    @BindView(R.id.details_type_title)
-    LinearLayout details_type_title;
     @BindView(R.id.empty_view)
     Button empty_view_button;
-    @BindView(R.id.tablayout)
-    TabLayout tabLayout;
-    @BindView(R.id.img_plus)
-    ImageView plusImg;
-    @BindView(R.id.viewPager)
-    ViewPager viewPager;
     List<VideoList.TypeListBean> b_list;
     VipItemAdapter bottom_adapter;
-    TabFragmentAdapter tabFragmentAdapter;
     int pageNum = 1;
     int pageSize = 60;
     int mId;
     @BindView(R.id.class_refresh_layout)
     SwipeRefreshLayout classRefreshLayout;
-    @BindView(R.id.class_details_back)
-    ImageView classDetailsBack;
-    @BindView(R.id.class_details_spinner)
-    Spinner classDetailsSpinner;
-    @BindView(R.id.class_details_choose)
-    ImageView classDetailsChoose;
     String[] mItems;
     private String lx;
     private String sx;
@@ -132,6 +112,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
 
     @Override
     protected void init(Bundle savedInstanceState) {
+
+
         manager = new GridLayoutManager(NewClassDetailPage.this, 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.divider_width);
@@ -142,6 +124,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 android.R.color.holo_blue_bright, android.R.color.holo_green_light,
                 android.R.color.holo_orange_light, android.R.color.holo_red_light);
         Bundle bundle = getIntent().getExtras();
+        if (bundle == null) return;
         if (bundle.containsKey("key")) {
             String title = bundle.getString("key");
 //            classDetailsTopbar.setTvTitle(title);
@@ -150,19 +133,13 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
             String id = bundle.getString("id");
             if (!StringUtils.isNullOrEmpty(id)) {
                 mId = Integer.parseInt(id);
-                classDetailsSpinner.setSelection(mId - 1);
+             //   classDetailsSpinner.setSelection(mId - 1);
             }
 //            classDetailsSpinner.setGravity(Gravity.CENTER_HORIZONTAL);
         }
-
-        tabLayout.setupWithViewPager(viewPager);
-        // 设置tab文本的没有选中（第一个参数）和选中（第二个参数）的颜色
-        tabLayout.setTabTextColors(getResources().getColor(R.color.darker_gray), Color.WHITE);
     }
 
     private void addHeadTypeView() {
-        details_type_title.invalidate();
-        details_type_title.removeAllViewsInLayout();
         RadioGroup group = new RadioGroup(this);
         group.setOrientation(RadioGroup.HORIZONTAL);
         Map<String, String> values = new LinkedHashMap<>();
@@ -211,60 +188,19 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 }
             }
         }
-        details_type_title.addView(group);
-        details_type_title.invalidate();
     }
 
     @Override
     public void initViews() {
         pop = new SelectMenuPop(this, mId);
         b_list = new ArrayList<>();
-        classDetailsBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                NewClassDetailPage.this.finish();
-            }
-        });
-        classDetailsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (!spinner_flag) {
-                    mId = position + 1;
-                    if (b_list != null && b_list.size() > 0) {
-                        b_list.clear();
-                        getListDatas(mId);
-                    }
-                } else {
-                    spinner_flag = false;
-                }
-                addHeadTypeView();
-            }
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-        classDetailsChoose.setOnClickListener((View v) -> {
-            pop.updateMenu(getApplicationContext(),mId);
-            pop.showPopupWindow(tabLayout, shown);
-            pop.setListener(new SelectMenuPop.OnRadioClickListener() {
-                @Override
-                public void clickListener(String key, String value) {
-                    SearchChecked(key, value);
-                }
-            });
-            pop.setTouchInterceptor(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
-                        pop.dismiss();
-                        return true;
-                    }
-                    return false;
-                }
-            });
-        });
         addHeadTypeView();
+
+        classDetailsTopbar.setTvTitle("电影");
+        classDetailsTopbar.setRightIsVisible(true);
+        classDetailsTopbar.setRightImageResource(R.drawable.icon_choosen);
+        classDetailsTopbar.setOnTopbarClickListenter(this);
 
     }
 
@@ -404,13 +340,22 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
 
     @Override
     public void rightClick() {
-        SelectMenuPop pop = new SelectMenuPop(this, mId);
-//        pop.showPopupWindow(class_details_head,shown);
-        pop.showPopupWindow(tabLayout, shown);
+        pop.updateMenu(getApplicationContext(),mId);
+        pop.showPopupWindow(classDetailsTopbar, shown);
         pop.setListener(new SelectMenuPop.OnRadioClickListener() {
             @Override
             public void clickListener(String key, String value) {
                 SearchChecked(key, value);
+            }
+        });
+        pop.setTouchInterceptor(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_OUTSIDE) {
+                    pop.dismiss();
+                    return true;
+                }
+                return false;
             }
         });
     }

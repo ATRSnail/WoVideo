@@ -10,6 +10,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -81,6 +83,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 	ImageView choicePersonCenter;
 	private CheckPermissionsActivity permChecker = null;
 	private AMapLocationClient locationClient = null;
+	private FragmentManager fragmentManager;
 	Handler mHandler = new Handler() {
 		public void dispatchMessage(android.os.Message msg) {
 			switch (msg.what) {
@@ -116,7 +119,8 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
 	@Override
 	protected void init(Bundle savedInstanceState) {
-		tabhost.setup(this, getSupportFragmentManager(), R.id.realtabcontent);
+		fragmentManager = getSupportFragmentManager();
+		tabhost.setup(this, fragmentManager, R.id.realtabcontent);
 		if (Build.VERSION.SDK_INT > 10) {
 			tabhost.getTabWidget().setShowDividers(0);
 		}
@@ -320,7 +324,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
 
 	private Fragment getCurrentFragment() {
-		return getSupportFragmentManager().findFragmentByTag(
+		return fragmentManager.findFragmentByTag(
 						tabhost.getCurrentTabTag());
 	}
 
@@ -343,8 +347,11 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 			commonHeadLayout.setVisibility(View.VISIBLE);
 			choiceHeadLayout.setVisibility(View.GONE);
 		}
+
 		View v = tabhost.getTabWidget().getChildTabViewAt(tabhost.getCurrentTab());
+		TLog.error(tabhost.getCurrentTab()+"");
 		v.setSelected(true);
+
 		supportInvalidateOptionsMenu();
 	}
 

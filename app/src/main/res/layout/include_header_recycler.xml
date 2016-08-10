@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/text_change_city"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:text="点击选择其他城市"
+        android:textColor="@color/black"
+        android:textSize="@dimen/sp_16"
+        android:visibility="gone" />
+
+    <include layout="@layout/layout_new_home_item" />
+
+    <FrameLayout
+        android:id="@+id/frame_recommend"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@color/white"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:src="@drawable/recommend" />
+    </FrameLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycle_cate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray_dark"
+        android:padding="@dimen/s_10"
+        android:visibility="gone" />
+
+    <include layout="@layout/include_title_text" />
+
+</LinearLayout>

@@ -29,6 +29,21 @@ public class RecomList {
         private String himg;//封面图片路径（横）
         private String tag;//横屏显示和竖屏显示 tag 设定
 
+        public Videos() {
+        }
+
+        public Videos(String vfId, int id, String img, String type, String name, String des, String typeId, String himg, String tag) {
+            this.vfId = vfId;
+            this.id = id;
+            this.img = img;
+            this.type = type;
+            this.name = name;
+            this.des = des;
+            this.typeId = typeId;
+            this.himg = himg;
+            this.tag = tag;
+        }
+
         public int getId() {
             return id;
         }

@@ -18,6 +18,7 @@ import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.TypeList;
+import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.ViewPagerIndicator;
@@ -46,6 +47,7 @@ public class NewChoicePage extends BaseFragment {
 	@BindView(R.id.choice_view_page)
 	ViewPager choiceViewPage;
 	List<TypeList.TypeListBean> mClass = new ArrayList<>();
+	TypeList.TypeListBean bean;
 	int CURRENT_POSITION;
 	private List<String> mTitles = new ArrayList<>();
 	private List<BaseFragment> fragments = new ArrayList<>();
@@ -62,7 +64,6 @@ public class NewChoicePage extends BaseFragment {
 	}
 
 	private void getClassInfos() {
-
 
 		HashMap<String, Object> map = new HashMap<>();
 		HttpApis.getClassesInfo(map, new StringCallback() {
@@ -81,9 +82,6 @@ public class NewChoicePage extends BaseFragment {
 					if (mClass.size() > 0) {
 						mClass.clear();
 					}
-					if (fragments.size()>0){
-						fragments.clear();
-					}
 					mClass.addAll(resp.getBody().getTypeList());
 					initBottom();
 
@@ -96,13 +94,15 @@ public class NewChoicePage extends BaseFragment {
 	}
 
 	private void initBottom() {
+		fragments.clear();
+		mTitles.clear();
 		for (int i = 0; i < mClass.size(); i++) {
-			mTitles.add(mClass.get(i).getTypeName());
-		}
-		for (int i = 0; i < mTitles.size(); i++) {
-			RecommendPage page = new RecommendPage();
+			bean = mClass.get(i);
+			mTitles.add(bean.getTypeName());
+			CommonTypePage page = CommonTypePage.getInstance(Integer.valueOf(bean.getId()));
 			fragments.add(page);
 		}
+
 		mAdapter = new FragmentPagerAdapter(getFragmentManager()) {
 			@Override
 			public int getCount() {

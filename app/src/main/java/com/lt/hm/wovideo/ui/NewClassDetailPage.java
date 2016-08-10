@@ -1,8 +1,11 @@
 package com.lt.hm.wovideo.ui;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.TabLayout;
 import android.support.percent.PercentRelativeLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +26,7 @@ import android.widget.Spinner;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.adapter.recommend.TabFragmentAdapter;
 import com.lt.hm.wovideo.adapter.vip.VipItemAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
@@ -82,12 +86,17 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     RecyclerView classDetailsList;
     @BindView(R.id.details_type_title)
     LinearLayout details_type_title;
-    @BindView(R.id.type_container)
-    HorizontalScrollView type_container;
     @BindView(R.id.empty_view)
     Button empty_view_button;
+    @BindView(R.id.tablayout)
+    TabLayout tabLayout;
+    @BindView(R.id.img_plus)
+    ImageView plusImg;
+    @BindView(R.id.viewPager)
+    ViewPager viewPager;
     List<VideoList.TypeListBean> b_list;
     VipItemAdapter bottom_adapter;
+    TabFragmentAdapter tabFragmentAdapter;
     int pageNum = 1;
     int pageSize = 60;
     int mId;
@@ -145,6 +154,10 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
             }
 //            classDetailsSpinner.setGravity(Gravity.CENTER_HORIZONTAL);
         }
+
+        tabLayout.setupWithViewPager(viewPager);
+        // 设置tab文本的没有选中（第一个参数）和选中（第二个参数）的颜色
+        tabLayout.setTabTextColors(getResources().getColor(R.color.darker_gray), Color.WHITE);
     }
 
     private void addHeadTypeView() {
@@ -233,7 +246,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         });
         classDetailsChoose.setOnClickListener((View v) -> {
             pop.updateMenu(getApplicationContext(),mId);
-            pop.showPopupWindow(type_container, shown);
+            pop.showPopupWindow(tabLayout, shown);
             pop.setListener(new SelectMenuPop.OnRadioClickListener() {
                 @Override
                 public void clickListener(String key, String value) {
@@ -393,7 +406,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     public void rightClick() {
         SelectMenuPop pop = new SelectMenuPop(this, mId);
 //        pop.showPopupWindow(class_details_head,shown);
-        pop.showPopupWindow(type_container, shown);
+        pop.showPopupWindow(tabLayout, shown);
         pop.setListener(new SelectMenuPop.OnRadioClickListener() {
             @Override
             public void clickListener(String key, String value) {

@@ -147,8 +147,9 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
             allList.remove(pos);
         }
         allAdapter.notifyItemRemoved(pos);
-
     }
+
+
 
 
 }

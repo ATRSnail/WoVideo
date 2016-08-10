@@ -20,22 +20,15 @@
         android:layout_height="@dimen/s_46"
         android:layout_gravity="center_vertical" />
 
+    <include layout="@layout/tab_layout"/>
 
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@color/white"
-            android:padding="5dp"
-            android:id="@+id/type_container"
-            android:scrollbars="none"
-            >
 
-            <LinearLayout
-                android:id="@+id/details_type_title"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal"></LinearLayout>
-        </HorizontalScrollView>
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+    
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

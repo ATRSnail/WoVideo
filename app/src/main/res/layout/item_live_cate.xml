@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="@dimen/sp_12"
+    android:layout_marginRight="@dimen/sp_12"
+    android:background="@color/gray_dark"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <RelativeLayout
+        android:id="@+id/frame_live1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/logo1"
+            android:layout_width="70dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:scaleType="centerCrop"
+            android:src="@drawable/img_3" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_media_play" />
+
+    </RelativeLayout>
+
+
+    <TextView
+        android:id="@+id/name1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/frame_live1"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="2dp"
+        android:layout_toRightOf="@+id/frame_live1"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="俏江南"
+        android:textColor="#101010"
+        android:textSize="@dimen/sp_16" />
+
+    <TextView
+        android:id="@+id/address1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/frame_live1"
+        android:layout_marginBottom="3dp"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/frame_live1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="地址：放假了大解放了看到就阿狸分开多久啊放了多久啊离开封疆大吏减肥大事了,放了多久啊离开封疆大吏减肥大事了"
+        android:textColor="@color/black"
+        android:textSize="@dimen/sp_12" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        android:drawableLeft="@drawable/icon_strike"
+        android:drawablePadding="6dp"
+        android:text="873884" />
+
+</RelativeLayout>

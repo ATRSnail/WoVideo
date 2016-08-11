@@ -393,5 +393,15 @@ public class HttpApis {
 		HttpUtils.formPost("mblOrder/unaoyunOrder", map, callback);
 	}
 
+	/**
+	 * 获取电影类型标签
+	 *
+	 * @param map
+	 * @param callback
+	 */
+	public static void getCategoryTag(HashMap<String, Object> map, StringCallback callback) {
+		HttpUtils.formPost("mblDictionary/getVfDict", map, callback);
+	}
+
 
 }

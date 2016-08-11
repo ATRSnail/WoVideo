@@ -75,7 +75,7 @@ public class LiveModles {
                 '}';
     }
 
-    public class LiveModel{
+    public static class LiveModel{
 
         /**
          * id : 24
@@ -102,6 +102,13 @@ public class LiveModles {
         private String nowPro;
         private long ctime;
         private String url;
+
+        public LiveModel(String tvName) {
+            this.tvName = tvName;
+        }
+
+        public LiveModel() {
+        }
 
         public int getId() {
             return id;

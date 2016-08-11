@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="180dp"
-              android:orientation="vertical"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:orientation="vertical">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -14,8 +13,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
-            android:src="@drawable/img_4"
-            />
+            android:src="@drawable/img_4" />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -23,8 +21,7 @@
             android:layout_gravity="center"
             android:background="@color/item_alpha_back"
             android:gravity="center"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/item_title"
@@ -36,24 +33,21 @@
                 android:singleLine="true"
                 android:text="test"
                 android:textColor="@android:color/white"
-                android:textSize="@dimen/sp_16"
-                />
+                android:textSize="@dimen/sp_16" />
 
             <LinearLayout
+                android:id="@+id/item_desc_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/item_title"
                 android:gravity="center"
-                android:id="@+id/item_desc_container"
-                android:orientation="horizontal"
-                >
+                android:orientation="horizontal">
 
                 <LinearLayout
+                    android:id="@+id/item_type_container"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:id="@+id/item_type_container"
-                    >
+                    android:orientation="horizontal">
                     <!--<Button-->
                     <!--android:layout_width="wrap_content"-->
                     <!--android:layout_height="wrap_content"-->
@@ -66,9 +60,8 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/icon_type"
                         android:layout_gravity="center"
-                        />
+                        android:src="@drawable/icon_type" />
 
                     <TextView
                         android:id="@+id/item_type"
@@ -81,8 +74,7 @@
                         android:singleLine="true"
                         android:text="TITLE"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/sp_14"
-                        />
+                        android:textSize="@dimen/sp_14" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -90,24 +82,20 @@
                         android:paddingLeft="@dimen/dp_4"
                         android:paddingRight="@dimen/dp_4"
                         android:text="/"
-                        android:textColor="@android:color/white"
-                        />
+                        android:textColor="@android:color/white" />
                 </LinearLayout>
-
 
 
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    >
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/icon_playtimes"
                         android:layout_gravity="center"
-                        />
+                        android:src="@drawable/icon_playtimes" />
 
                     <TextView
                         android:id="@+id/item_desc"
@@ -117,13 +105,12 @@
                         android:layout_toRightOf="@id/item_type"
                         android:ellipsize="end"
                         android:gravity="center"
-                        android:paddingLeft="@dimen/dp_4"
                         android:maxWidth="@dimen/s_60"
+                        android:paddingLeft="@dimen/dp_4"
                         android:singleLine="true"
                         android:text="DESC"
                         android:textColor="@android:color/white"
-                        android:textSize="@dimen/sp_14"
-                        />
+                        android:textSize="@dimen/sp_14" />
                 </LinearLayout>
             </LinearLayout>
         </RelativeLayout>
@@ -133,8 +120,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right|top"
-            android:src="@drawable/icon_v_vip"
-            />
+            android:src="@drawable/icon_v_vip" />
     </FrameLayout>
 
 

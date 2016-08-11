@@ -34,13 +34,18 @@
         android:id="@+id/recycle_cate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gray_lighter1"
+        android:background="@color/bg_new_color"
         android:columnWidth="80dp"
         android:numColumns="auto_fit"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:stretchMode="columnWidth"
         android:visibility="gone" />
+
+    <com.lt.hm.wovideo.widget.CustomListView
+        android:id="@+id/lv_live"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
     <include layout="@layout/include_title_text" />
 

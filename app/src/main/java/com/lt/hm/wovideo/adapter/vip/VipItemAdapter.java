@@ -63,7 +63,7 @@ public class VipItemAdapter extends BaseQuickAdapter<VideoList.TypeListBean> {
                 ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(typeListBean.gethIMG())).build());
 //                baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.gethIMG()));
             } else {
-                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(typeListBean.gethIMG())).build());
+//                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(typeListBean.gethIMG())).build());
 //                baseViewHolder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
             }
         }

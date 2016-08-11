@@ -12,6 +12,7 @@ import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
 import com.lt.hm.wovideo.model.Category;
 import com.lt.hm.wovideo.widget.CustomTopbar;
+import com.lt.hm.wovideo.widget.DividerDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,9 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
         allAdapter = new CategoryAdapter(this, allList, this,Category.SECOND_TYPE);
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, TOTAL_LINE);
         GridLayoutManager mLayoutManager2 = new GridLayoutManager(this, TOTAL_LINE);
+        DividerDecoration decoration = new DividerDecoration(getApplicationContext());
+        mineCateRecycler.addItemDecoration(decoration);
+        allCateRecycler.addItemDecoration(decoration);
         mineCateRecycler.setLayoutManager(mLayoutManager);
         allCateRecycler.setLayoutManager(mLayoutManager2);
         mineCateRecycler.setAdapter(adapter);

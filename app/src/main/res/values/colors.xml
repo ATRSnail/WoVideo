@@ -25,6 +25,7 @@
     <color name="btn_abort_service">#ff495a</color>
 
     <color name="blue_btn_bg_color">#1e9edc</color>
+    <color name="grey_place_title_color">#555555</color>
 
     <!--二维码扫描-->
     <color name="result_view">#b0000000</color>
@@ -47,5 +48,7 @@
 
     <color name="mask_color">#dd414141</color>
     <color name="item_alpha_back">#33000000</color>
+
+    <color name="bg_new_color">#f4f4f4</color>
 
 </resources>

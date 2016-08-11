@@ -38,6 +38,7 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
 
     private int mOrientation;
 
+
     public DividerDecoration(Context context) {
         final TypedArray a = context.obtainStyledAttributes(ATTRS);
         mDivider = a.getDrawable(0);
@@ -113,12 +114,15 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
         }
     }
 
-//    @Override
-//    public void getItemOffsets(Rect outRect, int itemPosition, RecyclerView parent) {
-//        if (mOrientation == VERTICAL_LIST) {
-//            outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
-//        } else {
-//            outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
-//        }
-//    }
+    @Override
+    public void getItemOffsets(Rect outRect, int itemPosition, RecyclerView parent) {
+        if (mDivider == null) return;
+        if (mOrientation == VERTICAL_LIST) {
+            outRect.set(0, 0, 0, mDivider.getIntrinsicHeight());
+        } else {
+            outRect.set(0, 0, mDivider.getIntrinsicWidth(), 0);
+        }
+    }
+
+
 }

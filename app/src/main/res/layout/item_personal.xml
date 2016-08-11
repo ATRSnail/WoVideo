@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.lt.hm.wovideo.widget.PercentLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <com.lt.hm.wovideo.widget.autofittextview.AutofitTextView
+            android:id="@+id/first_cat_name"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="1dp"
+            android:background="@color/white"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:text="北京"
+            android:singleLine="true"
+            android:paddingLeft="3dp"
+            android:paddingRight="3dp"
+            android:textColor="@color/class_font_color"
+            minTextSize="14sp"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:id="@+id/img_delete"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_alignRight="@+id/first_cat_name"
+            android:src="@drawable/close"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+</com.lt.hm.wovideo.widget.PercentLinearLayout>

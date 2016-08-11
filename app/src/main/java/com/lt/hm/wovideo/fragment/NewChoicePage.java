@@ -22,6 +22,8 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.TypeList;
 import com.lt.hm.wovideo.model.VideoType;
+import com.lt.hm.wovideo.ui.CityListPage;
+import com.lt.hm.wovideo.ui.NewClassDetailPage;
 import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
@@ -143,7 +145,9 @@ public class NewChoicePage extends BaseFragment {
         vipSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getContext(), PersonalitySet.class));
+
+                startActivity(new Intent(getContext(), NewClassDetailPage.class));
+           //     startActivity(new Intent(getContext(), PersonalitySet.class));
             }
         });
         getClassInfos();

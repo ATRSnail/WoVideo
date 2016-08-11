@@ -144,7 +144,6 @@ public class SelectMenuPop extends PopupWindow {
         params1.gravity = Gravity.CENTER;
         for (String key_name : keys) {
             RadioButton radiobutton = new RadioButton(context);
-            radiobutton.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.anthology_selector));
             radiobutton.setLayoutParams(params1);
             radiobutton.setPadding(20, 0, 20, 0);
             radiobutton.setText(values.get(key_name));
@@ -160,7 +159,7 @@ public class SelectMenuPop extends PopupWindow {
             });
             group.addView(radiobutton);
             //防止选中两个
-            if (radiobutton.getText().toString().equals("全部")) {
+            if (values.get(key_name).equals("全部")) {
                 group.check(radiobutton.getId());
             }
         }
@@ -216,14 +215,28 @@ public class SelectMenuPop extends PopupWindow {
             }
             AddMenus(movie_container, map_type, map_attr);
         } else {
-            //电影
+            /*//电影
             Map<String, String> map_type = new LinkedHashMap<>();
 
             //类型
             for (int i = 0; i < sport_type_names.length; i++) {
                 map_type.put(i + "", sport_type_names[i]);
             }
-            movie_container.put(type_string, map_type);
+            movie_container.put(type_string, map_type);*/
+
+            //综艺
+            Map<String, String> map_type = new LinkedHashMap<>();
+            Map<String, String> map_attr = new LinkedHashMap<>();
+
+            //类型
+            for (int i = 0; i < varity_type_names.length; i++) {
+                map_type.put(i + "", varity_type_names[i]);
+            }
+            //属性
+            for (int i = 0; i < varity_attr_names.length; i++) {
+                map_attr.put(i + "", varity_attr_names[i]);
+            }
+            AddMenus(movie_container, map_type, map_attr);
         }
     }
 

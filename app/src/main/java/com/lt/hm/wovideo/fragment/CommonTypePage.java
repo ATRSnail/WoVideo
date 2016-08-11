@@ -27,6 +27,7 @@ import com.lt.hm.wovideo.adapter.recommend.RecCateAdapter;
 import com.lt.hm.wovideo.base.BaseFragment;
 import com.lt.hm.wovideo.base.BaseLazyFragment;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.model.CateModel;
 import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.model.RecomList;
@@ -222,22 +223,21 @@ public class CommonTypePage extends BaseLazyFragment {
         }else {
             HashMap<String,Object> map = new HashMap<>();
             map.put("type",type);
-            HttpApis.getCategoryTag(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log(response);
-
-                }
-            });
+            HttpApis.getCategoryTag(map, HttpApis.http_one,new HttpCallback(String.class,this));
         }
 
 
 
+    }
+
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value, flag);
+        switch (flag) {
+            case HttpApis.http_one:
+
+                break;
+        }
     }
 
 }

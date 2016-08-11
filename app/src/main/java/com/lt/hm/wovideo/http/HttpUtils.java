@@ -44,22 +44,31 @@ public class HttpUtils {
     }
 
 
-    public static void formPost(String url, HashMap<String,Object> maps, Callback<?> callback){
-      PostFormBuilder builder = OkHttpUtils.post().url(getAbsoluteApiUrl(url));
-        if (maps.size()>0){
-            Set<String> keys=maps.keySet();
+    public static void formPost(String url, HashMap<String, Object> maps, Callback<?> callback) {
+        formPost(url, maps, -1, callback);
+    }
+
+    public static void formPost(String url, HashMap<String, Object> maps, int flag, Callback<?> callback) {
+        PostFormBuilder builder;
+        if (flag == -1) {//不加flag
+            builder = OkHttpUtils.post().url(getAbsoluteApiUrl(url));
+        } else {
+            builder = OkHttpUtils.post().url(getAbsoluteApiUrl(url)).id(flag);
+        }
+        if (maps.size() > 0) {
+            Set<String> keys = maps.keySet();
             for (String key :
                     keys) {
-                if (!StringUtils.isNullOrEmpty(maps.get(key))){
-                    builder.addParams(key,maps.get(key).toString());
+                if (!StringUtils.isNullOrEmpty(maps.get(key))) {
+                    builder.addParams(key, maps.get(key).toString());
                 }
             }
         }
-        TLog.log("request_params"+maps.toString());
+        TLog.log("request_params" + maps.toString());
         builder.build().execute(callback);
     }
 
-    public static void stringPost(String url, Object obj,Callback<?> callback){
+    public static void stringPost(String url, Object obj, Callback<?> callback) {
         PostStringBuilder builder = OkHttpUtils.postString().url(getAbsoluteApiUrl(url));
         builder.content(new Gson().toJson(obj));
         builder.build().execute(callback);
@@ -67,52 +76,56 @@ public class HttpUtils {
 
     /**
      * 单文件上传
+     *
      * @param url
      * @param file
      * @param callback
      */
-    public static void filePost(String url, File file, FileCallBack callback){
-        PostFileBuilder builder= OkHttpUtils.postFile().url(getAbsoluteApiUrl(url));
+    public static void filePost(String url, File file, FileCallBack callback) {
+        PostFileBuilder builder = OkHttpUtils.postFile().url(getAbsoluteApiUrl(url));
         builder.file(file);
         builder.build().execute(callback);
     }
 
     /**
      * 多文件上传
+     *
      * @param url
      * @param files
      * @param headers
      * @param callBack
      */
-    public static void multiFilePost(String url,Map<String,File>  files,Map<String,String> headers,FileCallBack callBack){
-        PostFormBuilder builder=  OkHttpUtils.post().url(url);
+    public static void multiFilePost(String url, Map<String, File> files, Map<String, String> headers, FileCallBack callBack) {
+        PostFormBuilder builder = OkHttpUtils.post().url(url);
         for (String key :
                 files.keySet()) {
-            builder.addFile("mFile",key,files.get(key));
+            builder.addFile("mFile", key, files.get(key));
         }
         builder.params(headers);
         builder.build().execute(callBack);
     }
+
     //单一文件下载（注意下载文件可以使用FileCallback，需要传入文件需要保存的文件夹以及文件名）
-    public static void downFile(String url,FileCallBack callback){
-        GetBuilder builder=  OkHttpUtils.get().url(url);
+    public static void downFile(String url, FileCallBack callback) {
+        GetBuilder builder = OkHttpUtils.get().url(url);
         builder.build().execute(callback);
     }
 
 
     /**
      * GET 方法
+     *
      * @param url
      * @param maps
      * @param callback
      */
-    public static void formGet(String url,HashMap<String,Object> maps,Callback callback){
-        GetBuilder builder= OkHttpUtils.get().url(getAbsoluteApiUrl(url));
-        if (maps.size()>0){
-            Set<String> keys=maps.keySet();
+    public static void formGet(String url, HashMap<String, Object> maps, Callback callback) {
+        GetBuilder builder = OkHttpUtils.get().url(getAbsoluteApiUrl(url));
+        if (maps.size() > 0) {
+            Set<String> keys = maps.keySet();
             for (String key :
                     keys) {
-                builder.addParams(key,maps.get(key).toString());
+                builder.addParams(key, maps.get(key).toString());
             }
         }
         builder.build().execute(callback);
@@ -120,19 +133,21 @@ public class HttpUtils {
 
     /**
      * 拼接URL（非％s 形式）
+     *
      * @param partUrl
      * @return
      */
-    public static String appendUrl(String partUrl){
+    public static String appendUrl(String partUrl) {
         String url = partUrl;
         if (!partUrl.startsWith("http:") && !partUrl.startsWith("https:")) {
-            url = HOST+partUrl;
+            url = HOST + partUrl;
         }
         return url;
     }
 
     /**
      * 拼接 URL
+     *
      * @param partUrl
      * @return
      */
@@ -144,9 +159,6 @@ public class HttpUtils {
         Log.d("BASE_CLIENT", "request:" + url);
         return url;
     }
-
-
-
 
 
 }

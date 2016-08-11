@@ -11,12 +11,16 @@ import okhttp3.Request;
 /**
  * Created by xuchunhui on 16/8/11.
  */
-public class BeanCallback<T> extends StringCallback {
+public class HttpCallback<T> extends StringCallback {
     private Class<T> clazz;
     private HttpUtilBack httpUtilBack;
     private String dialogStr;
 
-    public BeanCallback(Class<T> clazz, HttpUtilBack httpUtilBack, String dialogStr) {
+    public HttpCallback(Class<T> clazz, HttpUtilBack httpUtilBack) {
+        this(clazz,httpUtilBack,"");
+    }
+
+    public HttpCallback(Class<T> clazz, HttpUtilBack httpUtilBack, String dialogStr) {
         this.httpUtilBack = httpUtilBack;
         this.clazz = clazz;
         this.dialogStr = dialogStr;

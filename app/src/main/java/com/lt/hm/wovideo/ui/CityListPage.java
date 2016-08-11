@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -15,27 +14,18 @@ import com.lt.hm.wovideo.adapter.city.CityListAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.model.City;
 import com.lt.hm.wovideo.model.CityArrayModel;
-import com.lt.hm.wovideo.model.CityModel;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.PinyinUtil;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.SiteBSTree;
-import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
-import com.lt.hm.wovideo.widget.DividerItemDecoration;
+import com.lt.hm.wovideo.widget.DividerDecoration;
 import com.lt.hm.wovideo.widget.MySectionIndexer;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.LogRecord;
 
 import butterknife.BindView;
 
@@ -137,8 +127,7 @@ public class CityListPage extends BaseActivity {
         mAdapter = new CityListAdapter(R.layout.item_ont_text,list, indexer);
         cityList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         //添加分割线
-        cityList.addItemDecoration(new DividerItemDecoration(
-                this, DividerItemDecoration.VERTICAL_LIST));
+        cityList.addItemDecoration(new DividerDecoration(this,2,getResources().getColor(R.color.gray_lighter1)));
         cityList.setAdapter(mAdapter);
 
         placeText.setText("北京");

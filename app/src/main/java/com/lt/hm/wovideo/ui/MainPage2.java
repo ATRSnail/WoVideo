@@ -3,6 +3,7 @@ package com.lt.hm.wovideo.ui;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;

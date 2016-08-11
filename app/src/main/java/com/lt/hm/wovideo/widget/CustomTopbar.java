@@ -100,6 +100,7 @@ public class CustomTopbar extends RelativeLayout {
         leftImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (clicklistenter == null) return;
                 clicklistenter.leftClick();
             }
         });
@@ -107,6 +108,7 @@ public class CustomTopbar extends RelativeLayout {
         rightImage.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (clicklistenter == null) return;
                 clicklistenter.rightClick();
             }
         });

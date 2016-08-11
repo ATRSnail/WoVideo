@@ -125,11 +125,6 @@ public class BaseFragment extends Fragment implements BaseFragmentInterface,View
 	@Override
 	public void onClick(View v) {
 	}
-	@Override
-	public void setUserVisibleHint(boolean isVisibleToUser) {
-		super.setUserVisibleHint(isVisibleToUser);
-		TLog.log("TAG", "setUserVisibleHint() called with: " + "isVisibleToUser = [" + isVisibleToUser + "]");
-	}
 
 	public Context getApplicationContext() {
 		return context;

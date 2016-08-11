@@ -1,49 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:orientation="horizontal"
-        >
+    <include layout="@layout/tab_layout" />
 
-        <HorizontalScrollView
-            android:layout_width="0dp"
-            android:layout_weight="0.8"
-            android:layout_height="match_parent">
-
-            <com.lt.hm.wovideo.widget.ViewPagerIndicator
-                android:id="@+id/choice_view_indicator"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:layout_alignParentLeft="true"
-                android:orientation="horizontal"
-                app:visible_tab_count="4"
-                />
-        </HorizontalScrollView>
-
-        <View
-        android:layout_width="1dp"
-        android:layout_height="match_parent"
-        android:background="@drawable/divider_selector"/>
-
-        <ImageView
-            android:id="@+id/vip_selector"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
-            android:layout_weight="0.1"
-            android:src="@drawable/icon_channel"
-            />
-    </LinearLayout>
     <android.support.v4.view.ViewPager
         android:id="@+id/choice_view_page"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.0"
-        />
+        android:layout_weight="1.0" />
 </LinearLayout>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#D33C3C"
+    android:background="@color/white"
     android:gravity="center_vertical"
     android:orientation="horizontal">
 
@@ -12,7 +12,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        app:tabIndicatorColor="@android:color/transparent"
+        app:tabSelectedTextColor="@color/blue_btn_bg_color"
+        app:tabIndicatorColor="@color/blue_btn_bg_color"
         app:tabMode="scrollable" />
 
     <ImageView
@@ -20,5 +21,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginRight="8dp"
-        android:src="@drawable/icon_choosen" />
+        android:src="@drawable/icon_channel" />
 </LinearLayout>

@@ -1,6 +1,8 @@
 package com.lt.hm.wovideo.fragment;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
@@ -9,20 +11,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.TextView;
 
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.home.Bottom_ListAdapter;
+import com.lt.hm.wovideo.adapter.recommend.GridAdapter;
 import com.lt.hm.wovideo.adapter.recommend.RecCateAdapter;
 import com.lt.hm.wovideo.base.BaseFragment;
+import com.lt.hm.wovideo.base.BaseLazyFragment;
 import com.lt.hm.wovideo.model.CateModel;
 import com.lt.hm.wovideo.model.RecomList;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.ui.CityListPage;
 import com.lt.hm.wovideo.ui.NewClassDetailPage;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.widget.CustomGridView;
 
 import java.util.ArrayList;
 import java.util.IllegalFormatCodePointException;
@@ -36,7 +43,7 @@ import static com.lt.hm.wovideo.model.VideoType.MOVIE;
 /**
  * Created by xuchunhui on 16/8/8.
  */
-public class CommonTypePage extends BaseFragment{
+public class CommonTypePage extends BaseLazyFragment{
 
     public static final String TYPE_KEY = "type";
     private View view;
@@ -50,13 +57,14 @@ public class CommonTypePage extends BaseFragment{
     @BindView(R.id.recycler_recommend)
     RecyclerView recyclerView;
     @BindView(R.id.recycle_cate)
-    RecyclerView cateRecycle;
+    CustomGridView cateRecycle;
     @BindView(R.id.text_change_city)
     TextView changeCityBtn;
     @BindView(R.id.frame_recommend)
     View recommendImg;
     @BindView(R.id.linear_live)
     View liveLinear;
+    private boolean isHasView = false;//防止重复加载view
 
     public static CommonTypePage getInstance(int type){
         CommonTypePage common = new CommonTypePage();
@@ -66,7 +74,6 @@ public class CommonTypePage extends BaseFragment{
         return common;
     }
 
-
     @Override
     protected int getLayoutId() {
         return R.layout.frag_common_type_page;
@@ -75,18 +82,25 @@ public class CommonTypePage extends BaseFragment{
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(getLayoutId(),container,false);
-        return view;
+        if (!isHasView){
+            view = inflater.inflate(getLayoutId(),container,false);
+            ButterKnife.bind(this, view);
+        }
+        //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
+        ViewGroup parent = (ViewGroup) view.getParent();
+        if (parent != null) {
+            parent.removeView(view);
+        }
+         return view;
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        ButterKnife.bind(this, view);
-
+    public void onFirstUserVisible() {
+        if (isHasView) return;
+        TLog.error("OnFirst---");
+        isHasView = true;
         initData();
         initView(null);
-
     }
 
     @Override
@@ -111,10 +125,14 @@ public class CommonTypePage extends BaseFragment{
         videos.add(new RecomList.Videos("",1,"","dd","dddd","ddd","dd","dd","dd"));
         videos.add(new RecomList.Videos("",1,"","dd","dddd","ddd","dd","dd","dd"));
 
-        cates.add(new CateModel("1","dd"));
-        cates.add(new CateModel("1","dd"));
-        cates.add(new CateModel("1","dd"));
-        cates.add(new CateModel("1","dd"));
+        cates.add(new CateModel("1","dd",0));
+        cates.add(new CateModel("1","dd",0));
+        cates.add(new CateModel("1","dd",0));
+        cates.add(new CateModel("1","dd",0));
+        cates.add(new CateModel("1","dd",0));
+        cates.add(new CateModel("1","dd",0));
+        cates.add(new CateModel("1","dd",0));
+        cates.add(new CateModel("1","dd",1));
     }
 
     private void addGridView(List<RecomList.Videos> videos){
@@ -149,13 +167,15 @@ public class CommonTypePage extends BaseFragment{
         }
     }
 
-    private void addCateView(List<CateModel> cates){
-        RecCateAdapter adapter = new RecCateAdapter(R.layout.item_first_cate,cates);
-        GridLayoutManager manager = new GridLayoutManager(getApplicationContext(),5);
-        cateRecycle.setLayoutManager(manager);
-        cateRecycle.setAdapter(adapter);
-        adapter.setOnRecyclerViewItemClickListener((view1, i) -> {
-            startActivity(new Intent(getActivity(),NewClassDetailPage.class));
+    private void addCateView(List<CateModel> cateTags){
+        GridAdapter gridAdapter = new GridAdapter(getApplicationContext(),cateTags,R.layout.item_first_cate);
+        cateRecycle.setAdapter(gridAdapter);
+        cateRecycle.setSelector(new ColorDrawable(Color.TRANSPARENT));
+        cateRecycle.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                startActivity(new Intent(getActivity(),NewClassDetailPage.class));
+            }
         });
     }
 

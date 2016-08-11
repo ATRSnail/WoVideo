@@ -30,12 +30,16 @@
             android:src="@drawable/recommend" />
     </FrameLayout>
 
-    <android.support.v7.widget.RecyclerView
+    <com.lt.hm.wovideo.widget.CustomGridView
         android:id="@+id/recycle_cate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/gray_dark"
-        android:padding="@dimen/s_10"
+        android:background="@color/gray_lighter1"
+        android:columnWidth="80dp"
+        android:numColumns="auto_fit"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:stretchMode="columnWidth"
         android:visibility="gone" />
 
     <include layout="@layout/include_title_text" />

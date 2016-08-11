@@ -117,15 +117,17 @@ public class SelectMenuPop extends PopupWindow {
     private void addViews(LinearLayout layout_container, Context context, String key) {
         LinearLayout layout_item = new LinearLayout(context);
         layout_item.setOrientation(LinearLayout.HORIZONTAL);
-        layout_item.setPadding(25, 25, 25, 25);
-        layout_item.setBackgroundColor(Color.parseColor("#ccffffff"));
+        layout_item.setPadding(25, 20, 25, 20);
+        layout_item.setBackgroundColor(Color.parseColor("#33ffffff"));
         TextView text = new TextView(context);
-        text.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        LinearLayout.LayoutParams typelp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        typelp.setMargins(20, 12, 20, 12);
+        text.setLayoutParams(typelp);
         text.setText(key);
-        text.setPadding(20, 0, 20, 0);
-        text.setBackgroundColor(context.getResources().getColor(R.color.blue_bullet));
+        text.setPadding(30, 10, 30, 10);
+        text.setTextColor(Color.WHITE);
         text.setGravity(Gravity.CENTER);
-        text.setTextColor(context.getResources().getColor(R.color.black));
+        text.setBackgroundResource(R.drawable.blue_circle);
         HorizontalScrollView scrollView = new HorizontalScrollView(context);
         scrollView.setHorizontalScrollBarEnabled(false);
         LinearLayout layout_scroll = new LinearLayout(context);
@@ -137,25 +139,22 @@ public class SelectMenuPop extends PopupWindow {
         group.setOrientation(RadioGroup.HORIZONTAL);
         Map<String, String> values = movie_container.get(key);
         Set<String> keys = values.keySet();
+        LinearLayout.LayoutParams params1 = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
+        params1.setMargins(20,10,20,10);
+        params1.gravity = Gravity.CENTER;
         for (String key_name : keys) {
             RadioButton radiobutton = new RadioButton(context);
             radiobutton.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.anthology_selector));
-            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            params1.leftMargin = 20;
-            params1.gravity = Gravity.CENTER;
             radiobutton.setLayoutParams(params1);
             radiobutton.setPadding(20, 0, 20, 0);
             radiobutton.setText(values.get(key_name));
-            radiobutton.setTextColor(context.getResources().getColor(R.color.black));
+            radiobutton.setTextColor(context.getResources().getColor(R.color.text_press_selector));
             radiobutton.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
-            radiobutton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked) {
-                        if (listener != null) {
-                            TLog.log(key + "::::" + key_name);
-                            listener.clickListener(key, key_name);
-                        }
+            radiobutton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    if (listener != null) {
+                        TLog.log(key + "::::" + key_name);
+                        listener.clickListener(key, key_name);
                     }
                 }
             });

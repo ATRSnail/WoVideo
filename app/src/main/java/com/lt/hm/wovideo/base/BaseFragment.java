@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lt.hm.wovideo.http.HttpUtilBack;
 import com.lt.hm.wovideo.utils.TLog;
 
 import java.lang.reflect.Field;
@@ -15,7 +16,7 @@ import java.lang.reflect.Field;
 /**
  * Created by leonardo on 16/3/21.
  */
-public class BaseFragment extends Fragment implements BaseFragmentInterface,View.OnClickListener {
+public class BaseFragment extends Fragment implements BaseFragmentInterface,View.OnClickListener,HttpUtilBack {
 	public static final int STATE_NONE = 0;
 	public static final int STATE_REFRESH = 1;
 	public static final int STATE_LOADMORE = 2;
@@ -152,4 +153,18 @@ public class BaseFragment extends Fragment implements BaseFragmentInterface,View
 		}
 	}
 
+	@Override
+	public void onBefore(String dialog) {
+
+	}
+
+	@Override
+	public <T> void onSuccess(T value, int flag) {
+		TLog.error("onsuccess-->"+value.toString()+"----flag----"+flag);
+	}
+
+	@Override
+	public void onFail() {
+
+	}
 }

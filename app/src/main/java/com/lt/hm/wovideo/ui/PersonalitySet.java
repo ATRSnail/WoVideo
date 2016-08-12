@@ -9,12 +9,19 @@ import android.widget.Toast;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.category.CategoryAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpCallback;
+import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
 import com.lt.hm.wovideo.model.Category;
+import com.lt.hm.wovideo.model.ChannelModel;
+import com.lt.hm.wovideo.model.response.ResponseChannel;
+import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.CustomTopbar;
 import com.lt.hm.wovideo.widget.DividerDecoration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -36,8 +43,10 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     private CategoryAdapter adapter;
     private CategoryAdapter allAdapter;
-    private List<Category> list = new ArrayList<>();
-    private List<Category> allList = new ArrayList<>();
+    private List<ChannelModel> allList = new ArrayList<>();
+
+
+    private List<ChannelModel> channels = new ArrayList<>();
 
     @Override
     protected int getLayoutId() {
@@ -56,8 +65,12 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void initViews() {
-        adapter = new CategoryAdapter(this, list, this,Category.FIRST_TYPE);
-        allAdapter = new CategoryAdapter(this, allList, this,Category.SECOND_TYPE);
+
+    }
+
+    private void initCateView(){
+        adapter = new CategoryAdapter(this, channels, this, Category.FIRST_TYPE);
+        allAdapter = new CategoryAdapter(this, allList, this, Category.SECOND_TYPE);
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, TOTAL_LINE);
         GridLayoutManager mLayoutManager2 = new GridLayoutManager(this, TOTAL_LINE);
         DividerDecoration decoration = new DividerDecoration(getApplicationContext());
@@ -71,22 +84,27 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void initDatas() {
-        list.add(new Category("我的频道", 0));
-        list.add(new Category("奶油", 1));
-        list.add(new Category("威化", 1));
-        list.add(new Category("凤梨", 1));
-        list.add(new Category("烧饼", 1));
-        list.add(new Category("烧饼", 1));
-        list.add(new Category("烧饼", 1));
-        list.add(new Category("烧饼", 1));
 
-        allList.add(new Category("频道栏目", 0));
-        allList.add(new Category("饼干", 1));
-        allList.add(new Category("饼干", 1));
-        allList.add(new Category("饼干", 1));
-        allList.add(new Category("饼干", 1));
-        allList.add(new Category("饼干", 1));
-        allList.add(new Category("饼干", 1));
+        getClassInfos();
+    }
+
+    /**
+     * 从网络获取标签
+     */
+    private void getClassInfos() {
+        HashMap<String, Object> map = new HashMap<>();
+        HttpApis.getIndividuationChannel(map, HttpApis.http_one, new HttpCallback<>(ResponseChannel.class, this));
+    }
+
+    /**
+     * 保存个性化标签
+     */
+    private void updateChannel(String channel){
+        TLog.error("channel--->"+channel);
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("userid","2iRIK06ghJJiWYXxnSklFLNsMSvsOU3S");
+        map.put("channel",channel);
+        HttpApis.updateChannel(map, HttpApis.http_two, new HttpCallback<>(ResponseChannel.class, this));
     }
 
     @Override
@@ -96,14 +114,28 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void rightClick() {
-      adapter.toggleCanDelete();
+        if (adapter.isCanDel){
+
+            updateChannel(splitStr(channels));
+        }
+        adapter.toggleCanDelete();
         setEditorText(adapter.isCanDel);
     }
 
+    private String splitStr(List<ChannelModel> channelModels){
+        StringBuffer stringBuffer = new StringBuffer(1000);
+        for (int i = 0,length = channelModels.size();i<length;i++){
+            stringBuffer.append(channelModels.get(i).getFunName());
+            if (i != channelModels.size()-1){
+                stringBuffer.append("|");
+            }
+        }
+        return stringBuffer.toString();
+    }
 
     @Override
     public void OnItemClick(int type, int pos) {
-        btnAddItem(type,pos);
+        btnAddItem(type, pos);
         btnRemoveItem(type, pos);
         Toast.makeText(this, "---" + pos, Toast.LENGTH_SHORT).show();
     }
@@ -115,34 +147,36 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
         adapter.toggleCanDelete();
     }
 
-    private void setEditorText(boolean editor){
-        personTopbar.setRightText(editor?"完成":"编辑");
+    private void setEditorText(boolean editor) {
+        personTopbar.setRightText(editor ? "完成" : "编辑");
     }
 
     /**
      * 添加某项
+     *
      * @param type
      * @param pos
      */
-    public void btnAddItem(int type,int pos) {
+    public void btnAddItem(int type, int pos) {
         if (type == Category.FIRST_TYPE) {
-            allList.add(0, list.get(pos));
+            allList.add(0, channels.get(pos));
             allAdapter.notifyDataSetChanged();
             return;
         }
-        list.add(allList.get(pos));
+        channels.add(allList.get(pos));
         adapter.notifyDataSetChanged();
     }
 
     /**
      * 删除某项
+     *
      * @param type
      * @param pos
      */
     public void btnRemoveItem(int type, int pos) {
-        if (type == Category.FIRST_TYPE){
-            if (!list.isEmpty()) {
-                list.remove(pos);
+        if (type == Category.FIRST_TYPE) {
+            if (!channels.isEmpty()) {
+                channels.remove(pos);
             }
             adapter.notifyItemRemoved(pos);
             return;
@@ -154,6 +188,22 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     }
 
 
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value, flag);
+        switch (flag) {
 
+            case HttpApis.http_one:
+                ResponseChannel channelRe = (ResponseChannel) value;
+                channels = channelRe.getBody().getSelectedChannels();
+                allList = channelRe.getBody().getNotSelectedChannels();
+                if (channels == null || channels.size() == 0) return;
+                initCateView();
+                break;
+            case HttpApis.http_two:
+                Toast.makeText(this,"",Toast.LENGTH_SHORT).show();
+                break;
 
+        }
+    }
 }

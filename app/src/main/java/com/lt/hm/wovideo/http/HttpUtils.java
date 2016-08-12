@@ -50,6 +50,7 @@ public class HttpUtils {
 
     public static void formPost(String url, HashMap<String, Object> maps, int flag, Callback<?> callback) {
         PostFormBuilder builder;
+        TLog.error("flag---"+flag);
         if (flag == -1) {//不加flag
             builder = OkHttpUtils.post().url(getAbsoluteApiUrl(url));
         } else {

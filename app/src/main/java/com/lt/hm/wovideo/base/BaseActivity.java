@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.db.HistoryDataBase;
 import com.lt.hm.wovideo.db.NetUsageDatabase;
+import com.lt.hm.wovideo.http.HttpUtilBack;
 import com.lt.hm.wovideo.model.VideoHistory;
 
 import butterknife.ButterKnife;
@@ -22,7 +23,7 @@ import butterknife.Unbinder;
 /**
  * Created by leonardo on 16/3/21.
  */
-public abstract class BaseActivity extends FragmentActivity implements BaseViewInterface {
+public abstract class BaseActivity extends BaseRequestActivity implements BaseViewInterface {
 	protected LayoutInflater mInflater;
 	private boolean _isVisible;
 	private TextView mTvActionTitle;

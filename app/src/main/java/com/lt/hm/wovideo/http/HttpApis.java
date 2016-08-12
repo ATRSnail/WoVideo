@@ -15,6 +15,8 @@ public class HttpApis {
     public static final int http_one = 0xffffff00; //
     public static final int http_two = 0xffffff01;
     public static final int http_thr = 0xffffff02;
+    public static final int http_for = 0xffffff03;
+    public static final int http_fiv = 0xffffff04;
 
     /**
      * 登录
@@ -64,6 +66,10 @@ public class HttpApis {
      */
     public static void getBanners(HashMap<String, Object> maps, StringCallback callback) {
         HttpUtils.formPost("mblBanner/getBanner", maps, callback);
+    }
+
+    public static void getBanners(HashMap<String, Object> maps, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblBanner/getBanner", maps, flag, callback);
     }
 
     /**
@@ -116,6 +122,10 @@ public class HttpApis {
         HttpUtils.formPost("mblVf/getVfListByType", map, callback);
     }
 
+    public static void getListByType(HashMap<String, Object> map,int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/getVfListByType", map,flag, callback);
+    }
+
     /**
      * 获取视频详情信息
      *
@@ -144,6 +154,10 @@ public class HttpApis {
      */
     public static void getYouLikeList(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblVf/youLike", map, callback);
+    }
+
+    public static void getYouLikeList(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/youLike", map, flag, callback);
     }
 
     /**
@@ -408,5 +422,34 @@ public class HttpApis {
         HttpUtils.formPost("mblDictionary/getVfDict", map, flag, callback);
     }
 
+    /**
+     * 根据城市的code值,获取电台
+     * @param map
+     * @param flag
+     * @param callback
+     */
+    public static void getTvsByCityCode(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblLive/getTvsByCityCode", map, flag, callback);
+    }
 
+    /**
+     *
+     * @param map
+     * @param flag
+     * @param callback
+     */
+    public static void getIndividuationChannel(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblUser/getIndividuationChannel", map, flag, callback);
+    }
+
+
+    /**
+     *更新频道接口
+     * @param map
+     * @param flag
+     * @param callback
+     */
+    public static void updateChannel(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblUser/updateChannel", map, flag, callback);
+    }
 }

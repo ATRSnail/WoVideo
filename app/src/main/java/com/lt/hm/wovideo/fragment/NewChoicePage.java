@@ -17,11 +17,15 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.recommend.TabFragmentAdapter;
 import com.lt.hm.wovideo.base.BaseFragment;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.TypeList;
 import com.lt.hm.wovideo.model.VideoType;
+import com.lt.hm.wovideo.model.response.ResponseCateTag;
+import com.lt.hm.wovideo.model.response.ResponseChannel;
 import com.lt.hm.wovideo.ui.CityListPage;
 import com.lt.hm.wovideo.ui.NewClassDetailPage;
 import com.lt.hm.wovideo.ui.PersonalitySet;
@@ -57,8 +61,8 @@ public class NewChoicePage extends BaseFragment {
     ViewPager choiceViewPage;
 
     private TabFragmentAdapter tabFragmentAdapter;
-    List<TypeList.TypeListBean> mClass = new ArrayList<>();
-    TypeList.TypeListBean bean;
+    private List<ChannelModel> channels = new ArrayList<>();
+    private ChannelModel bean;
     int CURRENT_POSITION;
     private List<String> mTitles = new ArrayList<>();
     private List<Fragment> fragments = new ArrayList<>();
@@ -79,40 +83,18 @@ public class NewChoicePage extends BaseFragment {
     private void getClassInfos() {
 
         HashMap<String, Object> map = new HashMap<>();
-        HttpApis.getClassesInfo(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<TypeList, RespHeader> resp = new ResponseObj<TypeList, RespHeader>();
-                ResponseParser.parse(resp, response, TypeList.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals("0")) {
-                    TLog.log(resp.toString());
-                    if (mClass.size() > 0) {
-                        mClass.clear();
-                    }
-                    mClass.addAll(resp.getBody().getTypeList());
-                    initBottom();
-
-                } else {
-                    TLog.log(resp.getHead().getRspMsg());
-                }
-
-            }
-        });
+        HttpApis.getIndividuationChannel(map,HttpApis.http_one,new HttpCallback<>(ResponseChannel.class, this));
     }
 
     private void initBottom() {
         fragments.clear();
         mTitles.clear();
-        for (int i = 0; i < mClass.size(); i++) {
-            bean = mClass.get(i);
-            mTitles.add(bean.getTypeName());
-            CommonTypePage page = CommonTypePage.getInstance(Integer.valueOf(bean.getId()));
+        channels.add(0,new ChannelModel("推荐","6"));
+        channels.add(1,new ChannelModel("地区","7"));
+        for (int i = 0; i < channels.size(); i++) {
+            bean = channels.get(i);
+            mTitles.add(bean.getFunName());
+            CommonTypePage page = CommonTypePage.getInstance(bean);
             fragments.add(page);
         }
 
@@ -145,9 +127,7 @@ public class NewChoicePage extends BaseFragment {
         vipSelector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                startActivity(new Intent(getContext(), NewClassDetailPage.class));
-           //     startActivity(new Intent(getContext(), PersonalitySet.class));
+                startActivity(new Intent(getContext(), PersonalitySet.class));
             }
         });
         getClassInfos();
@@ -156,5 +136,18 @@ public class NewChoicePage extends BaseFragment {
     @Override
     public void initData() {
         super.initData();
+    }
+
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value, flag);
+        switch (flag){
+            case HttpApis.http_one:
+                ResponseChannel channelRe = (ResponseChannel) value;
+                channels = channelRe.getBody().getSelectedChannels();
+                if (channels == null || channels.size() == 0) return;
+                initBottom();
+                break;
+        }
     }
 }

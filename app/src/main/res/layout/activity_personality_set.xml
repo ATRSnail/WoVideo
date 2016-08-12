@@ -6,6 +6,7 @@
     android:background="@color/bg_new_color"
     android:orientation="vertical">
 
+
     <com.lt.hm.wovideo.widget.CustomTopbar
         android:id="@+id/person_topbar"
         android:layout_width="match_parent"
@@ -16,29 +17,40 @@
         app:leftBackGround="@drawable/left_arrow"
         app:rightBackGround="@drawable/left_arrow" />
 
-    <TextView
-        style="@style/personal_top_text"
-        android:layout_marginTop="1dp"
-        android:text="@string/mine_set"
-        android:id="@+id/text_change"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_personal_mine"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="false"
-      />
+        android:layout_height="match_parent">
 
-    <TextView
-        style="@style/personal_top_text"
-        android:text="@string/all_set"
-        android:id="@+id/text_unchange"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycler_personal_all"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clipToPadding="false"
-       />
+            <TextView
+                android:id="@+id/text_change"
+                style="@style/personal_top_text"
+                android:layout_marginTop="1dp"
+                android:text="@string/mine_set" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_personal_mine"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false" />
+
+            <TextView
+                android:id="@+id/text_unchange"
+                style="@style/personal_top_text"
+                android:text="@string/all_set" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler_personal_all"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false" />
+
+        </LinearLayout>
+    </ScrollView>
 
 </LinearLayout>

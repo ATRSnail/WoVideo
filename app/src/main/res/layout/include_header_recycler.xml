@@ -14,12 +14,18 @@
         android:textSize="@dimen/sp_16"
         android:visibility="gone" />
 
-    <include layout="@layout/layout_new_home_item" />
+    <com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView
+        android:visibility="gone"
+        android:id="@+id/img_indicator_vip"
+        android:layout_width="match_parent"
+        android:layout_height="180dp" />
+
+    <include layout="@layout/layout_new_top_item" />
 
     <FrameLayout
         android:id="@+id/frame_recommend"
         android:layout_width="match_parent"
-        android:layout_height="70dp"
+        android:layout_height="65dp"
         android:background="@color/white"
         android:visibility="gone">
 
@@ -36,7 +42,7 @@
         android:layout_height="wrap_content"
         android:background="@color/bg_new_color"
         android:columnWidth="80dp"
-        android:numColumns="auto_fit"
+        android:numColumns="5"
         android:paddingBottom="10dp"
         android:paddingTop="10dp"
         android:stretchMode="columnWidth"

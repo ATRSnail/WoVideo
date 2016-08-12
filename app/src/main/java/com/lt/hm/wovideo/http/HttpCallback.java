@@ -41,6 +41,7 @@ public class HttpCallback<T> extends StringCallback {
 
     @Override
     public void onResponse(String response, int id) {
+        TLog.error("onResponse==string==" + response);
         if (clazz == String.class) {
             httpUtilBack.onSuccess(response, id);
         } else {

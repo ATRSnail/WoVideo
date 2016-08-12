@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
 import com.lt.hm.wovideo.model.Category;
+import com.lt.hm.wovideo.model.ChannelModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +20,13 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context ctx;
-    private List<Category> list = new ArrayList<>();
+    private List<ChannelModel> list = new ArrayList<>();
     private LayoutInflater inflater;
     private OnCateItemListener listener;
     private int type;
     public boolean isCanDel = false;
 
-    public CategoryAdapter(Context ctx, List<Category> categories, OnCateItemListener listener, int type) {
+    public CategoryAdapter(Context ctx, List<ChannelModel> categories, OnCateItemListener listener, int type) {
         this.ctx = ctx;
         this.list = categories;
         this.listener = listener;
@@ -44,13 +45,13 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (type == Category.FIRST_TYPE) {
             FirstViewHolder firstViewHolder = (FirstViewHolder) holder;
-            firstViewHolder.firstCategory.setText(list.get(position).getCategoryName());
+            firstViewHolder.firstCategory.setText(list.get(position).getFunName());
             firstViewHolder.deleteImg.setVisibility(isCanDel ? View.VISIBLE : View.GONE);
             firstViewHolder.setIsCanDel(isCanDel);
             return;
         }
         SecondViewHolder secondViewHolder = (SecondViewHolder) holder;
-        secondViewHolder.secondCategory.setText(list.get(position).getCategoryName());
+        secondViewHolder.secondCategory.setText(list.get(position).getFunName());
     }
 
     @Override

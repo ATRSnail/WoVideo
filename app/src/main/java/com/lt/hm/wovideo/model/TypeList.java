@@ -33,6 +33,11 @@ public class TypeList {
         private String img;//封面图片路径
         private long ctime;
 
+        public TypeListBean(String typeName, String state) {
+            this.typeName = typeName;
+            this.id = state;
+        }
+
         public String getTypeName() {
             return typeName;
         }

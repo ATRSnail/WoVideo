@@ -89,8 +89,8 @@ public class NewChoicePage extends BaseFragment {
     private void initBottom() {
         fragments.clear();
         mTitles.clear();
-        channels.add(0,new ChannelModel("推荐","6"));
-        channels.add(1,new ChannelModel("地区","7"));
+        channels.add(0,new ChannelModel("推荐",ChannelModel.RECOMMEND_ID));
+        channels.add(1,new ChannelModel("地区",ChannelModel.LOCAL_ID));
         for (int i = 0; i < channels.size(); i++) {
             bean = channels.get(i);
             mTitles.add(bean.getFunName());

@@ -34,6 +34,14 @@ public class HttpCallback<T> extends StringCallback {
     }
 
     @Override
+    public void onAfter(int id) {
+        super.onAfter(id);
+        TLog.error("-onAfter--id---" + id);
+        httpUtilBack.onAfter(id);
+
+    }
+
+    @Override
     public void onError(Call call, Exception e, int id) {
         TLog.error( "error--->" + e.toString());
         httpUtilBack.onFail();

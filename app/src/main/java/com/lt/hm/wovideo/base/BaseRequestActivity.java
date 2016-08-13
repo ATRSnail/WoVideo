@@ -22,4 +22,9 @@ public class BaseRequestActivity extends FragmentActivity implements HttpUtilBac
     public void onFail() {
 
     }
+
+    @Override
+    public void onAfter(int flag) {
+
+    }
 }

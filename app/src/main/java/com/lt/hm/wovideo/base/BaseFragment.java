@@ -167,4 +167,9 @@ public class BaseFragment extends Fragment implements BaseFragmentInterface,View
 	public void onFail() {
 
 	}
+
+	@Override
+	public void onAfter(int flag) {
+
+	}
 }

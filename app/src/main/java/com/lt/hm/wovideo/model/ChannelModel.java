@@ -7,6 +7,12 @@ import java.io.Serializable;
  */
 public class ChannelModel implements Serializable{
 
+    public static final int TELEPLAY_ID = 136;//电视剧
+    public static final int FILM_ID = 135;//电影
+    public static final int VARIATY_ID = 139;//综艺
+    public static final int SPORTS_ID = 76;//体育
+    public static final int RECOMMEND_ID = -1;//推荐
+    public static final int LOCAL_ID = -2;//地方
     /**
      * id : 136
      * funName : 电视剧
@@ -23,9 +29,9 @@ public class ChannelModel implements Serializable{
     private String type;
     private String url;
 
-    public ChannelModel(String funName, String type) {
+    public ChannelModel(String funName, int id) {
         this.funName = funName;
-        this.type = type;
+        this.id = id;
     }
 
     public int getId() {

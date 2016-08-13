@@ -6,9 +6,12 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.OnScrollListener;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
+import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.home.FilmListAdapter;
 import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
@@ -42,8 +46,11 @@ import com.lt.hm.wovideo.model.response.ResponseLocalCityModel;
 import com.lt.hm.wovideo.ui.CityListPage;
 import com.lt.hm.wovideo.ui.NewClassDetailPage;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
+import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 import com.lt.hm.wovideo.widget.CustomGridView;
 import com.lt.hm.wovideo.widget.CustomListView;
+import com.lt.hm.wovideo.widget.CustomScrollView;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
 import com.yyydjk.library.BannerLayout;
 
@@ -55,31 +62,33 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
+import static android.support.v7.widget.RecyclerView.*;
+
 /**
  * Created by xuchunhui on 16/8/8.
  */
-public class CommonTypePage extends BaseLazyFragment {
+public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     public static final String CHANNEL = "channel";
     private View view;
-    private String typeName;
+    private int channelId;
     private String channelCode;
     private ChannelModel channel;
-    private List<RecomList.Videos> videos = new ArrayList<>();
     private List<CateTagModel> cateTags = new ArrayList<>();//标签
     private List<LocalCityModel> localCites = new ArrayList<>();
     private List<BannerList.Banner> banner_list = new ArrayList<>();//bar
     private List<LikeModel> grid_list = new ArrayList<LikeModel>();//猜你喜欢
     private List<FilmMode> films = new ArrayList<>();//电影电视剧列表
-    private LikeListAdapter listAdapter;
-    private FilmListAdapter filmListAdapter;
+    private BaseQuickAdapter listAdapter;
 
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mSwipeRefreshWidget;
     @BindView(R.id.header)
     RecyclerViewHeader header;
     @BindView(R.id.img_indicator_vip)
     ImageIndicatorView imageIndicatorView;
     @BindView(R.id.recycler_recommend)
-    RecyclerView recyclerView;
+    RecyclerView mRecyclerView;
     @BindView(R.id.recycle_cate)
     CustomGridView cateGv;
     @BindView(R.id.text_change_city)
@@ -110,10 +119,19 @@ public class CommonTypePage extends BaseLazyFragment {
     private boolean isHasView = false;//防止重复加载view
     Unbinder unbinder;
 
+    private int lastVisibleItem;
+    private  LinearLayoutManager layoutManager;
+
+    private int pageNum = 1;//页码
+    private int numPerPage = 10;//每页条数
+    private String seed;//翻页查询种子，这个参数如果不传会随机查询，然后会返回这个值，在翻页的时候要将这个值传入，否则会出现重复推荐，可选
+    private String tag;//兴趣标签，用户的user信息,可选
+    private String typeId;//视频类型，1电影2电视剧3综艺4体育，可选
+
     public static CommonTypePage getInstance(ChannelModel channel) {
         CommonTypePage common = new CommonTypePage();
         Bundle bundle = new Bundle();
-        bundle.putSerializable(CHANNEL,channel);
+        bundle.putSerializable(CHANNEL, channel);
         common.setArguments(bundle);
         return common;
     }
@@ -143,6 +161,7 @@ public class CommonTypePage extends BaseLazyFragment {
         if (isHasView) return;
         TLog.error("OnFirst---");
         isHasView = true;
+        initBundleData();
         initData();
         initView(null);
     }
@@ -151,58 +170,101 @@ public class CommonTypePage extends BaseLazyFragment {
     public void initView(View view) {
         titleRl.setVisibility(View.GONE);
         addLikeListView();
-        //addListView(liveModels);
 
+        mSwipeRefreshWidget.setColorSchemeResources(android.R.color.holo_green_light, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        mSwipeRefreshWidget.setOnRefreshListener(this);
+
+        mRecyclerView.addOnScrollListener(new OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                TLog.error("上拉加载--"+lastVisibleItem+"---"+listAdapter.getItemCount());
+                if (newState == RecyclerView.SCROLL_STATE_IDLE
+                        && lastVisibleItem + 2 == listAdapter.getItemCount()) {
+                    mSwipeRefreshWidget.setRefreshing(true);
+                    // 此处在现实项目中，请换成网络请求数据代码，sendRequest .....
+                    TLog.error("上拉加载----page-->"+pageNum+"----seed--->"+seed);
+                    getYouLikeData();
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                lastVisibleItem = layoutManager.findLastVisibleItemPosition();
+            }
+        });
         changeCityBtn.setOnClickListener((View v) -> {
             startActivity(new Intent(getActivity(), CityListPage.class));
         });
     }
 
-    @Override
-    public void initData() {
+    /**
+     * 获取bundle值
+     */
+    private void initBundleData(){
         context = getApplicationContext();
-
-        if (getArguments() != null){
-            channel = (ChannelModel) getArguments().getSerializable(CHANNEL);
-            typeName = channel.getFunName();
+         Bundle bundle = getArguments();
+        if (bundle != null) {
+            channel = (ChannelModel) bundle.getSerializable(CHANNEL);
+            channelId = channel.getId();
             channelCode = channel.getFunCode();
         }
-        TLog.error(typeName + "");
+        TLog.error(channelId + "");
+    }
 
-        switch (typeName) {
-            case "推荐"://推荐
+    /**
+     * 初始化数据
+     */
+    @Override
+    public void initData() {
+
+        switch (channelId) {
+            case ChannelModel.RECOMMEND_ID://推荐
+                pageNum = 1;
+                seed = "";
+                grid_list.clear();
+                banner_list.clear();
                 getBarData();
                 getYouLikeData();
                 break;
-            case "地区"://地方
+            case ChannelModel.LOCAL_ID://地方
                 getTvsByCityCode();
                 getYouLikeData();
                 break;
-            case "电影"://电影,电视剧,综艺,体育
-            case "电视剧":
-            case "综艺":
-            case "体育":
+            case ChannelModel.FILM_ID://电影,电视剧,综艺,体育
                 getCateTag("1");
+                getListByType();
+                break;
+            case ChannelModel.TELEPLAY_ID://电视剧
+                getCateTag("2");
+                getListByType();
+                break;
+            case ChannelModel.SPORTS_ID://体育
+                getCateTag("4");
+                getListByType();
+                break;
+            case ChannelModel.VARIATY_ID://综艺
+                getCateTag("3");
                 getListByType();
                 break;
             default://其他
 
         }
-
-        videos.add(new RecomList.Videos("", 1, "", "dd", "dddd", "ddd", "dd", "dd", "dd"));
-        videos.add(new RecomList.Videos("", 1, "", "dd", "dddd", "ddd", "dd", "dd", "dd"));
-        videos.add(new RecomList.Videos("", 1, "", "dd", "dddd", "ddd", "dd", "dd", "dd"));
-        videos.add(new RecomList.Videos("", 1, "", "dd", "dddd", "ddd", "dd", "dd", "dd"));
-        videos.add(new RecomList.Videos("", 1, "", "dd", "dddd", "ddd", "dd", "dd", "dd"));
-
     }
+
+
     /*
      地方直播列表
      */
+    private LocalCityModel localCityModel;
+
     private void addLocalListView() {
         topPageFl.setVisibility(View.VISIBLE);
         changeCityBtn.setVisibility(View.VISIBLE);
-        setDataToTopView(localCites.get(0).getTvName());
+        localCityModel = localCites.get(0);
+        setDataToTopView(localCityModel.getTvName(), localCityModel.getProperty(), localCityModel.getNowPro(), localCityModel.getImg());
         localCites.remove(0);
         if (localCites.size() == 0) return;
         View headView = LayoutInflater.from(context).inflate(R.layout.include_title_text, null);
@@ -215,8 +277,11 @@ public class CommonTypePage extends BaseLazyFragment {
     /**
      * 第一个布局图显示字体
      */
-    private void setDataToTopView(String name) {
+    private void setDataToTopView(String name, String typeStr, String descStr, String imgUrl) {
         tvTitle.setText(name);
+        ImageLoaderUtil.getInstance().loadImage(context, new ImageLoader.Builder().imgView(imgTopPage).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(imgUrl)).build());
+        tvType.setText(typeStr);
+        tvDesc.setText(descStr);
     }
 
 
@@ -266,22 +331,21 @@ public class CommonTypePage extends BaseLazyFragment {
      */
     private void addLikeListView() {
 
-        LinearLayoutManager layoutManager = null;
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        if (typeName.equals("推荐") || typeName.equals("地区")) {
+        if (channelId == ChannelModel.RECOMMEND_ID || channelId == ChannelModel.LOCAL_ID) {
             listAdapter = new LikeListAdapter(R.layout.layout_new_home_item, grid_list);
         } else {
-            if (typeName.equals("电影")){
-                layoutManager = new GridLayoutManager(getApplicationContext(),3);
+            if (channelId == ChannelModel.FILM_ID) {
+                layoutManager = new GridLayoutManager(getApplicationContext(), 3);
                 layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             }
 
-            filmListAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films);
+            listAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films);
         }
-        recyclerView.setLayoutManager(layoutManager);
-        header.attachTo(recyclerView);
-        recyclerView.setAdapter(typeName.equals("推荐") || typeName.equals("地区") ? listAdapter : filmListAdapter);
+        mRecyclerView.setLayoutManager(layoutManager);
+        header.attachTo(mRecyclerView);
+        mRecyclerView.setAdapter(listAdapter);
     }
 
     /**
@@ -298,9 +362,11 @@ public class CommonTypePage extends BaseLazyFragment {
      */
     private void getYouLikeData() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("pageNum", "1");
-        map.put("numPerPage", "10");
-        map.put("typeid", typeName.equals("推荐") || typeName.equals("地区")? "" : channel.getId());
+        map.put("pageNum", pageNum);
+        map.put("numPerPage", numPerPage);
+        if (!TextUtils.isEmpty(seed)) map.put("seed", seed);
+        if (!TextUtils.isEmpty(tag)) map.put("tag", tag);
+        map.put("typeid", channelId == ChannelModel.RECOMMEND_ID || channelId == ChannelModel.LOCAL_ID ? "" : channelId);
         HttpApis.getYouLikeList(map, HttpApis.http_thr, new HttpCallback<>(ResponseLikeList.class, this));
 
     }
@@ -374,21 +440,28 @@ public class CommonTypePage extends BaseLazyFragment {
                 break;
             case HttpApis.http_thr://获取like列表
                 ResponseLikeList re = (ResponseLikeList) value;
+                seed = re.getBody().getSeed();
                 grid_list = re.getBody().getLikeList();
                 if (grid_list == null || grid_list.size() == 0) return;
 
-                if (typeName.equals("推荐")) {
+                if (channelId == ChannelModel.RECOMMEND_ID) {
                     recommendImg.setVisibility(View.VISIBLE);
                 }
-                if (typeName.equals("地区")) {
+                if (channelId == ChannelModel.LOCAL_ID) {
                     titleRl.setVisibility(View.VISIBLE);
                 }
-                listAdapter.notifyDataChangedAfterLoadMore(grid_list, true);
+                if (pageNum == 1){
+                    listAdapter.setNewData(grid_list);
+                }else {
+                    listAdapter.notifyDataChangedAfterLoadMore(grid_list,true);
+                }
+                pageNum = 1 ;
                 break;
             case HttpApis.http_for://获取城市电台
                 ResponseLocalCityModel cityRe = (ResponseLocalCityModel) value;
                 localCites = cityRe.getBody().getCitys();
                 if (localCites == null || localCites.size() == 0) return;
+                localCites.addAll(localCites);
                 addLocalListView();
                 break;
             case HttpApis.http_fiv:
@@ -396,12 +469,31 @@ public class CommonTypePage extends BaseLazyFragment {
                 films = filmRe.getBody().getTypeList();
                 if (films == null || films.size() == 0) return;
                 topPageFl.setVisibility(View.VISIBLE);
-                setDataToTopView(films.get(0).getName());
+                FilmMode filmMode = films.get(0);
+                setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getDq(), filmMode.getImg());
                 films.remove(0);
                 if (films.size() == 0) return;
-                filmListAdapter.notifyDataChangedAfterLoadMore(films, true);
+                listAdapter.notifyDataChangedAfterLoadMore(films, true);
                 break;
         }
+    }
+
+    @Override
+    public void onAfter(int flag) {
+        super.onAfter( flag);
+        switch (flag){
+            case HttpApis.http_thr:
+                if (mSwipeRefreshWidget != null && mSwipeRefreshWidget.isRefreshing()){
+                    mSwipeRefreshWidget.setRefreshing(false);
+                }
+                break;
+        }
+    }
+
+    //下拉刷新
+    @Override
+    public void onRefresh() {
+        initData();
     }
 
     @Override

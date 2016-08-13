@@ -1,17 +1,23 @@
 package com.lt.hm.wovideo.ui;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.category.CategoryAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.RespHeader;
+import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
 import com.lt.hm.wovideo.model.Category;
 import com.lt.hm.wovideo.model.ChannelModel;
@@ -19,6 +25,9 @@ import com.lt.hm.wovideo.model.response.ResponseChannel;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.CustomTopbar;
 import com.lt.hm.wovideo.widget.DividerDecoration;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,7 +77,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     }
 
-    private void initCateView(){
+    private void initCateView() {
         adapter = new CategoryAdapter(this, channels, this, Category.FIRST_TYPE);
         allAdapter = new CategoryAdapter(this, allList, this, Category.SECOND_TYPE);
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, TOTAL_LINE);
@@ -99,12 +108,12 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     /**
      * 保存个性化标签
      */
-    private void updateChannel(String channel){
-        TLog.error("channel--->"+channel);
+    private void updateChannel(String channel) {
+        TLog.error("channel--->" + channel);
         HashMap<String, Object> map = new HashMap<>();
-        map.put("userid","2iRIK06ghJJiWYXxnSklFLNsMSvsOU3S");
-        map.put("channel",channel);
-        HttpApis.updateChannel(map, HttpApis.http_two, new HttpCallback<>(ResponseChannel.class, this));
+        map.put("userid", "2iRIK06ghJJiWYXxnSklFLNsMSvsOU3S");
+        map.put("channel", channel);
+        HttpApis.updateChannel(map, HttpApis.http_two, new HttpCallback<>(String.class, this));
     }
 
     @Override
@@ -114,7 +123,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void rightClick() {
-        if (adapter.isCanDel){
+        if (adapter.isCanDel) {
 
             updateChannel(splitStr(channels));
         }
@@ -122,11 +131,11 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
         setEditorText(adapter.isCanDel);
     }
 
-    private String splitStr(List<ChannelModel> channelModels){
+    private String splitStr(List<ChannelModel> channelModels) {
         StringBuffer stringBuffer = new StringBuffer(1000);
-        for (int i = 0,length = channelModels.size();i<length;i++){
+        for (int i = 0, length = channelModels.size(); i < length; i++) {
             stringBuffer.append(channelModels.get(i).getFunName());
-            if (i != channelModels.size()-1){
+            if (i != channelModels.size() - 1) {
                 stringBuffer.append("|");
             }
         }
@@ -201,9 +210,25 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
                 initCateView();
                 break;
             case HttpApis.http_two:
-                Toast.makeText(this,"",Toast.LENGTH_SHORT).show();
+                try {
+
+                    JSONObject obj = new JSONObject((String) value);
+                    if (obj.has("head")) {
+                        JSONObject obj_head = obj.getJSONObject("head");
+                        RespHeader header = new Gson().fromJson(obj_head.toString(), RespHeader.class);
+                        if (header.getRspCode().equals(ResponseCode.Success)){
+                            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
                 break;
 
         }
     }
+
+
 }

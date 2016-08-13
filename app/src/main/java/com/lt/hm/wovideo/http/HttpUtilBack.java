@@ -8,4 +8,5 @@ public interface HttpUtilBack {
     void onBefore(String dialog);
     <T> void onSuccess(T value, int flag);
     void onFail();
+    void onAfter(int flag);
 }

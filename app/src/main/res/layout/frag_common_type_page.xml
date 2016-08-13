@@ -6,7 +6,7 @@
     android:background="@color/bg_new_color"
     android:orientation="vertical">
 
-    <ScrollView
+    <com.lt.hm.wovideo.widget.FastScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -34,7 +34,7 @@
                 </com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader>
             </FrameLayout>
         </LinearLayout>
-    </ScrollView>
+    </com.lt.hm.wovideo.widget.FastScrollView>
 
 
 </android.support.v4.widget.SwipeRefreshLayout>

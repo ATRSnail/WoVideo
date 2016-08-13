@@ -15,10 +15,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.adapter.home.Bottom_ListAdapter;
 import com.lt.hm.wovideo.adapter.home.FilmListAdapter;
 import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.adapter.recommend.GridAdapter;
@@ -26,13 +26,12 @@ import com.lt.hm.wovideo.adapter.recommend.LiveAdapter;
 import com.lt.hm.wovideo.base.BaseLazyFragment;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
+import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.BannerList;
 import com.lt.hm.wovideo.model.CateTagModel;
 import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.FilmMode;
-import com.lt.hm.wovideo.model.LikeList;
 import com.lt.hm.wovideo.model.LikeModel;
-import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.model.LocalCityModel;
 import com.lt.hm.wovideo.model.RecomList;
 import com.lt.hm.wovideo.model.response.ResponseBanner;
@@ -46,6 +45,7 @@ import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.CustomGridView;
 import com.lt.hm.wovideo.widget.CustomListView;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
+import com.yyydjk.library.BannerLayout;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +53,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * Created by xuchunhui on 16/8/8.
@@ -100,11 +101,14 @@ public class CommonTypePage extends BaseLazyFragment {
     View titleRl;
     @BindView(R.id.lv_live)
     CustomListView liveLv;
+    @BindView(R.id.banner)
+    BannerLayout bannerLayout;
 
     private boolean isOnline = true;
     private LiveAdapter liveAdapter;
     private Context context;
     private boolean isHasView = false;//防止重复加载view
+    Unbinder unbinder;
 
     public static CommonTypePage getInstance(ChannelModel channel) {
         CommonTypePage common = new CommonTypePage();
@@ -124,7 +128,7 @@ public class CommonTypePage extends BaseLazyFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (!isHasView) {
             view = inflater.inflate(getLayoutId(), container, false);
-            ButterKnife.bind(this, view);
+            unbinder= ButterKnife.bind(this, view);
         }
         //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
         ViewGroup parent = (ViewGroup) view.getParent();
@@ -216,6 +220,23 @@ public class CommonTypePage extends BaseLazyFragment {
     }
 
 
+    private void addBannerView(List<BannerList.Banner> mList)
+    {
+        bannerLayout.setVisibility(View.VISIBLE);
+        List<String> strings= new ArrayList<>();
+        for (int i = 0; i < mList.size(); i++) {
+            strings.add(HttpUtils.appendUrl(mList.get(i).getImg()));
+        }
+        bannerLayout.setViewUrls(strings);
+        //添加点击监听
+        bannerLayout.setOnBannerItemClickListener(new BannerLayout.OnBannerItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                // TODO: 8/13/16 跳转页面
+                Toast.makeText(getActivity(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     /**
      * 添加bar滚动
      *
@@ -236,6 +257,7 @@ public class CommonTypePage extends BaseLazyFragment {
                 // TODO: 16/6/29 跳转页面
             }
         });
+
     }
 
     /*
@@ -347,7 +369,8 @@ public class CommonTypePage extends BaseLazyFragment {
                 ResponseBanner responseBar = (ResponseBanner) value;
                 banner_list = responseBar.getBody().getBannerList();
                 if (banner_list == null || banner_list.size() == 0) return;
-                addBarView(banner_list);
+//                addBarView(banner_list);
+                addBannerView(banner_list);
                 break;
             case HttpApis.http_thr://获取like列表
                 ResponseLikeList re = (ResponseLikeList) value;
@@ -381,4 +404,11 @@ public class CommonTypePage extends BaseLazyFragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (unbinder!=null){
+            unbinder.unbind();
+        }
+    }
 }

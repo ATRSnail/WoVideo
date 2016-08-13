@@ -43,7 +43,8 @@ public class VipItemAdapter extends BaseQuickAdapter<VideoList.TypeListBean> {
 //        }
         //Grid
         if (!StringUtils.isNullOrEmpty(typeListBean.getTag())&&typeListBean.getTag().equals("0")){
-            baseViewHolder.setText(R.id.item_desc, typeListBean.getDesc());
+//            baseViewHolder.setText(R.id.item_desc, typeListBean.getDesc());
+            baseViewHolder.setText(R.id.item_desc, typeListBean.getHit());
             TextView  text = (TextView) baseViewHolder.convertView.findViewById(R.id.item_title);
             text.setPadding(0,0,0,0);
             text.setGravity(Gravity.CENTER);
@@ -57,10 +58,12 @@ public class VipItemAdapter extends BaseQuickAdapter<VideoList.TypeListBean> {
 //                baseViewHolder.setImageResource(R.id.home_item_img_bg, R.drawable.img_4);
             }
         }else{
-            baseViewHolder.setText(R.id.item_desc, typeListBean.getDesc());
+            baseViewHolder.setText(R.id.item_desc, typeListBean.getHit());
+            baseViewHolder.setVisible(R.id.item_type_container,true);
+            baseViewHolder.setText(R.id.item_type,typeListBean.getLx());
             baseViewHolder.setVisible(R.id.item_desc,true);
-            if (typeListBean.gethIMG() != null) {
-                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(typeListBean.gethIMG())).build());
+            if (typeListBean.getHImg() != null) {
+                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(typeListBean.getHImg())).build());
 //                baseViewHolder.setImageUrl(R.id.home_item_img_bg, HttpUtils.appendUrl(typeListBean.gethIMG()));
             } else {
 //                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(view).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(typeListBean.gethIMG())).build());

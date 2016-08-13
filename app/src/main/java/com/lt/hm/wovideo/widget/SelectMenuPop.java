@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
@@ -151,10 +150,15 @@ public class SelectMenuPop extends PopupWindow {
             radiobutton.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
             radiobutton.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
+                    radiobutton.setTextColor(context.getResources().getColor(R.color.white));
+                    radiobutton.setBackgroundColor(Color.parseColor("#FF2eaff3"));
                     if (listener != null) {
                         TLog.log(key + "::::" + key_name);
                         listener.clickListener(key, key_name);
                     }
+                }else{
+                    radiobutton.setTextColor(context.getResources().getColor(R.color.black));
+                    radiobutton.setBackgroundColor(context.getResources().getColor(android.R.color.transparent));
                 }
             });
             group.addView(radiobutton);

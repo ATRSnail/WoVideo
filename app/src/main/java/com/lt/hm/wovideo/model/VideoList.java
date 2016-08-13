@@ -37,6 +37,27 @@ public class VideoList {
         private String introduction;// 简介
         private String desc;
         private String tag;
+        private String hit;
+        private String copyrightImg;
+
+        private String hImg;
+        private String lx;
+        private String typeName;
+        private String cpId;
+        private String nd;
+        private String dq;
+        private String cpname;
+        private String fname;
+        private String sx;
+
+
+        public String getHit() {
+            return hit;
+        }
+
+        public void setHit(String hit) {
+            this.hit = hit;
+        }
 
         public String getTag() {
             return tag;
@@ -185,7 +206,80 @@ public class VideoList {
                     ", introduction='" + introduction + '\'' +
                     ", desc='" + desc + '\'' +
                     ", tag='" + tag + '\'' +
+                    ", hit='" + hit + '\'' +
                     '}';
+        }
+
+        public String getHImg() {
+            return hImg;
+        }
+
+        public void setHImg(String hImg) {
+            this.hImg = hImg;
+        }
+
+        public String getLx() {
+            return lx;
+        }
+
+        public void setLx(String lx) {
+            this.lx = lx;
+        }
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public void setTypeName(String typeName) {
+            this.typeName = typeName;
+        }
+
+        public String getCpId() {
+            return cpId;
+        }
+
+        public void setCpId(String cpId) {
+            this.cpId = cpId;
+        }
+
+        public String getNd() {
+            return nd;
+        }
+
+        public void setNd(String nd) {
+            this.nd = nd;
+        }
+
+        public String getDq() {
+            return dq;
+        }
+
+        public void setDq(String dq) {
+            this.dq = dq;
+        }
+
+        public String getCpname() {
+            return cpname;
+        }
+
+        public void setCpname(String cpname) {
+            this.cpname = cpname;
+        }
+
+        public String getFname() {
+            return fname;
+        }
+
+        public void setFname(String fname) {
+            this.fname = fname;
+        }
+
+        public String getSx() {
+            return sx;
+        }
+
+        public void setSx(String sx) {
+            this.sx = sx;
         }
     }
 }

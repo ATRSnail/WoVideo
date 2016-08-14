@@ -16,18 +16,17 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
+import com.lt.hm.wovideo.handler.UserHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.ImageUtils;
-import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -111,14 +110,11 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
     }
 
     private void initPersonInfo() {
-//        String string = ACache.get(this).getAsString("userinfo");
-        String  string= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-//        headIcon.setImageBitmap(ImageUtils.getBitmap(getApplicationContext(),protraitPath));
+        UserModel model = UserHandler.getUserInfo(PersonCenter.this);
         if (FILE_SAVEPATH!=null){
             Glide.with(this).load(ACache.get(this).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
         }
-        if (!StringUtils.isNullOrEmpty(string)){
-            UserModel model = new Gson().fromJson(string,UserModel.class);
+        if (model!=null){
             if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
                 TLog.log(HttpUtils.appendUrl(model.getHeadImg().toString()));
                 Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(headIcon);
@@ -177,15 +173,12 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
             case R.id.head_icon:
                 // TODO: 16/6/6  变更头像 上传头像
 //                String user = ACache.get(getApplicationContext()).getAsString("userinfo");
-                String  user= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-
-                if (StringUtils.isNullOrEmpty(user)){
-                    UnLoginHandler.unLogin(PersonCenter.this);
-//                    Toast.makeText(this, getResources().getString(R.string.no_login_toast), Toast.LENGTH_SHORT).show();
-                }else {
-//                    UserModel model= new Gson().fromJson(user,UserModel.class);
+                if (UserHandler.isLogin(PersonCenter.this)){
                     handleSelectPicture();
+                }else{
+                    UnLoginHandler.unLogin(PersonCenter.this);
                 }
+
                 break;
             case R.id.login_tag:
                 UIHelper.ToLogin(this);
@@ -205,12 +198,10 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.collect:
                 // TODO: 16/6/6 我的收藏
-                String  user_collect= SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-                if (StringUtils.isNullOrEmpty(user_collect)){
-                    UnLoginHandler.unLogin(PersonCenter.this);
-                }else{
+                if (UserHandler.isLogin(PersonCenter.this)){
                     UIHelper.ToCollectPage(this);
                 }
+
                 break;
             case R.id.btn_person_back:
                 PersonCenter.this.finish();
@@ -361,7 +352,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
             String img64= ImageUtils.imgToBase64(protraitFile.getAbsolutePath(),protraitBitmap,"JPG");
             HashMap<String,Object> map= new HashMap<>();
             String string = ACache.get(this).getAsString("userinfo");
-            map.put("phone",new Gson().fromJson(string,UserModel.class).getPhoneNo());
+            map.put("phone",UserHandler.getUserInfo(PersonCenter.this).getPhoneNo());
             map.put("base","image/jpg;base64,"+img64);
             TLog.log(map.toString());
             HttpApis.uploadHeadImg(map, new StringCallback() {

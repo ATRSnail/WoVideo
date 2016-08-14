@@ -41,6 +41,7 @@ import com.lt.hm.wovideo.widget.CircleImageView;
 import com.lt.hm.wovideo.widget.SpaceItemDecoration;
 import com.lt.hm.wovideo.widget.indicatorView.AutoPlayManager;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
+import com.yyydjk.library.BannerLayout;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
@@ -76,6 +77,8 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
     SwipeRefreshLayout swipe_refresh;
     @BindView(R.id.recommend_container)
     LinearLayout recommend_container;
+    @BindView(R.id.banner)
+    BannerLayout bannerLayout;
     List<BannerList.Banner> banner_list;
     AutoPlayManager autoPlayManager;
 
@@ -197,6 +200,13 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
                     TLog.log(resp.toString());
                     List<BannerList.Banner> mList = resp.getBody().getBannerList();
                     banner_list.addAll(mList);
+                    List<String> urlList = new ArrayList<String>();
+
+                    for (int i = 0; i <mList.size() ; i++) {
+                        urlList.add(HttpUtils.appendUrl(mList.get(i).getImg()));
+                    }
+                    bannerLayout.setViewUrls(urlList);
+
                     imgIndicatorVip.setupLayoutByURL(mList);
                     imgIndicatorVip.setIndicateStyle(ImageIndicatorView.INDICATE_USERGUIDE_STYLE);
                     imgIndicatorVip.show();

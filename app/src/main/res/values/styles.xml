@@ -14,7 +14,10 @@
         <item name="android:windowAnimationStyle">@style/activityAnimation</item>
 
     </style>
-
+    <style name="Theme.AppStartLoadTranslucent" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
 
     <style name="Theme.IndicatorDefault" parent="android:Theme">
         <item name="tabView">@style/TabView</item>

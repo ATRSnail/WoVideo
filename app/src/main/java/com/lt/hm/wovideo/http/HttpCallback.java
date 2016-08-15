@@ -1,5 +1,7 @@
 package com.lt.hm.wovideo.http;
 
+import android.text.TextUtils;
+
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.utils.TLog;
 import com.zhy.http.okhttp.callback.Callback;
@@ -53,13 +55,20 @@ public class HttpCallback<T> extends StringCallback {
         if (clazz == String.class) {
             httpUtilBack.onSuccess(response, id);
         } else {
-            ResponseObj bean = (ResponseObj) new Gson().fromJson(response, clazz);
-            if (((RespHeader)bean.getHead()).getRspCode().equals(ResponseCode.Success)) {
-                TLog.error("onResponse==bean==" + bean.toString());
-                httpUtilBack.onSuccess(bean, id);
-            } else {
+            TLog.error("str---->"+response);
+            try {
+                ResponseObj bean = (ResponseObj) new Gson().fromJson(response, clazz);
+                if (((RespHeader)bean.getHead()).getRspCode().equals(ResponseCode.Success)) {
+                    TLog.error("onResponse==bean==" + bean.toString());
+                    httpUtilBack.onSuccess(bean, id);
+                } else {
+                    httpUtilBack.onFail();
+                }
+            }catch (Exception e){
+                e.printStackTrace();
                 httpUtilBack.onFail();
             }
+
         }
     }
 }

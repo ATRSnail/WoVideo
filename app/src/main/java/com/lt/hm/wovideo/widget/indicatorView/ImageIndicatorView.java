@@ -2,6 +2,7 @@ package com.lt.hm.wovideo.widget.indicatorView;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.media.Image;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
@@ -17,6 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
@@ -177,6 +179,33 @@ public class ImageIndicatorView extends RelativeLayout {
 				final View pageItem = new ImageView(getContext());
 				pageItem.setBackgroundResource(resList.get(index));
 				addViewItem(pageItem);
+			}
+		}
+	}
+
+	public void setupLayoutByClass(List<BannerList.Banner> resList) {
+		if (resList == null)
+			throw new NullPointerException();
+		if (this.viewList.size() > 0) {
+			this.viewList.clear();
+		}
+		if (this.indicateLayout.getChildCount() > 0) {
+			this.indicateLayout.removeAllViews();
+		}
+		final int len = resList.size();
+		if (len > 0) {
+			for (int index = 0; index < len; index++) {
+				BannerList.Banner bar = resList.get(index);
+				View view = inflate(getContext(),R.layout.layout_new_home_item,null);
+				TextView title = (TextView) view.findViewById(R.id.item_title);
+				ImageView imageView = (ImageView) view.findViewById(R.id.item_img_bg);
+				TextView item_type = (TextView) view.findViewById(R.id.item_type);
+				TextView item_desc = (TextView) view.findViewById(R.id.item_desc);
+				title.setText(bar.getVfName());
+				ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(imageView).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(bar.getImg())).build());
+				item_type.setText(bar.getTypeName());
+				item_desc.setText(bar.getHit());
+				addViewItem(view);
 			}
 		}
 	}

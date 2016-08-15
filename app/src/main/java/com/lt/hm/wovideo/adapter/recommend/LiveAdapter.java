@@ -17,6 +17,11 @@ import java.util.List;
 public class LiveAdapter extends CommonAdapter<LocalCityModel> {
 
 
+    public void notifyView(List<LocalCityModel> list){
+        this.mDatas = list;
+        notifyDataSetChanged();
+    }
+
     public LiveAdapter(Context context, List<LocalCityModel> datas, int layoutId) {
         super(context, datas, layoutId);
     }

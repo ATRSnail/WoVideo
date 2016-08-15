@@ -82,18 +82,18 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
         super.initView(view);
         vipSelector.setOnClickListener((View v) -> {
             if (CURRENT_POSITION != -1 && CURRENT_POSITION != 0) {
-                SelectMenuPop pop = new SelectMenuPop(getActivity(),CURRENT_POSITION);
-                pop.showPopupWindow(vipViewIndicator,shown);
-                pop.setListener(new SelectMenuPop.OnRadioClickListener() {
-                    @Override
-                    public void clickListener(String key, String value) {
-                        // TODO: 16/7/8 刷新Fragment  根据条件
-                        // TODO: 16/7/8  动态控制 当前显示 的筛选菜单
-
-//                        SearchChecked(key, value);
-//                        listener.onChoosen(key, value);
-                    }
-                });
+//                SelectMenuPop pop = new SelectMenuPop(getActivity(),CURRENT_POSITION);
+//                pop.showPopupWindow(vipViewIndicator,shown);
+//                pop.setListener(new SelectMenuPop.OnRadioClickListener() {
+//                    @Override
+//                    public void clickListener(String key, String value) {
+//                        // TODO: 16/7/8 刷新Fragment  根据条件
+//                        // TODO: 16/7/8  动态控制 当前显示 的筛选菜单
+//
+////                        SearchChecked(key, value);
+////                        listener.onChoosen(key, value);
+//                    }
+//                });
             }
 
         });

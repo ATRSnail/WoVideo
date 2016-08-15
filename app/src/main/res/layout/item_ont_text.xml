@@ -11,6 +11,7 @@
         android:background="@color/float_transparent"
         android:gravity="center_vertical"
         android:paddingLeft="12dp"
+        android:visibility="gone"
         android:text="AA"
         android:textColor="@color/grey_place_title_color"
         android:textSize="12sp" />
@@ -20,6 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="35dp"
         android:paddingLeft="15dp"
+        android:visibility="gone"
         android:gravity="center_vertical"
         android:background="@color/white"
         android:textColor="@color/class_font_color"

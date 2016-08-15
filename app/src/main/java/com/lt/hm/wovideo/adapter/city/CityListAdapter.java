@@ -28,7 +28,8 @@ public class CityListAdapter extends BaseQuickAdapter<City> {
 
 	@Override
 	protected void convert(BaseViewHolder holder, City city) {
-     holder.setText(R.id.text_place,city.getCity());
+     holder.setText(R.id.text_place,city.getCity().replaceAll("[^\u4E00-\u9FA5]",""));
+		holder.getView(R.id.text_place).setVisibility(View.VISIBLE);
 		int section = indexer.getSectionForPosition(holder.getLayoutPosition());
 		if (holder.getLayoutPosition() == indexer.getPositionForSection(section)) {
 			holder.setText(R.id.sort_key,Character.toUpperCase(city.pyOne.charAt(0)) + "");

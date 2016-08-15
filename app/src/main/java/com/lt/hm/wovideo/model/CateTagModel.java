@@ -1,10 +1,12 @@
 package com.lt.hm.wovideo.model;
 
+import java.io.Serializable;
+
 /**
  * 电影,电视剧标签
  * Created by xuchunhui on 16/8/12.
  */
-public class CateTagModel {
+public class CateTagModel implements Serializable{
 
 
     /**
@@ -25,10 +27,9 @@ public class CateTagModel {
     private String code;
     private long ctime;
 
-    public CateTagModel(String name, String code, int parent) {
+    public CateTagModel(String name, int id) {
         this.name = name;
-        this.code = code;
-        this.parent = parent;
+        this.id = id;
     }
 
     public int getId() {

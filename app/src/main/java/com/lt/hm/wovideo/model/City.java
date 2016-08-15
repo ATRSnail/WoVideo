@@ -1,9 +1,11 @@
 package com.lt.hm.wovideo.model;
 
+import java.io.Serializable;
+
 /**
  * Created by xuchunhui on 16/8/10.
  */
-public class City{
+public class City implements Serializable{
 
 
     /**
@@ -100,5 +102,19 @@ public class City{
         this.pyOne = pyOne;
     }
 
+    @Override
+    public String toString() {
+        return "City{" +
+                "city='" + city + '\'' +
+                ", code='" + code + '\'' +
+                ", pr='" + pr + '\'' +
+                ", prPyAll='" + prPyAll + '\'' +
+                ", prPyHead='" + prPyHead + '\'' +
+                ", prPyOne='" + prPyOne + '\'' +
+                ", pyAll='" + pyAll + '\'' +
+                ", pyHead='" + pyHead + '\'' +
+                ", pyOne='" + pyOne + '\'' +
+                '}';
+    }
 }
 

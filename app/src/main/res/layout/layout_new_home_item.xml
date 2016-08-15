@@ -7,7 +7,8 @@
         android:id="@+id/item_img_bg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
+        android:layout_marginTop="1dp"
+        android:scaleType="fitXY"
         android:src="@drawable/img_4" />
 
     <RelativeLayout
@@ -35,6 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/item_title"
+            android:layout_marginTop="15dp"
             android:gravity="center"
             android:orientation="horizontal">
 
@@ -69,7 +71,7 @@
                     android:singleLine="true"
                     android:text="TITLE"
                     android:textColor="@android:color/white"
-                    android:textSize="@dimen/sp_14" />
+                    android:textSize="@dimen/sp_12" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -105,7 +107,7 @@
                     android:singleLine="true"
                     android:text="DESC"
                     android:textColor="@android:color/white"
-                    android:textSize="@dimen/sp_14" />
+                    android:textSize="@dimen/sp_12" />
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

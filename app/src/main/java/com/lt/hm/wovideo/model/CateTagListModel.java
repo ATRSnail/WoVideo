@@ -1,11 +1,12 @@
 package com.lt.hm.wovideo.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by xuchunhui on 16/8/12.
  */
-public class CateTagListModel {
+public class CateTagListModel implements Serializable{
 
     private List<CateTagModel> nd;
     private List<CateTagModel> dq;

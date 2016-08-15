@@ -38,6 +38,8 @@ import com.amap.api.location.AMapLocationListener;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.fragment.ClassPage;
+import com.lt.hm.wovideo.fragment.LivePageFragment;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.interf.OnTabReselectListener;
 import com.lt.hm.wovideo.model.UserModel;
@@ -348,7 +350,7 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 
 	@Override
 	public void onTabChanged(String tabId) {
-		if (tabId.equals("推荐")) {
+		if (tabId.equals("精选")) {
 			commonHeadLayout.setVisibility(View.GONE);
 			choiceHeadLayout.setVisibility(View.VISIBLE);
 		} else {

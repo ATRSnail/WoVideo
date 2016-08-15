@@ -1,5 +1,7 @@
 package com.lt.hm.wovideo.ui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -25,9 +27,12 @@ import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.CateTagListModel;
+import com.lt.hm.wovideo.model.CateTagModel;
 import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoList;
 import com.lt.hm.wovideo.model.VideoType;
+import com.lt.hm.wovideo.model.response.ResponseCateTag;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -51,22 +56,11 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 16/7/3
  */
-public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myTopbarClicklistenter, SwipeRefreshLayout.OnRefreshListener{
+public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myTopbarClicklistenter, SwipeRefreshLayout.OnRefreshListener {
 
-    String[] movie_type_names = new String[]{
-            "全部", "剧情", "喜剧", "动作", "恐怖", "动画", "武侠", "警匪", "战争", "爱情",
-            "科幻", "奇幻", "犯罪", "冒险", "灾难", "伦理", "传记", "家庭", "记录", "惊悚", "历史",
-            "悬疑"
-    };
-    String[] teleplay_type_names = new String[]{
-            "全部", "古装", "武侠", "警匪", "战争", "神话", "科幻", "悬疑", "历史", "爱情", "喜剧", "都市", "农村", "奇幻", "其他"
-    };
-    String[] varity_type_names = new String[]{
-            "全部", "情感", "访谈", "真人秀", "选秀", "生活", "时尚", "美食", "纪实", "文化", "曲艺", "演唱会"
-    };
-    String[] sport_type_names = new String[]{
-            "全部", "NBA", "CBA", "中国女篮", "英超", "西甲	", "意甲", "德甲", "欧冠", "中超", "国际足球", "亚冠", "综合", "体育", "网球", "世界杯", "欧洲杯", "奥运会", "竞	速", "格斗", "电子竞技", "排球", "极限", "其他"
-    };
+    private static final String CATE_TAG = "cate_tag";
+    private static final String CATETAG_MOdEl = "CateTagModel";
+    private static final String CHANNEK_CODE = "channel_code";
 
     @BindView(R.id.class_details_topbar)
     SecondTopbar classDetailsTopbar;
@@ -75,6 +69,9 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     @BindView(R.id.empty_view)
     Button empty_view_button;
     List<VideoList.TypeListBean> b_list;
+    private CateTagListModel cateTagListModel;
+    private CateTagModel cateTagModel;
+    private int channelCode;
     VipItemAdapter bottom_adapter;
     int pageNum = 1;
     int pageSize = 60;
@@ -92,6 +89,17 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     private boolean shown = false;
     SelectMenuPop pop;
     GridLayoutManager manager;
+
+    public static void getInstance(Context context, CateTagModel cateTagModel, int channelCode,CateTagListModel cateTagListModel) {
+        Intent intent = new Intent(context, NewClassDetailPage.class);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(CATE_TAG, cateTagListModel);
+        bundle.putSerializable(CATETAG_MOdEl, cateTagModel);
+        bundle.putInt(CHANNEK_CODE,channelCode);
+        intent.putExtras(bundle);
+        context.startActivity(intent);
+    }
+
     @Override
     protected int getLayoutId() {
         return R.layout.layout_new_class_details;
@@ -106,7 +114,6 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     @Override
     protected void init(Bundle savedInstanceState) {
 
-
         manager = new GridLayoutManager(NewClassDetailPage.this, 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
         int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.divider_width);
@@ -118,95 +125,93 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 android.R.color.holo_orange_light, android.R.color.holo_red_light);
         Bundle bundle = getIntent().getExtras();
         if (bundle == null) return;
-        if (bundle.containsKey("key")) {
-            String title = bundle.getString("key");
-            classDetailsTopbar.setTvTitle(title);
+        if (bundle.containsKey(CATETAG_MOdEl)) {
+            cateTagModel = (CateTagModel) bundle.getSerializable(CATETAG_MOdEl);
+            assert cateTagModel != null;
+            classDetailsTopbar.setTvTitle(cateTagModel.getName());
+            mId = cateTagModel.getId();
         }
-        if (bundle.containsKey("id")) {
-            String id = bundle.getString("id");
-            if (!StringUtils.isNullOrEmpty(id)) {
-                mId = Integer.parseInt(id);
-             //   classDetailsSpinner.setSelection(mId - 1);
-            }
-//            classDetailsSpinner.setGravity(Gravity.CENTER_HORIZONTAL);
+        if (bundle.containsKey(CATE_TAG)) {
+            cateTagListModel = (CateTagListModel) bundle.getSerializable(CATE_TAG);
+            TLog.error("response--->"+cateTagListModel.toString());
+        }
+        if (bundle.containsKey(CHANNEK_CODE)){
+            channelCode = bundle.getInt(CHANNEK_CODE);
         }
     }
 
-    private void addHeadTypeView() {
-        RadioGroup group = new RadioGroup(this);
-        group.setOrientation(RadioGroup.HORIZONTAL);
-        Map<String, String> values = new LinkedHashMap<>();
-        if (mId == VideoType.MOVIE.getId()) {
-            for (int i = 0; i < movie_type_names.length; i++) {
-                values.put(i + "", movie_type_names[i]);
-            }
-        } else if (mId == VideoType.TELEPLAY.getId()) {
-            for (int i = 0; i < teleplay_type_names.length; i++) {
-                values.put(i + "", teleplay_type_names[i]);
-            }
-        } else if (mId == VideoType.VARIATY.getId()) {
-            for (int i = 0; i < varity_type_names.length; i++) {
-                values.put(i + "", varity_type_names[i]);
-            }
-        } else if (mId == VideoType.SPORTS.getId()) {
-            for (int i = 0; i < sport_type_names.length; i++) {
-                values.put(i + "", sport_type_names[i]);
-            }
-        }
-        if (values.size() > 0) {
-            Set<String> keys = values.keySet();
-            for (String key_name :
-                    keys) {
-                RadioButton radiobutton = new RadioButton(this);
-                radiobutton.setBackgroundDrawable(getResources().getDrawable(R.drawable.anthology_selector));
-                LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params1.leftMargin = 20;
-                params1.gravity = Gravity.CENTER;
-                radiobutton.setLayoutParams(params1);
-                radiobutton.setPadding(20, 0, 20, 0);
-                radiobutton.setButtonDrawable(null);
-                radiobutton.setText(values.get(key_name));
-                radiobutton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if (isChecked) {
-                            SearchChecked("类型", key_name);
-                        }
-                    }
-                });
-                group.addView(radiobutton);
-                //防止选中两个
-                if (radiobutton.getText().toString().equals("全部")) {
-                    group.check(radiobutton.getId());
-                }
-            }
-        }
-    }
+//    private void addHeadTypeView() {
+//        RadioGroup group = new RadioGroup(this);
+//        ndCates = responseCateTag.getBody().getNd();
+//        group.setOrientation(RadioGroup.HORIZONTAL);
+//        Map<String, String> values = new LinkedHashMap<>();
+//        if (mId == VideoType.MOVIE.getId()) {
+//            for (int i = 0; i < movie_type_names.length; i++) {
+//                values.put(i + "", movie_type_names[i]);
+//            }
+//        } else if (mId == VideoType.TELEPLAY.getId()) {
+//            for (int i = 0; i < teleplay_type_names.length; i++) {
+//                values.put(i + "", teleplay_type_names[i]);
+//            }
+//        } else if (mId == VideoType.VARIATY.getId()) {
+//            for (int i = 0; i < varity_type_names.length; i++) {
+//                values.put(i + "", varity_type_names[i]);
+//            }
+//        } else if (mId == VideoType.SPORTS.getId()) {
+//            for (int i = 0; i < sport_type_names.length; i++) {
+//                values.put(i + "", sport_type_names[i]);
+//            }
+//        }
+//        if (values.size() > 0) {
+//            Set<String> keys = values.keySet();
+//            for (String key_name : keys) {
+//                RadioButton radiobutton = new RadioButton(this);
+//                radiobutton.setBackgroundDrawable(getResources().getDrawable(R.drawable.anthology_selector));
+//                LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+//                params1.leftMargin = 20;
+//                params1.gravity = Gravity.CENTER;
+//                radiobutton.setLayoutParams(params1);
+//                radiobutton.setPadding(20, 0, 20, 0);
+//                radiobutton.setButtonDrawable(null);
+//                radiobutton.setText(values.get(key_name));
+//                radiobutton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//                    @Override
+//                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                        if (isChecked) {
+//                            SearchChecked("类型", key_name);
+//                        }
+//                    }
+//                });
+//                group.addView(radiobutton);
+//                //防止选中两个
+//                if (radiobutton.getText().toString().equals("全部")) {
+//                    group.check(radiobutton.getId());
+//                }
+//            }
+//        }
+//    }
 
     @Override
     public void initViews() {
-        pop = new SelectMenuPop(this, mId);
+        pop = new SelectMenuPop(this, channelCode, cateTagListModel);
+
         b_list = new ArrayList<>();
-
-        addHeadTypeView();
-//        classDetailsTopbar.setTvTitle("电影");
         classDetailsTopbar.setRightIsVisible(true);
-        classDetailsTopbar.setRightImageResource(R.drawable.icon_choosen);
+        classDetailsTopbar.setRightImageResource(R.drawable.icon_choosen_black);
         classDetailsTopbar.setOnTopbarClickListenter(this);
-
     }
 
     @Override
     public void initDatas() {
-        getListDatas(mId);
+        getListDatas();
     }
 
-    private void getListDatas(int id) {
+    private void getListDatas() {
         if (b_list != null && b_list.size() > 0) {
             b_list.clear();
         }
         HashMap<String, Object> map = new HashMap<>();
-        map.put("typeid", id);
+        map.put("channelCode", mId);
         map.put("pageNum", pageNum);
 //        map.put("channelCode",id);// 用户频道Code
         map.put("numPerPage", pageSize);
@@ -228,8 +233,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                 ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     b_list.addAll(resp.getBody().getTypeList());
-                    if (b_list == null || b_list.size() == 0||empty_view_button==null) {
-                        if (classDetailsList!=null){
+                    if (b_list == null || b_list.size() == 0 || empty_view_button == null) {
+                        if (classDetailsList != null) {
                             classDetailsList.setVisibility(View.INVISIBLE);
                         }
 //                        empty_view_button.setVisibility(View.VISIBLE);
@@ -240,7 +245,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                         b_list.get(i).setDesc(b_list.get(i).getIntroduction());
                     }
                     if (b_list != null && b_list.size() > 0) {
-                        if (classDetailsList==null)return;
+                        if (classDetailsList == null) return;
                         classDetailsList.setVisibility(View.VISIBLE);
 
                         bottom_adapter = new VipItemAdapter(getApplicationContext(), b_list);
@@ -268,7 +273,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                         });
 
                     } else {
-                        if (classDetailsList==null)return;
+                        if (classDetailsList == null) return;
                         classDetailsList.setVisibility(View.INVISIBLE);
                     }
                 }
@@ -301,26 +306,26 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                         // TODO: 16/6/14 跳转电影页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.MOVIE.getId());
+                        bundle.putInt("typeId", VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(NewClassDetailPage.this, bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
                         // TODO: 16/6/14 跳转电视剧页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+                        bundle.putInt("typeId", VideoType.TELEPLAY.getId());
                         UIHelper.ToDemandPage(NewClassDetailPage.this, bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
                         // TODO: 16/6/14 跳转 体育播放页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.SPORTS.getId());
+                        bundle.putInt("typeId", VideoType.SPORTS.getId());
 //                        UIHelper.ToMoviePage(NewClassDetailPage.this, bundle);
                         UIHelper.ToDemandPage(NewClassDetailPage.this, bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
                         // TODO: 16/6/14 跳转综艺界面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.VARIATY.getId());
+                        bundle.putInt("typeId", VideoType.VARIATY.getId());
                         UIHelper.ToDemandPage(NewClassDetailPage.this, bundle);
                     }
                 }
@@ -335,7 +340,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
 
     @Override
     public void rightClick() {
-        pop.updateMenu(getApplicationContext(),mId);
+        pop.updateMenu(getApplicationContext(), channelCode, cateTagListModel);
         pop.showPopupWindow(classDetailsTopbar, shown);
         pop.setListener(new SelectMenuPop.OnRadioClickListener() {
             @Override
@@ -387,7 +392,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         if (b_list != null && b_list.size() > 0) {
             b_list.clear();
         }
-        getListDatas(mId);
+        getListDatas();
 
     }
 
@@ -396,7 +401,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         if (b_list != null && b_list.size() > 0) {
             b_list.clear();
         }
-        getListDatas(mId);
+        getListDatas();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -407,11 +412,11 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         }, 3000);
     }
 
-    private void clearTmp(){
-        lx="";
-        sx="";
-        dq="";
-        nd="";
+    private void clearTmp() {
+        lx = "";
+        sx = "";
+        dq = "";
+        nd = "";
     }
 
     @Override

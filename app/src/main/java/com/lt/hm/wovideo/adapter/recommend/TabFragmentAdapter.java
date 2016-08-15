@@ -4,6 +4,9 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.view.ViewGroup;
+
+import com.lt.hm.wovideo.utils.TLog;
 
 import java.util.List;
 
@@ -24,6 +27,12 @@ public class TabFragmentAdapter extends FragmentPagerAdapter {
         this.titles = titles;
     }
 
+    public void notityView(List<String> titles,List<Fragment> fragments){
+        this.titles = titles;
+        this.fragments = fragments;
+        TLog.error("titles--->"+titles.toString());
+        notifyDataSetChanged();
+    }
 
     @Override
     public Fragment getItem(int position) {

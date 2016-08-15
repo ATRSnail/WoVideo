@@ -33,6 +33,9 @@ public class BannerList {
         private String ctime;
         private String outid;//跳转 视频播放页，使用 该ID outid
         private String isvip;
+        private String vfName;
+        private  String hit;
+        private String typeName;
 
         public String getId() {
             return id;
@@ -90,17 +93,28 @@ public class BannerList {
             this.isvip = isvip;
         }
 
-        @Override
-        public String toString() {
-            return "Banner{" +
-                    "id='" + id + '\'' +
-                    ", utime='" + utime + '\'' +
-                    ", img='" + img + '\'' +
-                    ", type='" + type + '\'' +
-                    ", ctime='" + ctime + '\'' +
-                    ", outid='" + outid + '\'' +
-                    ", isvip='" + isvip + '\'' +
-                    '}';
+        public String getVfName() {
+            return vfName;
+        }
+
+        public void setVfName(String vfName) {
+            this.vfName = vfName;
+        }
+
+        public String getHit() {
+            return hit;
+        }
+
+        public void setHit(String hit) {
+            this.hit = hit;
+        }
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public void setTypeName(String typeName) {
+            this.typeName = typeName;
         }
     }
 }

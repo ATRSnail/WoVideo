@@ -1,7 +1,9 @@
 package com.lt.hm.wovideo.fragment;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.AssetManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
@@ -21,6 +23,7 @@ import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.interf.OnPlaceChangeListener;
 import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.TypeList;
 import com.lt.hm.wovideo.model.VideoType;
@@ -51,7 +54,7 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 8/2/16
  */
-public class NewChoicePage extends BaseFragment {
+public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener{
     Unbinder unbinder;
     @BindView(R.id.tablayout)
     TabLayout tabLayout;
@@ -81,11 +84,11 @@ public class NewChoicePage extends BaseFragment {
     }
 
     private void getClassInfos() {
-
         HashMap<String, Object> map = new HashMap<>();
         HttpApis.getIndividuationChannel(map,HttpApis.http_one,new HttpCallback<>(ResponseChannel.class, this));
     }
 
+    @TargetApi(Build.VERSION_CODES.M)
     private void initBottom() {
         fragments.clear();
         mTitles.clear();
@@ -95,6 +98,8 @@ public class NewChoicePage extends BaseFragment {
             bean = channels.get(i);
             mTitles.add(bean.getFunName());
             CommonTypePage page = CommonTypePage.getInstance(bean);
+            if (bean.getId() == ChannelModel.LOCAL_ID)
+                page.setOnPlaceChangeListener(this);
             fragments.add(page);
         }
 
@@ -105,7 +110,6 @@ public class NewChoicePage extends BaseFragment {
 
         tabLayout.setupWithViewPager(choiceViewPage);
         tabLayout.setTabsFromPagerAdapter(tabFragmentAdapter);
-
     }
 
     @Override
@@ -149,5 +153,11 @@ public class NewChoicePage extends BaseFragment {
                 initBottom();
                 break;
         }
+    }
+
+    @Override
+    public void onChangePlaceListener(String str) {
+        mTitles.set(1,str);
+        tabFragmentAdapter.notityView(mTitles,fragments);
     }
 }

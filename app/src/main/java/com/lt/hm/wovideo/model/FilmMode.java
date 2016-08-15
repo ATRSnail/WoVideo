@@ -9,6 +9,7 @@ public class FilmMode {
      * utime : 1468809257000
      * tag : 0002
      * isfree : 1
+     * hImg:/vfinfoimg/85ce914fa31a4e6d9f33a0a3b741f9ee.jpg
      * state : 1
      * img : /vfinfoimg/ca7b225d4863477e825b595f027baf58.jpg
      * director : 沈东
@@ -35,6 +36,7 @@ public class FilmMode {
     private long utime;
     private String tag;
     private String isfree;
+    private String hImg;
     private String state;
     private String img;
     private String director;
@@ -67,6 +69,14 @@ public class FilmMode {
 
     public String getTag() {
         return tag;
+    }
+
+    public String gethImg() {
+        return hImg;
+    }
+
+    public void sethImg(String hImg) {
+        this.hImg = hImg;
     }
 
     public void setTag(String tag) {

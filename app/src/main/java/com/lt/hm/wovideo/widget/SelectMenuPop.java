@@ -14,10 +14,15 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.model.CateTagListModel;
+import com.lt.hm.wovideo.model.CateTagModel;
+import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.VideoType;
+import com.lt.hm.wovideo.model.response.ResponseCateTag;
 import com.lt.hm.wovideo.utils.TLog;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,41 +38,15 @@ public class SelectMenuPop extends PopupWindow {
     String area_string = "地区";
     String time_string = "年代";
     Map<String, Map<String, String>> movie_container = new LinkedHashMap<>();
-    String[] movie_type_names = new String[]{
-            "全部", "剧情", "喜剧", "动作", "恐怖", "动画", "武侠", "警匪", "战争", "爱情",
-            "科幻", "奇幻", "犯罪", "冒险", "灾难", "伦理", "传记", "家庭", "记录", "惊悚", "历史",
-            "悬疑"
-    };
-    String[] movie_attr_names = new String[]{"全部", "院线", "预告", "大电影"};
-    String[] teleplay_type_names = new String[]{
-            "全部", "古装", "武侠", "警匪", "战争", "神话", "科幻", "悬疑", "历史", "爱情", "喜剧", "都市", "农村", "奇幻", "其他"
-    };
-    String[] teleplay_attr_names = new String[]{
-            "全部", "高清全集", "自制剧", "精选", "TVB", "韩剧", "美剧", "英剧", "台剧"
-    };
-    String[] varity_type_names = new String[]{
-            "全部", "情感", "访谈", "真人秀", "选秀", "生活", "时尚", "美食", "纪实", "文化", "曲艺", "演唱会"
-    };
-    String[] varity_attr_names = new String[]{
-            "全部", "正片", "短片"
-    };
-    String[] sport_type_names = new String[]{
-            "全部", "NBA", "CBA", "中国女篮", "英超", "西甲	", "意甲", "德甲", "欧冠", "中超", "国际足球", "亚冠", "综合", "体育", "网球", "世界杯", "欧洲杯", "奥运会", "竞	速", "格斗", "电子竞技", "排球", "极限", "其他"
-    };
-    String[] area_names = new String[]{
-            "全部", "内地", "港台", "美国", "韩国", "日本", "英国", "法国", "俄罗斯", "新加坡", "加拿大", "泰国", "印	度", "西班牙", "马来西亚"
-    };
-    String[] time_names = new String[]{
-            "全部", "2016", "2015", "2013", "2012", "2010", "00年代", "90年代"
-    };
 
-    public SelectMenuPop(Context context, int id) {
+
+    public SelectMenuPop(Context context, int id, CateTagListModel cateTag) {
         super(context);
-        updateMenu(context, id);
+        updateMenu(context, id, cateTag);
     }
 
-    public void updateMenu(Context context, int id) {
-        initMenuHash(id);
+    public void updateMenu(Context context, int id, CateTagListModel cateTag) {
+        initMenuHash(id, cateTag);
         initViews(context);
     }
 
@@ -117,7 +96,7 @@ public class SelectMenuPop extends PopupWindow {
         LinearLayout layout_item = new LinearLayout(context);
         layout_item.setOrientation(LinearLayout.HORIZONTAL);
         layout_item.setPadding(25, 20, 25, 20);
-        layout_item.setBackgroundColor(Color.parseColor("#33ffffff"));
+        layout_item.setBackgroundColor(Color.parseColor("#00000000"));
         TextView text = new TextView(context);
         LinearLayout.LayoutParams typelp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         typelp.setMargins(20, 12, 20, 12);
@@ -139,7 +118,7 @@ public class SelectMenuPop extends PopupWindow {
         Map<String, String> values = movie_container.get(key);
         Set<String> keys = values.keySet();
         LinearLayout.LayoutParams params1 = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
-        params1.setMargins(20,10,20,10);
+        params1.setMargins(20, 10, 20, 10);
         params1.gravity = Gravity.CENTER;
         for (String key_name : keys) {
             RadioButton radiobutton = new RadioButton(context);
@@ -150,15 +129,13 @@ public class SelectMenuPop extends PopupWindow {
             radiobutton.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
             radiobutton.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 if (isChecked) {
-                    radiobutton.setTextColor(context.getResources().getColor(R.color.white));
-                    radiobutton.setBackgroundColor(Color.parseColor("#FF2eaff3"));
+                    radiobutton.setTextColor(context.getResources().getColor(R.color.float_button_color));
                     if (listener != null) {
                         TLog.log(key + "::::" + key_name);
                         listener.clickListener(key, key_name);
                     }
-                }else{
-                    radiobutton.setTextColor(context.getResources().getColor(R.color.black));
-                    radiobutton.setBackgroundColor(context.getResources().getColor(android.R.color.transparent));
+                } else {
+                    radiobutton.setTextColor(context.getResources().getColor(R.color.class_font_color));
                 }
             });
             group.addView(radiobutton);
@@ -176,89 +153,48 @@ public class SelectMenuPop extends PopupWindow {
     }
 
 
-    private void initMenuHash(int id) {
-        if (id == VideoType.MOVIE.getId()) {
-            // 初始化  电影菜单
-            Map<String, String> map_type = new LinkedHashMap<>();
-            Map<String, String> map_attr = new LinkedHashMap<>();
-            //类型
-            for (int i = 0; i < movie_type_names.length; i++) {
-                map_type.put(i + "", movie_type_names[i]);
-            }
-            //属性
-            for (int i = 0; i < movie_attr_names.length; i++) {
-                map_attr.put(i + "", movie_attr_names[i]);
-            }
-            AddMenus(movie_container, map_type, map_attr);
-        } else if (id == VideoType.TELEPLAY.getId()) {
-            //初始化 电视剧菜单
-            Map<String, String> map_type = new LinkedHashMap<>();
-            Map<String, String> map_attr = new LinkedHashMap<>();
-            //类型
-            for (int i = 0; i < teleplay_type_names.length; i++) {
-                map_type.put(i + "", teleplay_type_names[i]);
-            }
-            //属性
-            for (int i = 0; i < teleplay_attr_names.length; i++) {
-                map_attr.put(i + "", teleplay_attr_names[i]);
-            }
-            AddMenus(movie_container, map_type, map_attr);
+    private void initMenuHash(int id, CateTagListModel cateTag) {
+        List<CateTagModel> cateTagModels;
+        TLog.error("id---" + id + "-----" + ChannelModel.FILM_ID);
 
-        } else if (id == VideoType.VARIATY.getId()) {
-            //综艺
-            Map<String, String> map_type = new LinkedHashMap<>();
-            Map<String, String> map_attr = new LinkedHashMap<>();
-
-            //类型
-            for (int i = 0; i < varity_type_names.length; i++) {
-                map_type.put(i + "", varity_type_names[i]);
-            }
-            //属性
-            for (int i = 0; i < varity_attr_names.length; i++) {
-                map_attr.put(i + "", varity_attr_names[i]);
-            }
-            AddMenus(movie_container, map_type, map_attr);
-        } else {
-            /*//电影
-            Map<String, String> map_type = new LinkedHashMap<>();
-
-            //类型
-            for (int i = 0; i < sport_type_names.length; i++) {
-                map_type.put(i + "", sport_type_names[i]);
-            }
-            movie_container.put(type_string, map_type);*/
-
-            //综艺
-            Map<String, String> map_type = new LinkedHashMap<>();
-            Map<String, String> map_attr = new LinkedHashMap<>();
-
-            //类型
-            for (int i = 0; i < varity_type_names.length; i++) {
-                map_type.put(i + "", varity_type_names[i]);
-            }
-            //属性
-            for (int i = 0; i < varity_attr_names.length; i++) {
-                map_attr.put(i + "", varity_attr_names[i]);
-            }
-            AddMenus(movie_container, map_type, map_attr);
-        }
-    }
-
-
-    private void AddMenus(Map<String, Map<String, String>> movie_container, Map<String, String> map_type, Map<String, String> map_attr) {
+        // 初始化  电影菜单
+        Map<String, String> map_type = new LinkedHashMap<>();
+        Map<String, String> map_attr = new LinkedHashMap<>();
         Map<String, String> map_area = new LinkedHashMap<>();
         Map<String, String> map_time = new LinkedHashMap<>();
+        cateTagModels = cateTag.getLx();
+        //类型
+        if (cateTagModels != null) {
+            for (int i = 0; i < cateTagModels.size(); i++) {
+                map_type.put(i + "", cateTagModels.get(i).getName());
+            }
+        }
+        //属性
+        cateTagModels = cateTag.getSx();
+        if (cateTagModels != null) {
+            for (int i = 0; i < cateTagModels.size(); i++) {
+                map_attr.put(i + "", cateTagModels.get(i).getName());
+            }
+        }
         // 地区
-        for (int i = 0; i < area_names.length; i++) {
-            map_area.put(i + "", area_names[i]);
+        cateTagModels = cateTag.getDq();
+        if (cateTagModels != null) {
+            for (int i = 0; i < cateTagModels.size(); i++) {
+                map_area.put(i + "", cateTagModels.get(i).getName());
+            }
         }
-        for (int i = 0; i < time_names.length; i++) {
-            map_time.put(i + "", time_names[i]);
+        cateTagModels = cateTag.getNd();
+        if (cateTagModels != null) {
+            for (int i = 0; i < cateTagModels.size(); i++) {
+                map_time.put(i + "", cateTagModels.get(i).getName());
+            }
         }
+        TLog.error("type---" + map_type.toString());
         movie_container.put(type_string, map_type);
         movie_container.put(attr_string, map_attr);
         movie_container.put(area_string, map_area);
         movie_container.put(time_string, map_time);
+
     }
 
     public interface OnRadioClickListener {

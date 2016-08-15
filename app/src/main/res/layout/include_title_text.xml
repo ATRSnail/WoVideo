@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_marginLeft="@dimen/f_16"
-        android:drawableLeft="@drawable/vertical_line"
+        android:drawableLeft="@drawable/img_line"
         android:drawablePadding="5dp"
         android:gravity="center"
         android:text="热门推荐"
@@ -26,6 +26,6 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
-        android:src="@drawable/right_arrow"
+        android:src="@drawable/icon_more"
         android:visibility="gone" />
 </RelativeLayout>

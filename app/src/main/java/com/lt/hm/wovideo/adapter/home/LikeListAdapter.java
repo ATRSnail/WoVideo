@@ -37,7 +37,7 @@ public class LikeListAdapter extends BaseQuickAdapter<LikeModel> {
             if (likeModel.getTag() != null && likeModel.getTag().equals("h")) {
                 ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(img).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(likeModel.getHImg())).build());
             } else {
-                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(img).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(likeModel.getImg())).build());
+                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(img).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(likeModel.getHImg())).build());
             }
         } else {
             ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(img).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(likeModel.getImg())).build());

@@ -2,6 +2,8 @@ package com.lt.hm.wovideo.adapter.recommend;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
@@ -24,8 +26,7 @@ public class GridAdapter extends CommonAdapter<CateTagModel>{
     public void convert(ViewHolder holder, CateTagModel cateModel) {
         holder.setText(R.id.first_cat_name,cateModel.getName());
         if (holder.getmPostion() == getCount()-1){
-            ((TextView) holder.getView(R.id.first_cat_name)).setTextColor(Color.WHITE);
-            holder.getView(R.id.first_cat_name).setBackgroundResource(R.drawable.blue_circle);
-        }
+            holder.getView(R.id.img_more).setVisibility(View.VISIBLE);
+          }
     }
 }

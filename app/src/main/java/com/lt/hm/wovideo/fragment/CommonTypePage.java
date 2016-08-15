@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.fragment;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -20,6 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,16 +33,26 @@ import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.adapter.recommend.GridAdapter;
 import com.lt.hm.wovideo.adapter.recommend.LiveAdapter;
 import com.lt.hm.wovideo.base.BaseLazyFragment;
+import com.lt.hm.wovideo.base.BaseRequestActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
+import com.lt.hm.wovideo.http.RespHeader;
+import com.lt.hm.wovideo.http.ResponseCode;
+import com.lt.hm.wovideo.http.ResponseObj;
+import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.interf.OnPlaceChangeListener;
 import com.lt.hm.wovideo.model.BannerList;
+import com.lt.hm.wovideo.model.CateTagListModel;
 import com.lt.hm.wovideo.model.CateTagModel;
 import com.lt.hm.wovideo.model.ChannelModel;
+import com.lt.hm.wovideo.model.City;
 import com.lt.hm.wovideo.model.FilmMode;
 import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.LocalCityModel;
 import com.lt.hm.wovideo.model.RecomList;
+import com.lt.hm.wovideo.model.VideoDetails;
+import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.response.ResponseBanner;
 import com.lt.hm.wovideo.model.response.ResponseCateTag;
 import com.lt.hm.wovideo.model.response.ResponseFilms;
@@ -49,24 +61,30 @@ import com.lt.hm.wovideo.model.response.ResponseLocalCityModel;
 import com.lt.hm.wovideo.ui.CityListPage;
 import com.lt.hm.wovideo.ui.NewClassDetailPage;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
 import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 import com.lt.hm.wovideo.widget.CustomGridView;
 import com.lt.hm.wovideo.widget.CustomListView;
 import com.lt.hm.wovideo.widget.CustomScrollView;
+import com.lt.hm.wovideo.widget.DividerDecoration;
 import com.lt.hm.wovideo.widget.FastScrollView;
 import com.lt.hm.wovideo.widget.TopTileView;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
 import com.yyydjk.library.BannerLayout;
+import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import okhttp3.Call;
 
 import static android.support.v7.widget.RecyclerView.*;
 
@@ -80,6 +98,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private int channelId;
     private String channelCode;
     private ChannelModel channel;
+    private String cityCode;
     private List<CateTagModel> cateTags = new ArrayList<>();//标签
     private List<LocalCityModel> localCites = new ArrayList<>();
     private List<BannerList.Banner> banner_list = new ArrayList<>();//bar
@@ -118,8 +137,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     View titleRl;
     @BindView(R.id.lv_live)
     CustomListView liveLv;
-    @BindView(R.id.banner)
-    BannerLayout bannerLayout;
+//    @BindView(R.id.banner)
+//    BannerLayout bannerLayout;
 
     private boolean isOnline = true;
     private LiveAdapter liveAdapter;
@@ -127,7 +146,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private boolean isHasView = false;//防止重复加载view
     Unbinder unbinder;
 
-    private  LinearLayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
 
     private boolean isLoading = false;//防止scrollview滚动多次请求数据
     private boolean isNoData = false;//数据加载完了
@@ -155,7 +174,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (!isHasView) {
             view = inflater.inflate(getLayoutId(), container, false);
-            unbinder= ButterKnife.bind(this, view);
+            unbinder = ButterKnife.bind(this, view);
         }
         //缓存的rootView需要判断是否已经被加过parent， 如果有parent需要从parent删除，要不然会发生这个rootview已经有parent的错误。
         ViewGroup parent = (ViewGroup) view.getParent();
@@ -191,7 +210,21 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 isLoading = true;
                 TLog.error("上拉加载----");
 
-                getYouLikeData();
+                switch (channelId) {
+                    case ChannelModel.RECOMMEND_ID://推荐
+                    case ChannelModel.LOCAL_ID://地方
+
+                        getYouLikeData();
+                        break;
+                    case ChannelModel.FILM_ID://电影
+                    case ChannelModel.TELEPLAY_ID://电视剧
+                    case ChannelModel.SPORTS_ID://体育
+                    case ChannelModel.VARIATY_ID://综艺
+                        getListByType();
+                        break;
+                    default://其他
+
+                }
             }
 
             @Override
@@ -201,16 +234,16 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         });
 
         changeCityBtn.setOnClickListener((View v) -> {
-            startActivity(new Intent(getActivity(), CityListPage.class));
+            startActivityForResult(new Intent(getActivity(), CityListPage.class), 99);
         });
     }
 
     /**
      * 获取bundle值
      */
-    private void initBundleData(){
+    private void initBundleData() {
         context = getApplicationContext();
-         Bundle bundle = getArguments();
+        Bundle bundle = getArguments();
         if (bundle != null) {
             channel = (ChannelModel) bundle.getSerializable(CHANNEL);
             channelId = channel.getId();
@@ -230,7 +263,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             case ChannelModel.RECOMMEND_ID://推荐
                 seed = "";
                 grid_list.clear();
-                if (banner_list.size() == 0){
+                if (banner_list.size() == 0) {
                     getBarData();
                 }
                 getYouLikeData();
@@ -243,25 +276,25 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 break;
             case ChannelModel.FILM_ID://电影
                 films.clear();
-                if (cateTags.size() == 0){
+                if (cateTags.size() == 0) {
                     getCateTag("1");
                 }
                 getListByType();
                 break;
             case ChannelModel.TELEPLAY_ID://电视剧
-                if (cateTags.size() == 0){
+                if (cateTags.size() == 0) {
                     getCateTag("2");
                 }
                 getListByType();
                 break;
             case ChannelModel.SPORTS_ID://体育
-                if (cateTags.size() == 0){
+                if (cateTags.size() == 0) {
                     getCateTag("4");
                 }
                 getListByType();
                 break;
             case ChannelModel.VARIATY_ID://综艺
-                if (cateTags.size() == 0){
+                if (cateTags.size() == 0) {
                     getCateTag("3");
                 }
                 getListByType();
@@ -271,26 +304,20 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         }
     }
 
-
     /*
      地方直播列表
      */
     private LocalCityModel localCityModel;
 
     private void addLocalListView() {
+        liveLv.setVisibility(VISIBLE);
         topPageFl.setVisibility(View.VISIBLE);
         changeCityBtn.setVisibility(View.VISIBLE);
         localCityModel = localCites.get(0);
         setDataToTopView(localCityModel.getTvName(), localCityModel.getProperty(), localCityModel.getNowPro(), localCityModel.getImg());
         localCites.remove(0);
         if (localCites.size() == 0) return;
-        TopTileView headView = new TopTileView(context);
-        headView.setTitleTv("北京直播");
-        headView.setImageVisiable(true);
-        liveLv.addHeaderView(headView);
-
-        liveAdapter = new LiveAdapter(context, localCites, R.layout.item_live_cate);
-        liveLv.setAdapter(liveAdapter);
+        liveAdapter.notifyView(localCites);
     }
 
     /**
@@ -306,25 +333,26 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     /**
      * 添加bar滚动条
+     *
      * @param mList
      */
-    private void addBannerView(List<BannerList.Banner> mList)
-    {
-        bannerLayout.setVisibility(View.VISIBLE);
-        List<String> strings= new ArrayList<>();
-        for (int i = 0; i < mList.size(); i++) {
-            strings.add(HttpUtils.appendUrl(mList.get(i).getImg()));
-        }
-        bannerLayout.setViewUrls(strings);
-        //添加点击监听
-        bannerLayout.setOnBannerItemClickListener(new BannerLayout.OnBannerItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                // TODO: 8/13/16 跳转页面
-                Toast.makeText(getActivity(), String.valueOf(position), Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+//    private void addBannerView(List<BannerList.Banner> mList) {
+//        bannerLayout.setVisibility(View.VISIBLE);
+//        List<String> strings = new ArrayList<>();
+//        for (int i = 0; i < mList.size(); i++) {
+//            strings.add(HttpUtils.appendUrl(mList.get(i).getImg()));
+//        }
+//        bannerLayout.setViewUrls(strings);
+//        //添加点击监听
+//        bannerLayout.setOnBannerItemClickListener(new BannerLayout.OnBannerItemClickListener() {
+//            @Override
+//            public void onItemClick(int position) {
+//                // TODO: 8/13/16 跳转页面
+//                Toast.makeText(getActivity(), String.valueOf(position), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
+
     /**
      * 添加bar滚动
      *
@@ -333,7 +361,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private void addBarView(List<BannerList.Banner> mList) {
         banner_list.addAll(mList);
         imageIndicatorView.setVisibility(View.VISIBLE);
-        imageIndicatorView.setupLayoutByURL(mList);
+        imageIndicatorView.setupLayoutByClass(mList);
         imageIndicatorView.setIndicateStyle(ImageIndicatorView.INDICATE_USERGUIDE_STYLE);
         imageIndicatorView.show();
         imageIndicatorView.setOnItemClickListener(new ImageIndicatorView.OnItemClickListener() {
@@ -341,7 +369,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             public void OnItemClick(View view, int position) {
 //                            changePage(mList.get(position),typeListBean.getId());
 //                            changePage(mList.get(position).getId(),);
-                //               getVideoDetails(mList.get(position).getOutid());
+                               getVideoDetails(mList.get(position).getOutid());
                 // TODO: 16/6/29 跳转页面
             }
         });
@@ -352,23 +380,44 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
      *地方直播列表
      *先加载这个方法,以免recycleview加不了header
      */
+    private boolean isNotFilm = true;
+
     private void addLikeListView() {
 
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         if (channelId == ChannelModel.RECOMMEND_ID || channelId == ChannelModel.LOCAL_ID) {
             listAdapter = new LikeListAdapter(R.layout.layout_new_home_item, grid_list);
+            listAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+                @Override
+                public void onItemClick(View view, int i) {
+
+                        // 跳转视频详情页面
+              //          changePage(grid_list.get(i).getTypeId(), grid_list.get(i).getVfId());
+
+                }
+            });
         } else {
             if (channelId == ChannelModel.FILM_ID) {
+                isNotFilm = false;
                 layoutManager = new GridLayoutManager(getApplicationContext(), 3);
                 layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             }
-
-            listAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films);
+            listAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films, isNotFilm);
         }
         mRecyclerView.setLayoutManager(layoutManager);
         header.attachTo(mRecyclerView);
+        mRecyclerView.addItemDecoration(new DividerDecoration(context, 2, getResources().getColor(R.color.white)));
         mRecyclerView.setAdapter(listAdapter);
+
+
+        TopTileView headView = new TopTileView(context);
+        headView.setTitleTv("北京直播");
+        headView.setImageVisiable(true);
+        liveLv.addHeaderView(headView);
+
+        liveAdapter = new LiveAdapter(context, localCites, R.layout.item_live_cate);
+        liveLv.setAdapter(liveAdapter);
     }
 
     /**
@@ -391,7 +440,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         if (!TextUtils.isEmpty(tag)) map.put("tag", tag);
         map.put("typeid", channelId == ChannelModel.RECOMMEND_ID || channelId == ChannelModel.LOCAL_ID ? "" : channelId);
         HttpApis.getYouLikeList(map, HttpApis.http_thr, new HttpCallback<>(ResponseLikeList.class, this));
-
     }
 
     /*
@@ -408,7 +456,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
      */
     private void getTvsByCityCode() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("code", "0571");
+        map.put("code", TextUtils.isEmpty(cityCode) ? "010" : cityCode);
         HttpApis.getTvsByCityCode(map, HttpApis.http_for, new HttpCallback<>(ResponseLocalCityModel.class, this));
     }
 
@@ -429,23 +477,19 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private void addCateView() {
         if (cateTags.size() > 9) {//最多显示9个标签
             cateTags = cateTags.subList(0, 9);
-            cateTags.add(new CateTagModel("更多", "", 1));
+            cateTags.add(new CateTagModel("更多", -1));
         }
         cateGv.setVisibility(View.VISIBLE);
         GridAdapter gridAdapter = new GridAdapter(getApplicationContext(), cateTags, R.layout.item_first_cate);
         cateGv.setAdapter(gridAdapter);
         cateGv.setNumColumns(5);
-        cateGv.setPadding(20,15,20,15);
+        cateGv.setPadding(20, 15, 20, 15);
         cateGv.setGravity(Gravity.CENTER);
         cateGv.setSelector(new ColorDrawable(Color.TRANSPARENT));
-        cateGv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                startActivity(new Intent(getActivity(), NewClassDetailPage.class));
-            }
-        });
+        cateGv.setOnItemClickListener((parent, view1, position, id) -> NewClassDetailPage.getInstance(getActivity(), cateTags.get(position), channelId, cateTagListModel));
     }
 
+    private CateTagListModel cateTagListModel;
 
     @Override
     public <T> void onSuccess(T value, int flag) {
@@ -454,6 +498,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             case HttpApis.http_one:
                 ResponseCateTag responseCateTag = (ResponseCateTag) value;
                 cateTags = responseCateTag.getBody().getLx();
+                cateTagListModel = responseCateTag.getBody();
                 if (cateTags == null || cateTags.size() == 0) return;
                 addCateView();
                 break;
@@ -462,13 +507,13 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 banner_list = responseBar.getBody().getBannerList();
                 if (banner_list == null || banner_list.size() == 0) return;
 //                addBarView(banner_list);
-                addBannerView(banner_list);
+                addBarView(banner_list);
                 break;
             case HttpApis.http_thr://获取like列表
                 ResponseLikeList re = (ResponseLikeList) value;
                 seed = re.getBody().getSeed();
                 grid_list = re.getBody().getLikeList();
-                if (grid_list == null || grid_list.size() == 0){
+                if (grid_list == null || grid_list.size() == 0) {
                     isNoData = true;
                     UT.showNormal("暂无数据");
                     return;
@@ -480,18 +525,17 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 if (channelId == ChannelModel.LOCAL_ID) {
                     titleRl.setVisibility(View.VISIBLE);
                 }
-                if (pageNum == 1){
+                if (pageNum == 1) {
                     listAdapter.setNewData(grid_list);
-                }else {
-                    listAdapter.notifyDataChangedAfterLoadMore(grid_list,true);
+                } else {
+                    listAdapter.notifyDataChangedAfterLoadMore(grid_list, true);
                 }
-                pageNum ++ ;
+                pageNum++;
                 break;
             case HttpApis.http_for://获取城市电台
                 ResponseLocalCityModel cityRe = (ResponseLocalCityModel) value;
                 localCites = cityRe.getBody().getCitys();
                 if (localCites == null || localCites.size() == 0) return;
-                localCites.addAll(localCites);
                 addLocalListView();
                 break;
             case HttpApis.http_fiv:
@@ -507,24 +551,24 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                     UT.showNormal("暂无数据");
                     return;
                 }
-                if(pageNum == 1) {
+                if (pageNum == 1) {
                     listAdapter.setNewData(films);
-                }else{
+                } else {
                     listAdapter.notifyDataChangedAfterLoadMore(films, true);
                 }
-                pageNum ++;
+                pageNum++;
                 break;
         }
     }
 
     @Override
     public void onAfter(int flag) {
-        super.onAfter( flag);
-        switch (flag){
+        super.onAfter(flag);
+        switch (flag) {
             case HttpApis.http_thr:
             case HttpApis.http_fiv:
                 isLoading = false;
-                if (mSwipeRefreshWidget != null && mSwipeRefreshWidget.isRefreshing()){
+                if (mSwipeRefreshWidget != null && mSwipeRefreshWidget.isRefreshing()) {
                     mSwipeRefreshWidget.setRefreshing(false);
                 }
                 break;
@@ -540,8 +584,116 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (unbinder!=null){
+        if (unbinder != null) {
             unbinder.unbind();
+        }
+    }
+
+    private OnPlaceChangeListener onPlaceChangeListener;
+
+    public void setOnPlaceChangeListener(OnPlaceChangeListener listener) {
+        this.onPlaceChangeListener = listener;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (resultCode) {
+            case CityListPage.CITY_RESULT:
+                cityCode = data.getStringExtra("city");
+                if (onPlaceChangeListener != null) {
+                    onPlaceChangeListener.onChangePlaceListener(cityCode.replaceAll("[^\u4E00-\u9FA5]", ""));
+                }
+                TLog.error("city-code-" + submit(cityCode));
+                cityCode = submit(cityCode);
+                initData();
+                break;
+        }
+    }
+
+    public String submit(String string) {
+        String regEx = "[^0-9]";
+        Pattern p = Pattern.compile(regEx);
+        Matcher m = p.matcher(string);
+        return m.replaceAll("").trim();
+    }
+
+    public void getVideoDetails(String vfId) {
+        HashMap<String, Object> maps = new HashMap<>();
+        maps.put("vfid", vfId);
+        // TODO: 16/6/26 获取app typeId 并填充
+        String typeID = null;
+        maps.put("typeid", typeID);
+        HttpApis.getVideoInfo(maps, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log(response);
+                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+
+                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+                        // TODO: 16/6/14 跳转电影页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.MOVIE.getId());
+                        UIHelper.ToMoviePage(getActivity(), bundle);
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
+                        // TODO: 16/6/14 跳转电视剧页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+                        UIHelper.ToDemandPage(getActivity(), bundle);
+
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
+                        // TODO: 16/6/14 跳转 体育播放页面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.SPORTS.getId());
+                        UIHelper.ToDemandPage(getActivity(), bundle);
+                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
+                        // TODO: 16/6/14 跳转综艺界面
+                        Bundle bundle = new Bundle();
+                        bundle.putString("id", vfId);
+                        bundle.putInt("typeId",VideoType.VARIATY.getId());
+                        UIHelper.ToDemandPage(getActivity(), bundle);
+                    }
+                }
+            }
+        });
+    }
+
+    private void changePage(int typeId, String vfId) {
+        if (typeId == VideoType.MOVIE.getId()) {
+            // TODO: 16/6/14 跳转电影页面
+            Bundle bundle = new Bundle();
+            bundle.putString("id", vfId);
+            bundle.putInt("typeId",VideoType.MOVIE.getId());
+            UIHelper.ToMoviePage(getActivity(), bundle);
+        } else if (typeId == VideoType.TELEPLAY.getId()) {
+            // TODO: 16/6/14 跳转电视剧页面
+            Bundle bundle = new Bundle();
+            bundle.putString("id", vfId);
+            bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+            UIHelper.ToDemandPage(getActivity(), bundle);
+
+        } else if (typeId == VideoType.SPORTS.getId()) {
+            // TODO: 16/6/14 跳转 体育播放页面
+            Bundle bundle = new Bundle();
+            bundle.putString("id", vfId);
+            bundle.putInt("typeId",VideoType.SPORTS.getId());
+            UIHelper.ToDemandPage(getActivity(), bundle);
+        } else if (typeId == VideoType.VARIATY.getId()) {
+            // TODO: 16/6/14 跳转综艺界面
+            Bundle bundle = new Bundle();
+            bundle.putString("id", vfId);
+            bundle.putInt("typeId",VideoType.VARIATY.getId());
+            UIHelper.ToDemandPage(getActivity(), bundle);
         }
     }
 }

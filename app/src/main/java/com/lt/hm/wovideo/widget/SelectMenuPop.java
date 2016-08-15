@@ -17,8 +17,6 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.model.CateTagListModel;
 import com.lt.hm.wovideo.model.CateTagModel;
 import com.lt.hm.wovideo.model.ChannelModel;
-import com.lt.hm.wovideo.model.VideoType;
-import com.lt.hm.wovideo.model.response.ResponseCateTag;
 import com.lt.hm.wovideo.utils.TLog;
 
 import java.util.LinkedHashMap;
@@ -96,7 +94,9 @@ public class SelectMenuPop extends PopupWindow {
         LinearLayout layout_item = new LinearLayout(context);
         layout_item.setOrientation(LinearLayout.HORIZONTAL);
         layout_item.setPadding(25, 20, 25, 20);
-        layout_item.setBackgroundColor(Color.parseColor("#00000000"));
+//        layout_item.setBackgroundColor(Color.parseColor("#00000000"));
+        layout_item.setBackgroundDrawable(new ColorDrawable(0xC0FFFFFF));
+        layout_item.setAlpha(0.8f);
         TextView text = new TextView(context);
         LinearLayout.LayoutParams typelp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         typelp.setMargins(20, 12, 20, 12);

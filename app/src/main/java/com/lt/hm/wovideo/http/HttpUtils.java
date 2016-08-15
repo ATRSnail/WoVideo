@@ -30,7 +30,7 @@ public class HttpUtils {
     private static String API_URL = "http://172.16.10.15:9100/wsp-web-restservice/%s";
     //外网
 //    public final static String HOST = "http://59.108.94.40:9100";
-//    private static String API_URL = "http://59.108.94.40:9100/wsp-web-restservice/%s";
+//   private static String API_URL = "http://59.108.94.40:9100/wsp-web-restservice/%s";
     public static final String DELETE = "DELETE";
     public static final String GET = "GET";
     public static final String POST = "POST";

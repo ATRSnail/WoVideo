@@ -1,31 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:orientation="vertical">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/text_change_city"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="40dp"
         android:gravity="center"
         android:text="点击选择其他城市"
-        android:textColor="@color/black"
-        android:textSize="@dimen/sp_16"
+        android:textColor="@color/grey_place_title_color"
+        android:textSize="@dimen/sp_12"
         android:visibility="gone" />
 
     <com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView
-        android:visibility="gone"
         android:id="@+id/img_indicator_vip"
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
+        android:layout_height="180dp"
+        android:visibility="gone" />
+
     <com.yyydjk.library.BannerLayout
         android:id="@+id/banner"
-        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:visibility="gone"
         app:autoPlayDuration="5000"
+        app:defaultImage="@mipmap/ic_launcher"
         app:indicatorMargin="10dp"
         app:indicatorPosition="centerBottom"
         app:indicatorShape="oval"
@@ -38,7 +40,6 @@
         app:unSelectedIndicatorColor="#99ffffff"
         app:unSelectedIndicatorHeight="6dp"
         app:unSelectedIndicatorWidth="6dp" />
-
 
 
     <include layout="@layout/layout_new_top_item" />
@@ -72,7 +73,11 @@
     <com.lt.hm.wovideo.widget.CustomListView
         android:id="@+id/lv_live"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:divider="@null"
+        android:paddingLeft="@dimen/sp_12"
+        android:paddingRight="@dimen/sp_12" />
 
     <include layout="@layout/include_title_text" />
 

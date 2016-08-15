@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.lt.hm.wovideo.widget.PercentLinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<com.lt.hm.wovideo.widget.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    >
+    android:orientation="vertical">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <com.lt.hm.wovideo.widget.autofittextview.AutofitTextView
             android:id="@+id/first_cat_name"
+            minTextSize="12sp"
             android:layout_width="60dp"
             android:layout_height="30dp"
-            android:layout_marginTop="8dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="10dp"
             android:background="@drawable/white_circle"
             android:gravity="center"
-            android:layout_centerInParent="true"
-            android:text="北京"
-            android:textColor="@color/black"
-            android:singleLine="true"
             android:paddingLeft="3dp"
             android:paddingRight="3dp"
-            minTextSize="14sp"
-            android:textSize="16sp" />
+            android:singleLine="true"
+            android:text="北京"
+            android:textColor="@color/class_font_color"
+            android:textSize="14sp" />
 
         <ImageView
             android:id="@+id/img_delete"

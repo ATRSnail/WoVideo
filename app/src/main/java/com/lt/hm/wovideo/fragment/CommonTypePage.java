@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,7 @@ import com.lt.hm.wovideo.widget.CustomGridView;
 import com.lt.hm.wovideo.widget.CustomListView;
 import com.lt.hm.wovideo.widget.CustomScrollView;
 import com.lt.hm.wovideo.widget.FastScrollView;
+import com.lt.hm.wovideo.widget.TopTileView;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
 import com.yyydjk.library.BannerLayout;
 
@@ -282,7 +284,9 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         setDataToTopView(localCityModel.getTvName(), localCityModel.getProperty(), localCityModel.getNowPro(), localCityModel.getImg());
         localCites.remove(0);
         if (localCites.size() == 0) return;
-        View headView = LayoutInflater.from(context).inflate(R.layout.include_title_text, null);
+        TopTileView headView = new TopTileView(context);
+        headView.setTitleTv("北京直播");
+        headView.setImageVisiable(true);
         liveLv.addHeaderView(headView);
 
         liveAdapter = new LiveAdapter(context, localCites, R.layout.item_live_cate);
@@ -430,6 +434,9 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         cateGv.setVisibility(View.VISIBLE);
         GridAdapter gridAdapter = new GridAdapter(getApplicationContext(), cateTags, R.layout.item_first_cate);
         cateGv.setAdapter(gridAdapter);
+        cateGv.setNumColumns(5);
+        cateGv.setPadding(20,15,20,15);
+        cateGv.setGravity(Gravity.CENTER);
         cateGv.setSelector(new ColorDrawable(Color.TRANSPARENT));
         cateGv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -484,6 +491,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 ResponseLocalCityModel cityRe = (ResponseLocalCityModel) value;
                 localCites = cityRe.getBody().getCitys();
                 if (localCites == null || localCites.size() == 0) return;
+                localCites.addAll(localCites);
                 addLocalListView();
                 break;
             case HttpApis.http_fiv:

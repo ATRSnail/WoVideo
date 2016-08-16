@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import com.lt.hm.wovideo.utils.TLog;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,13 +28,6 @@ public class TabFragmentAdapter extends FragmentPagerAdapter {
         this.titles = titles;
     }
 
-    public void notityView(List<String> titles,List<Fragment> fragments){
-        this.titles = titles;
-        this.fragments = fragments;
-        TLog.error("titles--->"+titles.toString());
-        notifyDataSetChanged();
-    }
-
     @Override
     public Fragment getItem(int position) {
         return fragments.get(position);
@@ -47,6 +41,11 @@ public class TabFragmentAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         return titles.get(position);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+        return POSITION_NONE;
     }
 
 }

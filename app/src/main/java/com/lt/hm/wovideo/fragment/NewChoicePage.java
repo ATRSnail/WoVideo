@@ -22,9 +22,11 @@ import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.interf.OnPlaceChangeListener;
 import com.lt.hm.wovideo.model.ChannelModel;
+import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
 import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UserMgr;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,6 +71,9 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 
 	private void getClassInfos() {
 		HashMap<String, Object> map = new HashMap<>();
+		UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+		if (userModel != null)
+			map.put("userid", userModel.getId());
 		HttpApis.getIndividuationChannel(map, HttpApis.http_one, new HttpCallback<>(ResponseChannel.class, this));
 	}
 
@@ -91,15 +96,15 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 		vipSelector.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(getContext(), PersonalitySet.class));
+				startActivityForResult(new Intent(getContext(), PersonalitySet.class),34);
 			}
 		});
-		getClassInfos();
 	}
 
 	@Override
 	public void initData() {
 		super.initData();
+		getClassInfos();
 	}
 
 	@Override
@@ -109,7 +114,6 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 			case HttpApis.http_one:
 				ResponseChannel channelRe = (ResponseChannel) value;
 				channels = channelRe.getBody().getSelectedChannels();
-				if (channels == null || channels.size() == 0) return;
 				initBottom("");
 				break;
 		}
@@ -121,11 +125,8 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 		mTitles.clear();
 		channels.add(0, new ChannelModel("推荐", ChannelModel.RECOMMEND_ID));
 		// TODO: 8/15/16 ADD Current position name
-		if (str.equals("") || str == null) {
-			channels.add(1, new ChannelModel("地区", ChannelModel.LOCAL_ID));
-		} else {
-			channels.add(1, new ChannelModel(str, ChannelModel.LOCAL_ID));
-		}
+		channels.add(1, new ChannelModel(TextUtils.isEmpty(str)?"地区":str, ChannelModel.LOCAL_ID));
+
 		for (int i = 0; i < channels.size(); i++) {
 			bean = channels.get(i);
 			mTitles.add(bean.getFunName());
@@ -135,6 +136,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 			fragments.add(page);
 		}
 
+		TLog.error("title--->"+mTitles.toString());
 		tabFragmentAdapter = new TabFragmentAdapter(fragments, mTitles, getChildFragmentManager(), getApplicationContext());
 		choiceViewPage.setAdapter(tabFragmentAdapter);
 		choiceViewPage.setOffscreenPageLimit(mTitles.size());
@@ -157,5 +159,17 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 				// TODO: 8/16/16  refresh  the area fragment data
 			}
 		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		switch (resultCode){
+			case PersonalitySet.RESULT_PERSONALITY:
+				initView(view);
+				initData();
+				break;
+		}
+
 	}
 }

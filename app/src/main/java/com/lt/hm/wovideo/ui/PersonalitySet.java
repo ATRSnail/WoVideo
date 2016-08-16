@@ -21,8 +21,10 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
 import com.lt.hm.wovideo.model.Category;
 import com.lt.hm.wovideo.model.ChannelModel;
+import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.widget.CustomTopbar;
 import com.lt.hm.wovideo.widget.DividerDecoration;
 
@@ -38,6 +40,7 @@ import butterknife.BindView;
 public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopbarClicklistenter, OnCateItemListener {
 
     private static final int TOTAL_LINE = 5;
+    public static final int RESULT_PERSONALITY = 34;
 
     @BindView(R.id.person_topbar)
     CustomTopbar personTopbar;
@@ -102,16 +105,21 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
      */
     private void getClassInfos() {
         HashMap<String, Object> map = new HashMap<>();
+        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        if (userModel != null)
+            map.put("userid", userModel.getId());
         HttpApis.getIndividuationChannel(map, HttpApis.http_one, new HttpCallback<>(ResponseChannel.class, this));
     }
 
     /**
-     * 保存个性化标签
+     * 保存个性化频道
      */
     private void updateChannel(String channel) {
         TLog.error("channel--->" + channel);
         HashMap<String, Object> map = new HashMap<>();
-        map.put("userid", "2iRIK06ghJJiWYXxnSklFLNsMSvsOU3S");
+        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        if (userModel != null)
+            map.put("userid", userModel.getId());
         map.put("channel", channel);
         HttpApis.updateChannel(map, HttpApis.http_two, new HttpCallback<>(String.class, this));
     }
@@ -134,7 +142,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     private String splitStr(List<ChannelModel> channelModels) {
         StringBuffer stringBuffer = new StringBuffer(1000);
         for (int i = 0, length = channelModels.size(); i < length; i++) {
-            stringBuffer.append(channelModels.get(i).getFunName());
+            stringBuffer.append(channelModels.get(i).getFunCode());
             if (i != channelModels.size() - 1) {
                 stringBuffer.append("|");
             }
@@ -206,18 +214,18 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
                 ResponseChannel channelRe = (ResponseChannel) value;
                 channels = channelRe.getBody().getSelectedChannels();
                 allList = channelRe.getBody().getNotSelectedChannels();
-                if (channels == null || channels.size() == 0) return;
                 initCateView();
                 break;
             case HttpApis.http_two:
                 try {
-
                     JSONObject obj = new JSONObject((String) value);
                     if (obj.has("head")) {
                         JSONObject obj_head = obj.getJSONObject("head");
                         RespHeader header = new Gson().fromJson(obj_head.toString(), RespHeader.class);
-                        if (header.getRspCode().equals(ResponseCode.Success)){
+                        if (header.getRspCode().equals(ResponseCode.Success)) {
                             Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
+                            setResult(RESULT_PERSONALITY);
+                            this.finish();
                             return;
                         }
                     }

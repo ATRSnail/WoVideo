@@ -212,7 +212,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 switch (channelCode) {
                     case ChannelModel.RECOMMEND_ID://推荐
                     case ChannelModel.LOCAL_ID://地方
-
                         getYouLikeData();
                         break;
                     case ChannelModel.FILM_ID://电影
@@ -222,7 +221,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                         getListByType();
                         break;
                     default://其他
-
+                        getYouLikeData();
                 }
             }
 
@@ -257,9 +256,9 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     public void initData() {
         pageNum = 1;
         isNoData = false;
+        seed = "";
         switch (channelCode) {
             case ChannelModel.RECOMMEND_ID://推荐
-                seed = "";
                 grid_list.clear();
                 if (banner_list.size() == 0) {
                     getBarData();
@@ -298,7 +297,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 getListByType();
                 break;
             default://其他
-
+                getListByType();
         }
     }
 

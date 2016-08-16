@@ -27,6 +27,11 @@ public class CateTagModel implements Serializable{
     private String code;
     private long ctime;
 
+    public CateTagModel(String name,String code) {
+        this.name = name;
+        this.code = code;
+    }
+
     public CateTagModel(String name, int id) {
         this.name = name;
         this.id = id;

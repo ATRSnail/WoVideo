@@ -7,12 +7,12 @@ import java.io.Serializable;
  */
 public class ChannelModel implements Serializable{
 
-    public static final int TELEPLAY_ID = 136;//电视剧
-    public static final int FILM_ID = 135;//电影
-    public static final int VARIATY_ID = 139;//综艺
-    public static final int SPORTS_ID = 76;//体育
-    public static final int RECOMMEND_ID = -1;//推荐
-    public static final int LOCAL_ID = -2;//地方
+    public static final String TELEPLAY_ID = "0064";//电视剧
+    public static final String FILM_ID = "0063";//电影
+    public static final String VARIATY_ID = "0067";//综艺
+    public static final String SPORTS_ID = "0004";//体育
+    public static final String RECOMMEND_ID = "-1";//推荐
+    public static final String LOCAL_ID = "-2";//地方
     /**
      * id : 136
      * funName : 电视剧
@@ -29,9 +29,9 @@ public class ChannelModel implements Serializable{
     private String type;
     private String url;
 
-    public ChannelModel(String funName, int id) {
+    public ChannelModel(String funName, String funCode) {
         this.funName = funName;
-        this.id = id;
+        this.funCode = funCode;
     }
 
     public int getId() {

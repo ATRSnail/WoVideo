@@ -346,7 +346,6 @@ public class MainPage2 extends BaseActivity implements View.OnTouchListener, Tab
 //    @Override
 //    public void CloseCenter() {
 //        idMenu.closeMenu();
-//    }
 
 	@Override
 	public void onTabChanged(String tabId) {

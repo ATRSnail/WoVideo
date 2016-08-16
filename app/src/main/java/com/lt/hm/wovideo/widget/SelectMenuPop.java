@@ -35,15 +35,15 @@ public class SelectMenuPop extends PopupWindow {
     String attr_string = "属性";
     String area_string = "地区";
     String time_string = "年代";
-    Map<String, Map<String, String>> movie_container = new LinkedHashMap<>();
+    Map<String, Map<String, CateTagModel>> movie_container = new LinkedHashMap<>();
 
 
-    public SelectMenuPop(Context context, int id, CateTagListModel cateTag) {
+    public SelectMenuPop(Context context, String id, CateTagListModel cateTag) {
         super(context);
         updateMenu(context, id, cateTag);
     }
 
-    public void updateMenu(Context context, int id, CateTagListModel cateTag) {
+    public void updateMenu(Context context, String id, CateTagListModel cateTag) {
         initMenuHash(id, cateTag);
         initViews(context);
     }
@@ -115,7 +115,7 @@ public class SelectMenuPop extends PopupWindow {
         group.setLayoutParams(params);
         group.setGravity(Gravity.CENTER_VERTICAL);
         group.setOrientation(RadioGroup.HORIZONTAL);
-        Map<String, String> values = movie_container.get(key);
+        Map<String, CateTagModel> values = movie_container.get(key);
         Set<String> keys = values.keySet();
         LinearLayout.LayoutParams params1 = new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, RadioGroup.LayoutParams.WRAP_CONTENT);
         params1.setMargins(20, 10, 20, 10);
@@ -124,7 +124,7 @@ public class SelectMenuPop extends PopupWindow {
             RadioButton radiobutton = new RadioButton(context);
             radiobutton.setLayoutParams(params1);
             radiobutton.setPadding(20, 0, 20, 0);
-            radiobutton.setText(values.get(key_name));
+            radiobutton.setText(values.get(key_name).getName());
             radiobutton.setTextColor(context.getResources().getColor(R.color.text_press_selector));
             radiobutton.setButtonDrawable(new ColorDrawable(Color.TRANSPARENT));
             radiobutton.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -132,7 +132,7 @@ public class SelectMenuPop extends PopupWindow {
                     radiobutton.setTextColor(context.getResources().getColor(R.color.float_button_color));
                     if (listener != null) {
                         TLog.log(key + "::::" + key_name);
-                        listener.clickListener(key, key_name);
+                        listener.clickListener(key, values.get(key_name));
                     }
                 } else {
                     radiobutton.setTextColor(context.getResources().getColor(R.color.class_font_color));
@@ -153,40 +153,41 @@ public class SelectMenuPop extends PopupWindow {
     }
 
 
-    private void initMenuHash(int id, CateTagListModel cateTag) {
+    private void initMenuHash(String id, CateTagListModel cateTag) {
         List<CateTagModel> cateTagModels;
         TLog.error("id---" + id + "-----" + ChannelModel.FILM_ID);
 
         // 初始化  电影菜单
-        Map<String, String> map_type = new LinkedHashMap<>();
-        Map<String, String> map_attr = new LinkedHashMap<>();
-        Map<String, String> map_area = new LinkedHashMap<>();
-        Map<String, String> map_time = new LinkedHashMap<>();
+        Map<String, CateTagModel> map_type = new LinkedHashMap<>();
+        Map<String, CateTagModel> map_attr = new LinkedHashMap<>();
+        Map<String, CateTagModel> map_area = new LinkedHashMap<>();
+        Map<String, CateTagModel> map_time = new LinkedHashMap<>();
         cateTagModels = cateTag.getLx();
         //类型
         if (cateTagModels != null) {
-            for (int i = 0; i < cateTagModels.size(); i++) {
-                map_type.put(i + "", cateTagModels.get(i).getName());
+            for (int i = 0; i < cateTagModels.size() + 1; i++) {
+
+                map_type.put(i + "", i == 0 ? new CateTagModel("全部","")  : cateTagModels.get(i - 1));
             }
         }
         //属性
         cateTagModels = cateTag.getSx();
         if (cateTagModels != null) {
-            for (int i = 0; i < cateTagModels.size(); i++) {
-                map_attr.put(i + "", cateTagModels.get(i).getName());
+            for (int i = 0; i < cateTagModels.size() + 1; i++) {
+                map_attr.put(i + "", i == 0 ? new CateTagModel("全部","") : cateTagModels.get(i - 1));
             }
         }
         // 地区
         cateTagModels = cateTag.getDq();
         if (cateTagModels != null) {
-            for (int i = 0; i < cateTagModels.size(); i++) {
-                map_area.put(i + "", cateTagModels.get(i).getName());
+            for (int i = 0; i < cateTagModels.size() + 1; i++) {
+                map_area.put(i + "", i == 0 ? new CateTagModel("全部","")  : cateTagModels.get(i - 1));
             }
         }
         cateTagModels = cateTag.getNd();
         if (cateTagModels != null) {
-            for (int i = 0; i < cateTagModels.size(); i++) {
-                map_time.put(i + "", cateTagModels.get(i).getName());
+            for (int i = 0; i < cateTagModels.size() + 1; i++) {
+                map_time.put(i + "", i == 0 ? new CateTagModel("全部","")  : cateTagModels.get(i - 1));
             }
         }
         TLog.error("type---" + map_type.toString());
@@ -198,7 +199,7 @@ public class SelectMenuPop extends PopupWindow {
     }
 
     public interface OnRadioClickListener {
-        void clickListener(String key, String value);
+        void clickListener(String key, CateTagModel value);
     }
 
 }

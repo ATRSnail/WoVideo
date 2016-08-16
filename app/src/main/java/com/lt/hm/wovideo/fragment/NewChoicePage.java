@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -129,7 +130,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 			bean = channels.get(i);
 			mTitles.add(bean.getFunName());
 			CommonTypePage page = CommonTypePage.getInstance(bean);
-			if (bean.getId() == ChannelModel.LOCAL_ID)
+			if (bean.getFunCode().equals(ChannelModel.LOCAL_ID))
 				page.setOnPlaceChangeListener(this);
 			fragments.add(page);
 		}
@@ -145,7 +146,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 	@Override
 	public void onChangePlaceListener(String str) {
 		TLog.log("return_str" + str);
-		if (str != null || !str.equals("")) {
+		if (!TextUtils.isEmpty(str)) {
 			if (tabLayout != null) {
 				ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
 				ViewGroup vgTab = (ViewGroup) vg.getChildAt(1);

@@ -29,6 +29,7 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.CateTagListModel;
 import com.lt.hm.wovideo.model.CateTagModel;
+import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoList;
 import com.lt.hm.wovideo.model.VideoType;
@@ -71,11 +72,10 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     List<VideoList.TypeListBean> b_list;
     private CateTagListModel cateTagListModel;
     private CateTagModel cateTagModel;
-    private int channelCode;
+    private String channelCode;
     VipItemAdapter bottom_adapter;
     int pageNum = 1;
     int pageSize = 60;
-    int mId;
     @BindView(R.id.class_refresh_layout)
     SwipeRefreshLayout classRefreshLayout;
     String[] mItems;
@@ -90,12 +90,12 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     SelectMenuPop pop;
     GridLayoutManager manager;
 
-    public static void getInstance(Context context, CateTagModel cateTagModel, int channelCode,CateTagListModel cateTagListModel) {
+    public static void getInstance(Context context, CateTagModel cateTagModel, String channelCode, CateTagListModel cateTagListModel) {
         Intent intent = new Intent(context, NewClassDetailPage.class);
         Bundle bundle = new Bundle();
         bundle.putSerializable(CATE_TAG, cateTagListModel);
         bundle.putSerializable(CATETAG_MOdEl, cateTagModel);
-        bundle.putInt(CHANNEK_CODE,channelCode);
+        bundle.putString(CHANNEK_CODE, channelCode);
         intent.putExtras(bundle);
         context.startActivity(intent);
     }
@@ -129,14 +129,15 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
             cateTagModel = (CateTagModel) bundle.getSerializable(CATETAG_MOdEl);
             assert cateTagModel != null;
             classDetailsTopbar.setTvTitle(cateTagModel.getName());
-            mId = cateTagModel.getId();
+            lx = cateTagModel.getCode();
         }
         if (bundle.containsKey(CATE_TAG)) {
             cateTagListModel = (CateTagListModel) bundle.getSerializable(CATE_TAG);
-            TLog.error("response--->"+cateTagListModel.toString());
+            TLog.error("response--->" + cateTagListModel.toString());
         }
-        if (bundle.containsKey(CHANNEK_CODE)){
-            channelCode = bundle.getInt(CHANNEK_CODE);
+        if (bundle.containsKey(CHANNEK_CODE)) {
+            channelCode = bundle.getString(CHANNEK_CODE);
+            TLog.error("channelCode--->" + channelCode);
         }
     }
 
@@ -211,7 +212,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
             b_list.clear();
         }
         HashMap<String, Object> map = new HashMap<>();
-        map.put("channelCode", mId);
+        map.put("channelCode", channelCode);
         map.put("pageNum", pageNum);
 //        map.put("channelCode",id);// 用户频道Code
         map.put("numPerPage", pageSize);
@@ -249,7 +250,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                         classDetailsList.setVisibility(View.VISIBLE);
 
                         bottom_adapter = new VipItemAdapter(getApplicationContext(), b_list);
-                        if ((mId) == VideoType.MOVIE.getId()) {
+                        if (channelCode.equals(ChannelModel.FILM_ID)) {
 
                             classDetailsList.setLayoutManager(manager);
 //                        vipItemList.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.VERTICAL));
@@ -344,8 +345,8 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         pop.showPopupWindow(classDetailsTopbar, shown);
         pop.setListener(new SelectMenuPop.OnRadioClickListener() {
             @Override
-            public void clickListener(String key, String value) {
-                SearchChecked(key, value);
+            public void clickListener(String key, CateTagModel value) {
+                SearchChecked(key, value.getCode());
             }
         });
         pop.setTouchInterceptor(new View.OnTouchListener() {
@@ -361,33 +362,26 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     }
 
     private void SearchChecked(String key, String value) {
+
         if (key.equals("类型")) {
-            if (value.equals("0")) {
-                lx = "";
-            } else {
-                lx = value;
-            }
+
+            lx = value;
+
         }
         if (key.equals("属性")) {
-            if (value.equals("0")) {
-                sx = "";
-            } else {
-                sx = value;
-            }
+
+            sx = value;
+
         }
         if (key.equals("地区")) {
-            if (value.equals("0")) {
-                dq = "";
-            } else {
-                dq = value;
-            }
+
+            dq = value;
+
         }
         if (key.equals("年代")) {
-            if (value.equals("0")) {
-                nd = "";
-            } else {
-                nd = value;
-            }
+
+            nd = value;
+
         }
         if (b_list != null && b_list.size() > 0) {
             b_list.clear();

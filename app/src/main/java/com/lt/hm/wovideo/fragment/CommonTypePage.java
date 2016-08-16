@@ -95,7 +95,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     public static final String CHANNEL = "channel";
     private View view;
-    private int channelId;
     private String channelCode;
     private ChannelModel channel;
     private String cityCode;
@@ -210,7 +209,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 isLoading = true;
                 TLog.error("上拉加载----");
 
-                switch (channelId) {
+                switch (channelCode) {
                     case ChannelModel.RECOMMEND_ID://推荐
                     case ChannelModel.LOCAL_ID://地方
 
@@ -246,10 +245,9 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         Bundle bundle = getArguments();
         if (bundle != null) {
             channel = (ChannelModel) bundle.getSerializable(CHANNEL);
-            channelId = channel.getId();
             channelCode = channel.getFunCode();
         }
-        TLog.error(channelId + "");
+        TLog.error(channelCode + "");
     }
 
     /**
@@ -259,7 +257,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     public void initData() {
         pageNum = 1;
         isNoData = false;
-        switch (channelId) {
+        switch (channelCode) {
             case ChannelModel.RECOMMEND_ID://推荐
                 seed = "";
                 grid_list.clear();
@@ -328,6 +326,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         ImageLoaderUtil.getInstance().loadImage(context, new ImageLoader.Builder().imgView(imgTopPage).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(imgUrl)).build());
         tvType.setText(typeStr);
         tvDesc.setText(descStr);
+
     }
 
 
@@ -369,7 +368,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             public void OnItemClick(View view, int position) {
 //                            changePage(mList.get(position),typeListBean.getId());
 //                            changePage(mList.get(position).getId(),);
-                               getVideoDetails(mList.get(position).getOutid());
+                getVideoDetails(mList.get(position).getOutid());
                 // TODO: 16/6/29 跳转页面
             }
         });
@@ -386,24 +385,25 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        if (channelId == ChannelModel.RECOMMEND_ID || channelId == ChannelModel.LOCAL_ID) {
+        if (channelCode .equals( ChannelModel.RECOMMEND_ID) || channelCode .equals( ChannelModel.LOCAL_ID)) {
             listAdapter = new LikeListAdapter(R.layout.layout_new_home_item, grid_list);
-            listAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
-                @Override
-                public void onItemClick(View view, int i) {
+            listAdapter.setOnRecyclerViewItemClickListener((view1, i) -> {
 
-                        // 跳转视频详情页面
-              //          changePage(grid_list.get(i).getTypeId(), grid_list.get(i).getVfId());
-
-                }
+                // 跳转视频详情页面
+                changePage(grid_list.get(i).getTypeId(), grid_list.get(i).getId());
             });
         } else {
-            if (channelId == ChannelModel.FILM_ID) {
+            if (channelCode.equals(ChannelModel.FILM_ID)) {
                 isNotFilm = false;
                 layoutManager = new GridLayoutManager(getApplicationContext(), 3);
                 layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             }
             listAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films, isNotFilm);
+            listAdapter.setOnRecyclerViewItemClickListener((view1, i) -> {
+
+                // 跳转视频详情页面
+                changePage(films.get(i).getTypeId(), films.get(i).getVfinfo_id());
+            });
         }
         mRecyclerView.setLayoutManager(layoutManager);
         header.attachTo(mRecyclerView);
@@ -438,7 +438,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         map.put("numPerPage", numPerPage);
         if (!TextUtils.isEmpty(seed)) map.put("seed", seed);
         if (!TextUtils.isEmpty(tag)) map.put("tag", tag);
-        map.put("typeid", channelId == ChannelModel.RECOMMEND_ID || channelId == ChannelModel.LOCAL_ID ? "" : channelId);
+        map.put("typeid", channelCode .equals( ChannelModel.RECOMMEND_ID) || channelCode .equals( ChannelModel.LOCAL_ID) ? "" : channelCode);
         HttpApis.getYouLikeList(map, HttpApis.http_thr, new HttpCallback<>(ResponseLikeList.class, this));
     }
 
@@ -486,7 +486,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         cateGv.setPadding(20, 15, 20, 15);
         cateGv.setGravity(Gravity.CENTER);
         cateGv.setSelector(new ColorDrawable(Color.TRANSPARENT));
-        cateGv.setOnItemClickListener((parent, view1, position, id) -> NewClassDetailPage.getInstance(getActivity(), cateTags.get(position), channelId, cateTagListModel));
+        cateGv.setOnItemClickListener((parent, view1, position, id) -> NewClassDetailPage.getInstance(getActivity(), cateTags.get(position), channelCode, cateTagListModel));
     }
 
     private CateTagListModel cateTagListModel;
@@ -519,10 +519,10 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                     return;
                 }
 
-                if (channelId == ChannelModel.RECOMMEND_ID) {
+                if (channelCode .equals( ChannelModel.RECOMMEND_ID)) {
                     recommendImg.setVisibility(View.VISIBLE);
                 }
-                if (channelId == ChannelModel.LOCAL_ID) {
+                if (channelCode .equals( ChannelModel.LOCAL_ID)) {
                     titleRl.setVisibility(View.VISIBLE);
                 }
                 if (pageNum == 1) {
@@ -641,26 +641,26 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                         // TODO: 16/6/14 跳转电影页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.MOVIE.getId());
+                        bundle.putInt("typeId", VideoType.MOVIE.getId());
                         UIHelper.ToMoviePage(getActivity(), bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
                         // TODO: 16/6/14 跳转电视剧页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+                        bundle.putInt("typeId", VideoType.TELEPLAY.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
 
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
                         // TODO: 16/6/14 跳转 体育播放页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.SPORTS.getId());
+                        bundle.putInt("typeId", VideoType.SPORTS.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
                     } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
                         // TODO: 16/6/14 跳转综艺界面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.VARIATY.getId());
+                        bundle.putInt("typeId", VideoType.VARIATY.getId());
                         UIHelper.ToDemandPage(getActivity(), bundle);
                     }
                 }
@@ -673,26 +673,26 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             // TODO: 16/6/14 跳转电影页面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
-            bundle.putInt("typeId",VideoType.MOVIE.getId());
+            bundle.putInt("typeId", VideoType.MOVIE.getId());
             UIHelper.ToMoviePage(getActivity(), bundle);
         } else if (typeId == VideoType.TELEPLAY.getId()) {
             // TODO: 16/6/14 跳转电视剧页面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
-            bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+            bundle.putInt("typeId", VideoType.TELEPLAY.getId());
             UIHelper.ToDemandPage(getActivity(), bundle);
 
         } else if (typeId == VideoType.SPORTS.getId()) {
             // TODO: 16/6/14 跳转 体育播放页面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
-            bundle.putInt("typeId",VideoType.SPORTS.getId());
+            bundle.putInt("typeId", VideoType.SPORTS.getId());
             UIHelper.ToDemandPage(getActivity(), bundle);
         } else if (typeId == VideoType.VARIATY.getId()) {
             // TODO: 16/6/14 跳转综艺界面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
-            bundle.putInt("typeId",VideoType.VARIATY.getId());
+            bundle.putInt("typeId", VideoType.VARIATY.getId());
             UIHelper.ToDemandPage(getActivity(), bundle);
         }
     }

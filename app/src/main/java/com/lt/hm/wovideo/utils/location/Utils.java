@@ -3,9 +3,16 @@
  */
 package com.lt.hm.wovideo.utils.location;
 
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.text.TextUtils;
 
 import com.amap.api.location.AMapLocation;
+import com.amap.api.location.AMapLocationClient;
+import com.amap.api.location.AMapLocationClientOption;
+import com.amap.api.location.AMapLocationListener;
+import com.lt.hm.wovideo.utils.TLog;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -34,6 +41,59 @@ public class Utils {
 	
 	public final static String KEY_URL = "URL";
 	public final static String URL_H5LOCATION = "file:///android_asset/location.html";
+
+	private static AMapLocationClientOption locationOption = null;
+	private static AMapLocationClient locationClient = null;
+
+
+	public static void StartLocation(Context context){
+		locationClient = new AMapLocationClient(context);
+		locationOption = new AMapLocationClientOption();
+		// 设置定位模式为高精度模式
+		locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
+		// 设置定位监听
+		locationClient.setLocationListener(new AMapLocationListener(){
+
+			@Override
+			public void onLocationChanged(AMapLocation aMapLocation) {
+				if (null != aMapLocation) {
+					Message msg = mHandler.obtainMessage();
+					msg.obj = aMapLocation;
+					msg.what = Utils.MSG_LOCATION_FINISH;
+					mHandler.sendMessage(msg);
+				}
+			}
+		});
+		// 设置定位参数
+		locationClient.setLocationOption(locationOption);
+		locationClient.startLocation();
+		mHandler.sendEmptyMessage(Utils.MSG_LOCATION_START);
+	}
+
+	static Handler mHandler = new Handler() {
+		public void dispatchMessage(android.os.Message msg) {
+			switch (msg.what) {
+				// 定位完成
+				case Utils.MSG_LOCATION_FINISH:
+					AMapLocation loc = (AMapLocation) msg.obj;
+					String result = Utils.getLocationStr(loc);
+					TLog.log("location_result" + result);
+					locationClient.stopLocation();
+					// TODO: 8/2/16  缓存定位信息。。
+					break;
+				//停止定位
+				case Utils.MSG_LOCATION_STOP:
+//                    tvReult.setText("定位停止");
+					break;
+				default:
+					break;
+			}
+		}
+
+		;
+	};
+
+
 	/**
 	 * 根据定位结果返回定位信息的字符串
 	 * @param location

@@ -2,22 +2,15 @@ package com.lt.hm.wovideo.ui;
 
 import android.app.TaskStackBuilder;
 import android.content.Intent;
-import android.content.res.AssetManager;
-import android.graphics.ImageFormat;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -28,26 +21,19 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
-import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.amap.api.location.AMapLocation;
-import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
-import com.amap.api.location.AMapLocationListener;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
-import com.lt.hm.wovideo.fragment.ClassPage;
 import com.lt.hm.wovideo.fragment.EventsPage;
 import com.lt.hm.wovideo.fragment.LivePageFragment;
 import com.lt.hm.wovideo.fragment.NewChoicePage;
 import com.lt.hm.wovideo.fragment.RecommendPage;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
-import com.lt.hm.wovideo.interf.OnTabReselectListener;
 import com.lt.hm.wovideo.model.UserModel;
-import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -55,12 +41,9 @@ import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UpdateManager;
 import com.lt.hm.wovideo.utils.location.CheckPermissionsActivity;
 import com.lt.hm.wovideo.utils.location.Utils;
-import com.lt.hm.wovideo.widget.MyFragmentTabHost;
 import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
 import com.lt.hm.wovideo.zxing.ui.MipcaActivityCapture;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -71,7 +54,7 @@ import butterknife.BindView;
  * @version 1.0
  * @create_date 16/5/30
  */
-public class MainPage2 extends BaseActivity implements AMapLocationListener {
+public class MainPage2 extends BaseActivity{
     private final static int SCANNIN_GREQUEST_CODE = 1;
     private final static String FIRST_LAUNCH_KEY = "first launch";
     private static final String FRAGMENT_TAGS = "fragmentTags";
@@ -96,7 +79,6 @@ public class MainPage2 extends BaseActivity implements AMapLocationListener {
     @BindView(R.id.group)
     RadioGroup group;
     private CheckPermissionsActivity permChecker = null;
-    private AMapLocationClient locationClient = null;
     private FragmentManager fragmentManager;
 
     private ArrayList<String> fragmentTags;
@@ -202,28 +184,6 @@ public class MainPage2 extends BaseActivity implements AMapLocationListener {
         }
     }
 
-    Handler mHandler = new Handler() {
-        public void dispatchMessage(android.os.Message msg) {
-            switch (msg.what) {
-                // 定位完成
-                case Utils.MSG_LOCATION_FINISH:
-                    AMapLocation loc = (AMapLocation) msg.obj;
-                    String result = Utils.getLocationStr(loc);
-                    TLog.log("location_result" + result);
-                    locationClient.stopLocation();
-                    // TODO: 8/2/16  缓存定位信息。。
-                    break;
-                //停止定位
-                case Utils.MSG_LOCATION_STOP:
-//                    tvReult.setText("定位停止");
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        ;
-    };
     private boolean dialog_showing = false;
     private AMapLocationClientOption locationOption = null;
     private long mExitTime = 0;
@@ -263,17 +223,7 @@ public class MainPage2 extends BaseActivity implements AMapLocationListener {
         });
         builder.show();
 
-        locationClient = new AMapLocationClient(this.getApplicationContext());
-        locationOption = new AMapLocationClientOption();
-        // 设置定位模式为高精度模式
-        locationOption.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy);
-        // 设置定位监听
-        locationClient.setLocationListener(this);
-        // 设置定位参数
-        locationClient.setLocationOption(locationOption);
-        // 启动定位
-        locationClient.startLocation();
-        mHandler.sendEmptyMessage(Utils.MSG_LOCATION_START);
+        Utils.StartLocation(MainPage2.this);
     }
 
     @Override
@@ -284,15 +234,6 @@ public class MainPage2 extends BaseActivity implements AMapLocationListener {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (null != locationClient) {
-            /**
-             * 如果AMapLocationClient是在当前Activity实例化的，
-             * 在Activity的onDestroy中一定要执行AMapLocationClient的onDestroy
-             */
-            locationClient.onDestroy();
-            locationClient = null;
-            locationOption = null;
-        }
     }
 
 
@@ -506,16 +447,5 @@ public class MainPage2 extends BaseActivity implements AMapLocationListener {
     public void onCreateNavigateUpTaskStack(TaskStackBuilder builder) {
         super.onCreateNavigateUpTaskStack(builder);
     }
-
-    @Override
-    public void onLocationChanged(AMapLocation aMapLocation) {
-        if (null != aMapLocation) {
-            Message msg = mHandler.obtainMessage();
-            msg.obj = aMapLocation;
-            msg.what = Utils.MSG_LOCATION_FINISH;
-            mHandler.sendMessage(msg);
-        }
-    }
-
 
 }

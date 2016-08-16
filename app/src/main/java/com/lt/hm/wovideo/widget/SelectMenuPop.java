@@ -62,7 +62,7 @@ public class SelectMenuPop extends PopupWindow {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layout_container.setOrientation(LinearLayout.VERTICAL);
         layout_container.setBackgroundColor(context.getResources().getColor(R.color.white));
-
+        layout_container.setAlpha(0.8f);
         layout_container.setLayoutParams(params);
         Set<String> keys = movie_container.keySet();
         for (String key : keys) {
@@ -94,9 +94,6 @@ public class SelectMenuPop extends PopupWindow {
         LinearLayout layout_item = new LinearLayout(context);
         layout_item.setOrientation(LinearLayout.HORIZONTAL);
         layout_item.setPadding(25, 20, 25, 20);
-//        layout_item.setBackgroundColor(Color.parseColor("#00000000"));
-        layout_item.setBackgroundDrawable(new ColorDrawable(0xC0FFFFFF));
-        layout_item.setAlpha(0.8f);
         TextView text = new TextView(context);
         LinearLayout.LayoutParams typelp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         typelp.setMargins(20, 12, 20, 12);

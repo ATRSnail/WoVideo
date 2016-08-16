@@ -261,8 +261,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         }
     };
 
-
-
     @Override
     public void pipBtnCallBack(ArrayList<String> str) {
         if (str!=null&&str.size()>0){
@@ -1035,8 +1033,13 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         }
     }
 
+    private String intentPlayUrl = "";
+    public static final String PLAY_URL = "play_url";
     @Override
     public void initDatas() {
+        if (getIntent() != null){
+            intentPlayUrl = getIntent().getStringExtra(PLAY_URL);
+        }
         getLiveList();
     }
 

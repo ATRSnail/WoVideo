@@ -56,11 +56,17 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 	private List<String> mTitles = new ArrayList<>();
 	private List<Fragment> fragments = new ArrayList<>();
 	private View view;
+	private LayoutInflater inflater;
+	private ViewGroup container;
+	private Bundle savedInstanceState;
 
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		if (view == null) {
+			this.inflater = inflater;
+			this.container = container;
+			this.savedInstanceState = savedInstanceState;
 			view = inflater.inflate(getLayoutId(), container, false);
 			unbinder = ButterKnife.bind(this, view);
 			initView(view);
@@ -166,8 +172,8 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (resultCode){
 			case PersonalitySet.RESULT_PERSONALITY:
-				initView(view);
-				initData();
+	//			view = null;
+	//			onCreateView(inflater,container,savedInstanceState);
 				break;
 		}
 

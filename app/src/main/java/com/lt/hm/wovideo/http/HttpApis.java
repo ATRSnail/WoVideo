@@ -434,12 +434,24 @@ public class HttpApis {
 
     /**
      *
+     * 获取个性化频道
      * @param map
      * @param flag
      * @param callback
      */
     public static void getIndividuationChannel(HashMap<String, Object> map, int flag, HttpCallback callback) {
         HttpUtils.formPost("mblUser/getIndividuationChannel", map, flag, callback);
+    }
+
+    /**
+     *
+     * 获取个性化标签
+     * @param map
+     * @param flag
+     * @param callback
+     */
+    public static void getIndividuationTag(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblUser/getIndividuationTag", map, flag, callback);
     }
 
 
@@ -451,5 +463,15 @@ public class HttpApis {
      */
     public static void updateChannel(HashMap<String, Object> map, int flag, HttpCallback callback) {
         HttpUtils.formPost("mblUser/updateChannel", map, flag, callback);
+    }
+
+    /**
+     *更新tag接口
+     * @param map
+     * @param flag
+     * @param callback
+     */
+    public static void updateTag(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblUser/updateTag", map, flag, callback);
     }
 }

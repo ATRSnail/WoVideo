@@ -25,6 +25,7 @@ import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
 import com.lt.hm.wovideo.ui.PersonalitySet;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UserMgr;
 
@@ -113,6 +114,8 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 		getClassInfos();
 	}
 
+	private String cityCode=null;
+	private String cityName="地区";
 	@Override
 	public <T> void onSuccess(T value, int flag) {
 		super.onSuccess(value, flag);
@@ -120,7 +123,10 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 			case HttpApis.http_one:
 				ResponseChannel channelRe = (ResponseChannel) value;
 				channels = channelRe.getBody().getSelectedChannels();
-				initBottom("");
+				cityCode = SharedPrefsUtils.getStringPreference("city_code");
+				cityName = SharedPrefsUtils.getStringPreference("city_name");
+				TLog.error("cityCode--->"+cityCode);
+				initBottom(cityName);
 				break;
 		}
 	}
@@ -131,7 +137,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 		mTitles.clear();
 		channels.add(0, new ChannelModel("推荐", ChannelModel.RECOMMEND_ID));
 		// TODO: 8/15/16 ADD Current position name
-		channels.add(1, new ChannelModel(TextUtils.isEmpty(str)?"地区":str, ChannelModel.LOCAL_ID));
+		channels.add(1, new ChannelModel(str, cityCode));
 
 		for (int i = 0; i < channels.size(); i++) {
 			bean = channels.get(i);

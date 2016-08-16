@@ -9,6 +9,7 @@ import com.lt.hm.wovideo.ui.BillsPage;
 import com.lt.hm.wovideo.ui.ChangePassword1Aty;
 import com.lt.hm.wovideo.ui.CollectPage;
 import com.lt.hm.wovideo.ui.DemandPage;
+import com.lt.hm.wovideo.ui.EventsPageActivity;
 import com.lt.hm.wovideo.ui.FindPwdAty;
 import com.lt.hm.wovideo.ui.GuidPage;
 import com.lt.hm.wovideo.ui.HistoryPage;
@@ -21,6 +22,7 @@ import com.lt.hm.wovideo.ui.NewMoviePage;
 import com.lt.hm.wovideo.ui.OpenVipActivity;
 import com.lt.hm.wovideo.ui.PersonCenter;
 import com.lt.hm.wovideo.ui.PersonInfoPage;
+import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.ui.RecallBackPage;
 import com.lt.hm.wovideo.ui.RegistPage;
 import com.lt.hm.wovideo.ui.SearchPage;
@@ -118,12 +120,32 @@ public class UIHelper {
 	}
 
 	/**
+	 * 跳转到标签页
+	 * @param context
+     */
+	public static void ToTagPage(Context context) {
+		Intent intent = new Intent(context, PersonalitySet.class);
+		intent.putExtra("isTag",true);
+		context.startActivity(intent);
+	}
+
+	/**
 	 * 跳转
 	 *
 	 * @param context
 	 */
 	public static void ToSearchPage(Context context) {
 		Intent intent = new Intent(context, SearchPage.class);
+		context.startActivity(intent);
+	}
+
+	/**
+	 * 跳转
+	 *
+	 * @param context
+	 */
+	public static void ToEventPage(Context context) {
+		Intent intent = new Intent(context, EventsPageActivity.class);
 		context.startActivity(intent);
 	}
 
@@ -182,6 +204,18 @@ public class UIHelper {
 	 */
 	public static void ToLivePage(Context context) {
 		Intent intent = new Intent(context, LivePage.class);
+		context.startActivity(intent);
+	}
+
+	/**
+	 * 跳转直播页面
+	 *
+	 * @param context
+	 * @param bundle
+     */
+	public static void ToLivePage(Context context,Bundle bundle) {
+		Intent intent = new Intent(context, LivePage.class);
+		intent.putExtras(bundle);
 		context.startActivity(intent);
 	}
 

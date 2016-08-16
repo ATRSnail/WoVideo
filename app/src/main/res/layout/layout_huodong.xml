@@ -1,14 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/event_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/event_refresh"
-    >
+    android:orientation="vertical">
+
+    <com.lt.hm.wovideo.widget.SecondTopbar
+        android:id="@+id/set_topbar"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/s_46"
+        app:CustomtitleTextColor="@color/black"
+        app:CustomtitleTextSize="@dimen/f_16"
+        app:Customtoptitle="活动"
+        app:leftBackGround="@drawable/left_arrow"
+        app:rightBackGround="@drawable/left_arrow" />
+
     <ListView
         android:id="@+id/lv_huodong"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent" />
 
 </android.support.v4.widget.SwipeRefreshLayout>

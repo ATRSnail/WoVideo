@@ -2,9 +2,11 @@ package com.lt.hm.wovideo.ui;
 
 import android.app.TaskStackBuilder;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,10 +32,12 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.fragment.EventsPage;
 import com.lt.hm.wovideo.fragment.LivePageFragment;
+import com.lt.hm.wovideo.fragment.MineInfo;
 import com.lt.hm.wovideo.fragment.NewChoicePage;
 import com.lt.hm.wovideo.fragment.RecommendPage;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -44,6 +48,8 @@ import com.lt.hm.wovideo.utils.location.Utils;
 import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
 import com.lt.hm.wovideo.zxing.ui.MipcaActivityCapture;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -85,7 +91,7 @@ public class MainPage2 extends BaseActivity{
 
     private void initData() {
         currIndex = 0;
-        fragmentTags = new ArrayList<>(Arrays.asList("HomeFragment", "DoctorFragment", "BarFragment", "MineFragment"));
+        fragmentTags = new ArrayList<>(Arrays.asList("HomeFragment", "LiveFragment", "VipFragment", "MineFragment"));
     }
 
     private void initView() {
@@ -108,7 +114,6 @@ public class MainPage2 extends BaseActivity{
                     default:
                         break;
                 }
-                showFragment();
             }
         });
         showFragment();
@@ -119,11 +124,11 @@ public class MainPage2 extends BaseActivity{
             commonHeadLayout.setVisibility(View.GONE);
             choiceHeadLayout.setVisibility(View.VISIBLE);
         } else {
-            commonHeadLayout.setVisibility(View.VISIBLE);
+            commonHeadLayout.setVisibility(index == 3?View.GONE:View.VISIBLE);
             choiceHeadLayout.setVisibility(View.GONE);
         }
         if (index == 1){
-            UIHelper.ToLivePage(getApplicationContext());
+            UIHelper.ToLivePage(this);
             checkGroup(currIndex);
             return;
         }
@@ -138,10 +143,10 @@ public class MainPage2 extends BaseActivity{
                 group.check(R.id.foot_bar_home);
                 break;
             case 2:
-                group.check(R.id.main_footbar_user);
+                group.check(R.id.foot_bar_interest);
                 break;
             case 3:
-                group.check(R.id.foot_bar_interest);
+                group.check(R.id.main_footbar_user);
                 break;
         }
     }
@@ -178,7 +183,8 @@ public class MainPage2 extends BaseActivity{
             case 2:
                 return new RecommendPage();
             case 3:
-                return new EventsPage();
+           //     return new EventsPage();
+                return new MineInfo();
             default:
                 return null;
         }
@@ -203,6 +209,7 @@ public class MainPage2 extends BaseActivity{
         choiceHeadLayout.setVisibility(View.VISIBLE);
 
         checkLoginState();
+        readPositionFromAsset();
         initData();
         initView();
         MaterialShowcaseView.Builder builder = new MaterialShowcaseView.Builder(this)
@@ -259,6 +266,12 @@ public class MainPage2 extends BaseActivity{
             } else if (model.getIsVip().equals("0")) {
                 UnLoginHandler.freeDialog(MainPage2.this, model);
             }
+        }
+
+        boolean isFirstRegister = SharedPrefsUtils.getBooleanPreference(this,"regist",false);
+        if (isFirstRegister){
+            SharedPrefsUtils.setBooleanPreference(this,"regist",true);
+            UIHelper.ToTagPage(this);
         }
     }
 
@@ -446,6 +459,16 @@ public class MainPage2 extends BaseActivity{
     @Override
     public void onCreateNavigateUpTaskStack(TaskStackBuilder builder) {
         super.onCreateNavigateUpTaskStack(builder);
+    }
+
+    private void readPositionFromAsset() {
+        new Thread(() -> {
+            try {
+               FileUtil.readAsset(getApplicationContext());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
 }

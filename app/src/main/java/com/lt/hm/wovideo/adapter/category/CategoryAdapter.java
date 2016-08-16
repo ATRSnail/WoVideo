@@ -10,6 +10,7 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
 import com.lt.hm.wovideo.model.Category;
 import com.lt.hm.wovideo.model.ChannelModel;
+import com.lt.hm.wovideo.model.TagModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,15 +21,19 @@ import java.util.List;
 public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context ctx;
-    private List<ChannelModel> list = new ArrayList<>();
+    private List<ChannelModel> videolist = new ArrayList<>();
+    private List<TagModel> tagList = new ArrayList<>();
     private LayoutInflater inflater;
     private OnCateItemListener listener;
     private int type;
+    private boolean isTag;
     public boolean isCanDel = false;
 
-    public CategoryAdapter(Context ctx, List<ChannelModel> categories, OnCateItemListener listener, int type) {
+    public CategoryAdapter(boolean isTag, Context ctx, List<ChannelModel> categories, List<TagModel> tagList, OnCateItemListener listener, int type) {
+        this.isTag = isTag;
         this.ctx = ctx;
-        this.list = categories;
+        this.videolist = categories;
+        this.tagList = tagList;
         this.listener = listener;
         this.type = type;
         this.inflater = LayoutInflater.from(ctx);
@@ -45,18 +50,18 @@ public class CategoryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (type == Category.FIRST_TYPE) {
             FirstViewHolder firstViewHolder = (FirstViewHolder) holder;
-            firstViewHolder.firstCategory.setText(list.get(position).getFunName());
+            firstViewHolder.firstCategory.setText(isTag ? tagList.get(position).getName() : videolist.get(position).getFunName());
             firstViewHolder.deleteImg.setVisibility(isCanDel ? View.VISIBLE : View.GONE);
             firstViewHolder.setIsCanDel(isCanDel);
             return;
         }
         SecondViewHolder secondViewHolder = (SecondViewHolder) holder;
-        secondViewHolder.secondCategory.setText(list.get(position).getFunName());
+        secondViewHolder.secondCategory.setText(isTag ? tagList.get(position).getName() : videolist.get(position).getFunName());
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return isTag ? tagList.size() : videolist.size();
     }
 
     public void toggleCanDelete() {

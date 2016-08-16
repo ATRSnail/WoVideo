@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/person_center"
         android:padding="10dp"
+        android:visibility="gone"
         android:layout_centerVertical="true"
         android:src="@drawable/person_selecter"
         android:layout_alignParentLeft="true"

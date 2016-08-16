@@ -1,9 +1,14 @@
 package com.lt.hm.wovideo.utils;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.os.Environment;
 import android.os.StatFs;
 import android.util.Log;
+
+import com.google.gson.Gson;
+import com.lt.hm.wovideo.model.City;
+import com.lt.hm.wovideo.model.CityArrayModel;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -677,6 +683,27 @@ public class FileUtil {
 	public static void cleanInternalCache(Context context) {
 		deleteFilesByDirectory(context.getCacheDir());
 //		deleteFilesByDirectory(context.getFilesDir());
+	}
+
+	public static void readAsset(Context context) throws IOException {
+		AssetManager manager = context.getAssets();
+		InputStream is = manager.open("citys.json");
+		JsonToModel(FileUtil.readInStream(is));
+	}
+
+	public static Map<String,String> map = new HashMap<>();
+	public static List<City> cities = new ArrayList<>();
+	public static void JsonToModel(String city_json) {
+		CityArrayModel cityArrayModel = new Gson().fromJson(city_json, CityArrayModel.class);
+		if (cityArrayModel.list.size() > 0) {
+			SiteBSTree<String> tree = new SiteBSTree<String>();
+			for (int i = 0; i < cityArrayModel.list.size(); i++) {
+				tree.insert(PinyinUtil
+						.getPinYinHeadChar(cityArrayModel.list.get(i).getCity()), cityArrayModel.list.get(i).getCity()+cityArrayModel.list.get(i).getCode());
+				map.put(cityArrayModel.list.get(i).getCity(),cityArrayModel.list.get(i).getCode());
+			}
+			cities = tree.inOrder();
+		}
 	}
 
 }

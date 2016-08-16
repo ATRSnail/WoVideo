@@ -17,7 +17,7 @@ public enum MainTab {
 //            ChoicePage.class),
 	SELECTION(0, R.string.new_choice_string, R.drawable.tab_choice_selector,
 					NewChoicePage.class),
-	//CLASSES(1, R.string.classes_string, R.drawable.tab_classes_selector, ClassPage.class),
+//	CLASSES(1, R.string.classes_string, R.drawable.tab_classes_selector, ClassPage.class),
 
 	    CLASSES(1, R.string.live_string, R.drawable.tab_selection_selector, LivePageFragment.class),
 //    VIP(2, R.string.vip_string, R.drawable.tab_vip_selector, RecommendPage.class),

@@ -59,6 +59,7 @@ import com.lt.hm.wovideo.model.response.ResponseFilms;
 import com.lt.hm.wovideo.model.response.ResponseLikeList;
 import com.lt.hm.wovideo.model.response.ResponseLocalCityModel;
 import com.lt.hm.wovideo.ui.CityListPage;
+import com.lt.hm.wovideo.ui.LivePage;
 import com.lt.hm.wovideo.ui.NewClassDetailPage;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -127,6 +128,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     ImageView imgTopPage;
     @BindView(R.id.item_title)
     TextView tvTitle;
+    @BindView(R.id.line_tv)
+    TextView tvLine;
     @BindView(R.id.item_type)
     TextView tvType;
     @BindView(R.id.item_desc)
@@ -234,6 +237,25 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         changeCityBtn.setOnClickListener((View v) -> {
             startActivityForResult(new Intent(getActivity(), CityListPage.class), 99);
         });
+        topPageFl.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (channelCode) {
+                    case ChannelModel.LOCAL_ID://地方
+                        if (localCityModel != null)
+                        ToLivePage(localCityModel.getUrl(),localCityModel.getTvName());
+                        break;
+                    case ChannelModel.FILM_ID://电影
+                    case ChannelModel.TELEPLAY_ID://电视剧
+                    case ChannelModel.SPORTS_ID://体育
+                    case ChannelModel.VARIATY_ID://综艺
+                        // 跳转视频详情页面
+                        if (filmMode != null)
+                        changePage(filmMode.getTypeId(), filmMode.getVfinfo_id());
+                        break;
+                }
+            }
+        });
     }
 
     /**
@@ -311,19 +333,38 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         topPageFl.setVisibility(View.VISIBLE);
         changeCityBtn.setVisibility(View.VISIBLE);
         localCityModel = localCites.get(0);
-        setDataToTopView(localCityModel.getTvName(), localCityModel.getProperty(), localCityModel.getNowPro(), localCityModel.getImg());
+        setDataToTopView(localCityModel.getTvName(), "", localCityModel.getNowPro(), localCityModel.getImg());
         localCites.remove(0);
         if (localCites.size() == 0) return;
         liveAdapter.notifyView(localCites);
+        liveLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ToLivePage(localCites.get(position-1).getUrl(),localCites.get(position-1).getTvName());
+            }
+        });
+    }
+
+    private void ToLivePage(String url,String name){
+        Bundle bundle = new Bundle();
+        bundle.putString(LivePage.PLAY_URL,url);
+        bundle.putString(LivePage.PLAY_NAME,name);
+        UIHelper.ToLivePage(getActivity(),bundle);
     }
 
     /**
      * 第一个布局图显示字体
      */
     private void setDataToTopView(String name, String typeStr, String descStr, String imgUrl) {
+
         tvTitle.setText(name);
         ImageLoaderUtil.getInstance().loadImage(context, new ImageLoader.Builder().imgView(imgTopPage).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(imgUrl)).build());
-        tvType.setText(typeStr);
+        if (TextUtils.isEmpty(typeStr)){
+            tvDesc.setVisibility(GONE);
+            tvLine.setVisibility(GONE);
+            tvType.setCompoundDrawables(null,null,null,null);
+        }
+        tvType.setText("正在播放:"+descStr);
         tvDesc.setText(descStr);
 
     }
@@ -489,6 +530,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     }
 
     private CateTagListModel cateTagListModel;
+    private FilmMode filmMode;
 
     @Override
     public <T> void onSuccess(T value, int flag) {
@@ -542,8 +584,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 films = filmRe.getBody().getTypeList();
                 if (films == null || films.size() == 0) return;
                 topPageFl.setVisibility(View.VISIBLE);
-                FilmMode filmMode = films.get(0);
-                setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getDq(), filmMode.getImg());
+                filmMode = films.get(0);
+                setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getHit(), filmMode.getImg());
                 films.remove(0);
                 if (films.size() == 0) {
                     isNoData = true;

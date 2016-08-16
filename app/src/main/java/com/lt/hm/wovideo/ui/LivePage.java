@@ -114,7 +114,7 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  * @create_date 16/6/12
  */
 public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener,VideoPipAdapter.ItemClickCallBack {
+        AudioCapabilitiesReceiver.Listener, VideoPipAdapter.ItemClickCallBack {
     @BindView(R.id.video_name)
     TextView videoName;
     @BindView(R.id.video_play_number)
@@ -148,7 +148,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     TextView mFreeLabel;
     int newIndex = 0;
     int oldIndex = -1;
-    private boolean first_open= false;
+    private boolean first_open = false;
 
     @BindView(R.id.live_btn_sina)
     Button liveBtnSina;
@@ -173,7 +173,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     // For use when launching the demo app using adb.
     private static final String CONTENT_EXT_EXTRA = "type";
     //画中画urls
-    public  static  final String PIP_URLS="pip_urls";
+    public static final String PIP_URLS = "pip_urls";
 
     private static final int MENU_GROUP_TRACKS = 1;
     private static final int ID_OFFSET = 2;
@@ -227,7 +227,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                         String url = "http://www.bilibili.com/favicon.ico";
                         InputStream inputStream = null;
                         Drawable drawable = mDrawable;
-                        if(drawable == null) {
+                        if (drawable == null) {
                             try {
                                 URLConnection urlConnection = new URL(url).openConnection();
                                 inputStream = urlConnection.getInputStream();
@@ -245,7 +245,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                             drawable.setBounds(0, 0, 100, 100);
                             SpannableStringBuilder spannable = createSpannable(drawable);
                             danmaku.text = spannable;
-                            if(mDanmakuView != null) {
+                            if (mDanmakuView != null) {
                                 mDanmakuView.invalidateDanmaku(danmaku, false);
                             }
                             return;
@@ -263,15 +263,15 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     @Override
     public void pipBtnCallBack(ArrayList<String> str) {
-        if (str!=null&&str.size()>0){
+        if (str != null && str.size() > 0) {
             mListPopupWindow.dismiss();
-           Intent intent = new Intent(this,PipActivity.class);
+            Intent intent = new Intent(this, PipActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putStringArrayList(PIP_URLS,str);
+            bundle.putStringArrayList(PIP_URLS, str);
             intent.putExtras(bundle);
             startActivity(intent);
-        }else{
-            Toast.makeText(this,"请至少选择一个",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "请至少选择一个", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -724,7 +724,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     // AVPlayer.Listener implementation
 
-    @Override public void onStateChanged(boolean playWhenReady, int playbackState) {
+    @Override
+    public void onStateChanged(boolean playWhenReady, int playbackState) {
         if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
             mRotateLoading.stop();
         } else {
@@ -732,28 +733,33 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         }
     }
 
-    @Override public void onError(Exception e) {
+    @Override
+    public void onError(Exception e) {
 
     }
 
-    @Override public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
-                                             float pixelWidthHeightRatio) {
+    @Override
+    public void onVideoSizeChanged(int width, int height, int unappliedRotationDegrees,
+                                   float pixelWidthHeightRatio) {
         mShutterView.setVisibility(View.GONE);
         mVideoFrame.setAspectRatio(
                 height == 0 ? 1 : (width * pixelWidthHeightRatio) / height);
     }
 
-    @Override public void onCues(List<Cue> cues) {
+    @Override
+    public void onCues(List<Cue> cues) {
 
     }
 
-    @Override public void onId3Metadata(List<Id3Frame> id3Frames) {
+    @Override
+    public void onId3Metadata(List<Id3Frame> id3Frames) {
 
     }
 
     // AudioCapabilitiesReceiver.Listener methods
 
-    @Override public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
+    @Override
+    public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
         if (mPlayer == null) {
             return;
         }
@@ -764,13 +770,14 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         mPlayer.setBackgrounded(backgrounded);
     }
 
-    private void toggleControlsVisibility()  {
+    private void toggleControlsVisibility() {
         if (mMediaController.isShowing()) {
             mMediaController.hide();
         } else {
             showControls();
         }
     }
+
     private void showControls() {
         mMediaController.show(0);
     }
@@ -800,7 +807,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     @TargetApi(23)
     private boolean maybeRequestPermission() {
         if (requiresPermission(mContentUri)) {
-            requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
             return true;
         } else {
             return false;
@@ -819,7 +826,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
      * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
      * extension.
      *
-     * @param uri The {@link Uri} of the media.
+     * @param uri           The {@link Uri} of the media.
      * @param fileExtension An overriding file extension.
      * @return The inferred type.
      */
@@ -906,7 +913,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         otherList = new ArrayList<>();
         btns = new Button[]{liveBtnSina, liveBtnLocal, liveBtnCctv, liveBtnOthertv};
         liveProgramList.setLayoutManager(new LinearLayoutManager(this));
-        liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this,LinearLayoutManager.VERTICAL,R.drawable.custom_list_divider));
+        liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this, LinearLayoutManager.VERTICAL, R.drawable.custom_list_divider));
 //        liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this,LinearLayoutManager.VERTICAL,getResources().getDimensionPixelOffset(3),R.color.gray_lightest));
 //        liveProgramList.addItemDecoration(new SpaceItemDecoration(10));
 //        liveProgramList.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
@@ -927,37 +934,38 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     PipListviwPopuWindow mListPopupWindow;
     private List<LiveModles> liveModlesList;
-    private final String [] str={"央视","卫士","地方台","专业"};
-    private List<LiveModles> getPipDatas(){
-        liveModlesList=new ArrayList<>();
-            if (cctvList != null) {
-                LiveModles modles = new LiveModles();
-                modles.title = str[0];
-                modles.setSinatv(cctvList);
-                liveModlesList.add(modles);
-            }
-            if (sinaList != null) {
-                LiveModles modles1 = new LiveModles();
-                modles1.title = str[1];
-                modles1.setSinatv(sinaList);
-                liveModlesList.add(modles1);
-            }
+    private final String[] str = {"央视", "卫士", "地方台", "专业"};
+
+    private List<LiveModles> getPipDatas() {
+        liveModlesList = new ArrayList<>();
+        if (cctvList != null) {
+            LiveModles modles = new LiveModles();
+            modles.title = str[0];
+            modles.setSinatv(cctvList);
+            liveModlesList.add(modles);
+        }
+        if (sinaList != null) {
+            LiveModles modles1 = new LiveModles();
+            modles1.title = str[1];
+            modles1.setSinatv(sinaList);
+            liveModlesList.add(modles1);
+        }
 
 
-            if (localList != null) {
-                LiveModles modles2 = new LiveModles();
-                modles2.title = str[2];
-                modles2.setSinatv(localList);
-                liveModlesList.add(modles2);
-            }
+        if (localList != null) {
+            LiveModles modles2 = new LiveModles();
+            modles2.title = str[2];
+            modles2.setSinatv(localList);
+            liveModlesList.add(modles2);
+        }
 
 
-            if (otherList != null) {
-                LiveModles modles3 = new LiveModles();
-                modles3.title = str[3];
-                modles3.setSinatv(otherList);
-                liveModlesList.add(modles3);
-            }
+        if (otherList != null) {
+            LiveModles modles3 = new LiveModles();
+            modles3.title = str[3];
+            modles3.setSinatv(otherList);
+            liveModlesList.add(modles3);
+        }
 
 
         return liveModlesList;
@@ -984,33 +992,33 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
         liveBtnSina.setOnClickListener((View v) -> {
             changeState(btns[0]);
-            if (sinaList.size()>0){
+            if (sinaList.size() > 0) {
                 initListViews(sinaList);
             }
         });
         liveBtnLocal.setOnClickListener((View v) -> {
             changeState(btns[1]);
-            if (localList.size()>0){
+            if (localList.size() > 0) {
                 initListViews(localList);
             }
         });
         liveBtnCctv.setOnClickListener((View v) -> {
             changeState(btns[2]);
-            if (cctvList.size()>0){
+            if (cctvList.size() > 0) {
                 initListViews(cctvList);
             }
         });
         liveBtnOthertv.setOnClickListener((View v) -> {
             changeState(btns[3]);
-            if (otherList.size()>0){
+            if (otherList.size() > 0) {
                 initListViews(otherList);
             }
         });
         //显示视频画中画弹框
         videoPip.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick( View v) {
-                if (null!=liveModlesList&&liveModlesList.size()>0) {
+            public void onClick(View v) {
+                if (null != liveModlesList && liveModlesList.size() > 0) {
                     mListPopupWindow = new PipListviwPopuWindow(LivePage.this, liveModlesList, LivePage.this);
                     mListPopupWindow.showAsDropDown(v);
 
@@ -1022,11 +1030,11 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     private void changeState(Button btn) {
         for (int i = 0; i < btns.length; i++) {
-            Button tmp= btns[i];
-            if (btn!=tmp){
+            Button tmp = btns[i];
+            if (btn != tmp) {
                 tmp.setBackgroundColor(getResources().getColor(R.color.gray_lighter));
                 tmp.setTextColor(getResources().getColor(R.color.font_black));
-            }else{
+            } else {
                 tmp.setBackgroundColor(getResources().getColor(R.color.blue_btn_bg_color));
                 tmp.setTextColor(getResources().getColor(R.color.white));
             }
@@ -1034,11 +1042,15 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     }
 
     private String intentPlayUrl = "";
+    private String intentPlayName = "";
     public static final String PLAY_URL = "play_url";
+    public static final String PLAY_NAME = "play_name";
+
     @Override
     public void initDatas() {
-        if (getIntent() != null){
+        if (getIntent() != null) {
             intentPlayUrl = getIntent().getStringExtra(PLAY_URL);
+            intentPlayName = getIntent().getStringExtra(PLAY_NAME);
         }
         getLiveList();
     }
@@ -1071,15 +1083,16 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     }
 
     private void initListViews(List<LiveModles.LiveModel> liveTvList) {
+        if (liveProgramList == null) return;
         adapter = new LiveTVListAdapter(getApplicationContext(), liveTvList);
         liveProgramList.setAdapter(adapter);
         adapter.notifyDataSetChanged();
-        if (!first_open){
+        if (!first_open) {
 
-        getRealURL(liveTvList.get(0).getUrl());
-            videoName.setText(liveTvList.get(0).getTvName());
+            getRealURL(TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getUrl() : intentPlayUrl);
+            videoName.setText(TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getTvName() : intentPlayName);
 
-            first_open=true;
+            first_open = true;
         }
 
 //        videoName.setText(liveTvList.get(0).getTvName());
@@ -1090,9 +1103,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
 
                 String url = liveTvList.get(i).getUrl();
-                String userinfo= ACache.get(getApplicationContext()).getAsString("userinfo");
-                if (!StringUtils.isNullOrEmpty(userinfo)){
-                    UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+                String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
+                if (!StringUtils.isNullOrEmpty(userinfo)) {
+                    UserModel model = new Gson().fromJson(userinfo, UserModel.class);
                     String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
                     if (!StringUtils.isNullOrEmpty(tag)) {
 //                        free_hint.setText(" "+"已免流");
@@ -1106,7 +1119,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             }
         });
         //初始化画中画弹框
-        liveModlesList  =getPipDatas();
+        liveModlesList = getPipDatas();
 
     }
 
@@ -1144,7 +1157,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 //    }
 
 
-
     /**
      * 获取视频播放地址
      *
@@ -1153,17 +1165,17 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     private void getRealURL(String url) {
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("videoSourceURL", url);
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)){
-            UserModel model = new Gson().fromJson(userinfo,UserModel.class);
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)) {
+            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
             maps.put("cellphone", model.getPhoneNo());
-            if (model.getIsVip()!=null && model.getIsVip().equals("1")){
+            if (model.getIsVip() != null && model.getIsVip().equals("1")) {
                 maps.put("freetag", "1");
-            }else{
+            } else {
                 maps.put("freetag", "0");
             }
 
-        }else{
+        } else {
             maps.put("cellphone", StringUtils.generateOnlyID());
             maps.put("freetag", "0");
         }

@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
+import com.lt.hm.wovideo.AppContext;
+
 /**
  * @author leonardo
  * @version 1.0
@@ -29,6 +31,15 @@ public class SharedPrefsUtils {
         return value;
     }
 
+    public static String getStringPreference(String key) {
+        String value = null;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(AppContext.getInstance());
+        if (preferences != null) {
+            value = preferences.getString(key, null);
+        }
+        return value;
+    }
+
     /**
      * Helper method to write a String value to {@link SharedPreferences}.
      *
@@ -39,6 +50,16 @@ public class SharedPrefsUtils {
      */
     public static boolean setStringPreference(Context context, String key, String value) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        if (preferences != null && !TextUtils.isEmpty(key)) {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString(key, value);
+            return editor.commit();
+        }
+        return false;
+    }
+
+    public static boolean setStringPreference( String key, String value) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(AppContext.getInstance());
         if (preferences != null && !TextUtils.isEmpty(key)) {
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(key, value);

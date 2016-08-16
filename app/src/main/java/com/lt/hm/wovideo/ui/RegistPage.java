@@ -21,6 +21,7 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.utils.MD5Utils;
 import com.lt.hm.wovideo.utils.PhoneUtils;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.TimeCountUtil;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -195,11 +196,12 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     // TODO: 16/6/12 控制跳转
                     // TODO: 16/6/12 提示注册成功
+                    SharedPrefsUtils.setBooleanPreference(getApplicationContext(),"regist",true);
                     Toast.makeText(RegistPage.this, "注册成功", Toast.LENGTH_SHORT).show();
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            UIHelper.ToMain2(RegistPage.this);
+                             UIHelper.ToMain2(RegistPage.this);
                             RegistPage.this.finish();
                         }
                     }, 1000);

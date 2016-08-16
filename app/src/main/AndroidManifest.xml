@@ -76,6 +76,10 @@
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".ui.EventsPageActivity"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.OpenVipActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait" />
@@ -230,7 +234,7 @@
         <!--正式 发布需替换-->
         <meta-data
             android:name="com.amap.api.v2.apikey"
-            android:value="a2a6525af91b35a7792df3d609df69c1" />
+            android:value="b2f72e61321a11376edd370fc23b636a" />
         <!--高德定位服务-->
         <service android:name="com.amap.api.location.APSService"></service>
     </application>

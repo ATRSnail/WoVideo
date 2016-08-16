@@ -28,6 +28,7 @@ public class LiveAdapter extends CommonAdapter<LocalCityModel> {
 
     @Override
     public void convert(ViewHolder holder, LocalCityModel liveModel) {
-        holder.setText(R.id.name1, liveModel.getTvName());
+        holder.setText(R.id.tv_title, liveModel.getTvName());
+        holder.setText(R.id.name1,"正在播放:"+liveModel.getNowPro());
     }
 }

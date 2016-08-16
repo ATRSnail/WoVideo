@@ -1,15 +1,11 @@
 package com.lt.hm.wovideo.ui;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.category.CategoryAdapter;
@@ -19,10 +15,13 @@ import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
+import com.lt.hm.wovideo.model.CateTagModel;
 import com.lt.hm.wovideo.model.Category;
 import com.lt.hm.wovideo.model.ChannelModel;
+import com.lt.hm.wovideo.model.TagModel;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
+import com.lt.hm.wovideo.model.response.ResponseTag;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.widget.CustomTopbar;
@@ -55,10 +54,12 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     private CategoryAdapter adapter;
     private CategoryAdapter allAdapter;
-    private List<ChannelModel> allList = new ArrayList<>();
+    private List<ChannelModel> seleChannelList = new ArrayList<>();
+    private List<ChannelModel> unSelecChannels = new ArrayList<>();
 
-
-    private List<ChannelModel> channels = new ArrayList<>();
+    private List<TagModel> seleTags = new ArrayList<>();
+    private List<TagModel> unSeleTags = new ArrayList<>();
+    private boolean isTag = false;
 
     @Override
     protected int getLayoutId() {
@@ -67,12 +68,15 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        if (getIntent() != null) {
+            isTag = getIntent().getBooleanExtra("isTag", false);
+        }
         personTopbar.setLeftIsVisible(true);
         personTopbar.setRightIsVisible(true);
-        personTopbar.setRightText("编辑");
+        personTopbar.setRightText(isTag ? "跳过" : "编辑");
         personTopbar.setOnTopbarClickListenter(this);
-        changeText.setText("我的频道");
-        unchangeText.setText("频道栏目");
+        changeText.setText(isTag ? "我的标签" : "我的频道");
+        unchangeText.setText(isTag ? "未选标签" : "频道栏目");
     }
 
     @Override
@@ -81,8 +85,8 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     }
 
     private void initCateView() {
-        adapter = new CategoryAdapter(this, channels, this, Category.FIRST_TYPE);
-        allAdapter = new CategoryAdapter(this, allList, this, Category.SECOND_TYPE);
+        adapter = new CategoryAdapter(isTag, this, seleChannelList, seleTags, this, Category.FIRST_TYPE);
+        allAdapter = new CategoryAdapter(isTag, this, unSelecChannels, unSeleTags, this, Category.SECOND_TYPE);
         GridLayoutManager mLayoutManager = new GridLayoutManager(this, TOTAL_LINE);
         GridLayoutManager mLayoutManager2 = new GridLayoutManager(this, TOTAL_LINE);
         DividerDecoration decoration = new DividerDecoration(getApplicationContext());
@@ -96,12 +100,26 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void initDatas() {
-
-        getClassInfos();
+        if (isTag) {
+            getTagInfos();
+        } else {
+            getClassInfos();
+        }
     }
 
     /**
-     * 从网络获取标签
+     * 获取标签
+     */
+    private void getTagInfos() {
+        HashMap<String, Object> map = new HashMap<>();
+        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        if (userModel != null)
+            map.put("userid", userModel.getId());
+        HttpApis.getIndividuationTag(map, HttpApis.http_thr, new HttpCallback<>(ResponseTag.class, this));
+    }
+
+    /**
+     * 从网络获取频道
      */
     private void getClassInfos() {
         HashMap<String, Object> map = new HashMap<>();
@@ -124,6 +142,19 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
         HttpApis.updateChannel(map, HttpApis.http_two, new HttpCallback<>(String.class, this));
     }
 
+    /**
+     * 保存个性化tag
+     */
+    private void updateTag(String channel) {
+        TLog.error("channel--->" + channel);
+        HashMap<String, Object> map = new HashMap<>();
+        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        if (userModel != null)
+            map.put("userid", userModel.getId());
+        map.put("tag", channel);
+        HttpApis.updateTag(map, HttpApis.http_two, new HttpCallback<>(String.class, this));
+    }
+
     @Override
     public void leftClick() {
         this.finish();
@@ -131,29 +162,49 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void rightClick() {
-        if (adapter.isCanDel) {
 
-            updateChannel(splitStr(channels));
+        if (adapter.isCanDel) {
+            if (isTag) {
+                updateTag(splitStr());
+            } else {
+                updateChannel(splitStr());
+            }
         }
-        adapter.toggleCanDelete();
-        setEditorText(adapter.isCanDel);
+        if (isTag) {
+            this.finish();
+        }else {
+            adapter.toggleCanDelete();
+            setEditorText(adapter.isCanDel);
+        }
+
     }
 
-    private String splitStr(List<ChannelModel> channelModels) {
-        StringBuffer stringBuffer = new StringBuffer(1000);
-        for (int i = 0, length = channelModels.size(); i < length; i++) {
-            stringBuffer.append(channelModels.get(i).getFunCode());
-            if (i != channelModels.size() - 1) {
-                stringBuffer.append("|");
+    private String splitStr() {
+        StringBuilder stringBuffer = new StringBuilder(1000);
+        if (isTag) {
+            for (int i = 0, length = seleTags.size(); i < length; i++) {
+                stringBuffer.append(seleTags.get(i).getCode());
+                if (i != seleTags.size() - 1) {
+                    stringBuffer.append("|");
+                }
+            }
+        } else {
+            for (int i = 0, length = seleChannelList.size(); i < length; i++) {
+                stringBuffer.append(seleChannelList.get(i).getFunCode());
+                if (i != seleChannelList.size() - 1) {
+                    stringBuffer.append("|");
+                }
             }
         }
         return stringBuffer.toString();
     }
 
+    private ChannelModel channelModel;
+    private TagModel tagModel;
+
     @Override
     public void OnItemClick(int type, int pos) {
         btnAddItem(type, pos);
-        btnRemoveItem(type, pos);
         Toast.makeText(this, "---" + pos, Toast.LENGTH_SHORT).show();
     }
 
@@ -165,7 +216,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     }
 
     private void setEditorText(boolean editor) {
-        personTopbar.setRightText(editor ? "完成" : "编辑");
+        personTopbar.setRightText(editor ? "完成" : isTag ? "跳过" : "编辑");
     }
 
     /**
@@ -175,33 +226,32 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
      * @param pos
      */
     public void btnAddItem(int type, int pos) {
-        if (type == Category.FIRST_TYPE) {
-            allList.add(0, channels.get(pos));
-            allAdapter.notifyDataSetChanged();
-            return;
-        }
-        channels.add(allList.get(pos));
-        adapter.notifyDataSetChanged();
-    }
-
-    /**
-     * 删除某项
-     *
-     * @param type
-     * @param pos
-     */
-    public void btnRemoveItem(int type, int pos) {
-        if (type == Category.FIRST_TYPE) {
-            if (!channels.isEmpty()) {
-                channels.remove(pos);
+        if (isTag) {
+            if (type == Category.FIRST_TYPE) {
+                tagModel = seleTags.get(pos);
+                unSeleTags.add(0, tagModel);
+                seleTags.remove(tagModel);
+            } else {
+                tagModel = unSeleTags.get(pos);
+                seleTags.add(tagModel);
+                unSeleTags.remove(tagModel);
             }
-            adapter.notifyItemRemoved(pos);
-            return;
+        } else {
+            if (type == Category.FIRST_TYPE) {
+                channelModel = seleChannelList.get(pos);
+                unSelecChannels.add(0, channelModel);
+                seleChannelList.remove(channelModel);
+            } else {
+                setEditorText(true);
+                adapter.isCanDel = true;
+                channelModel = unSelecChannels.get(pos);
+                seleChannelList.add(channelModel);
+                unSelecChannels.remove(channelModel);
+            }
         }
-        if (!allList.isEmpty()) {
-            allList.remove(pos);
-        }
-        allAdapter.notifyItemRemoved(pos);
+
+        adapter.notifyDataSetChanged();
+        allAdapter.notifyDataSetChanged();
     }
 
 
@@ -212,8 +262,8 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
             case HttpApis.http_one:
                 ResponseChannel channelRe = (ResponseChannel) value;
-                channels = channelRe.getBody().getSelectedChannels();
-                allList = channelRe.getBody().getNotSelectedChannels();
+                seleChannelList = channelRe.getBody().getSelectedChannels();
+                unSelecChannels = channelRe.getBody().getNotSelectedChannels();
                 initCateView();
                 break;
             case HttpApis.http_two:
@@ -233,6 +283,12 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
                     e.printStackTrace();
                 }
                 Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
+                break;
+            case HttpApis.http_thr:
+                ResponseTag responseTag = (ResponseTag) value;
+                seleTags = responseTag.getBody().getSelectedDicList();
+                unSeleTags = responseTag.getBody().getNotSelectedDicList();
+                initCateView();
                 break;
 
         }

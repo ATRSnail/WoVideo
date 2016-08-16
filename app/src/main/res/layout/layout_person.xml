@@ -1,139 +1,185 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/layout_person_head"/>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include layout="@layout/layout_person_head" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/white"
-        >
+        android:orientation="vertical">
+
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
             android:id="@+id/order"
-            >
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
             <ImageView
-                style="@style/person_menu_img"
-                android:src="@drawable/icon_order"
                 android:id="@+id/order_icon"
-                />
+                style="@style/person_menu_img"
+                android:src="@drawable/icon_order" />
+
             <TextView
                 style="@style/person_menu_text"
                 android:layout_toRightOf="@id/order_icon"
-                android:text="@string/my_order"
-                />
+                android:text="@string/my_order" />
         </RelativeLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/font_gray"
-            />
+            android:visibility="gone" />
+
         <RelativeLayout
+            android:id="@+id/integral"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/integral"
-            >
+            android:visibility="gone">
+
             <ImageView
-                style="@style/person_menu_img"
-                android:src="@drawable/icon_integral"
                 android:id="@+id/integral_icon"
-                />
+                style="@style/person_menu_img"
+                android:src="@drawable/icon_integral" />
+
             <TextView
                 style="@style/person_menu_text"
                 android:layout_toRightOf="@id/integral_icon"
-                android:text="@string/my_integral"
-                />
+                android:text="@string/my_integral" />
         </RelativeLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/font_gray"
-            />
+            android:background="@color/font_gray" />
+
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
             android:id="@+id/history"
-            >
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
             <ImageView
-                style="@style/person_menu_img"
-                android:src="@drawable/icon_history"
                 android:id="@+id/history_icon"
-                />
+                style="@style/person_menu_img"
+                android:src="@drawable/icon_history" />
+
             <TextView
                 style="@style/person_menu_text"
                 android:layout_toRightOf="@id/history_icon"
-                android:text="@string/history_string"
-                />
+                android:text="@string/history_string" />
         </RelativeLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/font_gray"
-            />
+            android:background="@color/font_gray" />
+
         <RelativeLayout
+            android:id="@+id/cache"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/cache"
-            android:visibility="gone"
-            >
+            android:visibility="gone">
+
             <ImageView
-                style="@style/person_menu_img"
-                android:src="@mipmap/ic_launcher"
                 android:id="@+id/cache_icon"
-                />
+                style="@style/person_menu_img"
+                android:src="@mipmap/ic_launcher" />
+
             <TextView
                 style="@style/person_menu_text"
                 android:layout_toRightOf="@id/cache_icon"
-                android:text="@string/cache_offline"
-                />
+                android:text="@string/cache_offline" />
         </RelativeLayout>
+
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
             android:id="@+id/collect"
-            >
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
             <ImageView
-                style="@style/person_menu_img"
-                android:src="@drawable/icon_collect_press"
                 android:id="@+id/collect_icon"
-                />
+                style="@style/person_menu_img"
+                android:src="@drawable/icon_collect_press" />
+
             <TextView
                 style="@style/person_menu_text"
                 android:layout_toRightOf="@id/collect_icon"
-                android:text="@string/my_collect"
-                />
+                android:text="@string/my_collect" />
         </RelativeLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/font_gray"
-            />
+            android:background="@color/font_gray" />
+
         <RelativeLayout
+            android:id="@+id/mine_tag"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <ImageView
+                android:id="@+id/tag_icon"
+                style="@style/person_menu_img"
+                android:src="@drawable/icon_label" />
+
+            <TextView
+                style="@style/person_menu_text"
+                android:layout_toRightOf="@id/tag_icon"
+                android:text="@string/my_tag" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/font_gray" />
+
+        <RelativeLayout
+            android:id="@+id/active"
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
+
+            <ImageView
+                android:id="@+id/active_icon"
+                style="@style/person_menu_img"
+                android:src="@drawable/icon_event" />
+
+            <TextView
+                style="@style/person_menu_text"
+                android:layout_toRightOf="@id/active_icon"
+                android:text="活动" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/font_gray" />
+
+        <RelativeLayout
+            android:id="@+id/netwrok_usage"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:id="@+id/netwrok_usage"
-            >
+            android:visibility="gone">
+
             <ImageView
-                style="@style/person_menu_img"
-                android:src="@drawable/network_usage_icon"
                 android:id="@+id/netwrok_icon"
-                />
+                style="@style/person_menu_img"
+                android:src="@drawable/network_usage_icon" />
+
             <TextView
                 android:id="@+id/network_usage_text"
                 style="@style/person_menu_text"
                 android:layout_toRightOf="@id/netwrok_icon"
-                android:text="@string/network"
-                />
+                android:text="@string/network" />
         </RelativeLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:visibility="gone"
             android:background="@color/font_gray"
-            />
+            android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>

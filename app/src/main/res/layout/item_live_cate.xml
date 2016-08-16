@@ -6,8 +6,8 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
-        android:layout_height="48dp"
-        android:background="@color/gray_dark"
+        android:layout_height="50dp"
+        android:background="@color/gray_e"
         android:orientation="vertical">
 
         <!--<RelativeLayout-->
@@ -37,8 +37,9 @@
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_marginLeft="20dp"
+            android:textColor="@color/class_font_color"
             android:text="BT-ddd"
-            android:textSize="20sp" />
+            android:textSize="16sp" />
 
 
         <TextView
@@ -51,8 +52,8 @@
             android:ellipsize="end"
             android:singleLine="true"
             android:text="俏江南"
-            android:textColor="#101010"
-            android:textSize="@dimen/sp_16" />
+            android:textColor="@color/grey_place_title_color"
+            android:textSize="@dimen/sp_12" />
 
         <!--<TextView-->
         <!--android:id="@+id/address1"-->

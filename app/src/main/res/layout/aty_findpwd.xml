@@ -9,11 +9,11 @@
         android:id="@+id/set_topbar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/s_46"
-        app:CustomtitleTextColor="@color/black"
-        app:CustomtitleTextSize="@dimen/f_16"
-        app:Customtoptitle="@string/find_pwd"
-        app:leftBackGround="@drawable/left_arrow"
-        app:rightBackGround="@drawable/left_arrow" />
+    app:CustomtitleTextColor="@color/black"
+    app:CustomtitleTextSize="@dimen/f_16"
+    app:Customtoptitle="@string/find_pwd"
+    app:leftBackGround="@drawable/left_arrow"
+    app:rightBackGround="@drawable/left_arrow" />
     <LinearLayout
         android:background="@color/password_bg"
         android:orientation="vertical"

@@ -41,7 +41,7 @@
             android:id="@+id/main_footbar_user"
             style="@style/main_footer_bar_radio"
             android:drawableTop="@drawable/tab_events_selector"
-            android:text="@string/event_string" />
+            android:text="我的" />
     </RadioGroup>
 
     <LinearLayout

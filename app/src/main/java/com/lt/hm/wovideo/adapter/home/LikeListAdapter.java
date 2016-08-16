@@ -29,7 +29,7 @@ public class LikeListAdapter extends BaseQuickAdapter<LikeModel> {
 
 
         baseViewHolder.setText(R.id.item_title, likeModel.getName());
-        baseViewHolder.setText(R.id.item_desc, likeModel.getDq());
+        baseViewHolder.setText(R.id.item_desc, likeModel.getHit());
         baseViewHolder.setText(R.id.item_type,likeModel.getTypeName());
 
         ImageView img = (ImageView) baseViewHolder.convertView.findViewById(R.id.item_img_bg);

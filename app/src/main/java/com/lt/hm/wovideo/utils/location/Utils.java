@@ -12,6 +12,7 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 
 import java.text.SimpleDateFormat;
@@ -76,6 +77,8 @@ public class Utils {
 				// 定位完成
 				case Utils.MSG_LOCATION_FINISH:
 					AMapLocation loc = (AMapLocation) msg.obj;
+					SharedPrefsUtils.setStringPreference("city_name",loc.getCity());
+					SharedPrefsUtils.setStringPreference("city_code",loc.getCityCode());
 					String result = Utils.getLocationStr(loc);
 					TLog.log("location_result" + result);
 					locationClient.stopLocation();
@@ -89,8 +92,6 @@ public class Utils {
 					break;
 			}
 		}
-
-		;
 	};
 
 
@@ -164,4 +165,6 @@ public class Utils {
 		}
 		return sdf == null ? "NULL" : sdf.format(l);
 	}
+
+
 }

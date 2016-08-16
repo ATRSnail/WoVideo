@@ -28,7 +28,9 @@ import com.lt.hm.wovideo.widget.MySectionIndexer;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
 
@@ -74,12 +76,14 @@ public class CityListPage extends BaseActivity {
 
 
     private void JsonToModel(String city_json) {
+        Map<String,String> map = new HashMap<>();
         CityArrayModel cityArrayModel = new Gson().fromJson(city_json, CityArrayModel.class);
         if (cityArrayModel.list.size() > 0) {
             SiteBSTree<String> tree = new SiteBSTree<String>();
             for (int i = 0; i < cityArrayModel.list.size(); i++) {
                 tree.insert(PinyinUtil
                         .getPinYinHeadChar(cityArrayModel.list.get(i).getCity()), cityArrayModel.list.get(i).getCity()+cityArrayModel.list.get(i).getCode());
+                map.put(cityArrayModel.list.get(i).getCity(),cityArrayModel.list.get(i).getCode());
             }
             cities = tree.inOrder();
         }
@@ -87,7 +91,9 @@ public class CityListPage extends BaseActivity {
 
     @Override
     public void initDatas() {
-        readPositionFromAsset();
+        cities = FileUtil.cities;
+        setValue(cities);
+     //   readPositionFromAsset();
     }
 
     private static final String POSITION_TAG = "position";

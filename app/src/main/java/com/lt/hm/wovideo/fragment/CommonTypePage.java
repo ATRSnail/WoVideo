@@ -64,6 +64,7 @@ import com.lt.hm.wovideo.model.response.ResponseLocalCityModel;
 import com.lt.hm.wovideo.ui.CityListPage;
 import com.lt.hm.wovideo.ui.LivePage;
 import com.lt.hm.wovideo.ui.NewClassDetailPage;
+import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UT;
@@ -375,29 +376,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     }
 
-
-    /**
-     * 添加bar滚动条
-     *
-     * @param mList
-     */
-//    private void addBannerView(List<BannerList.Banner> mList) {
-//        bannerLayout.setVisibility(View.VISIBLE);
-//        List<String> strings = new ArrayList<>();
-//        for (int i = 0; i < mList.size(); i++) {
-//            strings.add(HttpUtils.appendUrl(mList.get(i).getImg()));
-//        }
-//        bannerLayout.setViewUrls(strings);
-//        //添加点击监听
-//        bannerLayout.setOnBannerItemClickListener(new BannerLayout.OnBannerItemClickListener() {
-//            @Override
-//            public void onItemClick(int position) {
-//                // TODO: 8/13/16 跳转页面
-//                Toast.makeText(getActivity(), String.valueOf(position), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
-
     /**
      * 添加bar滚动
      *
@@ -429,9 +407,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private boolean isNotFilm = true;
     private  FilmMode filmmode;
     private LikeModel likemodel;
-
     private void addLikeListView() {
-
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         if (channelCode .equals( ChannelModel.RECOMMEND_ID) || channelCode .equals( ChannelModel.LOCAL_ID)) {
@@ -658,18 +634,10 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 if (onPlaceChangeListener != null) {
                     onPlaceChangeListener.onChangePlaceListener(cityCode.replaceAll("[^\u4E00-\u9FA5]", ""));
                 }
-                TLog.error("city-code-" + submit(cityCode));
-                cityCode = submit(cityCode);
+                cityCode = StringUtils.submitNum(cityCode);
                 initData();
                 break;
         }
-    }
-
-    public String submit(String string) {
-        String regEx = "[^0-9]";
-        Pattern p = Pattern.compile(regEx);
-        Matcher m = p.matcher(string);
-        return m.replaceAll("").trim();
     }
 
     public void getVideoDetails(String vfId) {

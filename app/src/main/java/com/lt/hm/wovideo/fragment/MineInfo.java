@@ -247,7 +247,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
 
                 break;
             case R.id.mine_tag:
-                UIHelper.ToTagPage(getActivity(),true);
+                UIHelper.ToTagPage(getActivity(), true);
                 break;
             case R.id.active:
                 UIHelper.ToEventPage(getActivity());

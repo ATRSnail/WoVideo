@@ -1,5 +1,7 @@
 package com.lt.hm.wovideo.ui;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.os.Bundle;
@@ -42,6 +44,7 @@ import butterknife.BindView;
 public class CityListPage extends BaseActivity {
 
     public static final int CITY_RESULT = 456;
+    private static String CITY_NAME = "cityName";
     @BindView(R.id.city_list)
     RecyclerView cityList;
     @BindView(R.id.sort_key)
@@ -49,19 +52,21 @@ public class CityListPage extends BaseActivity {
     @BindView(R.id.text_place)
     TextView placeText;
     CityListAdapter mAdapter;
-    MySectionIndexer sectionIndexer;
     private List<City> cities = new ArrayList<>();
-    private String city_json;
-
     /**
      * 定义字母表的排序规则
      */
     private String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private String currentCity;
+
+    public static void newInstance(Activity activity, String cityName) {
+        Intent intent = new Intent(activity, CityListPage.class);
+        intent.putExtra(CITY_NAME, cityName);
+        activity.startActivityForResult(intent, MainPage2.SCANNIN_PERSON);
+    }
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        city_json = SharedPrefsUtils.getStringPreference(getApplicationContext(), "position");
-        TLog.log("json_city" + city_json);
     }
 
     @Override
@@ -71,88 +76,37 @@ public class CityListPage extends BaseActivity {
 
     @Override
     public void initViews() {
-
-    }
-
-
-    private void JsonToModel(String city_json) {
-        Map<String,String> map = new HashMap<>();
-        CityArrayModel cityArrayModel = new Gson().fromJson(city_json, CityArrayModel.class);
-        if (cityArrayModel.list.size() > 0) {
-            SiteBSTree<String> tree = new SiteBSTree<String>();
-            for (int i = 0; i < cityArrayModel.list.size(); i++) {
-                tree.insert(PinyinUtil
-                        .getPinYinHeadChar(cityArrayModel.list.get(i).getCity()), cityArrayModel.list.get(i).getCity()+cityArrayModel.list.get(i).getCode());
-                map.put(cityArrayModel.list.get(i).getCity(),cityArrayModel.list.get(i).getCode());
-            }
-            cities = tree.inOrder();
-        }
     }
 
     @Override
     public void initDatas() {
+        if (getIntent() != null) {
+            currentCity = getIntent().getStringExtra(CITY_NAME);
+        }
         cities = FileUtil.cities;
         setValue(cities);
-     //   readPositionFromAsset();
     }
-
-    private static final String POSITION_TAG = "position";
-
-    private void readPositionFromAsset() {
-        new Thread(() -> {
-            try {
-                AssetManager manager = getAssets();
-                InputStream is = manager.open("citys.json");
-                city_json = FileUtil.readInStream(is);
-                JsonToModel(city_json);
-                if (cities != null) {
-                    Message msg = new Message();
-                    msg.obj = cities;
-                    msg.what = SUCCESS_BST;
-                    handler.sendMessage(msg);
-                }
-                TLog.log("json_city" + city_json);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }).start();
-    }
-
-    private final int SUCCESS_BST = 10001;
-    private Handler handler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            super.handleMessage(msg);
-            switch (msg.what) {
-                case SUCCESS_BST:
-                    List<City> city = (List<City>) msg.obj;
-
-                    setValue(city);
-                    break;
-            }
-        }
-    };
 
     private void setValue(List<City> list) {
         TLog.error(list.toString());
         MySectionIndexer<City> indexer = new MySectionIndexer(list, alphabet);
-        mAdapter = new CityListAdapter(R.layout.item_ont_text,list, indexer);
+        mAdapter = new CityListAdapter(R.layout.item_ont_text, list, indexer);
         cityList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         //添加分割线
-        cityList.addItemDecoration(new DividerDecoration(this,2,getResources().getColor(R.color.gray_lighter1)));
+        cityList.addItemDecoration(new DividerDecoration(this, 2, getResources().getColor(R.color.gray_lighter1)));
         cityList.setAdapter(mAdapter);
 
-        placeText.setText("北京");
+        placeText.setText(currentCity);
         sortKey.setText("您当前可能在");
         placeText.setVisibility(View.VISIBLE);
         sortKey.setVisibility(View.VISIBLE);
         mAdapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int i) {
-                TLog.error("position--->"+list.get(i).getCode());
+                TLog.error("position--->" + list.get(i).getCode());
                 Intent intent = new Intent();
-                intent.putExtra("city",list.get(i).getCity());
-                setResult(CITY_RESULT,intent);
+                intent.putExtra("city", list.get(i).getCity());
+                setResult(CITY_RESULT, intent);
                 finish();
             }
         });

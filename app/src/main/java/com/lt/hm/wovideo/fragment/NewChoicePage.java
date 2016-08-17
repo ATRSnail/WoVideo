@@ -26,6 +26,7 @@ import com.lt.hm.wovideo.interf.OnUpdateLocationListener;
 import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
+import com.lt.hm.wovideo.ui.CityListPage;
 import com.lt.hm.wovideo.ui.MainPage2;
 import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.utils.DialogHelp;
@@ -106,14 +107,11 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
     @Override
     public void initView(View view) {
         super.initView(view);
-        vipSelector.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (UserHandler.isLogin(getContext())) {
-                    getActivity().startActivityForResult(new Intent(getContext(), PersonalitySet.class), MainPage2.SCANNIN_PERSON);
-                } else {
-                    DialogHelp.getMessageDialog(getContext(),"请先登录",null).show();
-                }
+        vipSelector.setOnClickListener(v -> {
+            if (UserHandler.isLogin(getContext())) {
+                CityListPage.newInstance(getActivity(),cityName);
+            } else {
+                DialogHelp.getMessageDialog(getContext(),"请先登录",null).show();
             }
         });
     }
@@ -125,7 +123,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
         UpdateLocationMsg.getInstance().addRegisterSucListeners(this);
     }
 
-    private String cityCode = null;
+    private String cityCode = "";
     private String cityName = "";
 
     @Override

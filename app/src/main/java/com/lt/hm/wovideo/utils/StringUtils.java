@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -967,5 +968,16 @@ public class StringUtils {
 		return  uniqueId.toString();
 	}
 
+	/**
+	 *截取date里的数字
+	 * @param date
+	 * @return
+     */
+	public static String submitNum(String date){
+		String regEx = "[^0-9]";
+		Pattern p = Pattern.compile(regEx);
+		Matcher m = p.matcher(date);
+		return m.replaceAll("").trim();
+	}
 
 }

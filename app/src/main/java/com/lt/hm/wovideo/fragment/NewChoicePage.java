@@ -18,16 +18,22 @@ import android.widget.TextView;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.recommend.TabFragmentAdapter;
 import com.lt.hm.wovideo.base.BaseFragment;
+import com.lt.hm.wovideo.handler.UserHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.interf.OnPlaceChangeListener;
+import com.lt.hm.wovideo.interf.OnUpdateLocationListener;
 import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
+import com.lt.hm.wovideo.ui.MainPage2;
 import com.lt.hm.wovideo.ui.PersonalitySet;
+import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UpdateLocationMsg;
 import com.lt.hm.wovideo.utils.UserMgr;
+import com.lt.hm.wovideo.widget.MyPageChangeListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,146 +48,158 @@ import butterknife.Unbinder;
  * @version 1.0
  * @create_date 8/2/16
  */
-public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener {
-	Unbinder unbinder;
-	@BindView(R.id.tablayout)
-	TabLayout tabLayout;
-	@BindView(R.id.img_plus)
-	ImageView vipSelector;
-	@BindView(R.id.choice_view_page)
-	ViewPager choiceViewPage;
-	int CURRENT_POSITION;
-	private TabFragmentAdapter tabFragmentAdapter;
-	private List<ChannelModel> channels = new ArrayList<>();
-	private ChannelModel bean;
-	private List<String> mTitles = new ArrayList<>();
-	private List<Fragment> fragments = new ArrayList<>();
-	private View view;
-	private LayoutInflater inflater;
-	private ViewGroup container;
-	private Bundle savedInstanceState;
+public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener, OnUpdateLocationListener {
+    Unbinder unbinder;
+    @BindView(R.id.tablayout)
+    TabLayout tabLayout;
+    @BindView(R.id.img_plus)
+    ImageView vipSelector;
+    @BindView(R.id.choice_view_page)
+    ViewPager choiceViewPage;
+    int CURRENT_POSITION;
+    private TabFragmentAdapter tabFragmentAdapter;
+    private List<ChannelModel> channels = new ArrayList<>();
+    private ChannelModel bean;
+    private List<String> mTitles = new ArrayList<>();
+    private List<Fragment> fragments = new ArrayList<>();
+    private View view;
+    private LayoutInflater inflater;
+    private ViewGroup container;
+    private Bundle savedInstanceState;
 
-	@Nullable
-	@Override
-	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-		if (view == null) {
-			this.inflater = inflater;
-			this.container = container;
-			this.savedInstanceState = savedInstanceState;
-			view = inflater.inflate(getLayoutId(), container, false);
-			unbinder = ButterKnife.bind(this, view);
-			initView(view);
-			initData();
-		}
-		return view;
-	}
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (view == null) {
+            this.inflater = inflater;
+            this.container = container;
+            this.savedInstanceState = savedInstanceState;
+            view = inflater.inflate(getLayoutId(), container, false);
+            unbinder = ButterKnife.bind(this, view);
+            initView(view);
+            initData();
+        }
+        return view;
+    }
 
-	private void getClassInfos() {
-		HashMap<String, Object> map = new HashMap<>();
-		UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
-		if (userModel != null)
-			map.put("userid", userModel.getId());
-		HttpApis.getIndividuationChannel(map, HttpApis.http_one, new HttpCallback<>(ResponseChannel.class, this));
-	}
+    private void getClassInfos() {
+        HashMap<String, Object> map = new HashMap<>();
+        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        if (userModel != null)
+            map.put("userid", userModel.getId());
+        HttpApis.getIndividuationChannel(map, HttpApis.http_one, new HttpCallback<>(ResponseChannel.class, this));
+    }
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		if (unbinder != null) {
-			unbinder.unbind();
-		}
-	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (unbinder != null) {
+            unbinder.unbind();
+        }
+    }
 
-	@Override
-	protected int getLayoutId() {
-		return R.layout.layout_new_choice;
-	}
+    @Override
+    protected int getLayoutId() {
+        return R.layout.layout_new_choice;
+    }
 
-	@Override
-	public void initView(View view) {
-		super.initView(view);
-		vipSelector.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivityForResult(new Intent(getContext(), PersonalitySet.class),34);
-			}
-		});
-	}
+    @Override
+    public void initView(View view) {
+        super.initView(view);
+        vipSelector.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (UserHandler.isLogin(getContext())) {
+                    getActivity().startActivityForResult(new Intent(getContext(), PersonalitySet.class), MainPage2.SCANNIN_PERSON);
+                } else {
+                    DialogHelp.getMessageDialog(getContext(),"请先登录",null).show();
+                }
+            }
+        });
+    }
 
-	@Override
-	public void initData() {
-		super.initData();
-		getClassInfos();
-	}
+    @Override
+    public void initData() {
+        super.initData();
+        getClassInfos();
+        UpdateLocationMsg.getInstance().addRegisterSucListeners(this);
+    }
 
-	private String cityCode=null;
-	private String cityName="地区";
-	@Override
-	public <T> void onSuccess(T value, int flag) {
-		super.onSuccess(value, flag);
-		switch (flag) {
-			case HttpApis.http_one:
-				ResponseChannel channelRe = (ResponseChannel) value;
-				channels = channelRe.getBody().getSelectedChannels();
-				cityCode = SharedPrefsUtils.getStringPreference("city_code");
-				cityName = SharedPrefsUtils.getStringPreference("city_name");
-				TLog.error("cityCode--->"+cityCode);
-				initBottom(cityName);
-				break;
-		}
-	}
+    private String cityCode = null;
+    private String cityName = "";
 
-	@TargetApi(Build.VERSION_CODES.M)
-	private void initBottom(String str) {
-		fragments.clear();
-		mTitles.clear();
-		channels.add(0, new ChannelModel("推荐", ChannelModel.RECOMMEND_ID));
-		// TODO: 8/15/16 ADD Current position name
-		channels.add(1, new ChannelModel(str, cityCode));
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value, flag);
+        switch (flag) {
+            case HttpApis.http_one:
+                ResponseChannel channelRe = (ResponseChannel) value;
+                channels = channelRe.getBody().getSelectedChannels();
+                cityCode = TextUtils.isEmpty(cityCode) ? SharedPrefsUtils.getStringPreference("city_code") : cityCode;
+                cityName = TextUtils.isEmpty(cityName) ? SharedPrefsUtils.getStringPreference("city_name") : cityName;
+                TLog.error("cityCode--->" + cityCode);
+                initBottom(cityName);
+                break;
+        }
+    }
 
-		for (int i = 0; i < channels.size(); i++) {
-			bean = channels.get(i);
-			mTitles.add(bean.getFunName());
-			CommonTypePage page = CommonTypePage.getInstance(bean);
-			if (bean.getFunCode().equals(ChannelModel.LOCAL_ID))
-				page.setOnPlaceChangeListener(this);
-			fragments.add(page);
-		}
+    @TargetApi(Build.VERSION_CODES.M)
+    private void initBottom(String str) {
+        fragments.clear();
+        mTitles.clear();
+        channels.add(0, new ChannelModel("推荐", ChannelModel.RECOMMEND_ID));
+        // TODO: 8/15/16 ADD Current position name
+        channels.add(1, new ChannelModel(TextUtils.isEmpty(str) ? "地区" : str, ChannelModel.LOCAL_ID));
 
-		TLog.error("title--->"+mTitles.toString());
-		tabFragmentAdapter = new TabFragmentAdapter(fragments, mTitles, getChildFragmentManager(), getApplicationContext());
-		choiceViewPage.setAdapter(tabFragmentAdapter);
-		choiceViewPage.setOffscreenPageLimit(mTitles.size());
+        for (int i = 0; i < channels.size(); i++) {
+            bean = channels.get(i);
+            mTitles.add(bean.getFunName());
+            CommonTypePage page = CommonTypePage.getInstance(bean);
+            if (bean.getFunCode().equals(ChannelModel.LOCAL_ID))
+                page.setOnPlaceChangeListener(this);
+            fragments.add(page);
+        }
 
-		tabLayout.setupWithViewPager(choiceViewPage);
-		tabLayout.setTabsFromPagerAdapter(tabFragmentAdapter);
-	}
+        TLog.error("title--->" + mTitles.toString());
+        tabFragmentAdapter = new TabFragmentAdapter(fragments, mTitles, getChildFragmentManager(), getApplicationContext());
+        choiceViewPage.setAdapter(tabFragmentAdapter);
+        choiceViewPage.setOffscreenPageLimit(mTitles.size());
 
-	@Override
-	public void onChangePlaceListener(String str) {
-		TLog.log("return_str" + str);
-		if (!TextUtils.isEmpty(str)) {
-			if (tabLayout != null) {
-				ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
-				ViewGroup vgTab = (ViewGroup) vg.getChildAt(1);
-				View tabViewChild = vgTab.getChildAt(1);
-				if (tabViewChild instanceof TextView) {
-					((TextView) tabViewChild).setText(str);
-				}
-				// TODO: 8/16/16  refresh  the area fragment data
-			}
-		}
-	}
+        tabLayout.setupWithViewPager(choiceViewPage);
+        tabLayout.setTabsFromPagerAdapter(tabFragmentAdapter);
+        choiceViewPage.addOnPageChangeListener(new MyPageChangeListener());
+    }
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		switch (resultCode){
-			case PersonalitySet.RESULT_PERSONALITY:
-	//			view = null;
-	//			onCreateView(inflater,container,savedInstanceState);
-				break;
-		}
+    @Override
+    public void onChangePlaceListener(String str) {
+        TLog.log("return_str" + str);
+        setLocalTabTile(str);
+    }
 
-	}
+    private void setLocalTabTile(String cityName) {
+        if (!TextUtils.isEmpty(cityName)) {
+            if (tabLayout != null) {
+                ViewGroup vg = (ViewGroup) tabLayout.getChildAt(0);
+                ViewGroup vgTab = (ViewGroup) vg.getChildAt(1);
+                if (vgTab == null) return;
+                View tabViewChild = vgTab.getChildAt(1);
+                if (tabViewChild instanceof TextView) {
+                    ((TextView) tabViewChild).setText(cityName);
+                }
+                // TODO: 8/16/16  refresh  the area fragment data
+            }
+        }
+    }
+
+    @Override
+    public void onUpdateLocListener(String name, String code) {
+        TLog.error("place---" + name);
+        setLocalTabTile(name);
+    }
+
+    @Override
+    public void onDestroyView() {
+        UpdateLocationMsg.getInstance().removeRegisterSucListeners(this);
+        super.onDestroyView();
+    }
 }

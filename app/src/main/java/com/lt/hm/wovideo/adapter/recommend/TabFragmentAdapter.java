@@ -35,7 +35,7 @@ public class TabFragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return titles.size();
+        return fragments.size();
     }
 
     @Override
@@ -48,4 +48,9 @@ public class TabFragmentAdapter extends FragmentPagerAdapter {
         return POSITION_NONE;
     }
 
+    @Override
+    public void destroyItem(ViewGroup container, int position, Object object) {
+        super.destroyItem(container,position,object);
+
+    }
 }

@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:keepScreenOn="true">
+    android:keepScreenOn="true"
+    android:orientation="vertical">
+
     <FrameLayout
         android:id="@+id/video_root"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/black"
-        >
+        android:background="@android:color/black">
+
         <com.google.android.exoplayer.AspectRatioFrameLayout
             android:id="@+id/video_frame"
             android:layout_width="match_parent"
@@ -21,65 +22,71 @@
                 android:id="@+id/surface_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="center_horizontal" />
+
             <View
                 android:id="@+id/shutter"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:visibility="gone"
-                android:background="@android:color/black"/>
+                android:background="@android:color/black"
+                android:visibility="gone" />
+
             <master.flame.danmaku.ui.widget.DanmakuView
                 android:id="@+id/sv_danmaku"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+
             <com.victor.loading.rotate.RotateLoading
                 android:id="@+id/loading"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                app:loading_width="5dp"
+                android:layout_gravity="center"
                 app:loading_color="@color/video_loading"
-                android:layout_gravity="center"/>
+                app:loading_width="5dp" />
+
             <TextView
                 android:id="@+id/free_label"
+                style="@style/TextWithRoundedBackground"
                 android:text="@string/free_network"
-                android:visibility="invisible"
-                style="@style/TextWithRoundedBackground" />
+                android:visibility="invisible" />
             <!--<com.google.android.exoplayer.text.SubtitleLayout android:id="@+id/subtitles"-->
             <!--android:layout_width="match_parent"-->
             <!--android:layout_height="wrap_content"/>-->
         </com.google.android.exoplayer.AspectRatioFrameLayout>
     </FrameLayout>
-    <include layout="@layout/video_bottom"
+
+    <include
         android:id="@+id/live_video_bottom"
-        />
+        layout="@layout/video_bottom" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="5dp"
         android:background="@color/font_gray" />
 
-    <include layout="@layout/layout_video_live_bref"
+    <include
         android:id="@+id/live_video_bref"
-        />
+        layout="@layout/layout_video_live_bref" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"
         android:background="@color/font_gray" />
     <!--<ScrollView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:orientation="vertical"-->
-        <!--android:background="@color/font_gray"-->
-        <!--&gt;-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:orientation="vertical"-->
+    <!--android:background="@color/font_gray"-->
+    <!--&gt;-->
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:orientation="vertical"-->
-            <!--&gt;-->
+    <!--<LinearLayout-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:orientation="vertical"-->
+    <!--&gt;-->
 
-            <include layout="@layout/layout_live_program" />
-        <!--</LinearLayout>-->
+    <include layout="@layout/layout_live_program" />
+    <!--</LinearLayout>-->
     <!--</ScrollView>-->
 </LinearLayout>

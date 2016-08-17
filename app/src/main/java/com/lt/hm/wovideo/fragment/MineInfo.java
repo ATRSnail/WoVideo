@@ -212,7 +212,6 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.btn_set:
                 UIHelper.ToSetPage(getActivity());
-                getActivity().finish();
                 break;
             case R.id.head_icon:
                 // TODO: 16/6/6  变更头像 上传头像
@@ -248,7 +247,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
 
                 break;
             case R.id.mine_tag:
-                UIHelper.ToTagPage(getActivity());
+                UIHelper.ToTagPage(getActivity(),true);
                 break;
             case R.id.active:
                 UIHelper.ToEventPage(getActivity());
@@ -264,7 +263,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
 
 
     private void handleSelectPicture() {
-        DialogHelp.getSelectDialog(getApplicationContext(), "选择图片", getResources().getStringArray(R.array.choose_picture), new DialogInterface.OnClickListener() {
+        DialogHelp.getSelectDialog(getContext(), "选择图片", getActivity().getResources().getStringArray(R.array.choose_picture), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 goToSelectPicture(i);

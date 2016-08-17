@@ -12,10 +12,13 @@ import com.amap.api.location.AMapLocation;
 import com.amap.api.location.AMapLocationClient;
 import com.amap.api.location.AMapLocationClientOption;
 import com.amap.api.location.AMapLocationListener;
+import com.lt.hm.wovideo.interf.OnUpdateLocationListener;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UpdateLocationMsg;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /**
@@ -80,6 +83,7 @@ public class Utils {
 					SharedPrefsUtils.setStringPreference("city_name",loc.getCity());
 					SharedPrefsUtils.setStringPreference("city_code",loc.getCityCode());
 					String result = Utils.getLocationStr(loc);
+					removeBeforViews(loc.getCity(),loc.getCityCode());
 					TLog.log("location_result" + result);
 					locationClient.stopLocation();
 					// TODO: 8/2/16  缓存定位信息。。
@@ -93,6 +97,14 @@ public class Utils {
 			}
 		}
 	};
+
+	private static void removeBeforViews(String name,String code) {
+		ArrayList<OnUpdateLocationListener> registerSucListeners = UpdateLocationMsg.getInstance().downloadListeners;
+		if (registerSucListeners == null || registerSucListeners.size() == 0) return;
+		for (int i = 0; i < registerSucListeners.size(); i++) {
+			registerSucListeners.get(i).onUpdateLocListener(name,code);
+		}
+	}
 
 
 	/**

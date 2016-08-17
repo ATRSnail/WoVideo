@@ -1,5 +1,6 @@
 package com.lt.hm.wovideo.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,6 +24,7 @@ import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
 import com.lt.hm.wovideo.model.response.ResponseTag;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.widget.CustomTopbar;
 import com.lt.hm.wovideo.widget.DividerDecoration;
@@ -60,6 +62,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     private List<TagModel> seleTags = new ArrayList<>();
     private List<TagModel> unSeleTags = new ArrayList<>();
     private boolean isTag = false;
+    private boolean isEdit = false;
 
     @Override
     protected int getLayoutId() {
@@ -68,12 +71,19 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        if (getIntent() != null) {
-            isTag = getIntent().getBooleanExtra("isTag", false);
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            if (intent.getExtras().containsKey("isTag")) {
+
+                isTag = intent.getBooleanExtra("isTag", false);
+            }
+            if (intent.getExtras().containsKey("isEdit")) {
+                isEdit = intent.getBooleanExtra("isEdit", false);
+            }
         }
         personTopbar.setLeftIsVisible(true);
         personTopbar.setRightIsVisible(true);
-        personTopbar.setRightText(isTag ? "跳过" : "编辑");
+        personTopbar.setRightText(isTag ? isEdit ? "编辑" : "跳过" : "编辑");
         personTopbar.setOnTopbarClickListenter(this);
         changeText.setText(isTag ? "我的标签" : "我的频道");
         unchangeText.setText(isTag ? "未选标签" : "频道栏目");
@@ -162,6 +172,10 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void rightClick() {
+        if (isTag && adapter == null) {
+            finish();
+            return;
+        }
 
         if (adapter.isCanDel) {
             if (isTag) {
@@ -172,7 +186,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
         }
         if (isTag) {
             this.finish();
-        }else {
+        } else {
             adapter.toggleCanDelete();
             setEditorText(adapter.isCanDel);
         }
@@ -205,7 +219,6 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     @Override
     public void OnItemClick(int type, int pos) {
         btnAddItem(type, pos);
-        Toast.makeText(this, "---" + pos, Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -232,6 +245,8 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
                 unSeleTags.add(0, tagModel);
                 seleTags.remove(tagModel);
             } else {
+                setEditorText(true);
+                adapter.isCanDel = true;
                 tagModel = unSeleTags.get(pos);
                 seleTags.add(tagModel);
                 unSeleTags.remove(tagModel);
@@ -274,7 +289,9 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
                         RespHeader header = new Gson().fromJson(obj_head.toString(), RespHeader.class);
                         if (header.getRspCode().equals(ResponseCode.Success)) {
                             Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
-                            setResult(RESULT_PERSONALITY);
+                            if (!isTag)
+                                UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
+
                             this.finish();
                             return;
                         }

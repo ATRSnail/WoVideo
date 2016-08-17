@@ -14,7 +14,8 @@ public enum VideoType implements Serializable{
     SPORTS(4),//体育
     LIVE(5),//直播
     RECOMMEND(6),//推荐
-    LOCAL(7);//地方
+    LOCAL(7),//地方
+    SMIML(5);//小视屏
     private int id;
 
     VideoType(int id) {

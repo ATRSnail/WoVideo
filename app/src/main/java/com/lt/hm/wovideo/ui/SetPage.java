@@ -18,6 +18,7 @@ import com.lt.hm.wovideo.utils.MethodsCompat;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 
 import java.io.File;
@@ -63,7 +64,8 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
         logout.setOnClickListener((View v) -> {
             ACache.get(this).clear();
             SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo","");
-            UIHelper.ToPerson(this);
+           // UIHelper.ToPerson(this);
+            UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
             this.finish();
         });
     }

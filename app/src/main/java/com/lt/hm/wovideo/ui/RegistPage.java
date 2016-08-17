@@ -12,19 +12,25 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.utils.AppUtils;
 import com.lt.hm.wovideo.utils.MD5Utils;
 import com.lt.hm.wovideo.utils.PhoneUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.TimeCountUtil;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.UT;
+import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -72,6 +78,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        aCache = ACache.get(getApplicationContext());
         registTopbar.setRightIsVisible(false);
         registTopbar.setLeftIsVisible(true);
         registTopbar.setOnTopbarClickListenter(this);
@@ -91,7 +98,6 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                    }else{
                        Operators_flag =false;
                        Toast.makeText(getApplicationContext(),"只支持联通手机号登录",Toast.LENGTH_SHORT).show();
-                       return;
 //                       regist_validate_layout.setVisibility(View.GONE);
 //                       divider_layout2.setVisibility(View.GONE);
                    }
@@ -196,12 +202,14 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     // TODO: 16/6/12 控制跳转
                     // TODO: 16/6/12 提示注册成功
+                    ToLogin();
                     SharedPrefsUtils.setBooleanPreference(getApplicationContext(),"regist",true);
+                    UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
                     Toast.makeText(RegistPage.this, "注册成功", Toast.LENGTH_SHORT).show();
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                             UIHelper.ToMain2(RegistPage.this);
+                        //     UIHelper.ToMain2(RegistPage.this);
                             RegistPage.this.finish();
                         }
                     }, 1000);
@@ -212,6 +220,52 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 }
             }
         });
+    }
+
+    private ACache aCache;
+    private void ToLogin() {
+        String account = etResigtAccount.getText().toString();
+        String pwd = etRegistPwd.getText().toString();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("phone", account);
+        map.put("passWord", MD5Utils.getMD5Code(pwd).toLowerCase());
+        map.put("platform", AppUtils.getPlatForms());
+        HttpApis.login(map, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log("result:" + response);
+                ResponseObj<UserModel, RespHeader> resp = new ResponseObj<UserModel, RespHeader>();
+                ResponseParser.loginParse(resp, response, UserModel.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+
+                    SharedPrefsUtils.setBooleanPreference(getApplicationContext(),"regist",true);
+                    UT.showNormal("注册成功");
+                    UserModel model = resp.getBody();
+                    String json = new Gson().toJson(model);
+                    cacheUserInfo(json);
+                    UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            RegistPage.this.finish();
+                        }
+                    }, 1000);
+                } else {
+                    Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+    }
+
+    private void cacheUserInfo(String json) {
+        aCache.put("userinfo", json);
+        SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",json);
     }
 
     private void sendValidateCode() {

@@ -138,6 +138,6 @@
             android:background="@drawable/video_btn_bg"
             android:textColor="@color/white"
             android:clickable="false"
-            android:text="画中画" />
+            android:text="四屏播放" />
     </com.lt.hm.wovideo.widget.PercentLinearLayout>
 </android.support.percent.PercentRelativeLayout>

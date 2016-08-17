@@ -22,10 +22,12 @@ import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.http.HttpUtils;
+import com.lt.hm.wovideo.interf.onChangeLister;
 import com.lt.hm.wovideo.model.BannerList;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
 import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
+import com.lt.hm.wovideo.widget.MyPageChangeListener;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ public class ImageIndicatorView extends RelativeLayout {
 	 * item changed listener
 	 */
 	private OnItemChangeListener onItemChangeListener;
+	private onChangeLister onChangeLister;
 	/**
 	 * item clicked listener
 	 */
@@ -284,6 +287,10 @@ public class ImageIndicatorView extends RelativeLayout {
 		this.onItemChangeListener = onItemChangeListener;
 	}
 
+	public void setOnRefrshViewEnable(onChangeLister onChangeLister){
+		this.onChangeLister = onChangeLister;
+	}
+
 	/**
 	 * add setOnItemClickListener
 	 *
@@ -412,7 +419,7 @@ public class ImageIndicatorView extends RelativeLayout {
 
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
-
+			onChangeLister.onChangeLister(arg0 == ViewPager.SCROLL_STATE_IDLE);
 		}
 	}
 

@@ -44,14 +44,14 @@ public class BillList {
         private Object user;
         private long ctime;
         private String name;
-        private String desc;
+        private String dec;
 
-        public String getDesc() {
-            return desc;
+        public String getDec() {
+            return dec;
         }
 
-        public void setDesc(String desc) {
-            this.desc = desc;
+        public void setDec(String dec) {
+            this.dec = dec;
         }
 
         public String getName() {

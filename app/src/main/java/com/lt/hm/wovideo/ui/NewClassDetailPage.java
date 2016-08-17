@@ -238,7 +238,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
                         if (classDetailsList != null) {
                             classDetailsList.setVisibility(View.INVISIBLE);
                         }
-//                        empty_view_button.setVisibility(View.VISIBLE);
+                        empty_view_button.setVisibility(View.VISIBLE);
                         return;
                     }
                     empty_view_button.setVisibility(View.INVISIBLE);

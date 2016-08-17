@@ -1,9 +1,11 @@
 package com.lt.hm.wovideo.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.ui.AboutPage;
 import com.lt.hm.wovideo.ui.BillsPage;
 import com.lt.hm.wovideo.ui.ChangePassword1Aty;
@@ -130,6 +132,18 @@ public class UIHelper {
 	}
 
 	/**
+	 * 从我的信息跳进去的
+	 * @param context
+	 * @param isEdit //编辑/跳过
+     */
+	public static void ToTagPage(Context context,boolean isEdit) {
+		Intent intent = new Intent(context, PersonalitySet.class);
+		intent.putExtra("isTag",true);
+		intent.putExtra("isEdit",isEdit);
+		context.startActivity(intent);
+	}
+
+	/**
 	 * 跳转
 	 *
 	 * @param context
@@ -249,6 +263,41 @@ public class UIHelper {
 	public static void ToFindPwd(Context context) {
 		Intent intent = new Intent(context, FindPwdAty.class);
 		context.startActivity(intent);
+	}
+
+	public static void ToAllCateVideo(Activity activity,int typeId, String vfId){
+		if (typeId == VideoType.MOVIE.getId()) {
+			// TODO: 16/6/14 跳转电影页面
+			Bundle bundle = new Bundle();
+			bundle.putString("id", vfId);
+			bundle.putInt("typeId", VideoType.MOVIE.getId());
+			ToMoviePage(activity, bundle);
+		} else if (typeId == VideoType.TELEPLAY.getId()) {
+			// TODO: 16/6/14 跳转电视剧页面
+			Bundle bundle = new Bundle();
+			bundle.putString("id", vfId);
+			bundle.putInt("typeId", VideoType.TELEPLAY.getId());
+			ToDemandPage(activity, bundle);
+
+		} else if (typeId == VideoType.SPORTS.getId()) {
+			// TODO: 16/6/14 跳转 体育播放页面
+			Bundle bundle = new Bundle();
+			bundle.putString("id", vfId);
+			bundle.putInt("typeId", VideoType.SPORTS.getId());
+			ToDemandPage(activity, bundle);
+		} else if (typeId == VideoType.VARIATY.getId()) {
+			// TODO: 16/6/14 跳转综艺界面
+			Bundle bundle = new Bundle();
+			bundle.putString("id", vfId);
+			bundle.putInt("typeId", VideoType.VARIATY.getId());
+			ToDemandPage(activity, bundle);
+		} else if (typeId == VideoType.SMIML.getId()){
+			// TODO: 16/6/14 跳转小视屏页面
+			Bundle bundle = new Bundle();
+			bundle.putString("id", vfId);
+			bundle.putInt("typeId", VideoType.SMIML.getId());
+			ToMoviePage(activity, bundle);
+		}
 	}
 
 }

@@ -26,6 +26,7 @@ import com.lt.hm.wovideo.utils.PhoneUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -154,6 +155,7 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
                     UserModel model = resp.getBody();
                     String json = new Gson().toJson(model);
                     cacheUserInfo(json);
+                    UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
                     LoginPage.this.finish();
                 } else {
                     Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();

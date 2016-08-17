@@ -30,12 +30,14 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
+import com.lt.hm.wovideo.base.BaseRequestActivity;
 import com.lt.hm.wovideo.fragment.EventsPage;
 import com.lt.hm.wovideo.fragment.LivePageFragment;
 import com.lt.hm.wovideo.fragment.MineInfo;
 import com.lt.hm.wovideo.fragment.NewChoicePage;
 import com.lt.hm.wovideo.fragment.RecommendPage;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
+import com.lt.hm.wovideo.interf.updateTagLister;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
@@ -43,6 +45,7 @@ import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UpdateManager;
+import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.utils.location.CheckPermissionsActivity;
 import com.lt.hm.wovideo.utils.location.Utils;
 import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
@@ -60,8 +63,9 @@ import butterknife.BindView;
  * @version 1.0
  * @create_date 16/5/30
  */
-public class MainPage2 extends BaseActivity{
+public class MainPage2 extends BaseActivity implements updateTagLister {
     private final static int SCANNIN_GREQUEST_CODE = 1;
+    public final static int SCANNIN_PERSON = 2;
     private final static String FIRST_LAUNCH_KEY = "first launch";
     private static final String FRAGMENT_TAGS = "fragmentTags";
     private static final String CURR_INDEX = "currIndex";
@@ -124,10 +128,10 @@ public class MainPage2 extends BaseActivity{
             commonHeadLayout.setVisibility(View.GONE);
             choiceHeadLayout.setVisibility(View.VISIBLE);
         } else {
-            commonHeadLayout.setVisibility(index == 3?View.GONE:View.VISIBLE);
+            commonHeadLayout.setVisibility(index == 3 ? View.GONE : View.VISIBLE);
             choiceHeadLayout.setVisibility(View.GONE);
         }
-        if (index == 1){
+        if (index == 1) {
             UIHelper.ToLivePage(this);
             checkGroup(currIndex);
             return;
@@ -174,7 +178,6 @@ public class MainPage2 extends BaseActivity{
     }
 
     private Fragment instantFragment(int currIndex) {
-
         switch (currIndex) {
             case 0:
                 return new NewChoicePage();
@@ -183,7 +186,7 @@ public class MainPage2 extends BaseActivity{
             case 2:
                 return new RecommendPage();
             case 3:
-           //     return new EventsPage();
+                //     return new EventsPage();
                 return new MineInfo();
             default:
                 return null;
@@ -207,6 +210,8 @@ public class MainPage2 extends BaseActivity{
 
         commonHeadLayout.setVisibility(View.GONE);
         choiceHeadLayout.setVisibility(View.VISIBLE);
+
+        UpdateRecommedMsg.getInstance().addRegisterSucListeners(this);
 
         checkLoginState();
         readPositionFromAsset();
@@ -240,10 +245,21 @@ public class MainPage2 extends BaseActivity{
 
     @Override
     protected void onDestroy() {
+        UpdateRecommedMsg.getInstance().removeRegisterSucListeners(this);
         super.onDestroy();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        isFirstRegister = SharedPrefsUtils.getBooleanPreference(this, "regist", false);
+        if (isFirstRegister) {
+            SharedPrefsUtils.setBooleanPreference(this, "regist", false);
+            UIHelper.ToTagPage(this);
+        }
+    }
 
+    private boolean isFirstRegister = false;
 
     private void checkLoginState() {
 //        String info = ACache.get(getApplicationContext()).getAsString("userinfo");
@@ -266,12 +282,6 @@ public class MainPage2 extends BaseActivity{
             } else if (model.getIsVip().equals("0")) {
                 UnLoginHandler.freeDialog(MainPage2.this, model);
             }
-        }
-
-        boolean isFirstRegister = SharedPrefsUtils.getBooleanPreference(this,"regist",false);
-        if (isFirstRegister){
-            SharedPrefsUtils.setBooleanPreference(this,"regist",true);
-            UIHelper.ToTagPage(this);
         }
     }
 
@@ -360,7 +370,20 @@ public class MainPage2 extends BaseActivity{
 
                 }
                 break;
+            case SCANNIN_PERSON:
+                if (resultCode == PersonalitySet.RESULT_PERSONALITY) {
+                  //  restartHome();
+                }
+                break;
         }
+    }
+
+    private void restartHome(){
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        Fragment fragment = instantFragment(currIndex);
+        fragmentTransaction.replace(R.id.fragment_container, fragment, fragmentTags.get(currIndex));
+        fragmentTransaction.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions();
     }
 
     @Override
@@ -464,11 +487,15 @@ public class MainPage2 extends BaseActivity{
     private void readPositionFromAsset() {
         new Thread(() -> {
             try {
-               FileUtil.readAsset(getApplicationContext());
+                FileUtil.readAsset(getApplicationContext());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }).start();
     }
 
+    @Override
+    public void onUpdateTagLister() {
+        restartHome();
+    }
 }

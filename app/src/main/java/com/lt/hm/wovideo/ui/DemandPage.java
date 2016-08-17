@@ -48,6 +48,7 @@ import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
+import com.lt.hm.wovideo.widget.CustomGridView;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.lt.hm.wovideo.widget.multiselector.MultiSelector;
@@ -451,6 +452,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 		}
 		LinearLayoutManager manager = new LinearLayoutManager(this.getApplicationContext());
 		manager.setOrientation(LinearLayoutManager.HORIZONTAL);
+		if (anthologyList == null) anthologyList = (RecyclerView) findViewById(R.id.anthology_list);
 		anthologyList.addItemDecoration(new RecycleViewDivider(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
 		anthologyList.setLayoutManager(manager);
 		mMultiSelector.setSelectable(true);
@@ -629,6 +631,9 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 			for (int i = 0; i < tmp; i++) {
 				grid_list.remove(0);
 			}
+		}
+		if (videoBottomGrid == null) {
+			videoBottomGrid = (RecyclerView) findViewById(R.id.video_bottom_grid);
 		}
 		grid_adapter = new VideoItemGridAdapter(DemandPage.this, grid_list);
 		videoBottomGrid.setHasFixedSize(true);

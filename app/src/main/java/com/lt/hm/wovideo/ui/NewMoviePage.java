@@ -11,6 +11,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -86,8 +87,7 @@ public class NewMoviePage extends BaseVideoActivity {
     @BindView(R.id.movie_bref_purch)
     ImageView movieBrefPurch;
     @BindView(R.id.bref_txt_short)
-//    TextView brefTxt1;
-            TextView bref_txt_short;
+    TextView bref_txt_short;
     @BindView(R.id.bref_txt_long)
     TextView bref_txt_long;
     @BindView(R.id.bref_expand)
@@ -98,6 +98,8 @@ public class NewMoviePage extends BaseVideoActivity {
     TextView free_hint;
     @BindView(R.id.free_label)
     TextView mFreeLabel;
+    @BindView(R.id.fl_bref)
+    FrameLayout brefFl;
     CommentAdapter commentAdapter;
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
@@ -125,6 +127,7 @@ public class NewMoviePage extends BaseVideoActivity {
     private String share_desc;
     private String vfId;
     private String collect_tag;
+    private int typeId = 0;
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -153,11 +156,16 @@ public class NewMoviePage extends BaseVideoActivity {
             getVideoDetails(vfId);
             getFirstURL(vfId);
             getCommentList(vfId);
-            if (mMediaController!=null){
+            if (mMediaController != null) {
                 mMediaController.setBulletScreen(false);
             }
         }
-
+        if (bundle.containsKey("typeId")) {
+            typeId = bundle.getInt("typeId");
+        }
+        if (typeId == VideoType.SMIML.getId()){
+            brefFl.setVisibility(View.GONE);
+        }
         getYouLikeDatas(10);
 
     }
@@ -204,7 +212,7 @@ public class NewMoviePage extends BaseVideoActivity {
                     ResponseParser.parse(resp, response, CommentModel.class, RespHeader.class);
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                         if (!StringUtils.isNullOrEmpty(resp.getBody().getCommentList()) && resp.getBody().getCommentList().size() > 0) {
-                            if (empty==null) return;
+                            if (empty == null) return;
                             empty.setVisibility(View.GONE);
                             videoCommentList.setVisibility(View.VISIBLE);
                             beans.addAll(resp.getBody().getCommentList());
@@ -238,11 +246,7 @@ public class NewMoviePage extends BaseVideoActivity {
         HashMap<String, Object> map = new HashMap<>();
         map.put("pageNum", 1);
         map.put("numPerPage", size);
-        if (getIntent().getExtras().containsKey("typeId")) {
-            map.put("typeid", getIntent().getExtras().getInt("typeId"));
-        } else {
-            map.put("typeid", 1);
-        }
+        map.put("typeid", typeId == 0 ? 1 : typeId);
         HttpApis.getYouLikeList(map, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -271,6 +275,9 @@ public class NewMoviePage extends BaseVideoActivity {
                 grid_list.remove(0);
             }
         }
+        if (videoBottomGrid == null) {
+            videoBottomGrid = (RecyclerView) findViewById(R.id.video_bottom_grid);
+        }
         grid_adapter = new VideoItemGridAdapter(NewMoviePage.this, grid_list);
         videoBottomGrid.setHasFixedSize(true);
         GridLayoutManager manager = new GridLayoutManager(this, 3);
@@ -290,7 +297,7 @@ public class NewMoviePage extends BaseVideoActivity {
     public void getChangePage(String vfId) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", vfId);
-        maps.put("typeid", VideoType.MOVIE.getId());
+        maps.put("typeid", typeId == 0 ? 1 : typeId);
         HttpApis.getVideoInfo(maps, new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
@@ -303,38 +310,8 @@ public class NewMoviePage extends BaseVideoActivity {
                 ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
                 ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
-                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
-                        // TODO: 16/6/14 跳转电影页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId", VideoType.MOVIE.getId());
-                        UIHelper.ToMoviePage(NewMoviePage.this, bundle);
-                        NewMoviePage.this.finish();
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
-                        // TODO: 16/6/14 跳转电视剧页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId", VideoType.TELEPLAY.getId());
-                        UIHelper.ToDemandPage(NewMoviePage.this, bundle);
-                        NewMoviePage.this.finish();
-
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
-                        // TODO: 16/6/14 跳转 体育播放页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId", VideoType.SPORTS.getId());
-                        UIHelper.ToDemandPage(NewMoviePage.this, bundle);
-                        NewMoviePage.this.finish();
-
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
-                        // TODO: 16/6/14 跳转综艺界面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId", VideoType.VARIATY.getId());
-                        UIHelper.ToDemandPage(NewMoviePage.this, bundle);
-                        NewMoviePage.this.finish();
-                    }
+                    UIHelper.ToAllCateVideo(NewMoviePage.this, resp.getBody().getVfinfo().getTypeId(), vfId);
+                    NewMoviePage.this.finish();
                 }
             }
         });
@@ -370,6 +347,7 @@ public class NewMoviePage extends BaseVideoActivity {
                     videoHistory.setImg_url(details.getImg());
                     values = new String[]{details.getDirector(), details.getStars(), details.getLx(), details.getDq(), details.getNd(), details.getCpname()};
                     biAdapter = new BrefIntroAdapter(NewMoviePage.this, names, values);
+                    if (videoBrefIntros == null) videoBrefIntros = (CustomListView) findViewById(R.id.video_bref_intros);
                     videoBrefIntros.setAdapter(biAdapter);
                     String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
                     if (!StringUtils.isNullOrEmpty(userinfo)) {

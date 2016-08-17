@@ -33,6 +33,16 @@
 
                     <include layout="@layout/include_header_recycler" />
                 </com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader>
+
+                <Button
+                    android:id="@+id/empty_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:drawableTop="@drawable/empty_state"
+                    android:text="@string/empty_video_list"
+                    android:visibility="gone" />
+
             </FrameLayout>
         </LinearLayout>
     </com.lt.hm.wovideo.widget.FastScrollView>

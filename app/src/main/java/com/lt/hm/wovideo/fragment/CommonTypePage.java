@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
@@ -137,6 +138,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     TextView tvType;
     @BindView(R.id.item_desc)
     TextView tvDesc;
+    @BindView(R.id.empty_view)
+    Button emptyView;
 
     @BindView(R.id.rl_title)
     View titleRl;
@@ -599,6 +602,10 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                     return;
                 }
                 if (pageNum == 1) {
+                    if (films.size() == 0){
+                        emptyView.setVisibility(VISIBLE);
+                        return;
+                    }
                     listAdapter.setNewData(films);
                 } else {
                     listAdapter.notifyDataChangedAfterLoadMore(films, true);

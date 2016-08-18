@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="1dp"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <include
+                layout="@layout/vip_person_layout"
+                android:layout_width="match_parent"
+                android:layout_height="60dp" />
+
+            <com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView
+                android:id="@+id/img_indicator_vip"
+                android:layout_width="match_parent"
+                android:layout_height="180dp" />
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <include layout="@layout/include_title_text" />
+
+                <com.lt.hm.wovideo.widget.CustomGridView
+                    android:id="@+id/gv_movie"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/float_transparent"
+                    android:focusable="false"
+                    android:horizontalSpacing="6dp"
+                    android:listSelector="@color/float_transparent"
+                    android:numColumns="3"
+                    android:paddingLeft="6dp"
+                    android:paddingRight="6dp"
+                    android:verticalSpacing="6dp" />
+            </LinearLayout>
+
+            <com.lt.hm.wovideo.widget.CustomListView
+                android:id="@+id/elv_teleplay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff8f8f8"
+                android:cacheColorHint="#00000000"
+                android:childIndicator="@null"
+                android:divider="@null"
+                android:dividerHeight="0.0dip"
+                android:fadingEdge="none"
+                android:focusable="false"
+                android:groupIndicator="@null"
+                android:headerDividersEnabled="false"
+                android:listSelector="@color/float_transparent"
+                android:minHeight="500.0dip" />
+
+            <com.lt.hm.wovideo.widget.CustomListView
+                android:id="@+id/elv_variaty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#fff8f8f8"
+                android:cacheColorHint="#00000000"
+                android:childIndicator="@null"
+                android:divider="@null"
+                android:dividerHeight="0.0dip"
+                android:fadingEdge="none"
+                android:focusable="false"
+                android:groupIndicator="@null"
+                android:headerDividersEnabled="false"
+                android:listSelector="@color/float_transparent"
+                android:minHeight="500.0dip" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

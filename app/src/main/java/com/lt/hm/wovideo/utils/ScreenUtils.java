@@ -2,6 +2,7 @@ package com.lt.hm.wovideo.utils;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
@@ -20,6 +21,14 @@ public class ScreenUtils
 	{
 		/* cannot be instantiated */
 		throw new UnsupportedOperationException("cannot be instantiated");
+	}
+
+	public static int dp2px(Context paramContext, float paramFloat) {
+		return dp2px(paramContext.getResources(), paramFloat);
+	}
+
+	public static int dp2px(Resources paramResources, float paramFloat) {
+		return (int) (0.5F + paramFloat * paramResources.getDisplayMetrics().density);
 	}
 
 	/**

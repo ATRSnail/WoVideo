@@ -36,6 +36,7 @@ import com.lt.hm.wovideo.fragment.LivePageFragment;
 import com.lt.hm.wovideo.fragment.MineInfo;
 import com.lt.hm.wovideo.fragment.NewChoicePage;
 import com.lt.hm.wovideo.fragment.RecommendPage;
+import com.lt.hm.wovideo.fragment.VipRecommendFrg;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.interf.updateTagLister;
 import com.lt.hm.wovideo.model.UserModel;
@@ -184,7 +185,7 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
             case 1:
                 return new LivePageFragment();
             case 2:
-                return new RecommendPage();
+                return new VipRecommendFrg();
             case 3:
                 //     return new EventsPage();
                 return new MineInfo();

@@ -18,8 +18,8 @@ public class TopTileView extends LinearLayout {
 
     @BindView(R.id.tv_title)
     TextView titleTv;
-    @BindView(R.id.img_right)
-    ImageView imageView;
+    @BindView(R.id.tv_right)
+    TextView imageView;
     @BindView(R.id.rl_title)
     RelativeLayout rl_title;
 

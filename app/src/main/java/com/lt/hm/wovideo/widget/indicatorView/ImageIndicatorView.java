@@ -419,6 +419,7 @@ public class ImageIndicatorView extends RelativeLayout {
 
 		@Override
 		public void onPageScrollStateChanged(int arg0) {
+			if (onChangeLister != null)
 			onChangeLister.onChangeLister(arg0 == ViewPager.SCROLL_STATE_IDLE);
 		}
 	}

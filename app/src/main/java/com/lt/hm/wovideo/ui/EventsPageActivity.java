@@ -27,6 +27,10 @@ import butterknife.Unbinder;
 public class EventsPageActivity extends BaseActivity implements SwipeRefreshLayout.OnRefreshListener,SecondTopbar.myTopbarClicklistenter {
     @BindView(R.id.set_topbar)
     SecondTopbar setTopbar;
+    @BindView(R.id.lv_huodong)
+    ListView lvHuodong;
+    @BindView(R.id.event_refresh)
+    SwipeRefreshLayout evnetRefresh;
     @Override
     protected int getLayoutId() {
         return R.layout.layout_huodong;
@@ -62,11 +66,6 @@ public class EventsPageActivity extends BaseActivity implements SwipeRefreshLayo
             }
         });
     }
-
-    @BindView(R.id.lv_huodong)
-    ListView lvHuodong;
-    @BindView(R.id.event_refresh)
-    SwipeRefreshLayout evnetRefresh;
 
     Unbinder unbinder;
 

@@ -422,6 +422,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 isNotFilm = false;
                 layoutManager = new GridLayoutManager(getApplicationContext(), 3);
                 layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+                mRecyclerView.setPadding(10,0,10,10);
             }
             listAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films, isNotFilm);
             listAdapter.setOnRecyclerViewItemClickListener((view1, i) -> {
@@ -450,7 +451,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
      */
     private void getBarData() {
         HashMap<String, Object> map = new HashMap<>();
-        map.put("isVip", 1);
+        map.put("isVip", 0);
         HttpApis.getBanners(map, HttpApis.http_two, new HttpCallback<>(ResponseBanner.class, this));
     }
 

@@ -911,7 +911,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         localList = new ArrayList<>();
         cctvList = new ArrayList<>();
         otherList = new ArrayList<>();
-        btns = new Button[]{liveBtnSina, liveBtnLocal, liveBtnCctv, liveBtnOthertv};
+        btns = new Button[]{liveBtnCctv,liveBtnSina, liveBtnLocal , liveBtnOthertv};
         liveProgramList.setLayoutManager(new LinearLayoutManager(this));
         liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this, LinearLayoutManager.VERTICAL, R.drawable.custom_list_divider));
 //        liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this,LinearLayoutManager.VERTICAL,getResources().getDimensionPixelOffset(3),R.color.gray_lightest));
@@ -990,24 +990,27 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 //
 //        });
 
-        liveBtnSina.setOnClickListener((View v) -> {
-            changeState(btns[0]);
-            if (sinaList.size() > 0) {
-                initListViews(sinaList);
-            }
-        });
-        liveBtnLocal.setOnClickListener((View v) -> {
-            changeState(btns[1]);
-            if (localList.size() > 0) {
-                initListViews(localList);
-            }
-        });
         liveBtnCctv.setOnClickListener((View v) -> {
-            changeState(btns[2]);
+            changeState(btns[0]);
             if (cctvList.size() > 0) {
                 initListViews(cctvList);
             }
         });
+
+        liveBtnSina.setOnClickListener((View v) -> {
+            changeState(btns[1]);
+            if (sinaList.size() > 0) {
+                initListViews(sinaList);
+            }
+        });
+
+        liveBtnLocal.setOnClickListener((View v) -> {
+            changeState(btns[2]);
+            if (localList.size() > 0) {
+                initListViews(localList);
+            }
+        });
+
         liveBtnOthertv.setOnClickListener((View v) -> {
             changeState(btns[3]);
             if (otherList.size() > 0) {
@@ -1043,15 +1046,20 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     private String intentPlayUrl = "";
     private String intentPlayName = "";
+    private String intentProperty = "";//电视台属性:0:央视;1:卫视2地方台;3:其他
+    private String currentPlayName = "";
     public static final String PLAY_URL = "play_url";
     public static final String PLAY_NAME = "play_name";
+    public static final String PLAY_PROPERTY = "property";
 
     @Override
     public void initDatas() {
         if (getIntent() != null) {
             intentPlayUrl = getIntent().getStringExtra(PLAY_URL);
             intentPlayName = getIntent().getStringExtra(PLAY_NAME);
+            intentProperty = getIntent().getStringExtra(PLAY_PROPERTY);
         }
+        TLog.error("intentProperty ---->" +intentProperty);
         getLiveList();
     }
 
@@ -1076,7 +1084,18 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     otherList.addAll(resp.getBody().getOtherTv());
 
 //                    mList.addAll(resp.getBody().getLiveTvList());
-                    initListViews(cctvList);
+
+                        if (TextUtils.isEmpty(intentProperty)||Integer.valueOf(intentProperty) == 0){
+                            initListViews(cctvList);
+                        }else if (Integer.valueOf(intentProperty) == 1){
+                            initListViews(sinaList);
+                        }else if (Integer.valueOf(intentProperty) == 2){
+                            initListViews(localList);
+                        }else if (Integer.valueOf(intentProperty) == 3){
+                            initListViews(otherList);
+                        }
+
+
                 }
             }
         });
@@ -1086,21 +1105,25 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         if (liveProgramList == null) return;
         adapter = new LiveTVListAdapter(getApplicationContext(), liveTvList);
         liveProgramList.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+
         if (!first_open) {
-
+            currentPlayName = TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getTvName() : intentPlayName;
             getRealURL(TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getUrl() : intentPlayUrl);
-            videoName.setText(TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getTvName() : intentPlayName);
-
+            videoName.setText(currentPlayName);
+            if (!TextUtils.isEmpty(intentProperty)&&Integer.valueOf(intentProperty)<4){
+                TLog.error("intentproperty--->"+intentProperty);
+                changeState(btns[Integer.valueOf(intentProperty)]);
+            }else {
+                changeState(btns[0]);
+            }
             first_open = true;
         }
-
+        adapter.updateShowText(liveTvList,currentPlayName);
 //        videoName.setText(liveTvList.get(0).getTvName());
 
         adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int i) {
-
 
                 String url = liveTvList.get(i).getUrl();
                 String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
@@ -1112,8 +1135,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                         mFreeLabel.setVisibility(View.VISIBLE);
                     }
                 }
-                videoName.setText(liveTvList.get(i).getTvName());
-
+                currentPlayName = liveTvList.get(i).getTvName();
+                videoName.setText(currentPlayName);
+                adapter.updateShowText(liveTvList,currentPlayName);
 //                videoName.setText(liveTvList.get(i).getTvName());
                 getRealURL(url);
             }

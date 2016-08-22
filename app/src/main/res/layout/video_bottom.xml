@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.percent.PercentRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
     android:background="@color/white"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp">
 
     <com.lt.hm.wovideo.widget.PercentLinearLayout
         android:layout_width="wrap_content"
@@ -14,19 +14,21 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:orientation="vertical">
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-        <TextView
-            android:id="@+id/video_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Title"
-            android:textSize="18sp"
-            android:textColor="@color/black" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/video_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Title"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -42,32 +44,33 @@
                 android:id="@+id/video_play_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1.2亿"
                 android:paddingLeft="5dp"
+                android:text="1.2亿"
                 android:textColor="@color/gray_darker" />
+
             <TextView
+                android:id="@+id/free_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/sp_14"
-                android:id="@+id/free_hint"
                 android:textColor="@android:color/holo_green_light"
-                />
+                android:textSize="@dimen/sp_14" />
         </LinearLayout>
 
     </com.lt.hm.wovideo.widget.PercentLinearLayout>
+
     <com.lt.hm.wovideo.widget.PercentLinearLayout
         android:id="@+id/video_collect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:paddingRight="10dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:paddingRight="10dp">
 
         <ImageView
+            android:id="@+id/img_collect"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/img_collect"
             android:layout_gravity="center"
             android:src="@drawable/icon_collect" />
 
@@ -82,10 +85,10 @@
         android:id="@+id/video_share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toLeftOf="@id/video_collect"
         android:layout_centerVertical="true"
-        android:paddingRight="10dp"
-        android:orientation="vertical">
+        android:layout_toLeftOf="@id/video_collect"
+        android:orientation="vertical"
+        android:paddingRight="10dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -107,8 +110,7 @@
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/video_share"
         android:orientation="vertical"
-        android:paddingRight="10dp"
-        >
+        android:paddingRight="10dp">
 
         <ImageView
             android:layout_width="wrap_content"
@@ -129,15 +131,16 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
+        android:orientation="vertical"
         android:paddingRight="10dp"
-        android:visibility="gone"
-        android:orientation="vertical">
+        android:visibility="gone">
+
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/video_btn_bg"
-            android:textColor="@color/white"
             android:clickable="false"
-            android:text="四屏播放" />
+            android:text="四屏播放"
+            android:textColor="@color/white" />
     </com.lt.hm.wovideo.widget.PercentLinearLayout>
 </android.support.percent.PercentRelativeLayout>

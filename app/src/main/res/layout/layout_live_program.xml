@@ -1,112 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/font_gray"
-    >
+    android:orientation="vertical">
 
     <com.lt.hm.wovideo.widget.PercentLinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
         android:background="@color/white"
-        >
+        android:orientation="vertical">
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:gravity="center"
-            android:text="@string/program_string"
-            />
+            android:text="@string/program_string" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="@color/font_gray"
-            />
+            android:background="@color/font_gray" />
+
         <android.support.percent.PercentRelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            >
+            android:layout_height="wrap_content">
+
             <LinearLayout
+                android:id="@+id/live_programs_layout"
                 android:layout_width="0dp"
-                app:layout_widthPercent="20%"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:id="@+id/live_programs_layout"
-                >
+                app:layout_widthPercent="20%">
+
                 <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:background="@color/blue_btn_bg_color"
-                    android:textColor="@color/white"
-                    android:text="@string/cctv"
                     android:id="@+id/live_btn_cctv"
-
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
                     android:layout_alignParentLeft="true"
-                    />
+                    android:background="@color/blue_btn_bg_color"
+                    android:text="@string/cctv"
+
+                    android:textColor="@color/white" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/gray_lighter1"
-                    />
+                    android:background="@color/gray_lighter1" />
+
                 <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:background="@color/gray_lighter"
-                    android:textColor="@color/black"
-                    android:text="@string/sinatv"
                     android:id="@+id/live_btn_sina"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
                     android:layout_alignParentLeft="true"
-                    />
+                    android:background="@color/gray_lighter"
+                    android:text="@string/sinatv"
+                    android:textColor="@color/black" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/gray_lighter1"
-                    />
+                    android:background="@color/gray_lighter1" />
+
                 <Button
+                    android:id="@+id/live_btn_local"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:textColor="@color/black"
-                    android:text="@string/localTv"
+                    android:layout_alignParentLeft="true"
                     android:background="@color/gray_lighter"
 
-                    android:id="@+id/live_btn_local"
-                    android:layout_alignParentLeft="true"
-                    />
+                    android:text="@string/localTv"
+                    android:textColor="@color/black" />
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/gray_lighter1"
-                    />
+                    android:background="@color/gray_lighter1" />
+
                 <Button
+                    android:id="@+id/live_btn_othertv"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:background="@color/gray_lighter"
-                    android:textColor="@color/black"
-                    android:text="@string/other_string"
-                    android:id="@+id/live_btn_othertv"
                     android:layout_alignParentLeft="true"
-                    />
+                    android:background="@color/gray_lighter"
+                    android:text="@string/other_string"
+                    android:textColor="@color/black" />
             </LinearLayout>
-            <View android:layout_width="2dp"
+
+            <View
+                android:layout_width="2dp"
                 android:layout_height="match_parent"
-                android:background="@color/gray_lighter1"
-                />
+                android:background="@color/gray_lighter1" />
 
             <android.support.v7.widget.RecyclerView
+                android:id="@+id/live_program_list"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/live_program_list"
-                app:layout_widthPercent="80%"
-                android:background="@color/gray_btn_bg_color"
                 android:layout_toRightOf="@id/live_programs_layout"
-                />
+                android:background="@color/gray_btn_bg_color"
+                app:layout_widthPercent="80%" />
         </android.support.percent.PercentRelativeLayout>
 
     </com.lt.hm.wovideo.widget.PercentLinearLayout>
-
-
 
 
 </LinearLayout>

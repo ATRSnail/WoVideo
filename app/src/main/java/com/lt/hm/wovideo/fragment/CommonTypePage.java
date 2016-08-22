@@ -78,6 +78,7 @@ import com.lt.hm.wovideo.widget.CustomScrollView;
 import com.lt.hm.wovideo.widget.DividerDecoration;
 import com.lt.hm.wovideo.widget.FastScrollView;
 import com.lt.hm.wovideo.widget.TopTileView;
+import com.lt.hm.wovideo.widget.indicatorView.AutoPlayManager;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -146,6 +147,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     View titleRl;
     @BindView(R.id.lv_live)
     CustomListView liveLv;
+    @BindView(R.id.tv_right)
+    TextView tv_right;
 //    @BindView(R.id.banner)
 //    BannerLayout bannerLayout;
 
@@ -156,6 +159,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     Unbinder unbinder;
 
     private LinearLayoutManager layoutManager;
+
+    private AutoPlayManager autoPlayManager;
 
     private boolean isLoading = false;//防止scrollview滚动多次请求数据
     private boolean isNoData = false;//数据加载完了
@@ -241,7 +246,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         });
 
         changeCityBtn.setOnClickListener((View v) -> {
-            startActivityForResult(new Intent(getActivity(), CityListPage.class), 99);
+            startActivityForResult(new Intent(getContext(), CityListPage.class), 99);
         });
         topPageFl.setOnClickListener(new OnClickListener() {
             @Override
@@ -249,7 +254,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 switch (channelCode) {
                     case ChannelModel.LOCAL_ID://地方
                         if (localCityModel != null)
-                        ToLivePage(localCityModel.getUrl(),localCityModel.getTvName());
+                        ToLivePage(localCityModel.getUrl(),localCityModel.getTvName(),localCityModel.getProperty());
                         break;
                     case ChannelModel.FILM_ID://电影
                     case ChannelModel.TELEPLAY_ID://电视剧
@@ -347,15 +352,16 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         liveLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ToLivePage(localCites.get(position-1).getUrl(),localCites.get(position-1).getTvName());
+                ToLivePage(localCites.get(position-1).getUrl(),localCites.get(position-1).getTvName(),localCites.get(position-1).getProperty());
             }
         });
     }
 
-    private void ToLivePage(String url,String name){
+    private void ToLivePage(String url,String name,String property){
         Bundle bundle = new Bundle();
         bundle.putString(LivePage.PLAY_URL,url);
         bundle.putString(LivePage.PLAY_NAME,name);
+        bundle.putString(LivePage.PLAY_PROPERTY,property);
         UIHelper.ToLivePage(getActivity(),bundle);
     }
 
@@ -370,8 +376,11 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             tvDesc.setVisibility(GONE);
             tvLine.setVisibility(GONE);
             tvType.setCompoundDrawables(null,null,null,null);
+            tvType.setText("正在播放:"+descStr);
+        }else {
+            tvType.setText(typeStr);
         }
-        tvType.setText("正在播放:"+descStr);
+
         tvDesc.setText(descStr);
 
     }
@@ -397,7 +406,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             }
         });
         imageIndicatorView.setOnRefrshViewEnable(this);
-
+        loopIndicatorView();
     }
 
     /*
@@ -440,6 +449,12 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         TopTileView headView = new TopTileView(context);
         headView.setTitleTv("北京直播");
         headView.setImageVisiable(true);
+        headView.setImage(R.drawable.icon_more);
+        headView.setImageText("");
+        headView.setOnClickListener(v ->{
+            TLog.error("直播--->");
+            UIHelper.ToLivePage(getActivity());
+        });
         liveLv.addHeaderView(headView);
 
         liveAdapter = new LiveAdapter(context, localCites, R.layout.item_live_cate);
@@ -669,6 +684,13 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
        UIHelper.ToAllCateVideo(getActivity(),typeId,vfId);
     }
 
+    private void loopIndicatorView() {
+        autoPlayManager = new AutoPlayManager(imageIndicatorView);
+        autoPlayManager.setBroadcastEnable(true);
+        autoPlayManager.setBroadcastTimeIntevel(3 * 1000, 3 * 1000);//set first play time and interval
+        autoPlayManager.loop();
+    }
+
     @Override
     public void onUpdateLocListener(String name, String code) {
         cityCode = code;
@@ -684,6 +706,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     @Override
     public void onChangeLister(boolean isEnable) {
         TLog.error("viewpage---isscroll---"+isEnable);
+        if (mSwipeRefreshWidget != null)
         mSwipeRefreshWidget.setEnabled(isEnable);
     }
 }

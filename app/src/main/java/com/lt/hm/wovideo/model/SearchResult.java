@@ -9,29 +9,6 @@ import java.util.List;
  */
 public class SearchResult {
 
-    /**
-     * utime : 1464781808000
-     * isfree : 1
-     * state : 1
-     * img : /recommendations/9f24b96bdca44e5da7586fba9384f3fe.jpg
-     * director : 赵旭
-     * ctime : 1464781805000
-     * gxzt : 1
-     * jjs : 1
-     * lx : 4
-     * hIMG : /recommendations/c7bde064ce7a47a6ac774a4d6934d6c6.jpg
-     * id : 3
-     * cpId : null
-     * stars : 张无忌,李莫愁
-     * nd : 4
-     * name : 倚天屠龙记
-     * copyrightImg :
-     * dq : 3
-     * typeId : 1
-     * fname :
-     * introduction : 这夜很离奇，自认废青的阿平来到谜之便利店第一晚上班，先遇上刻薄老板和神经质女同事，转头黑警来借厕所；刚出狱的愤怒老人即兴玩老笠，又有富豪和性感女伴乱入。众人各有故事，各怀鬼胎，一场大龙凤在便利店热闹上演。当炸弹狂徒来袭，最后殊途同归但又意想不到。笑他们太疯癫，只是这个城市病了我们看不穿，导演火火掌控节奏和精警对白非常准确，几位老戏骨交足功课，成就一部港片少见的黑色荒诞困兽斗好戏。
-     * sx : 2
-     */
 
     private List<VfListBean> vfList;
 
@@ -44,8 +21,40 @@ public class SearchResult {
     }
 
     public static class VfListBean {
+
+
+        /**
+         * utime : 1471847519000
+         * tag : 0003|0015|0010
+         * isfree : 0
+         * hImg : /himg/748ace4839e34ed19ea0ddaa34cbf30c.jpg
+         * state : 1
+         * img : /vimg/2214983125d44fb9a0c71bc0bc238770.jpg
+         * director : 无
+         * ctime : 1471585380000
+         * gxzt : 1
+         * jjs : 1
+         * lx :
+         * typeName : 短剧
+         * cpId : rxTEP1PcxJPYaNoVieDalwztSlyI3yl2
+         * hit : 4
+         * vfinfo_id : udYQWqlJNmxvbxdxQBclSYtVK1gySndv
+         * stars : 尤莉亚
+         * nd :
+         * name : 台湾ShowGirl萌萌哒电翻全场
+         * copyrightImg : /copyrightimg/7ea39ae6398d4c219cba121aa5989880.jpg
+         * dq :
+         * typeId : 5
+         * cpname :
+         * introduction : CJ2016ShowGirl眼镜萌妹尤莉亚，肤白貌美，电眼萌萌哒。
+         * fname : cjmmd
+         * sx :
+         */
+
         private long utime;
+        private String tag;
         private String isfree;
+        private String hImg;
         private String state;
         private String img;
         private String director;
@@ -53,35 +62,20 @@ public class SearchResult {
         private String gxzt;
         private int jjs;
         private String lx;
-        private String hIMG;
-        private String id;
+        private String typeName;
+        private String cpId;
+        private int hit;
         private String vfinfo_id;
-        private Object cpId;
         private String stars;
         private String nd;
         private String name;
         private String copyrightImg;
         private String dq;
         private int typeId;
-        private String fname;
+        private String cpname;
         private String introduction;
+        private String fname;
         private String sx;
-
-        public String gethIMG() {
-            return hIMG;
-        }
-
-        public void sethIMG(String hIMG) {
-            this.hIMG = hIMG;
-        }
-
-        public String getVfinfo_id() {
-            return vfinfo_id;
-        }
-
-        public void setVfinfo_id(String vfinfo_id) {
-            this.vfinfo_id = vfinfo_id;
-        }
 
         public long getUtime() {
             return utime;
@@ -91,12 +85,28 @@ public class SearchResult {
             this.utime = utime;
         }
 
+        public String getTag() {
+            return tag;
+        }
+
+        public void setTag(String tag) {
+            this.tag = tag;
+        }
+
         public String getIsfree() {
             return isfree;
         }
 
         public void setIsfree(String isfree) {
             this.isfree = isfree;
+        }
+
+        public String getHImg() {
+            return hImg;
+        }
+
+        public void setHImg(String hImg) {
+            this.hImg = hImg;
         }
 
         public String getState() {
@@ -155,28 +165,36 @@ public class SearchResult {
             this.lx = lx;
         }
 
-        public String getHIMG() {
-            return hIMG;
+        public String getTypeName() {
+            return typeName;
         }
 
-        public void setHIMG(String hIMG) {
-            this.hIMG = hIMG;
+        public void setTypeName(String typeName) {
+            this.typeName = typeName;
         }
 
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public Object getCpId() {
+        public String getCpId() {
             return cpId;
         }
 
-        public void setCpId(Object cpId) {
+        public void setCpId(String cpId) {
             this.cpId = cpId;
+        }
+
+        public int getHit() {
+            return hit;
+        }
+
+        public void setHit(int hit) {
+            this.hit = hit;
+        }
+
+        public String getVfinfo_id() {
+            return vfinfo_id;
+        }
+
+        public void setVfinfo_id(String vfinfo_id) {
+            this.vfinfo_id = vfinfo_id;
         }
 
         public String getStars() {
@@ -227,12 +245,12 @@ public class SearchResult {
             this.typeId = typeId;
         }
 
-        public String getFname() {
-            return fname;
+        public String getCpname() {
+            return cpname;
         }
 
-        public void setFname(String fname) {
-            this.fname = fname;
+        public void setCpname(String cpname) {
+            this.cpname = cpname;
         }
 
         public String getIntroduction() {
@@ -241,6 +259,14 @@ public class SearchResult {
 
         public void setIntroduction(String introduction) {
             this.introduction = introduction;
+        }
+
+        public String getFname() {
+            return fname;
+        }
+
+        public void setFname(String fname) {
+            this.fname = fname;
         }
 
         public String getSx() {

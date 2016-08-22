@@ -1,12 +1,15 @@
 package com.lt.hm.wovideo.utils.imageloader;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.stream.StreamModelLoader;
+import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.lt.hm.wovideo.utils.AppUtils;
 
 import java.io.IOException;
@@ -51,7 +54,41 @@ public class GlideImageLoaderStrategy implements BaseImageLoaderStrategy {
      * load image with Glide
      */
     private void loadNormal(Context ctx, ImageLoader img) {
-        Glide.with(ctx).load(img.getUrl()).placeholder(img.getPlaceHolder()).into(img.getImgView());
+ //       Glide.with(ctx).load(img.getUrl()).placeholder(img.getPlaceHolder()).into(img.getImgView());
+
+        displayImageTarget(img.getImgView(), img.getUrl(), getTarget(img.getImgView(), img.getUrl()));
+    }
+
+    /**
+     * 加载图片 Target
+     *
+     * @param imageView
+     * @param target
+     * @param url
+     */
+    public void displayImageTarget(ImageView imageView, final String
+            url, BitmapImageViewTarget target) {
+        Glide.get(imageView.getContext()).with(imageView.getContext())
+                .load(url)
+                .asBitmap()//强制转换Bitmap
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(target);
+    }
+
+
+    /**
+     * 获取BitmapImageViewTarget
+     */
+    private BitmapImageViewTarget getTarget(ImageView imageView, final String url) {
+        return new BitmapImageViewTarget(imageView) {
+            @Override
+            protected void setResource(Bitmap resource) {
+                super.setResource(resource);
+                //缓存Bitmap，以便于在没有用到时，自动回收
+                LruCacheUtils.getInstance().addBitmapToMemoryCache(url,
+                        resource);
+            }
+        };
     }
 
 

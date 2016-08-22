@@ -1,5 +1,7 @@
 package com.lt.hm.wovideo.ui;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -380,14 +382,41 @@ public class NewMoviePage extends BaseVideoActivity {
     private void hideSomething() {
         videoCollect.setVisibility(View.VISIBLE);
         videoShare.setVisibility(View.VISIBLE);
-        videoProjection.setVisibility(View.GONE);
+        videoProjection.setVisibility(View.VISIBLE);
         bref_txt_short.setVisibility(View.VISIBLE);
         brefExpand.setVisibility(View.VISIBLE);
         movieBrefPurch.setVisibility(View.GONE);
     }
 
+    public static final String DIALOG_FRAGMENT_TAG = "dialog";
+    public static final int PLAY_ACTION = 0xa1;
+    public static final int PAUSE_ACTION = 0xa2;
+    public static final int STOP_ACTION = 0xa3;
+    public static final int GET_MEDIA_INFO_ACTION = 0xa4;
+    public static final int GET_POSITION_INFO_ACTION = 0xa5;
+    public static final int RESUME_SEEKBAR_ACTION = 0xa6;
+    public static final int GET_VOLUME_ACTION = 0xa7;
+    public static final int SET_VOLUME_ACTION = 0xa8;
     @Override
     public void initViews() {
+        videoProjection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                FragmentTransaction ft = getFragmentManager().beginTransaction();
+//                Fragment prev = getFragmentManager().findFragmentByTag(DIALOG_FRAGMENT_TAG);
+//                if (prev != null) {
+//                    ft.remove(prev);
+//                }
+//                ft.addToBackStack(null);
+//
+//                // Create and show the dialog.
+//                DeviceListDialogFragment newFragment = DeviceListDialogFragment.newInstance();
+//                newFragment.show(ft, DIALOG_FRAGMENT_TAG);
+//                newFragment.setButtonClickedListener(NewMoviePage.this);
+//
+           }
+        });
+
         videoShare.setOnClickListener((View v) -> {
             ShareUtils.showShare(this, null, true, share_title, share_desc, HttpUtils.appendUrl(img_url));
 
@@ -754,4 +783,10 @@ public class NewMoviePage extends BaseVideoActivity {
         history.save(videoHistory);
         super.onDestroy();
     }
+
+//    @Override
+//    public void onclicked() {
+//     //   PlaybackCommand.playNewItem("http://video.sinosns.cn/fx7/3.mp4","video");
+////
+//    }
 }

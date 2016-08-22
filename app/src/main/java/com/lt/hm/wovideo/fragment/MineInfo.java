@@ -13,6 +13,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,6 +63,7 @@ import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -77,6 +79,7 @@ import okhttp3.Call;
 import static com.lt.hm.wovideo.R.id.bref_expand;
 import static com.lt.hm.wovideo.R.id.p_info_logo;
 import static com.lt.hm.wovideo.R.id.pc_username;
+import static com.lt.hm.wovideo.utils.FileUtil.*;
 
 
 /**
@@ -156,6 +159,9 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
     }
 
     private void initPersonInfo() {
+        if (!TextUtils.isEmpty(ACache.get(getApplicationContext()).getAsString("img_back_url"))) {
+            personHeadBg.setBackground(FileUtil.getImageDrawable(ACache.get(getApplicationContext()).getAsString("img_back_url")));
+        }
         UserModel model = UserHandler.getUserInfo(getApplicationContext());
         netUsageDatabase = new NetUsageDatabase(getApplicationContext());
         if (FILE_SAVEPATH != null) {
@@ -219,7 +225,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
                 if (UserHandler.isLogin(getApplicationContext())) {
                     handleSelectPicture();
                 } else {
-                    UnLoginHandler.unLogin(getApplicationContext());
+                    UnLoginHandler.unLogin(getActivity());
                 }
 
                 break;
@@ -365,7 +371,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         if (StringUtils.isEmpty(thePath)) {
             thePath = ImageUtils.getAbsoluteImagePath(getActivity(), uri);
         }
-        String ext = FileUtil.getFileFormat(thePath);
+        String ext = getFileFormat(thePath);
         ext = StringUtils.isEmpty(ext) ? "jpg" : ext;
         // 照片命名
         String cropFileName = "wovideo_crop_" + timeStamp + "." + ext;
@@ -432,7 +438,6 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         intent.putExtra("outputX", CROP);// 输出图片大小
         intent.putExtra("outputY", CROP);
         intent.putExtra("scale", true);// 去黑边
-        intent.putExtra("scaleUpIfNeeded", true);// 去黑边
         startActivityForResult(intent,
                 ImageUtils.REQUEST_CODE_GETIMAGE_BYSDCARD);
     }

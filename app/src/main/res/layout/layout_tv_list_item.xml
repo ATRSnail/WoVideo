@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:id="@+id/rl_tv_item"
+    android:layout_width="match_parent"
     android:layout_height="50dp"
-    android:gravity="center_vertical"
     android:background="@drawable/listview_selector"
-    >
+    android:gravity="center_vertical"
+    android:orientation="vertical">
+
     <TextView
+        android:id="@+id/live_list_item_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/live_list_item_text"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:textColor="@color/black"
-        android:text="CCTV－1CCTVCCTVCCTVCCTVCCTVCCTVCCTV"
-        android:maxWidth="130dp"
-        android:singleLine="true"
         android:ellipsize="end"
-        android:textSize="15sp"
+        android:maxWidth="130dp"
         android:paddingLeft="15dp"
-        />
+        android:singleLine="true"
+        android:text="CCTV－1CCTVCCTVCCTVCCTVCCTVCCTVCCTV"
+        android:textColor="@color/black"
+        android:textSize="15sp" />
+
     <TextView
+        android:id="@+id/live_list_item_current_text"
         android:layout_width="@dimen/s_150"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:gravity="left"
-        android:singleLine="true"
-        android:ellipsize="end"
-        android:text="CCTV－1CCTVCCTVCCTVCCTVCCTVCCTVCCTV"
         android:layout_centerVertical="true"
-        android:id="@+id/live_list_item_current_text"
-        android:textColor="@color/gray_darker"
-        android:textSize="12sp"
+        android:ellipsize="end"
+        android:gravity="left"
         android:maxWidth="150dp"
         android:paddingRight="25dp"
-        />
+        android:singleLine="true"
+        android:text="CCTV－1CCTVCCTVCCTVCCTVCCTVCCTVCCTV"
+        android:textColor="@color/gray_darker"
+        android:textSize="12sp" />
 
 </RelativeLayout>

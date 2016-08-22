@@ -371,11 +371,6 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
 
                 }
                 break;
-            case SCANNIN_PERSON:
-                if (resultCode == PersonalitySet.RESULT_PERSONALITY) {
-                  //  restartHome();
-                }
-                break;
         }
     }
 

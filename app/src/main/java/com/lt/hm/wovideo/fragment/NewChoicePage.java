@@ -32,6 +32,7 @@ import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UpdateLocationMsg;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.widget.MyPageChangeListener;
@@ -109,9 +110,9 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
         super.initView(view);
         vipSelector.setOnClickListener(v -> {
             if (UserHandler.isLogin(getContext())) {
-                CityListPage.newInstance(getActivity(),cityName);
-            } else {
-                DialogHelp.getMessageDialog(getContext(),"请先登录",null).show();
+                UIHelper.ToPersonlitySetPage(getContext());
+             } else {
+                DialogHelp.showDialog(getContext(),"请先登录",null,null,"确定",null).show();
             }
         });
     }

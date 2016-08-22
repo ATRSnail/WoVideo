@@ -7,6 +7,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.utils.ScreenUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -37,6 +38,15 @@ public class TopTileView extends LinearLayout {
 
     public void setImageVisiable(boolean b) {
         imageView.setVisibility(b ? VISIBLE : GONE);
+    }
+
+    public void setImageText(String str){
+        imageView.setText(str);
+    }
+
+    public void setImage(int img) {
+        imageView.setCompoundDrawablePadding(ScreenUtils.dp2px(getContext(),10));
+        imageView.setCompoundDrawablesWithIntrinsicBounds(null,null,getResources().getDrawable(img),null);
     }
 
 

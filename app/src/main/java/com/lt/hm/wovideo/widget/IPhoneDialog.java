@@ -112,13 +112,14 @@ public class IPhoneDialog extends Dialog {
             dialog.addContentView(view, new ViewGroup.LayoutParams(width * 2 / 3, height / 5));
             ((TextView) view.findViewById(R.id.dialog_content)).setText(message);
             if (positiveButtonText != null) {
-                Button confirm= (Button) view.findViewById(R.id.dialog_confirm);
+                Button confirm = (Button) view.findViewById(R.id.dialog_confirm);
                 confirm.setText(positiveButtonText);
                 view.findViewById(R.id.dialog_confirm).setOnClickListener(new NoDoubleClickListener() {
                     @Override
                     public void onNoDoubleClick(View v) {
-                        positiveButtonClickListener.onClick(dialog,
-                                DialogInterface.BUTTON_POSITIVE);
+                        if (positiveButtonClickListener != null)
+                            positiveButtonClickListener.onClick(dialog,
+                                    DialogInterface.BUTTON_POSITIVE);
                     }
                 });
             } else {
@@ -127,13 +128,14 @@ public class IPhoneDialog extends Dialog {
             }
 
             if (negativeButtonText != null) {
-                Button negative= (Button) view.findViewById(R.id.dialg_cancel);
+                Button negative = (Button) view.findViewById(R.id.dialg_cancel);
                 negative.setText(negativeButtonText);
                 view.findViewById(R.id.dialg_cancel).setOnClickListener(new NoDoubleClickListener() {
                     @Override
                     public void onNoDoubleClick(View v) {
-                        negativeButtonClickListener.onClick(dialog,
-                                DialogInterface.BUTTON_POSITIVE);
+                        if (negativeButtonClickListener != null)
+                            negativeButtonClickListener.onClick(dialog,
+                                    DialogInterface.BUTTON_POSITIVE);
                     }
                 });
             } else {

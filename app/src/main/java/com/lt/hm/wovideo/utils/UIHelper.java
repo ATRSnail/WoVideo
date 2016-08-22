@@ -122,6 +122,15 @@ public class UIHelper {
 	}
 
 	/**
+	 * 跳转到个性化
+	 * @param context
+	 */
+	public static void ToPersonlitySetPage(Context context) {
+		Intent intent = new Intent(context, PersonalitySet.class);
+		context.startActivity(intent);
+	}
+
+	/**
 	 * 跳转到标签页
 	 * @param context
      */

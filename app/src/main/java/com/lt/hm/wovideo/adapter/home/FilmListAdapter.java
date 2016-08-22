@@ -39,5 +39,10 @@ public class FilmListAdapter extends BaseQuickAdapter<FilmMode> {
         ImageView img = (ImageView) baseViewHolder.convertView.findViewById(R.id.item_img_bg);
         ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(img).placeHolder(channelCode ? R.drawable.default_horizental : R.drawable.default_vertical).url(HttpUtils.appendUrl(channelCode ? likeModel.gethImg() : likeModel.getImg())).build());
 
+        if (!likeModel.getIsfree().equals("1")){
+            baseViewHolder.setVisible(R.id.item_vip_logo,true);
+        }else{
+            baseViewHolder.setVisible(R.id.item_vip_logo,false);
+        }
     }
 }

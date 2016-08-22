@@ -24,6 +24,7 @@ import com.lt.hm.wovideo.utils.PinyinUtil;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.SiteBSTree;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.widget.CustomTopbar;
 import com.lt.hm.wovideo.widget.DividerDecoration;
 import com.lt.hm.wovideo.widget.MySectionIndexer;
 
@@ -41,16 +42,18 @@ import butterknife.BindView;
  * @version 1.0
  * @create_date 8/5/16
  */
-public class CityListPage extends BaseActivity {
+public class CityListPage extends BaseActivity implements CustomTopbar.myTopbarClicklistenter{
 
     public static final int CITY_RESULT = 456;
-    private static String CITY_NAME = "cityName";
+    public static String CITY_NAME = "cityName";
     @BindView(R.id.city_list)
     RecyclerView cityList;
     @BindView(R.id.sort_key)
     TextView sortKey;
     @BindView(R.id.text_place)
     TextView placeText;
+    @BindView(R.id.person_topbar)
+    CustomTopbar topbar;
     CityListAdapter mAdapter;
     private List<City> cities = new ArrayList<>();
     /**
@@ -59,14 +62,11 @@ public class CityListPage extends BaseActivity {
     private String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private String currentCity;
 
-    public static void newInstance(Activity activity, String cityName) {
-        Intent intent = new Intent(activity, CityListPage.class);
-        intent.putExtra(CITY_NAME, cityName);
-        activity.startActivityForResult(intent, MainPage2.SCANNIN_PERSON);
-    }
-
     @Override
     protected void init(Bundle savedInstanceState) {
+        topbar.setLeftIsVisible(true);
+        topbar.setRightIsVisible(true);
+        topbar.setOnTopbarClickListenter(this);
     }
 
     @Override
@@ -80,9 +80,7 @@ public class CityListPage extends BaseActivity {
 
     @Override
     public void initDatas() {
-        if (getIntent() != null) {
-            currentCity = getIntent().getStringExtra(CITY_NAME);
-        }
+        currentCity = SharedPrefsUtils.getStringPreference(getApplicationContext(),"city_name");
         cities = FileUtil.cities;
         setValue(cities);
     }
@@ -112,4 +110,13 @@ public class CityListPage extends BaseActivity {
         });
     }
 
+    @Override
+    public void leftClick() {
+        this.finish();
+    }
+
+    @Override
+    public void rightClick() {
+
+    }
 }

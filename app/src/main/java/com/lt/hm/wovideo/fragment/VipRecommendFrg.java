@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.fragment;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,23 +11,29 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.recommend.GridAdapter;
 import com.lt.hm.wovideo.adapter.vip.GridViewAapter;
 import com.lt.hm.wovideo.adapter.vip.ListViewAdapter;
 import com.lt.hm.wovideo.base.BaseFragment;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
+import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BannerList;
 import com.lt.hm.wovideo.model.LikeModel;
+import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.response.ResponseBanner;
 import com.lt.hm.wovideo.model.response.ResponseLikeList;
 import com.lt.hm.wovideo.utils.ScreenUtils;
+import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -50,7 +57,9 @@ import okhttp3.Call;
  * Created by xuchunhui on 16/8/18.
  */
 public class VipRecommendFrg extends BaseFragment {
-
+    private final static String FILE_SAVEPATH = Environment
+            .getExternalStorageDirectory().getAbsolutePath()
+            + "/WoVideo/Portrait/";
     private View view;
     @BindView(R.id.img_indicator_vip)
     ImageIndicatorView imgIndicatorVip;
@@ -72,6 +81,8 @@ public class VipRecommendFrg extends BaseFragment {
     View rl_title;
     @BindView(R.id.tv_right)
     TextView rightTv;
+    @BindView(R.id.tv_title)
+    TextView tv_title;
     private GridViewAapter movieAdapter;
     private ListViewAdapter teleAdapter;
     private ListViewAdapter varAdapter;
@@ -108,21 +119,52 @@ public class VipRecommendFrg extends BaseFragment {
     @Override
     public void initView(View view) {
         inflater = LayoutInflater.from(getContext());
+        vipPersonLayout.setOnClickListener((View v) -> {
+            UIHelper.ToOpenVipPage(getActivity());
+        });
+        if (FILE_SAVEPATH != null) {
+            Glide.with(this).load(ACache.get(getActivity()).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(vipPersonLogo);
+        }
+
+        String userinfo=  SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)){
+            UserModel model= new Gson().fromJson(userinfo,UserModel.class);
+            String phoneNum= model.getPhoneNo();
+            vipPersonAccount.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
+            if (model.getIsVip().equals("1")){
+                vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_opened));
+            }else{
+                vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
+            }
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+                Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).thumbnail(1f).into(vipPersonLogo);
+            }else{
+                vipPersonLogo.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
+            }
+
+        }else{
+            vipPersonAccount.setText(getResources().getText(R.string.unlogin_hint));
+            vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
+        }
+
         movieAdapter = new GridViewAapter(getContext(), movieList, R.layout.layout_new_home_movie_item);
         teleAdapter = new ListViewAdapter(getContext(), teleList, R.layout.layout_new_home_item);
         varAdapter = new ListViewAdapter(getContext(), varlist, R.layout.layout_new_home_item);
         rl_title.setVisibility(View.VISIBLE);
         rightTv.setText("换一换");
+        tv_title.setText("热门电影");
         rightTv.setVisibility(View.VISIBLE);
-        rightTv.setCompoundDrawables(null,null,getResources().getDrawable(R.drawable.icon_change),null);
+        rightTv.setCompoundDrawablesWithIntrinsicBounds(null,null,getResources().getDrawable(R.drawable.icon_change),null);
         rightTv.setCompoundDrawablePadding(ScreenUtils.dp2px(getContext(),10));
         TopTileView teleHeadView = new TopTileView(getContext());
         teleHeadView.setTitleTv("热播剧");
         teleHeadView.setImageVisiable(true);
+        teleHeadView.setImage(R.drawable.icon_change);
         teleLv.addHeaderView(teleHeadView);
         TopTileView varHeadView = new TopTileView(getContext());
         varHeadView.setTitleTv("热播综艺");
         varHeadView.setImageVisiable(true);
+        varHeadView.setImage(R.drawable.icon_change);
         varLv.addHeaderView(varHeadView);
         movieLv.setAdapter(movieAdapter);
         teleLv.setAdapter(teleAdapter);
@@ -158,7 +200,7 @@ public class VipRecommendFrg extends BaseFragment {
         teleLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                likemodel = teleList.get(position);
+                likemodel = teleList.get(position-1);
                 // 跳转视频详情页面
                 changePage(likemodel.getTypeId(), likemodel.getId());
             }
@@ -166,7 +208,7 @@ public class VipRecommendFrg extends BaseFragment {
         varLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                likemodel = varlist.get(position);
+                likemodel = varlist.get(position-1);
                 // 跳转视频详情页面
                 changePage(likemodel.getTypeId(), likemodel.getId());
 

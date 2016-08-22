@@ -1,119 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
+    android:id="@+id/person_head_bg"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:id="@+id/person_head_bg"
-    android:background="@drawable/bg_person_center">
+    android:background="@drawable/bg_person_center"
+    android:orientation="vertical">
+
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
+
         <ImageView
+            android:id="@+id/btn_person_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_person_back"
             android:padding="15dp"
-            android:src="@drawable/left_arrow"
-            />
+            android:src="@drawable/left_arrow" />
 
         <ImageView
             android:id="@+id/btn_set"
-            android:layout_alignTop="@id/btn_person_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_set"
-            android:padding="15dp"
             android:layout_alignParentRight="true"
-            />
+            android:layout_alignTop="@id/btn_person_back"
+            android:padding="15dp"
+            android:src="@drawable/icon_set" />
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="left|center_vertical"
-        android:paddingLeft="40dp"
-        >
+        android:paddingLeft="40dp">
+
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
-            >
+            android:orientation="horizontal">
+
             <com.lt.hm.wovideo.widget.CircleImageView
+                android:id="@+id/head_icon"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:src="@drawable/icon_head"
                 android:layout_alignParentLeft="true"
-                android:id="@+id/head_icon"
-                app:border_width="1dp"
+                android:src="@drawable/icon_head"
                 app:border_color="@color/white"
-                />
+                app:border_width="1dp" />
 
             <LinearLayout
+                android:id="@+id/unlogin_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:paddingLeft="20dp"
                 android:layout_centerVertical="true"
                 android:layout_toRightOf="@id/head_icon"
-                android:id="@+id/unlogin_layout"
-                >
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="20dp">
+
                 <TextView
+                    android:id="@+id/login_tag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/login_tag"
-                    android:textColor="@color/white"
                     android:text="@string/login"
-                    />
+                    android:textColor="@color/white" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingLeft="10dp"
                     android:paddingRight="10dp"
-                    android:textColor="@color/white"
                     android:text="/"
-                    />
+                    android:textColor="@color/white" />
 
                 <TextView
+                    android:id="@+id/regist_tag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/regist_tag"
-                    android:textColor="@color/white"
                     android:text="@string/regist"
-                    />
+                    android:textColor="@color/white" />
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/login_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
                 android:layout_centerInParent="true"
                 android:layout_centerVertical="true"
-                android:id="@+id/login_layout"
-                android:paddingLeft="20dp"
                 android:layout_toRightOf="@id/head_icon"
-                android:visibility="gone"
-                >
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textColor="@color/white"
-                    android:text="用户名"
-                    android:id="@+id/pc_username"
-                    />
+                android:orientation="vertical"
+                android:paddingLeft="20dp"
+                android:visibility="gone">
 
                 <TextView
+                    android:id="@+id/pc_username"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="用户名"
+                    android:textColor="@color/white" />
+
+                <TextView
+                    android:id="@+id/person_etime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingTop="@dimen/s_10"
-                    android:id="@+id/person_etime"
-                    android:textColor="@color/white"
                     android:text="有效期"
-                    />
+                    android:textColor="@color/white" />
 
 
             </LinearLayout>
@@ -121,7 +115,6 @@
 
         </RelativeLayout>
     </RelativeLayout>
-
 
 
 </LinearLayout>

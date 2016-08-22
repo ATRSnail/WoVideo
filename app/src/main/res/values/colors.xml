@@ -25,6 +25,10 @@
     <color name="float_button_color">#FF2eaff3</color>
     <color name="btn_abort_service">#ff495a</color>
 
+    <!-- A semi-transparent dark Holo shade of blue -->
+    <color name="holo_blue_dark">#ff0099cc</color>
+
+
     <color name="blue_btn_bg_color">#1e9edc</color>
     <color name="grey_place_title_color">#555555</color>
 

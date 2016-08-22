@@ -74,9 +74,8 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         android:divider="@null"
-        android:visibility="gone"
-        android:paddingLeft="@dimen/sp_12"
-        android:paddingRight="@dimen/sp_12" />
+        android:layout_marginBottom="-20dp"
+        android:visibility="gone" />
 
     <include layout="@layout/include_title_text" />
 

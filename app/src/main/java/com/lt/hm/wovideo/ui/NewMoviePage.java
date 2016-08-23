@@ -48,6 +48,7 @@ import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
@@ -422,8 +423,8 @@ public class NewMoviePage extends BaseVideoActivity {
 
         });
         addComment.setOnClickListener((View v) -> {
-            if (TextUtils.isEmpty(etAddComment.getText().toString())) {
-                Toast.makeText(getApplicationContext(), "评论内容不能为空", Toast.LENGTH_SHORT).show();
+            if (TextUtils.isEmpty(etAddComment.getText().toString().trim())) {
+                UT.showNormal( "评论内容不能为空");
                 return;
             }
             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -480,7 +481,7 @@ public class NewMoviePage extends BaseVideoActivity {
                         //check validate success;
                         SendComment(etAddComment.getText().toString());
                     } else {
-                        Toast.makeText(getApplicationContext(), "言论不当，请斟酌发言", Toast.LENGTH_SHORT).show();
+                        UT.showNormal("言论不当，请斟酌发言");
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();

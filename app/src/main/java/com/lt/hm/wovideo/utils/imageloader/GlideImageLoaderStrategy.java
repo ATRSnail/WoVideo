@@ -5,11 +5,13 @@ import android.graphics.Bitmap;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.MemoryCategory;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.data.DataFetcher;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.stream.StreamModelLoader;
 import com.bumptech.glide.request.target.BitmapImageViewTarget;
+import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.utils.AppUtils;
 
 import java.io.IOException;
@@ -24,27 +26,27 @@ public class GlideImageLoaderStrategy implements BaseImageLoaderStrategy {
     @Override
     public void loadImage(Context ctx, ImageLoader img) {
 
-        boolean flag= false;
+        boolean flag = false;
 //        boolean flag= SettingUtils.getOnlyWifiLoadImg(ctx);
         //如果不是在wifi下加载图片，直接加载
-        if(!flag){
-            loadNormal(ctx,img);
-            return;
-        }
+//        if(!flag){
+//            loadNormal(ctx,img);
+//            return;
+//        }
 
-        int strategy =img.getWifiStrategy();
-        if(strategy == ImageLoaderUtil.LOAD_STRATEGY_ONLY_WIFI){
+        int strategy = img.getWifiStrategy();
+        if (strategy == ImageLoaderUtil.LOAD_STRATEGY_ONLY_WIFI) {
             int netType = AppUtils.getNetWorkType(ctx);
             //如果是在wifi下才加载图片，并且当前网络是wifi,直接加载
-            if(netType == AppUtils.NETWORKTYPE_WIFI) {
-                loadNormal(ctx, img);
+            if (netType == AppUtils.NETWORKTYPE_WIFI) {
+                loadNormal(img.getImgView(), img.getUrl());
             } else {
                 //如果是在wifi下才加载图片，并且当前网络不是wifi，加载缓存
                 loadCache(ctx, img);
             }
-        }else{
+        } else {
             //如果不是在wifi下才加载图片
-            loadNormal(ctx,img);
+            loadNormal(img.getImgView(), img.getUrl());
         }
 
     }
@@ -53,47 +55,20 @@ public class GlideImageLoaderStrategy implements BaseImageLoaderStrategy {
     /**
      * load image with Glide
      */
-    private void loadNormal(Context ctx, ImageLoader img) {
- //       Glide.with(ctx).load(img.getUrl()).placeholder(img.getPlaceHolder()).into(img.getImgView());
-
-        displayImageTarget(img.getImgView(), img.getUrl(), getTarget(img.getImgView(), img.getUrl()));
-    }
-
-    /**
-     * 加载图片 Target
-     *
-     * @param imageView
-     * @param target
-     * @param url
-     */
-    public void displayImageTarget(ImageView imageView, final String
-            url, BitmapImageViewTarget target) {
-        Glide.get(imageView.getContext()).with(imageView.getContext())
-                .load(url)
-                .asBitmap()//强制转换Bitmap
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(target);
-    }
+    private void loadNormal(ImageView imageView, final String url) {
+        Glide.get(imageView.getContext())
+                .with(imageView.getContext())
+                .load(HttpUtils.appendUrl(url))
+                //  .asBitmap()//强制转换Bitmap
+                .crossFade(1000)
+                //  .skipMemoryCache(true)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .into(imageView);
+          }
 
 
     /**
-     * 获取BitmapImageViewTarget
-     */
-    private BitmapImageViewTarget getTarget(ImageView imageView, final String url) {
-        return new BitmapImageViewTarget(imageView) {
-            @Override
-            protected void setResource(Bitmap resource) {
-                super.setResource(resource);
-                //缓存Bitmap，以便于在没有用到时，自动回收
-                LruCacheUtils.getInstance().addBitmapToMemoryCache(url,
-                        resource);
-            }
-        };
-    }
-
-
-    /**
-     *load cache image with Glide
+     * load cache image with Glide
      */
     private void loadCache(Context ctx, ImageLoader img) {
         Glide.with(ctx).using(new StreamModelLoader<String>() {
@@ -121,6 +96,6 @@ public class GlideImageLoaderStrategy implements BaseImageLoaderStrategy {
                     }
                 };
             }
-        }).load(img.getUrl()).placeholder(img.getPlaceHolder()).diskCacheStrategy(DiskCacheStrategy.ALL).into(img.getImgView());
+        }).load(img.getUrl()).placeholder(img.getPlaceHolder()).diskCacheStrategy(DiskCacheStrategy.SOURCE).into(img.getImgView());
     }
 }

@@ -114,43 +114,23 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout mSwipeRefreshWidget;
-    @BindView(R.id.header)
-    RecyclerViewHeader header;
-    @BindView(R.id.scroll_view)
-    FastScrollView scrollView;
-    @BindView(R.id.img_indicator_vip)
     ImageIndicatorView imageIndicatorView;
     @BindView(R.id.recycler_recommend)
     RecyclerView mRecyclerView;
-    @BindView(R.id.recycle_cate)
     CustomGridView cateGv;
-    @BindView(R.id.text_change_city)
     TextView changeCityBtn;
-    @BindView(R.id.frame_recommend)
     View recommendImg;
-    @BindView(R.id.fl_page)
     View topPageFl;
-    @BindView(R.id.item_img_bg)
     ImageView imgTopPage;
-    @BindView(R.id.item_title)
     TextView tvTitle;
-    @BindView(R.id.line_tv)
     TextView tvLine;
-    @BindView(R.id.item_type)
     TextView tvType;
-    @BindView(R.id.item_desc)
     TextView tvDesc;
-    @BindView(R.id.empty_view)
-    Button emptyView;
 
-    @BindView(R.id.rl_title)
     View titleRl;
-    @BindView(R.id.lv_live)
     CustomListView liveLv;
-    @BindView(R.id.tv_right)
     TextView tv_right;
-//    @BindView(R.id.banner)
-//    BannerLayout bannerLayout;
+    private View mHeadView;
 
     private boolean isOnline = true;
     private LiveAdapter liveAdapter;
@@ -206,8 +186,26 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         TLog.error("OnFirst---");
         isHasView = true;
         initBundleData();
+        initHeadView();
         initData();
         initView(null);
+    }
+
+    private void initHeadView() {
+        mHeadView = View.inflate(context,R.layout.include_header_recycler,null);
+        imageIndicatorView = (ImageIndicatorView)mHeadView.findViewById(R.id.img_indicator_vip);
+        recommendImg = mHeadView.findViewById(R.id.frame_recommend);
+        changeCityBtn = (TextView) mHeadView.findViewById(R.id.text_change_city);
+        cateGv = (CustomGridView) mHeadView.findViewById(R.id.recycle_cate);
+        liveLv = (CustomListView) mHeadView.findViewById(R.id.lv_live);
+        topPageFl = mHeadView.findViewById(R.id.fl_page);
+        tv_right = (TextView)mHeadView.findViewById(R.id.tv_right);
+        titleRl = mHeadView.findViewById(R.id.rl_title);
+        imgTopPage = (ImageView) mHeadView.findViewById(R.id.item_img_bg);
+        tvTitle = (TextView) mHeadView.findViewById(R.id.item_title);
+        tvLine = (TextView) mHeadView.findViewById(R.id.line_tv);
+        tvType = (TextView) mHeadView.findViewById(R.id.item_type);
+        tvDesc = (TextView) mHeadView.findViewById(R.id.item_desc);
     }
 
     @Override
@@ -217,33 +215,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         mSwipeRefreshWidget.setColorSchemeResources(android.R.color.holo_green_light, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
         mSwipeRefreshWidget.setOnRefreshListener(this);
-
-        scrollView.setOnBorderListener(new CustomScrollView.OnBorderListener() {
-            @Override
-            public void onBottom() {
-                if (isLoading || isNoData) return;
-                isLoading = true;
-                TLog.error("上拉加载----");
-
-                switch (channelCode) {
-                    case ChannelModel.RECOMMEND_ID://推荐
-                    case ChannelModel.LOCAL_ID://地方
-                        getYouLikeData();
-                        break;
-                    case ChannelModel.FILM_ID://电影
-                    case ChannelModel.TELEPLAY_ID://电视剧
-                    case ChannelModel.SPORTS_ID://体育
-                    case ChannelModel.VARIATY_ID://综艺
-                    default://其他
-                        getListByType();
-                }
-            }
-
-            @Override
-            public void onTop() {
-                TLog.error("下拉加载--");
-            }
-        });
 
         changeCityBtn.setOnClickListener((View v) -> {
             startActivityForResult(new Intent(getContext(), CityListPage.class), 99);
@@ -371,7 +342,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private void setDataToTopView(String name, String typeStr, String descStr, String imgUrl) {
 
         tvTitle.setText(name);
-        ImageLoaderUtil.getInstance().loadImage(context, new ImageLoader.Builder().imgView(imgTopPage).placeHolder(R.drawable.default_horizental).url(HttpUtils.appendUrl(imgUrl)).build());
+        ImageLoaderUtil.getInstance().loadImage(imgTopPage,imgUrl,true);
         if (TextUtils.isEmpty(typeStr)){
             tvDesc.setVisibility(GONE);
             tvLine.setVisibility(GONE);
@@ -440,22 +411,45 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 changePage(filmmode.getTypeId(), filmmode.getVfinfo_id());
             });
         }
+
         mRecyclerView.setLayoutManager(layoutManager);
-        header.attachTo(mRecyclerView);
-        mRecyclerView.addItemDecoration(new DividerDecoration(context, 2, getResources().getColor(R.color.white)));
-        mRecyclerView.setAdapter(listAdapter);
+        listAdapter.addHeaderView(mHeadView);
+        listAdapter.openLoadMore(numPerPage,true);
+        listAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+            @Override
+            public void onLoadMoreRequested() {
+                TLog.error("上拉加载----"+isLoading+isNoData);
+                if (isLoading || isNoData) return;
+                isLoading = true;
+                TLog.error("上拉加载----");
+
+                switch (channelCode) {
+                    case ChannelModel.RECOMMEND_ID://推荐
+                    case ChannelModel.LOCAL_ID://地方
+                        getYouLikeData();
+                        break;
+                    case ChannelModel.FILM_ID://电影
+                    case ChannelModel.TELEPLAY_ID://电视剧
+                    case ChannelModel.SPORTS_ID://体育
+                    case ChannelModel.VARIATY_ID://综艺
+                    default://其他
+                        getListByType();
+                }
+            }
+        });
+         mRecyclerView.setAdapter(listAdapter);
 
 
-        TopTileView headView = new TopTileView(context);
-        headView.setTitleTv("北京直播");
-        headView.setImageVisiable(true);
-        headView.setImage(R.drawable.icon_more);
-        headView.setImageText("");
-        headView.setOnClickListener(v ->{
+        TopTileView headView1 = new TopTileView(context);
+        headView1.setTitleTv("北京直播");
+        headView1.setImageVisiable(true);
+        headView1.setImage(R.drawable.icon_more);
+        headView1.setImageText("");
+        headView1.setOnClickListener(v ->{
             TLog.error("直播--->");
             UIHelper.ToLivePage(getActivity());
         });
-        liveLv.addHeaderView(headView);
+        liveLv.addHeaderView(headView1);
 
         liveAdapter = new LiveAdapter(context, localCites, R.layout.item_live_cate);
         liveLv.setAdapter(liveAdapter);
@@ -508,7 +502,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         HashMap<String, Object> map = new HashMap<>();
         map.put("channelCode", channelCode);
         map.put("pageNum", pageNum);
-        map.put("numPerPage", numPerPage);
+        map.put("numPerPage", pageNum==1?numPerPage+1:numPerPage);
         HttpApis.getListByType(map, HttpApis.http_fiv, new HttpCallback<>(ResponseFilms.class, this));
     }
 
@@ -585,9 +579,11 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 films = filmRe.getBody().getTypeList();
                 if (films == null || films.size() == 0) return;
                 topPageFl.setVisibility(View.VISIBLE);
-                filmMode = films.get(0);
-                setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getHit(), filmMode.gethImg());
-                films.remove(0);
+                if (pageNum == 1){
+                    filmMode = films.get(0);
+                    setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getHit(), filmMode.gethImg());
+                    films.remove(0);
+                }
                 if (films.size() == 0) {
                     isNoData = true;
                     UT.showNormal("暂无数据");
@@ -595,7 +591,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 }
                 if (pageNum == 1) {
                     if (films.size() == 0){
-                        emptyView.setVisibility(VISIBLE);
                         return;
                     }
                     listAdapter.setNewData(films);
@@ -705,7 +700,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     @Override
     public void onChangeLister(boolean isEnable) {
-        TLog.error("viewpage---isscroll---"+isEnable);
         if (mSwipeRefreshWidget != null)
         mSwipeRefreshWidget.setEnabled(isEnable);
     }

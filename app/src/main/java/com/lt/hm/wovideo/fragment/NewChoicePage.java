@@ -112,7 +112,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
             if (UserHandler.isLogin(getContext())) {
                 UIHelper.ToPersonlitySetPage(getContext());
              } else {
-                DialogHelp.showDialog(getContext(),"请先登录",null,null,"确定",null).show();
+                DialogHelp.getMessageDialog(getContext(),"请先登录").show();
             }
         });
     }

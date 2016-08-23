@@ -2,16 +2,10 @@ package com.lt.hm.wovideo.adapter.home;
 
 import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.http.HttpUtils;
-import com.lt.hm.wovideo.model.CateTagModel;
-import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.FilmMode;
-import com.lt.hm.wovideo.model.LikeModel;
-import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
 import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 
 import java.util.List;
@@ -36,8 +30,9 @@ public class FilmListAdapter extends BaseQuickAdapter<FilmMode> {
         baseViewHolder.setText(R.id.item_desc, likeModel.getHit());
         baseViewHolder.setText(R.id.item_type, likeModel.getTypeName());
 
-        ImageView img = (ImageView) baseViewHolder.convertView.findViewById(R.id.item_img_bg);
-        ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(img).placeHolder(channelCode ? R.drawable.default_horizental : R.drawable.default_vertical).url(HttpUtils.appendUrl(channelCode ? likeModel.gethImg() : likeModel.getImg())).build());
+        ImageView img = baseViewHolder.getView(R.id.item_img_bg);
+
+        ImageLoaderUtil.getInstance().loadImage(img,channelCode ? likeModel.gethImg() : likeModel.getImg(),channelCode);
 
         if (!likeModel.getIsfree().equals("1")){
             baseViewHolder.setVisible(R.id.item_vip_logo,true);

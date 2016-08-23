@@ -6,46 +6,10 @@
     android:background="@color/bg_new_color"
     android:orientation="vertical">
 
-    <com.lt.hm.wovideo.widget.FastScrollView
-        android:id="@+id/scroll_view"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_recommend"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recycler_recommend"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-
-                <com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader
-                    android:id="@+id/header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal|top">
-
-                    <include layout="@layout/include_header_recycler" />
-                </com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader>
-
-                <Button
-                    android:id="@+id/empty_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="@android:color/transparent"
-                    android:drawableTop="@drawable/empty_state"
-                    android:text="@string/empty_video_list"
-                    android:visibility="gone" />
-
-            </FrameLayout>
-        </LinearLayout>
-    </com.lt.hm.wovideo.widget.FastScrollView>
+        android:layout_height="wrap_content" />
 
 
 </android.support.v4.widget.SwipeRefreshLayout>

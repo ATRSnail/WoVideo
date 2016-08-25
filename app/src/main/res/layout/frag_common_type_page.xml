@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/swipe_refresh"
+<com.lt.hm.wovideo.widget.ptrpull.SamplePtrFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ptr_refresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_new_color"
@@ -12,4 +12,4 @@
         android:layout_height="wrap_content" />
 
 
-</android.support.v4.widget.SwipeRefreshLayout>
+</com.lt.hm.wovideo.widget.ptrpull.SamplePtrFrameLayout>

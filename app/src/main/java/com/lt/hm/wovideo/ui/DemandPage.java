@@ -45,6 +45,7 @@ import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
@@ -234,17 +235,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 //                            mFreeLabel.setVisibility(View.VISIBLE);
 //                        }
 //                    }
-					String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
-					if (!StringUtils.isNullOrEmpty(userinfo)) {
-						UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-						if (model.getIsVip() != null && model.getIsVip().equals("1")) {
-							mFreeLabel.setVisibility(View.VISIBLE);
-						}
-//                        String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
-//                        if (!StringUtils.isNullOrEmpty(tag)) {
-////                            free_hint.setText(" "+"已免流");
-//                        }
-					}
+
+					mFreeLabel.setVisibility(UserMgr.isVip()?View.VISIBLE:View.GONE);
 
 					videoName.setText(details.getName());
 					img_collect.setImageResource(details.getSc() != null && details.getSc().equals("1") ? R.drawable.icon_collect_press : R.drawable.icon_collect);
@@ -740,37 +732,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
 				ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
 				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
 
-					if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
-						// TODO: 16/6/14 跳转电影页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						UIHelper.ToMoviePage(DemandPage.this, bundle);
-						DemandPage.this.finish();
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
-						// TODO: 16/6/14 跳转电视剧页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						UIHelper.ToDemandPage(DemandPage.this, bundle);
-						DemandPage.this.finish();
-
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
-						// TODO: 16/6/14 跳转 体育播放页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						UIHelper.ToDemandPage(DemandPage.this, bundle);
-						DemandPage.this.finish();
-
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
-						// TODO: 16/6/14 跳转综艺界面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						UIHelper.ToDemandPage(DemandPage.this, bundle);
-						DemandPage.this.finish();
-
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.LIVE.getId()) {
-						UIHelper.ToLivePage(DemandPage.this);
-						DemandPage.this.finish();
-					}
+					UIHelper.ToAllCateVideo(DemandPage.this,resp.getBody().getVfinfo().getTypeId(),vfId);
+					DemandPage.this.finish();
 				}
 			}
 		});

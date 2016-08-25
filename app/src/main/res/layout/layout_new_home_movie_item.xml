@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="112dp"
-    android:layout_height="163dp">
+    android:layout_width="match_parent"
+    android:layout_height="163dp"
+    android:layout_gravity="center">
 
     <ImageView
         android:id="@+id/item_img_bg"
@@ -59,11 +60,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
+                    android:drawableLeft="@drawable/icon_type"
+                    android:drawablePadding="@dimen/dp_4"
                     android:ellipsize="end"
                     android:gravity="center"
-                    android:drawablePadding="@dimen/dp_4"
                     android:singleLine="true"
-                    android:drawableLeft="@drawable/icon_type"
                     android:text="TITLE"
                     android:textColor="@android:color/white"
                     android:textSize="@dimen/sp_12" />
@@ -91,10 +92,10 @@
                     android:layout_centerVertical="true"
                     android:layout_toRightOf="@id/item_type"
                     android:drawableLeft="@drawable/icon_playtimes"
+                    android:drawablePadding="@dimen/dp_4"
                     android:ellipsize="end"
                     android:gravity="center"
                     android:maxWidth="@dimen/s_60"
-                    android:drawablePadding="@dimen/dp_4"
                     android:singleLine="true"
                     android:text="DESC"
                     android:textColor="@android:color/white"

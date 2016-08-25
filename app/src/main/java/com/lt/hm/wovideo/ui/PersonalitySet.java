@@ -24,6 +24,7 @@ import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
 import com.lt.hm.wovideo.model.response.ResponseTag;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.widget.CustomTopbar;
@@ -122,7 +123,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
      */
     private void getTagInfos() {
         HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        UserModel userModel = UserMgr.getUseInfo();
         if (userModel != null)
             map.put("userid", userModel.getId());
         HttpApis.getIndividuationTag(map, HttpApis.http_thr, new HttpCallback<>(ResponseTag.class, this));
@@ -133,7 +134,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
      */
     private void getClassInfos() {
         HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        UserModel userModel = UserMgr.getUseInfo();
         if (userModel != null)
             map.put("userid", userModel.getId());
         HttpApis.getIndividuationChannel(map, HttpApis.http_one, new HttpCallback<>(ResponseChannel.class, this));
@@ -145,7 +146,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     private void updateChannel(String channel) {
         TLog.error("channel--->" + channel);
         HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        UserModel userModel = UserMgr.getUseInfo();
         if (userModel != null)
             map.put("userid", userModel.getId());
         map.put("channel", channel);
@@ -158,7 +159,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     private void updateTag(String channel) {
         TLog.error("channel--->" + channel);
         HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        UserModel userModel = UserMgr.getUseInfo();
         if (userModel != null)
             map.put("userid", userModel.getId());
         map.put("tag", channel);
@@ -299,7 +300,7 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                Toast.makeText(this, "保存失败", Toast.LENGTH_SHORT).show();
+                UT.showNormal("保存失败");
                 break;
             case HttpApis.http_thr:
                 ResponseTag responseTag = (ResponseTag) value;

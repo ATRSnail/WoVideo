@@ -1,32 +1,24 @@
 package com.lt.hm.wovideo.fragment;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.RecyclerView.OnScrollListener;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.bartoszlipinski.recyclerviewheader2.RecyclerViewHeader;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.home.FilmListAdapter;
@@ -34,10 +26,8 @@ import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.adapter.recommend.GridAdapter;
 import com.lt.hm.wovideo.adapter.recommend.LiveAdapter;
 import com.lt.hm.wovideo.base.BaseLazyFragment;
-import com.lt.hm.wovideo.base.BaseRequestActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
-import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
@@ -49,13 +39,10 @@ import com.lt.hm.wovideo.model.BannerList;
 import com.lt.hm.wovideo.model.CateTagListModel;
 import com.lt.hm.wovideo.model.CateTagModel;
 import com.lt.hm.wovideo.model.ChannelModel;
-import com.lt.hm.wovideo.model.City;
 import com.lt.hm.wovideo.model.FilmMode;
 import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.LocalCityModel;
-import com.lt.hm.wovideo.model.RecomList;
 import com.lt.hm.wovideo.model.VideoDetails;
-import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.response.ResponseBanner;
 import com.lt.hm.wovideo.model.response.ResponseCateTag;
 import com.lt.hm.wovideo.model.response.ResponseFilms;
@@ -70,35 +57,37 @@ import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.UpdateLocationMsg;
 import com.lt.hm.wovideo.utils.ViewPageChangeMsg;
-import com.lt.hm.wovideo.utils.imageloader.ImageLoader;
 import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 import com.lt.hm.wovideo.widget.CustomGridView;
 import com.lt.hm.wovideo.widget.CustomListView;
-import com.lt.hm.wovideo.widget.CustomScrollView;
 import com.lt.hm.wovideo.widget.DividerDecoration;
-import com.lt.hm.wovideo.widget.FastScrollView;
+import com.lt.hm.wovideo.widget.SpacesItemDecoration;
 import com.lt.hm.wovideo.widget.TopTileView;
 import com.lt.hm.wovideo.widget.indicatorView.AutoPlayManager;
 import com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView;
+import com.lt.hm.wovideo.widget.ptrpull.SamplePtrFrameLayout;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import in.srain.cube.views.ptr.PtrDefaultHandler;
+import in.srain.cube.views.ptr.PtrFrameLayout;
+import in.srain.cube.views.ptr.PtrHandler;
 import okhttp3.Call;
 
-import static android.support.v7.widget.RecyclerView.*;
+import static android.support.v7.widget.RecyclerView.GONE;
+import static android.support.v7.widget.RecyclerView.OnClickListener;
+import static android.support.v7.widget.RecyclerView.VISIBLE;
 
 /**
  * Created by xuchunhui on 16/8/8.
  */
-public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayout.OnRefreshListener,OnUpdateLocationListener,onChangeLister {
+public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayout.OnRefreshListener, OnUpdateLocationListener, onChangeLister {
 
     public static final String CHANNEL = "channel";
     private View view;
@@ -112,8 +101,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private List<FilmMode> films = new ArrayList<>();//电影电视剧列表
     private BaseQuickAdapter listAdapter;
 
-    @BindView(R.id.swipe_refresh)
-    SwipeRefreshLayout mSwipeRefreshWidget;
+    @BindView(R.id.ptr_refresh)
+    SamplePtrFrameLayout ptrFrameLayout;
     ImageIndicatorView imageIndicatorView;
     @BindView(R.id.recycler_recommend)
     RecyclerView mRecyclerView;
@@ -187,58 +176,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         isHasView = true;
         initBundleData();
         initHeadView();
-        initData();
         initView(null);
-    }
-
-    private void initHeadView() {
-        mHeadView = View.inflate(context,R.layout.include_header_recycler,null);
-        imageIndicatorView = (ImageIndicatorView)mHeadView.findViewById(R.id.img_indicator_vip);
-        recommendImg = mHeadView.findViewById(R.id.frame_recommend);
-        changeCityBtn = (TextView) mHeadView.findViewById(R.id.text_change_city);
-        cateGv = (CustomGridView) mHeadView.findViewById(R.id.recycle_cate);
-        liveLv = (CustomListView) mHeadView.findViewById(R.id.lv_live);
-        topPageFl = mHeadView.findViewById(R.id.fl_page);
-        tv_right = (TextView)mHeadView.findViewById(R.id.tv_right);
-        titleRl = mHeadView.findViewById(R.id.rl_title);
-        imgTopPage = (ImageView) mHeadView.findViewById(R.id.item_img_bg);
-        tvTitle = (TextView) mHeadView.findViewById(R.id.item_title);
-        tvLine = (TextView) mHeadView.findViewById(R.id.line_tv);
-        tvType = (TextView) mHeadView.findViewById(R.id.item_type);
-        tvDesc = (TextView) mHeadView.findViewById(R.id.item_desc);
-    }
-
-    @Override
-    public void initView(View view) {
-        addLikeListView();
-
-        mSwipeRefreshWidget.setColorSchemeResources(android.R.color.holo_green_light, android.R.color.holo_blue_bright, android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-        mSwipeRefreshWidget.setOnRefreshListener(this);
-
-        changeCityBtn.setOnClickListener((View v) -> {
-            startActivityForResult(new Intent(getContext(), CityListPage.class), 99);
-        });
-        topPageFl.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                switch (channelCode) {
-                    case ChannelModel.LOCAL_ID://地方
-                        if (localCityModel != null)
-                        ToLivePage(localCityModel.getUrl(),localCityModel.getTvName(),localCityModel.getProperty());
-                        break;
-                    case ChannelModel.FILM_ID://电影
-                    case ChannelModel.TELEPLAY_ID://电视剧
-                    case ChannelModel.SPORTS_ID://体育
-                    case ChannelModel.VARIATY_ID://综艺
-                        default:
-                        // 跳转视频详情页面
-                        if (filmMode != null)
-                        changePage(filmMode.getTypeId(), filmMode.getVfinfo_id());
-                        break;
-                }
-            }
-        });
+        autoRefresh();
     }
 
     /**
@@ -252,6 +191,74 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             channelCode = channel.getFunCode();
         }
         TLog.error(channelCode + "");
+    }
+
+    private void initHeadView() {
+        mHeadView = View.inflate(context, R.layout.include_header_recycler, null);
+        imageIndicatorView = (ImageIndicatorView) mHeadView.findViewById(R.id.img_indicator_vip);
+        recommendImg = mHeadView.findViewById(R.id.frame_recommend);
+        changeCityBtn = (TextView) mHeadView.findViewById(R.id.text_change_city);
+        cateGv = (CustomGridView) mHeadView.findViewById(R.id.recycle_cate);
+        liveLv = (CustomListView) mHeadView.findViewById(R.id.lv_live);
+        topPageFl = mHeadView.findViewById(R.id.fl_page);
+        tv_right = (TextView) mHeadView.findViewById(R.id.tv_right);
+        titleRl = mHeadView.findViewById(R.id.rl_title);
+        imgTopPage = (ImageView) mHeadView.findViewById(R.id.item_img_bg);
+        tvTitle = (TextView) mHeadView.findViewById(R.id.item_title);
+        tvLine = (TextView) mHeadView.findViewById(R.id.line_tv);
+        tvType = (TextView) mHeadView.findViewById(R.id.item_type);
+        tvDesc = (TextView) mHeadView.findViewById(R.id.item_desc);
+    }
+
+    @Override
+    public void initView(View view) {
+        addLikeListView();
+
+        ptrFrameLayout.disableWhenHorizontalMove(true);
+        ptrFrameLayout.setPtrHandler(new PtrHandler() {
+            @Override
+            public boolean checkCanDoRefresh(PtrFrameLayout frame, View content, View header) {
+                return PtrDefaultHandler.checkContentCanBePulledDown(ptrFrameLayout, mRecyclerView, header);
+            }
+
+            @Override
+            public void onRefreshBegin(PtrFrameLayout frame) {
+                initData();
+            }
+        });
+
+        changeCityBtn.setOnClickListener((View v) -> {
+            startActivityForResult(new Intent(getContext(), CityListPage.class), 99);
+        });
+        topPageFl.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (channelCode) {
+                    case ChannelModel.LOCAL_ID://地方
+                        if (localCityModel != null)
+                            ToLivePage(localCityModel.getUrl(), localCityModel.getTvName(), localCityModel.getProperty());
+                        break;
+                    case ChannelModel.FILM_ID://电影
+                    case ChannelModel.TELEPLAY_ID://电视剧
+                    case ChannelModel.SPORTS_ID://体育
+                    case ChannelModel.VARIATY_ID://综艺
+                    default:
+                        // 跳转视频详情页面
+                        if (filmMode != null)
+                            changePage(filmMode.getTypeId(), filmMode.getVfinfo_id());
+                        break;
+                }
+            }
+        });
+    }
+
+    private void autoRefresh() {
+        ptrFrameLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                ptrFrameLayout.autoRefresh();
+            }
+        }, 500);
     }
 
     /**
@@ -323,17 +330,17 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         liveLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                ToLivePage(localCites.get(position-1).getUrl(),localCites.get(position-1).getTvName(),localCites.get(position-1).getProperty());
+                ToLivePage(localCites.get(position - 1).getUrl(), localCites.get(position - 1).getTvName(), localCites.get(position - 1).getProperty());
             }
         });
     }
 
-    private void ToLivePage(String url,String name,String property){
+    private void ToLivePage(String url, String name, String property) {
         Bundle bundle = new Bundle();
-        bundle.putString(LivePage.PLAY_URL,url);
-        bundle.putString(LivePage.PLAY_NAME,name);
-        bundle.putString(LivePage.PLAY_PROPERTY,property);
-        UIHelper.ToLivePage(getActivity(),bundle);
+        bundle.putString(LivePage.PLAY_URL, url);
+        bundle.putString(LivePage.PLAY_NAME, name);
+        bundle.putString(LivePage.PLAY_PROPERTY, property);
+        UIHelper.ToLivePage(getActivity(), bundle);
     }
 
     /**
@@ -342,13 +349,13 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private void setDataToTopView(String name, String typeStr, String descStr, String imgUrl) {
 
         tvTitle.setText(name);
-        ImageLoaderUtil.getInstance().loadImage(imgTopPage,imgUrl,true);
-        if (TextUtils.isEmpty(typeStr)){
+        ImageLoaderUtil.getInstance().loadImage(imgTopPage, imgUrl, true);
+        if (TextUtils.isEmpty(typeStr)) {
             tvDesc.setVisibility(GONE);
             tvLine.setVisibility(GONE);
-            tvType.setCompoundDrawables(null,null,null,null);
-            tvType.setText("正在播放:"+descStr);
-        }else {
+            tvType.setCompoundDrawables(null, null, null, null);
+            tvType.setText("正在播放:" + descStr);
+        } else {
             tvType.setText(typeStr);
         }
 
@@ -385,12 +392,15 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
      *先加载这个方法,以免recycleview加不了header
      */
     private boolean isNotFilm = true;
-    private  FilmMode filmmode;
+    private FilmMode filmmode;
     private LikeModel likemodel;
+    private SpacesItemDecoration decoration;
+
+
     private void addLikeListView() {
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        if (channelCode .equals( ChannelModel.RECOMMEND_ID) || channelCode .equals( ChannelModel.LOCAL_ID)) {
+        if (channelCode.equals(ChannelModel.RECOMMEND_ID) || channelCode.equals(ChannelModel.LOCAL_ID)) {
             listAdapter = new LikeListAdapter(R.layout.layout_new_home_item, grid_list);
             listAdapter.setOnRecyclerViewItemClickListener((view1, i) -> {
                 likemodel = (LikeModel) listAdapter.getData().get(i);
@@ -402,11 +412,16 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 isNotFilm = false;
                 layoutManager = new GridLayoutManager(getApplicationContext(), 3);
                 layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                mRecyclerView.setPadding(10,0,10,10);
+                if (decoration == null)
+                    decoration = new SpacesItemDecoration(10);
+                mRecyclerView.setPadding(16, 0, 16, 0);
+                mRecyclerView.addItemDecoration(decoration);
+                listAdapter = new FilmListAdapter(R.layout.layout_new_home_movie_item, films, isNotFilm);
+            }else {
+                listAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films, isNotFilm);
             }
-            listAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films, isNotFilm);
             listAdapter.setOnRecyclerViewItemClickListener((view1, i) -> {
-                filmmode = (FilmMode)listAdapter.getData().get(i);
+                filmmode = (FilmMode) listAdapter.getData().get(i);
                 // 跳转视频详情页面
                 changePage(filmmode.getTypeId(), filmmode.getVfinfo_id());
             });
@@ -414,11 +429,10 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
         mRecyclerView.setLayoutManager(layoutManager);
         listAdapter.addHeaderView(mHeadView);
-        listAdapter.openLoadMore(numPerPage,true);
+        listAdapter.openLoadMore(numPerPage, true);
         listAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
             public void onLoadMoreRequested() {
-                TLog.error("上拉加载----"+isLoading+isNoData);
                 if (isLoading || isNoData) return;
                 isLoading = true;
                 TLog.error("上拉加载----");
@@ -437,7 +451,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 }
             }
         });
-         mRecyclerView.setAdapter(listAdapter);
+        mRecyclerView.setAdapter(listAdapter);
 
 
         TopTileView headView1 = new TopTileView(context);
@@ -445,7 +459,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         headView1.setImageVisiable(true);
         headView1.setImage(R.drawable.icon_more);
         headView1.setImageText("");
-        headView1.setOnClickListener(v ->{
+        headView1.setOnClickListener(v -> {
             TLog.error("直播--->");
             UIHelper.ToLivePage(getActivity());
         });
@@ -473,7 +487,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         map.put("numPerPage", numPerPage);
         if (!TextUtils.isEmpty(seed)) map.put("seed", seed);
         if (!TextUtils.isEmpty(tag)) map.put("tag", tag);
-        map.put("typeid", channelCode .equals( ChannelModel.RECOMMEND_ID) || channelCode .equals( ChannelModel.LOCAL_ID) ? "" : channelCode);
+        map.put("typeid", channelCode.equals(ChannelModel.RECOMMEND_ID) || channelCode.equals(ChannelModel.LOCAL_ID) ? "" : channelCode);
         HttpApis.getYouLikeList(map, HttpApis.http_thr, new HttpCallback<>(ResponseLikeList.class, this));
     }
 
@@ -502,7 +516,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         HashMap<String, Object> map = new HashMap<>();
         map.put("channelCode", channelCode);
         map.put("pageNum", pageNum);
-        map.put("numPerPage", pageNum==1?numPerPage+1:numPerPage);
+        map.put("numPerPage", numPerPage + 1);
         HttpApis.getListByType(map, HttpApis.http_fiv, new HttpCallback<>(ResponseFilms.class, this));
     }
 
@@ -555,10 +569,10 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                     return;
                 }
 
-                if (channelCode .equals( ChannelModel.RECOMMEND_ID)) {
+                if (channelCode.equals(ChannelModel.RECOMMEND_ID)) {
                     recommendImg.setVisibility(View.VISIBLE);
                 }
-                if (channelCode .equals( ChannelModel.LOCAL_ID)) {
+                if (channelCode.equals(ChannelModel.LOCAL_ID)) {
                     titleRl.setVisibility(View.VISIBLE);
                 }
                 if (pageNum == 1) {
@@ -579,7 +593,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 films = filmRe.getBody().getTypeList();
                 if (films == null || films.size() == 0) return;
                 topPageFl.setVisibility(View.VISIBLE);
-                if (pageNum == 1){
+                if (pageNum == 1) {
                     filmMode = films.get(0);
                     setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getHit(), filmMode.gethImg());
                     films.remove(0);
@@ -590,9 +604,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                     return;
                 }
                 if (pageNum == 1) {
-                    if (films.size() == 0){
-                        return;
-                    }
                     listAdapter.setNewData(films);
                 } else {
                     listAdapter.notifyDataChangedAfterLoadMore(films, true);
@@ -609,8 +620,8 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             case HttpApis.http_thr:
             case HttpApis.http_fiv:
                 isLoading = false;
-                if (mSwipeRefreshWidget != null && mSwipeRefreshWidget.isRefreshing()) {
-                    mSwipeRefreshWidget.setRefreshing(false);
+                if (ptrFrameLayout != null && ptrFrameLayout.isRefreshing()) {
+                    ptrFrameLayout.refreshComplete();
                 }
                 break;
         }
@@ -669,14 +680,14 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
                 ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    changePage(resp.getBody().getVfinfo().getTypeId(),vfId);
+                    changePage(resp.getBody().getVfinfo().getTypeId(), vfId);
                 }
             }
         });
     }
 
     private void changePage(int typeId, String vfId) {
-       UIHelper.ToAllCateVideo(getActivity(),typeId,vfId);
+        UIHelper.ToAllCateVideo(getActivity(), typeId, vfId);
     }
 
     private void loopIndicatorView() {
@@ -700,7 +711,5 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     @Override
     public void onChangeLister(boolean isEnable) {
-        if (mSwipeRefreshWidget != null)
-        mSwipeRefreshWidget.setEnabled(isEnable);
     }
 }

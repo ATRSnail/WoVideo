@@ -86,7 +86,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
 
     private void getClassInfos() {
         HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo(getApplicationContext());
+        UserModel userModel = UserMgr.getUseInfo();
         if (userModel != null)
             map.put("userid", userModel.getId());
         HttpApis.getIndividuationChannel(map, HttpApis.http_one, new HttpCallback<>(ResponseChannel.class, this));

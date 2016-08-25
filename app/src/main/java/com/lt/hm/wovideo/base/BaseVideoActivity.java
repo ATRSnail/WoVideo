@@ -28,6 +28,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -51,6 +52,7 @@ import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.video.model.Bullet;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.player.AVController;
@@ -99,13 +101,13 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  * Contains all the video control and bullet screen control methods in base activity for easy to maintain.
  * FIXME: Known issue, current version is messed up by the screen orientation logical, need to clean it.
  *
- * @version 1.0
  * @author KECB
- * Created by KECB on 7/19/16.
+ *         Created by KECB on 7/19/16.
+ * @version 1.0
  */
 
 public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener, AVController.OnInterfaceInteract{
+        AudioCapabilitiesReceiver.Listener, AVController.OnInterfaceInteract {
 
     // Video thing
     // For use when launching the demo app using adb.
@@ -180,7 +182,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                         String url = "http://www.bilibili.com/favicon.ico";
                         InputStream inputStream = null;
                         Drawable drawable = mDrawable;
-                        if(drawable == null) {
+                        if (drawable == null) {
                             try {
                                 URLConnection urlConnection = new URL(url).openConnection();
                                 inputStream = urlConnection.getInputStream();
@@ -198,7 +200,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                             drawable.setBounds(0, 0, 100, 100);
                             SpannableStringBuilder spannable = createSpannable(drawable);
                             danmaku.text = spannable;
-                            if(mDanmakuView != null) {
+                            if (mDanmakuView != null) {
                                 mDanmakuView.invalidateDanmaku(danmaku, false);
                             }
                             return;
@@ -228,7 +230,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         View root = findViewById(R.id.video_root);
         root.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -290,7 +291,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 //        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
                 .setMaximumLines(maxLinesPair)
                 .preventOverlapping(overlappingEnablePair);
-        if (mDanmakuView != null){
+        if (mDanmakuView != null) {
 //            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
                 @Override
@@ -332,19 +333,19 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 //                @Override
 //                public void onClick(View view) {
 //                    mMediaController.setVisibility(View.VISIBLE);
-                }
+        }
 //            });
-            ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        //toggleControlsVisibility();
-                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                        v.performClick();
-                    }
-                    return false;
+        ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    //toggleControlsVisibility();
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    v.performClick();
                 }
-            });
+                return false;
+            }
+        });
 
     }
 
@@ -374,6 +375,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         return parser;
 
     }
+
     protected Intent onUrlGot(VideoModel video) {
         Intent mpdIntent = new Intent(this, BaseVideoActivity.class)
                 .setData(Uri.parse(video.getmPlayUrl().getFormatUrl()))
@@ -434,7 +436,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     public void onPause() {
         super.onPause();
-        if (mPlayer==null)return;
+        if (mPlayer == null) return;
         mLoadedBytes = mPlayer.getLoadedBytes();
         if (Util.SDK_INT <= 23) {
             onHidden();
@@ -473,7 +475,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         NetUsage usage = new NetUsage();
         usage.setUserId("");
         usage.setVideoId(mVideoId);
-        usage.setCreateTime(System.currentTimeMillis()+"");
+        usage.setCreateTime(System.currentTimeMillis() + "");
         usage.setBytes(String.valueOf(mLoadedBytes));
         netUsageDatabase.insert(usage);
 
@@ -515,7 +517,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
             // when in portrait screen, turn off bullet screen.
-            if (mDanmakuView!=null){
+            if (mDanmakuView != null) {
                 mDanmakuView.hide();
             }
         }
@@ -567,7 +569,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mDanmakuView.seekTo(mPlayer.getCurrentPosition());
         } else {
             mRotateLoading.start();
-            if (mDanmakuView==null) return;
+            if (mDanmakuView == null) return;
             mDanmakuView.hide();
         }
     }
@@ -630,49 +632,48 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     }
 
     protected void getBullets() {
-        TLog.log("Bullet", "get bullets"+mVideoId);
-            if (mDanmakuView!=null){
-                mDanmakuView.release();
-            }
-            HashMap<String, Object> maps = new HashMap<String, Object>();
-            maps.put("pageNum", 1);
-            maps.put("numPerPage", 10000);
-            maps.put("vfPlayId", mVideoId);
+        TLog.log("Bullet", "get bullets" + mVideoId);
+        if (mDanmakuView != null) {
+            mDanmakuView.release();
+        }
+        HashMap<String, Object> maps = new HashMap<String, Object>();
+        maps.put("pageNum", 1);
+        maps.put("numPerPage", 10000);
+        maps.put("vfPlayId", mVideoId);
 
 //        maps.put("vfPlayId", );
-            HttpApis.getBulletByVideoId(maps, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log("error:" + e.getMessage());
-                }
+        HttpApis.getBulletByVideoId(maps, new StringCallback() {
+            @Override
+            public void onError(Call call, Exception e, int id) {
+                TLog.log("error:" + e.getMessage());
+            }
 
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log("getBullet"+response);
-                    ResponseObj<BulletModel, RespHeader> resp = new ResponseObj<BulletModel, RespHeader>();
-                    ResponseParser.parse(resp, response, BulletModel.class, RespHeader.class);
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        if (!StringUtils.isNullOrEmpty(resp.getBody().getBarrageList()) && resp.getBody().getBarrageList().size() > 0) {
-                            mParser = new WoDanmakuParser();
-                            mParser.setmDanmuListData(resp.getBody());
-                            if (mContext == null||mParser==null)
-                                return;
-                            mDanmakuView.prepare(mParser, mContext);
-                            mDanmakuView.showFPS(false);
-                            mDanmakuView.enableDanmakuDrawingCache(true);
-                            if (mMediaController.getBulletScreen()){
-                                mDanmakuView.hide();
-                            }else{
-                                mDanmakuView.show();
-                            }
-//                                mDanmakuView.hide();
-                        } else {
-                        }
+            @Override
+            public void onResponse(String response, int id) {
+                TLog.log("getBullet" + response);
+                ResponseObj<BulletModel, RespHeader> resp = new ResponseObj<BulletModel, RespHeader>();
+                ResponseParser.parse(resp, response, BulletModel.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+                    mParser = new WoDanmakuParser();
+                    TLog.log("getBullet" + mParser);
+                    mParser.setmDanmuListData(resp.getBody());
+                    if (mContext == null || mParser == null)
+                        return;
+                    mDanmakuView.prepare(mParser, mContext);
+                    mDanmakuView.showFPS(false);
+                    mDanmakuView.enableDanmakuDrawingCache(true);
+                    if (mMediaController.getBulletScreen()) {
+                        mDanmakuView.hide();
                     } else {
-                        TLog.log(resp.getHead().getRspMsg());
+                        mDanmakuView.show();
                     }
+//                                mDanmakuView.hide();
+
+                } else {
+                    TLog.log(resp.getHead().getRspMsg());
                 }
-            });
+            }
+        });
     }
 
     /**
@@ -682,7 +683,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
      */
     protected void addBullet(Bullet bullet) {
         HashMap<String, Object> map = new HashMap<>();
-        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
+        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
         if (!StringUtils.isNullOrEmpty(string)) {
             UserModel model = new Gson().fromJson(string, UserModel.class);
             //FIXME user id is incorrect!
@@ -731,32 +732,31 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     }
 
     private void addDanmaku(Bullet bullet) {
-        BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
-        if (danmaku == null || mDanmakuView == null|| mParser==null) {
+        BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mContext);
+
+        if (danmaku == null || mDanmakuView == null || mParser == null) {
             return;
         }
-        if (mParser!=null&& mParser.getDisplayer()!=null){
-            danmaku.text = bullet.getContent();
-            danmaku.padding = 1000;
-//            danmaku.duration= DanmakuFactory.MIN_DANMAKU_DURATION;
-            danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
-            danmaku.time = mDanmakuView.getCurrentTime() + 1200;
-            danmaku.textSize = Float.parseFloat(bullet.getFontSize()) * (mParser.getDisplayer().getDensity() - 0.6f);
-//            danmaku.textSize=20f;
-            danmaku.textColor = Color.parseColor(bullet.getFontColor());
-            danmaku.textShadowColor = Color.WHITE;
-//            danmaku.underlineColor = Color.GREEN;
-//            danmaku.borderColor = Color.GREEN;
-            mDanmakuView.addDanmaku(danmaku);
+
+        danmaku.text = bullet.getContent();
+        danmaku.padding = 5;
+        danmaku.isLive = false; //是否是直播弹幕
+        danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
+        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
+        danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
+//            danMaKu.textColor = Color.parseColor(bullet.getFontColor());
+        danmaku.textShadowColor = Color.WHITE;
+        danmaku.underlineColor = Color.GREEN;
+        danmaku.borderColor = Color.GREEN;
+        mDanmakuView.addDanmaku(danmaku);
 //            getBullets();
-        }
 
 
     }
 
     protected long getCurrentPosition() {
         if (mPlayer != null && mPlayer.getPlaybackState() != AVPlayer.STATE_PREPARING) {
-            return  mPlayer.getCurrentPosition() / 1000;
+            return mPlayer.getCurrentPosition() / 1000;
         }
         return 0;
     }
@@ -783,6 +783,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     /**
      * Seek to certain position, unit is millisecond.
+     *
      * @param positionMs
      */
     protected void seekTo(long positionMs) {
@@ -821,25 +822,33 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         }
         ft.addToBackStack(null);
         DialogFragment bulletDialog = BulletSendDialog.newInstance(this);
-        bulletDialog.show(ft,"dialog");
+        bulletDialog.show(ft, "dialog");
     }
 
     @Override
     public void onSendBulletClick(Bullet bullet) {
-        if (mMediaController.getBulletScreen()){
+        if (mMediaController.getBulletScreen()) {
+            if (TextUtils.isEmpty(bullet.getContent().trim())){
+                UT.showNormal("弹幕不能为空");
+                return;
+            }
+            if (!TextUtils.isEmpty(bullet.getContent().trim())&&bullet.getContent().length()>50){
+                UT.showNormal("弹幕仅限50字");
+                return;
+            }
             addDanmaku(bullet);
             addBullet(bullet);
-        }else{
-            Toast.makeText(getApplicationContext(),"open switch first",Toast.LENGTH_SHORT).show();
+        } else {
+            UT.showNormal("open switch first");
         }
     }
 
     @Override
     public void onBulletSwitchCheck(boolean isChecked) {
-        if (isChecked){
+        if (isChecked) {
             mMediaController.setBulletScreen(true);
             mDanmakuView.show();
-        }else{
+        } else {
             mMediaController.setBulletScreen(false);
             mDanmakuView.hide();
         }
@@ -861,16 +870,17 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             super.setMediaPlayer(playerControl);
             this.playerControl = playerControl;
         }
+
         @Override
         public void toggleBulletScreen(boolean isShow) {
             super.toggleBulletScreen(isShow);
             if (isShow) {
-                TLog.log("toggleBullet_status"+isShow);
-                if (playerControl==null) mDanmakuView.hide();
+                TLog.log("toggleBullet_status" + isShow);
+                if (playerControl == null) mDanmakuView.hide();
                 mDanmakuView.seekTo(playerControl.getCurrentPosition());
                 mDanmakuView.show();
             } else {
-                TLog.log("toggleBullet_status"+isShow);
+                TLog.log("toggleBullet_status" + isShow);
                 mDanmakuView.hide();
             }
         }

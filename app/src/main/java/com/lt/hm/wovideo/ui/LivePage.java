@@ -62,6 +62,7 @@ import com.lt.hm.wovideo.model.VideoURL;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
@@ -911,7 +912,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         localList = new ArrayList<>();
         cctvList = new ArrayList<>();
         otherList = new ArrayList<>();
-        btns = new Button[]{liveBtnCctv,liveBtnSina, liveBtnLocal , liveBtnOthertv};
+        btns = new Button[]{liveBtnCctv, liveBtnSina, liveBtnLocal, liveBtnOthertv};
         liveProgramList.setLayoutManager(new LinearLayoutManager(this));
         liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this, LinearLayoutManager.VERTICAL, R.drawable.custom_list_divider));
 //        liveProgramList.addItemDecoration(new RecycleViewDivider(LivePage.this,LinearLayoutManager.VERTICAL,getResources().getDimensionPixelOffset(3),R.color.gray_lightest));
@@ -1059,7 +1060,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             intentPlayName = getIntent().getStringExtra(PLAY_NAME);
             intentProperty = getIntent().getStringExtra(PLAY_PROPERTY);
         }
-        TLog.error("intentProperty ---->" +intentProperty);
+        TLog.error("intentProperty ---->" + intentProperty);
         getLiveList();
     }
 
@@ -1085,15 +1086,15 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
 //                    mList.addAll(resp.getBody().getLiveTvList());
 
-                        if (TextUtils.isEmpty(intentProperty)||Integer.valueOf(intentProperty) == 0){
-                            initListViews(cctvList);
-                        }else if (Integer.valueOf(intentProperty) == 1){
-                            initListViews(sinaList);
-                        }else if (Integer.valueOf(intentProperty) == 2){
-                            initListViews(localList);
-                        }else if (Integer.valueOf(intentProperty) == 3){
-                            initListViews(otherList);
-                        }
+                    if (TextUtils.isEmpty(intentProperty) || Integer.valueOf(intentProperty) == 0) {
+                        initListViews(cctvList);
+                    } else if (Integer.valueOf(intentProperty) == 1) {
+                        initListViews(sinaList);
+                    } else if (Integer.valueOf(intentProperty) == 2) {
+                        initListViews(localList);
+                    } else if (Integer.valueOf(intentProperty) == 3) {
+                        initListViews(otherList);
+                    }
 
 
                 }
@@ -1110,15 +1111,15 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             currentPlayName = TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getTvName() : intentPlayName;
             getRealURL(TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getUrl() : intentPlayUrl);
             videoName.setText(currentPlayName);
-            if (!TextUtils.isEmpty(intentProperty)&&Integer.valueOf(intentProperty)<4){
-                TLog.error("intentproperty--->"+intentProperty);
+            if (!TextUtils.isEmpty(intentProperty) && Integer.valueOf(intentProperty) < 4) {
+                TLog.error("intentproperty--->" + intentProperty);
                 changeState(btns[Integer.valueOf(intentProperty)]);
-            }else {
+            } else {
                 changeState(btns[0]);
             }
             first_open = true;
         }
-        adapter.updateShowText(liveTvList,currentPlayName);
+        adapter.updateShowText(liveTvList, currentPlayName);
 //        videoName.setText(liveTvList.get(0).getTvName());
 
         adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
@@ -1137,7 +1138,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 }
                 currentPlayName = liveTvList.get(i).getTvName();
                 videoName.setText(currentPlayName);
-                adapter.updateShowText(liveTvList,currentPlayName);
+                adapter.updateShowText(liveTvList, currentPlayName);
 //                videoName.setText(liveTvList.get(i).getTvName());
                 getRealURL(url);
             }
@@ -1220,6 +1221,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     videoUrl.setFormatUrl(resp.getBody().getUrl());
                     video.setmPlayUrl(videoUrl);
                     // Reset player and params.
+                    mFreeLabel.setVisibility(UserMgr.isVip() ? View.VISIBLE : View.GONE);
                     releasePlayer();
                     // Set Player
                     setIntent(onUrlGot());

@@ -29,6 +29,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.Bullet;
 import com.lt.hm.wovideo.video.model.VideoModel;
 
@@ -584,8 +585,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     }
 
-    ;
-
     public void setTitle(String titleName) {
         if (mVideoTitle != null) {
             mVideoTitle.setText(titleName);
@@ -898,6 +897,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     private void updateBrightness(float delta) {
         mCurBrightness = ((Activity) mContext).getWindow().getAttributes().screenBrightness;
+        //获取当前亮度,获取失败则返回255
+       // mCurBrightness= BrightnessTools.getScreenBrightness((Activity) mContext)*(1f/255f);
+        TLog.error("mCurBrightness--->"+mCurBrightness);
         if (mCurBrightness <= 0.01f) {
             mCurBrightness = 0.01f;
         }

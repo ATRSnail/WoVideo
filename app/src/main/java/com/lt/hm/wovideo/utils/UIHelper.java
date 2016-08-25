@@ -279,7 +279,7 @@ public class UIHelper {
 			// TODO: 16/6/14 跳转电影页面
 			Bundle bundle = new Bundle();
 			bundle.putString("id", vfId);
-			bundle.putInt("typeId", VideoType.MOVIE.getId());
+			bundle.putInt("typeId", typeId);
 			ToMoviePage(activity, bundle);
 		} else if (typeId == VideoType.TELEPLAY.getId()) {
 			// TODO: 16/6/14 跳转电视剧页面
@@ -306,6 +306,8 @@ public class UIHelper {
 			bundle.putString("id", vfId);
 			bundle.putInt("typeId", VideoType.SMIML.getId());
 			ToMoviePage(activity, bundle);
+		}else if (typeId == VideoType.LIVE.getId()) {
+			UIHelper.ToLivePage(activity);
 		}
 	}
 

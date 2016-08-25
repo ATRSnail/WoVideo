@@ -2,11 +2,9 @@ package com.lt.hm.wovideo.ui;
 
 import android.app.TaskStackBuilder;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,12 +28,9 @@ import com.amap.api.location.AMapLocationClientOption;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
-import com.lt.hm.wovideo.base.BaseRequestActivity;
 import com.lt.hm.wovideo.fragment.EventsPage;
-import com.lt.hm.wovideo.fragment.LivePageFragment;
 import com.lt.hm.wovideo.fragment.MineInfo;
 import com.lt.hm.wovideo.fragment.NewChoicePage;
-import com.lt.hm.wovideo.fragment.RecommendPage;
 import com.lt.hm.wovideo.fragment.VipRecommendFrg;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.interf.updateTagLister;
@@ -53,7 +48,6 @@ import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
 import com.lt.hm.wovideo.zxing.ui.MipcaActivityCapture;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -183,7 +177,7 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
             case 0:
                 return new NewChoicePage();
             case 1:
-                return new LivePageFragment();
+                return new EventsPage();
             case 2:
                 return new VipRecommendFrg();
             case 3:

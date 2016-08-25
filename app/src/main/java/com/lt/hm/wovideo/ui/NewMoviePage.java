@@ -427,6 +427,11 @@ public class NewMoviePage extends BaseVideoActivity {
                 UT.showNormal( "评论内容不能为空");
                 return;
             }
+
+            if (etAddComment.getText().toString().trim().length()>200) {
+                UT.showNormal( "评论内容不能超过200字");
+                return;
+            }
             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             if (imm.isActive()) {
                 imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);

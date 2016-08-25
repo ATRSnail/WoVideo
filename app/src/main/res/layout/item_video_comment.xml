@@ -1,49 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/white"
-    android:padding="@dimen/s_5"
-    >
+    android:orientation="vertical"
+    android:padding="@dimen/s_5">
+
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/s_1"
-        android:background="@color/gray_lighter"
-        />
+        android:background="@color/gray_lighter" />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        >
+        android:orientation="horizontal">
+
         <ImageView
-            android:padding="@dimen/s_5"
+            android:id="@+id/comment_head_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_head"
-            android:id="@+id/comment_head_icon"
-            />
+            android:padding="@dimen/s_5"
+            android:src="@drawable/icon_head" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/s_10"
-            android:layout_toRightOf="@id/comment_head_icon"
             android:layout_alignTop="@id/comment_head_icon"
-            >
+            android:layout_toRightOf="@id/comment_head_icon"
+            android:orientation="vertical"
+            android:padding="@dimen/s_10">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="@color/font_black"
                 android:id="@+id/comment_account"
-                android:text="手机用户:170****8910"
-                />
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/font_black"
+                android:text="手机用户:170****8910"
+                android:textColor="@color/font_black" />
+
+            <TextView
                 android:id="@+id/comment_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="That's awesome"
-                />
+                android:textColor="@color/font_black" />
         </LinearLayout>
     </RelativeLayout>
 </LinearLayout>

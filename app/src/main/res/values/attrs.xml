@@ -67,4 +67,15 @@
         <attr name="topbar_right_img" format="integer"/>
         <attr name="topbar_right_tv" format="string"/>
     </declare-styleable>
+
+    <declare-styleable name="SmileyLoadingView">
+        <!-- animation duration -->
+        <attr name="duration" format="integer"/>
+        <!-- stroke width -->
+        <attr name="stroke_Width" format="dimension"/>
+        <!-- stroke color -->
+        <attr name="strokeColor" format="color"/>
+        <!-- animation repeat count -->
+        <attr name="animRepeatCount" format="integer"/>
+    </declare-styleable>
 </resources>

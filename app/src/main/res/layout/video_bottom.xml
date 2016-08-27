@@ -34,17 +34,12 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/icon_v_play" />
-
             <TextView
                 android:id="@+id/video_play_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="5dp"
+                android:drawableLeft="@drawable/icon_v_play"
+                android:drawablePadding="5dp"
                 android:text="1.2亿"
                 android:textColor="@color/gray_darker" />
 
@@ -58,72 +53,52 @@
 
     </com.lt.hm.wovideo.widget.PercentLinearLayout>
 
-    <com.lt.hm.wovideo.widget.PercentLinearLayout
+
+    <TextView
         android:id="@+id/video_collect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:orientation="vertical"
-        android:paddingRight="10dp">
-
-        <ImageView
-            android:id="@+id/img_collect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/icon_collect" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/collect" />
-    </com.lt.hm.wovideo.widget.PercentLinearLayout>
+        android:drawableTop="@drawable/icon_collect"
+        android:paddingRight="10dp"
+        android:text="@string/collect" />
 
 
-    <com.lt.hm.wovideo.widget.PercentLinearLayout
+    <TextView
         android:id="@+id/video_share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/video_collect"
-        android:orientation="vertical"
-        android:paddingRight="10dp">
+        android:drawableTop="@drawable/icon_share"
+        android:gravity="center"
+        android:paddingRight="10dp"
+        android:text="@string/share" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/icon_share" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/share" />
-    </com.lt.hm.wovideo.widget.PercentLinearLayout>
-
-    <com.lt.hm.wovideo.widget.PercentLinearLayout
+    <TextView
         android:id="@+id/video_projection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toLeftOf="@id/video_share"
-        android:orientation="vertical"
-        android:paddingRight="10dp">
+        android:drawableTop="@drawable/icon_projection"
+        android:gravity="center"
+        android:paddingRight="10dp"
+        android:text="@string/projection" />
 
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:src="@drawable/icon_projection" />
+    <TextView
+        android:id="@+id/video_like"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/video_projection"
+        android:drawableTop="@drawable/icon_like_nor"
+        android:gravity="center"
+        android:paddingRight="10dp"
+        android:text="@string/like" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/projection" />
-    </com.lt.hm.wovideo.widget.PercentLinearLayout>
 
     <com.lt.hm.wovideo.widget.PercentLinearLayout
         android:id="@+id/video_Pip"

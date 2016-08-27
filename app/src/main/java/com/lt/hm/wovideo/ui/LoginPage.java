@@ -8,11 +8,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.RespHeader;
@@ -23,10 +21,11 @@ import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.AppUtils;
 import com.lt.hm.wovideo.utils.MD5Utils;
 import com.lt.hm.wovideo.utils.PhoneUtils;
-import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -52,7 +51,6 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
     Button btnLoginSubmit;
     @BindView(R.id.tv_login_regist)
     TextView tvLoginRegist;
-    ACache aCache;
     @BindView(R.id.tv_login_forget)
     TextView tvLoginForget;
 
@@ -65,7 +63,6 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        aCache = ACache.get(this);
         loginTopbar.setRightIsVisible(false);
         loginTopbar.setLeftIsVisible(true);
         loginTopbar.setOnTopbarClickListenter(this);
@@ -105,20 +102,20 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
         btnLoginSubmit.setOnClickListener((View v) -> {
             if (TextUtils.isEmpty(etLoginAccount.getText())) {
 //                TLog.log("用户名不能为空");
-                Toast.makeText(getApplicationContext(),"用户名不能为空",Toast.LENGTH_SHORT).show();
+                UT.showNormal("用户名不能为空");
             } else if (TextUtils.isEmpty(etLoginPwd.getText())) {
 //                TLog.log("密码不能为空");
-                Toast.makeText(getApplicationContext(),"密码不能为空",Toast.LENGTH_SHORT).show();
+                UT.showNormal("密码不能为空");
             } else {
-                if (PhoneUtils.isPhoneNum(etLoginAccount.getText().toString())){
-                    Operators_flag =true;
-                }else{
-                    Operators_flag =false;
+                if (PhoneUtils.isPhoneNum(etLoginAccount.getText().toString())) {
+                    Operators_flag = true;
+                } else {
+                    Operators_flag = false;
                 }
-                if (Operators_flag){
+                if (Operators_flag) {
                     ToLogin();
                 } else {
-                    Toast.makeText(getApplicationContext(), "只支持联通手机号登录", Toast.LENGTH_SHORT).show();
+                    UT.showNormal("只支持联通手机号登录");
                 }
             }
         });
@@ -142,6 +139,7 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log("error:" + e.getMessage());
+                UT.showNormal(e.getMessage());
             }
 
             @Override
@@ -150,24 +148,17 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
                 ResponseObj<UserModel, RespHeader> resp = new ResponseObj<UserModel, RespHeader>();
                 ResponseParser.loginParse(resp, response, UserModel.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
-
                     UserModel model = resp.getBody();
                     String json = new Gson().toJson(model);
-                    cacheUserInfo(json);
+                    UserMgr.cacheUserInfo(json);
                     UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
                     LoginPage.this.finish();
                 } else {
-                    Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+                    UT.showNormal(resp.getHead().getRspMsg());
                 }
 
             }
         });
-    }
-
-    private void cacheUserInfo(String json) {
-        aCache.put("userinfo", json);
-        SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",json);
     }
 
     @Override
@@ -184,6 +175,7 @@ public class LoginPage extends BaseActivity implements SecondTopbar.myTopbarClic
     public void rightClick() {
 
     }
+
     @OnClick(R.id.tv_login_forget)
     public void onClick() {
         UIHelper.ToFindPwd(this);

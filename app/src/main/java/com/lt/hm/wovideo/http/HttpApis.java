@@ -332,6 +332,16 @@ public class HttpApis {
     }
 
     /**
+     * 取消收藏
+     *
+     * @param map
+     * @param callback
+     */
+    public static void cancelCollect(HashMap<String, Object> map,int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblCollection/cancelMyColls", map,flag, callback);
+    }
+
+    /**
      * 增加点击量接口
      *
      * @param map
@@ -349,6 +359,16 @@ public class HttpApis {
      */
     public static void CommentVerification(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblSensitiveWord/filter", map, callback);
+    }
+
+    /**
+     * 评论敏感词校验
+     *
+     * @param map
+     * @param callback
+     */
+    public static void CommentVerification(HashMap<String, Object> map, int flag,HttpCallback callback) {
+        HttpUtils.formPost("mblSensitiveWord/filter", map, flag,callback);
     }
 
     /**
@@ -473,5 +493,15 @@ public class HttpApis {
      */
     public static void updateTag(HashMap<String, Object> map, int flag, HttpCallback callback) {
         HttpUtils.formPost("mblUser/updateTag", map, flag, callback);
+    }
+
+    /**
+     *点赞接口
+     * @param map
+     * @param flag
+     * @param callback
+     */
+    public static void clickZan(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/clickZan", map, flag, callback);
     }
 }

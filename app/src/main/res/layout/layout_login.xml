@@ -42,7 +42,11 @@
                 android:layout_height="match_parent"
                 android:layout_toRightOf="@id/login_person_icon"
                 android:background="@null"
-                android:hint="@string/hint_login_account" />
+                android:hint="@string/hint_login_account"
+                android:inputType="number"
+                android:maxLength="11"
+                android:singleLine="true"
+                android:textSize="15sp" />
         </android.support.percent.PercentRelativeLayout>
 
         <View
@@ -76,7 +80,8 @@
                 android:layout_toRightOf="@id/login_pwd_icon"
                 android:background="@null"
                 android:hint="@string/hint_login_pwd"
-                android:inputType="textPassword" />
+                android:inputType="textPassword"
+                android:textSize="15sp" />
         </android.support.percent.PercentRelativeLayout>
     </android.support.percent.PercentRelativeLayout>
 
@@ -85,9 +90,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="15dp"
+        android:background="@color/blue_btn_bg_color"
         android:text="@string/login"
-        android:textColor="@color/white"
-        android:background="@color/blue_btn_bg_color" />
+        android:textColor="@color/white" />
 
     <RelativeLayout
         android:layout_width="match_parent"

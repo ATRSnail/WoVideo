@@ -164,7 +164,7 @@ public class BaseFragment extends Fragment implements BaseFragmentInterface,View
 	}
 
 	@Override
-	public void onFail() {
+	public void onFail(String error,int flag) {
 
 	}
 

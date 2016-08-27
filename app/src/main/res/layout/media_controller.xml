@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2007 The Android Open Source Project
+<?xml version="1.0" encoding="utf-8"?><!-- Copyright (C) 2007 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -30,28 +29,33 @@
         android:minHeight="42dp"
         android:orientation="vertical"
         android:padding="9dp">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:gravity="center"
+            android:orientation="horizontal"
             android:paddingTop="4dip"
-            android:visibility="gone"
-            android:orientation="horizontal">
+            android:visibility="gone">
 
-            <ImageButton android:id="@+id/prev"
+            <ImageButton
+                android:id="@+id/prev"
                 style="@android:style/MediaButton.Previous"
                 android:contentDescription="@string/description" />
 
-            <ImageButton android:id="@+id/rew"
+            <ImageButton
+                android:id="@+id/rew"
                 style="@android:style/MediaButton.Rew"
                 android:contentDescription="@string/description" />
 
-            <ImageButton android:id="@+id/ffwd"
+            <ImageButton
+                android:id="@+id/ffwd"
                 style="@android:style/MediaButton.Ffwd"
                 android:contentDescription="@string/description" />
 
-            <ImageButton android:id="@+id/next"
+            <ImageButton
+                android:id="@+id/next"
                 style="@android:style/MediaButton.Next"
                 android:contentDescription="@string/description" />
 
@@ -62,53 +66,65 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:orientation="horizontal">
-            <ImageButton android:id="@+id/pause"
+
+            <ImageButton
+                android:id="@+id/pause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:background="@drawable/ic_media_play"
                 android:contentDescription="@string/description" />
 
-            <TextView android:id="@+id/time_current"
-                android:textSize="12sp"
-                android:textStyle="normal"
-                android:paddingTop="4dip"
-                android:paddingLeft="4dip"
-                android:layout_gravity="center_vertical"
+            <TextView
+                android:id="@+id/time_current"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingRight="4dip"
-                android:textColor="@android:color/white"/>
-
-            <android.support.v7.widget.AppCompatSeekBar
-                android:id="@+id/mediacontroller_progress"
-                android:layout_width="0dip"
-                android:layout_weight="1"
-                android:layout_height="32dip"
                 android:layout_gravity="center_vertical"
-                />
+                android:gravity="center"
+                android:paddingLeft="4dip"
+                android:paddingRight="4dip"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="normal" />
+
+            <SeekBar
+                android:id="@+id/mediacontroller_progress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1.0"
+                android:background="@null"
+                android:max="100"
+                android:maxHeight="4dp"
+                android:minHeight="4dp"
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp"
+                android:progressDrawable="@drawable/jc_seek_progress"
+                android:thumb="@drawable/jc_seek_thumb" />
             <!--android:paddingTop="4dip"-->
             <!--android:progressDrawable="@drawable/po_seekbar"-->
             <!--android:thumb="@drawable/seekbar_thumb"-->
 
-            <TextView android:id="@+id/time"
-                android:textSize="12sp"
-                android:textStyle="normal"
-                android:paddingTop="4dip"
-                android:paddingRight="4dip"
-                android:layout_gravity="center_vertical"
+            <TextView
+                android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center"
                 android:paddingLeft="4dip"
-                android:textColor="@android:color/white"/>
+                android:paddingRight="4dip"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:textStyle="normal" />
 
-            <ImageButton android:id="@+id/fullscreen"
-                android:layout_gravity="center"
+            <ImageButton
+                android:id="@+id/fullscreen"
                 android:layout_width="@dimen/s_40"
                 android:layout_height="@dimen/s_40"
-                android:src="@drawable/ic_media_fullscreen_stretch"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
-                android:contentDescription="@string/description" />
+                android:contentDescription="@string/description"
+                android:src="@drawable/ic_media_fullscreen_stretch" />
 
         </LinearLayout>
 
@@ -140,29 +156,29 @@
             android:progressDrawable="@drawable/layer_progress"
             android:visibility="visible" />
     </FrameLayout>
+
     <FrameLayout
+        android:id="@+id/layout_center_schedule"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:id="@+id/layout_center_schedule"
         android:background="@android:color/transparent"
-        android:visibility="invisible"
-        >
+        android:visibility="invisible">
+
         <TextView
+            android:id="@+id/schedule_center_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="test"
-            android:textColor="@color/white"
-            android:id="@+id/schedule_center_text"
-            />
+            android:textColor="@color/white" />
     </FrameLayout>
 
     <ImageView
         android:id="@+id/back"
         android:layout_width="@dimen/s_40"
         android:layout_height="@dimen/s_40"
-        android:padding="5dp"
         android:layout_margin="10dp"
-        android:src="@drawable/icon_back"/>
+        android:padding="5dp"
+        android:src="@drawable/icon_back" />
 </RelativeLayout>

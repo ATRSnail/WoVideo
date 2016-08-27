@@ -19,7 +19,7 @@ public class BaseRequestActivity extends FragmentActivity implements HttpUtilBac
     }
 
     @Override
-    public void onFail() {
+    public void onFail(String error,int flag) {
 
     }
 

@@ -9,6 +9,7 @@ import com.zhy.http.okhttp.log.LoggerInterceptor;
 
 import java.util.concurrent.TimeUnit;
 
+import cn.sharesdk.framework.ShareSDK;
 import okhttp3.OkHttpClient;
 
 /**
@@ -29,7 +30,7 @@ public class AppContext extends BaseApplication {
         instance=this;
         _context = getApplicationContext();
         _resource = _context.getResources();
-//        ShareSDK.initSDK(this);
+        ShareSDK.initSDK(this);
         Stetho.initializeWithDefaults(this);
         initNetWork();
 //        initNewsLens();

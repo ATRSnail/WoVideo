@@ -1,7 +1,5 @@
 package com.lt.hm.wovideo.ui;
 
-import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -29,7 +27,9 @@ import com.lt.hm.wovideo.adapter.video.BrefIntroAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
+import com.lt.hm.wovideo.handler.UserHandler;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
@@ -43,12 +43,15 @@ import com.lt.hm.wovideo.model.ValidateComment;
 import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.model.response.ResponseValidateComment;
 import com.lt.hm.wovideo.utils.ShareUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UT;
+import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
@@ -78,11 +81,13 @@ public class NewMoviePage extends BaseVideoActivity {
     @BindView(R.id.video_play_number)
     TextView videoPlayNumber;
     @BindView(R.id.video_collect)
-    PercentLinearLayout videoCollect;
+    TextView videoCollect;
     @BindView(R.id.video_share)
-    PercentLinearLayout videoShare;
+    TextView videoShare;
     @BindView(R.id.video_projection)
-    PercentLinearLayout videoProjection;
+    TextView videoProjection;
+    @BindView(R.id.video_like)
+    TextView videoLike;
     @BindView(R.id.movie_bref_img)
     ImageView movieBrefImg;
     @BindView(R.id.video_bref_intros)
@@ -119,8 +124,6 @@ public class NewMoviePage extends BaseVideoActivity {
     EditText etAddComment;
     @BindView(R.id.add_comment)
     LinearLayout addComment;
-    @BindView(R.id.img_collect)
-    ImageView img_collect;
     boolean text_flag = false;
     private boolean isCollected;
 
@@ -166,7 +169,7 @@ public class NewMoviePage extends BaseVideoActivity {
         if (bundle.containsKey("typeId")) {
             typeId = bundle.getInt("typeId");
         }
-        if (typeId == VideoType.SMIML.getId()){
+        if (typeId == VideoType.SMIML.getId()) {
             brefFl.setVisibility(View.GONE);
         }
         getYouLikeDatas(10);
@@ -320,6 +323,11 @@ public class NewMoviePage extends BaseVideoActivity {
         });
     }
 
+    private void setCollectImg(boolean isCollected) {
+        videoCollect.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(isCollected ? R.drawable.icon_collect_press : R.drawable.icon_collect), null, null);
+    }
+
+
     /**
      * 获取视频详情数据
      *
@@ -350,7 +358,8 @@ public class NewMoviePage extends BaseVideoActivity {
                     videoHistory.setImg_url(details.getImg());
                     values = new String[]{details.getDirector(), details.getStars(), details.getLx(), details.getDq(), details.getNd(), details.getCpname()};
                     biAdapter = new BrefIntroAdapter(NewMoviePage.this, names, values);
-                    if (videoBrefIntros == null) videoBrefIntros = (CustomListView) findViewById(R.id.video_bref_intros);
+                    if (videoBrefIntros == null)
+                        videoBrefIntros = (CustomListView) findViewById(R.id.video_bref_intros);
                     videoBrefIntros.setAdapter(biAdapter);
                     String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
                     if (!StringUtils.isNullOrEmpty(userinfo)) {
@@ -376,7 +385,6 @@ public class NewMoviePage extends BaseVideoActivity {
         });
     }
 
-
     /**
      * 在正式项目中需要 解禁
      */
@@ -398,6 +406,7 @@ public class NewMoviePage extends BaseVideoActivity {
     public static final int RESUME_SEEKBAR_ACTION = 0xa6;
     public static final int GET_VOLUME_ACTION = 0xa7;
     public static final int SET_VOLUME_ACTION = 0xa8;
+
     @Override
     public void initViews() {
         videoProjection.setOnClickListener(new View.OnClickListener() {
@@ -415,21 +424,28 @@ public class NewMoviePage extends BaseVideoActivity {
 //                newFragment.show(ft, DIALOG_FRAGMENT_TAG);
 //                newFragment.setButtonClickedListener(NewMoviePage.this);
 //
-           }
+            }
         });
 
         videoShare.setOnClickListener((View v) -> {
             ShareUtils.showShare(this, null, true, share_title, share_desc, HttpUtils.appendUrl(img_url));
-
         });
+
+        videoLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clickZan();
+            }
+        });
+
         addComment.setOnClickListener((View v) -> {
             if (TextUtils.isEmpty(etAddComment.getText().toString().trim())) {
-                UT.showNormal( "评论内容不能为空");
+                UT.showNormal("评论内容不能为空");
                 return;
             }
 
-            if (etAddComment.getText().toString().trim().length()>200) {
-                UT.showNormal( "评论内容不能超过200字");
+            if (etAddComment.getText().toString().trim().length() > 200) {
+                UT.showNormal("评论内容不能超过200字");
                 return;
             }
             InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -445,7 +461,6 @@ public class NewMoviePage extends BaseVideoActivity {
                 isCollected = true;
             } else {
                 CancelCollect();
-                isCollected = false;
             }
         });
 
@@ -466,64 +481,92 @@ public class NewMoviePage extends BaseVideoActivity {
         });
     }
 
+    /**
+     * 点赞
+     */
+    private void clickZan() {
+        if (details == null) {
+            UT.showNormal("点赞失败");
+            return;
+        }
+        if (!UserHandler.isLogin(this)) {
+            UT.showNormal("请先登录");
+            return;
+        }
+        UserModel model = UserMgr.getUseInfo();
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("vfplayId", details.getId());
+        map.put("userId", model.getId());
+        HttpApis.clickZan(map, HttpApis.http_one, new HttpCallback<>(String.class, this));
+    }
+
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        switch (flag) {
+            case HttpApis.http_one:
+                String val = (String) value;
+                if (!TextUtils.isEmpty(val) && val.equals(ResponseCode.Success)) {
+                    UT.showNormal("点赞成功");
+                } else {
+                    UT.showNormal("点赞失败");
+                }
+                break;
+            case HttpApis.http_two:
+                ResponseValidateComment responseValidateComment = (ResponseValidateComment) value;
+                ValidateComment validate = responseValidateComment.getBody();
+                if (validate.getIsPass().equals("1")) {
+                    //check validate success;
+                    SendComment(etAddComment.getText().toString());
+                } else {
+                    UT.showNormal("言论不当，请斟酌发言");
+                }
+                break;
+            case HttpApis.http_thr:
+                String valColl = (String) value;
+                if (!TextUtils.isEmpty(valColl) && valColl.equals(ResponseCode.Success)) {
+                    isCollected = false;
+                    setCollectImg(false);
+                    UT.showNormal(getResources().getString(R.string.cancel_collect_success));
+                } else {
+                    UT.showNormal(getResources().getString(R.string.cancel_collect_failed));
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onFail(String error, int flag) {
+        switch (flag) {
+            case HttpApis.http_one:
+            case HttpApis.http_two:
+            case HttpApis.http_thr:
+                UT.showNormal(error);
+                break;
+        }
+    }
+
+    /**
+     * 检查言论是否合规
+     *
+     * @param s
+     */
     private void checkCommentValide(String s) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("context", s);
-        HttpApis.CommentVerification(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log(e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<ValidateComment, RespHeader> resp = new ResponseObj<ValidateComment, RespHeader>();
-                ResponseParser.parse(resp, response, ValidateComment.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    ValidateComment validate = resp.getBody();
-                    if (validate.getIsPass().equals("1")) {
-                        //check validate success;
-                        SendComment(etAddComment.getText().toString());
-                    } else {
-                        UT.showNormal("言论不当，请斟酌发言");
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
+        HttpApis.CommentVerification(map, HttpApis.http_two, new HttpCallback<>(ResponseValidateComment.class, this));
     }
 
+    /**
+     * 取消收藏
+     */
     private void CancelCollect() {
-
         String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)) {
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
             HashMap<String, Object> map = new HashMap<>();
             map.put("userid", model.getId());
             map.put("vfids", collect_tag);
-            HttpApis.cancelCollect(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log("cancel_result" + response);
-                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
-                    } else {
-                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
-                        Toast.makeText(getApplicationContext(), getResources().getString(R.string.cancel_collect_success), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
+            HttpApis.cancelCollect(map, HttpApis.http_thr, new HttpCallback<>(String.class, this));
         } else {
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
@@ -552,9 +595,9 @@ public class NewMoviePage extends BaseVideoActivity {
                     ResponseParser.parse(resp, response, String.class, RespHeader.class);
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                         Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
-                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect_press));
+                        setCollectImg(true);
                     } else {
-                        img_collect.setImageDrawable(getResources().getDrawable(R.drawable.icon_collect));
+                        setCollectImg(false);
                     }
                 }
             });
@@ -615,6 +658,8 @@ public class NewMoviePage extends BaseVideoActivity {
         }
     }
 
+    private PlayList.PlaysListBean details;
+
     /**
      * 获取 视频播放地址，并播放
      *
@@ -642,17 +687,16 @@ public class NewMoviePage extends BaseVideoActivity {
                 ResponseObj<PlayList, RespHeader> resp = new ResponseObj<PlayList, RespHeader>();
                 ResponseParser.parse(resp, response, PlayList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    PlayList.PlaysListBean details = resp.getBody().getPlaysList().get(0);
+                    details = resp.getBody().getPlaysList().get(0);
                     if (StringUtils.isNullOrEmpty(login_info)) {
-                        img_collect.setImageResource(R.drawable.icon_collect);
+                        setCollectImg(false);
                     } else {
                         if (details.getSc() != null && details.getSc().equals("1")) {
-                            img_collect.setImageResource(R.drawable.icon_collect_press);
                             isCollected = true;
                         } else {
-                            img_collect.setImageResource(R.drawable.icon_collect);
                             isCollected = false;
                         }
+                        setCollectImg(isCollected);
                     }
                     collect_tag = details.getId();
                     videoAddHit(details.getId());

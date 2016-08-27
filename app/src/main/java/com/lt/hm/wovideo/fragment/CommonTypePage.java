@@ -60,7 +60,6 @@ import com.lt.hm.wovideo.utils.ViewPageChangeMsg;
 import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 import com.lt.hm.wovideo.widget.CustomGridView;
 import com.lt.hm.wovideo.widget.CustomListView;
-import com.lt.hm.wovideo.widget.DividerDecoration;
 import com.lt.hm.wovideo.widget.SpacesItemDecoration;
 import com.lt.hm.wovideo.widget.TopTileView;
 import com.lt.hm.wovideo.widget.indicatorView.AutoPlayManager;

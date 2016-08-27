@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -283,24 +284,15 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
                 initCateView();
                 break;
             case HttpApis.http_two:
-                try {
-                    JSONObject obj = new JSONObject((String) value);
-                    if (obj.has("head")) {
-                        JSONObject obj_head = obj.getJSONObject("head");
-                        RespHeader header = new Gson().fromJson(obj_head.toString(), RespHeader.class);
-                        if (header.getRspCode().equals(ResponseCode.Success)) {
-                            Toast.makeText(this, "保存成功", Toast.LENGTH_SHORT).show();
-                            if (!isTag)
-                                UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
-
-                            this.finish();
-                            return;
-                        }
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                String val = (String) value;
+                if (!TextUtils.isEmpty(val) && val.equals(ResponseCode.Success)){
+                    UT.showNormal("保存成功");
+                    if (!isTag)
+                        UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
+                    this.finish();
+                }else {
+                    UT.showNormal("保存失败");
                 }
-                UT.showNormal("保存失败");
                 break;
             case HttpApis.http_thr:
                 ResponseTag responseTag = (ResponseTag) value;
@@ -312,5 +304,12 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
         }
     }
 
-
+    @Override
+    public void onFail(String error, int flag) {
+        switch (flag){
+            case HttpApis.http_two:
+                UT.showNormal(error);
+                break;
+        }
+    }
 }

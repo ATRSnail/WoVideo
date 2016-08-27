@@ -1,11 +1,16 @@
 package com.lt.hm.wovideo.http;
 
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.zhy.http.okhttp.callback.Callback;
 import com.zhy.http.okhttp.callback.StringCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import okhttp3.Call;
 import okhttp3.Request;
@@ -19,7 +24,7 @@ public class HttpCallback<T> extends StringCallback {
     private String dialogStr;
 
     public HttpCallback(Class<T> clazz, HttpUtilBack httpUtilBack) {
-        this(clazz,httpUtilBack,"");
+        this(clazz, httpUtilBack, "");
     }
 
     public HttpCallback(Class<T> clazz, HttpUtilBack httpUtilBack, String dialogStr) {
@@ -45,28 +50,48 @@ public class HttpCallback<T> extends StringCallback {
 
     @Override
     public void onError(Call call, Exception e, int id) {
-        TLog.error( "error--->" + e.toString());
-        httpUtilBack.onFail();
+        TLog.error("error--->" + e.toString());
+        httpUtilBack.onFail(e.toString(),id);
     }
 
     @Override
     public void onResponse(String response, int id) {
         TLog.error("onResponse==string==" + response);
         if (clazz == String.class) {
-            httpUtilBack.onSuccess(response, id);
+            JSONObject obj = null;
+            try {
+                obj = new JSONObject(response);
+                if (obj.isNull("body") || obj.getString("body").equals("{}")) {
+                    if (obj.has("head")) {
+                        JSONObject obj_head = obj.getJSONObject("head");
+                        RespHeader header = new Gson().fromJson(obj_head.toString(), RespHeader.class);
+                        if (header.getRspCode().equals(ResponseCode.Success)) {
+                            httpUtilBack.onSuccess(ResponseCode.Success, id);
+                        } else {
+                            httpUtilBack.onFail(header.getRspMsg(),id);
+                        }
+                    }
+                } else {
+                    httpUtilBack.onSuccess(response, id);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+                httpUtilBack.onFail(e.toString(),id);
+            }
+
         } else {
-            TLog.error("str---->"+response);
+            TLog.error("str---->" + response);
             try {
                 ResponseObj bean = (ResponseObj) new Gson().fromJson(response, clazz);
-                if (((RespHeader)bean.getHead()).getRspCode().equals(ResponseCode.Success)) {
+                if (((RespHeader) bean.getHead()).getRspCode().equals(ResponseCode.Success)) {
                     TLog.error("onResponse==bean==" + bean.toString());
                     httpUtilBack.onSuccess(bean, id);
                 } else {
-                    httpUtilBack.onFail();
+                    httpUtilBack.onFail(((RespHeader) bean.getHead()).getRspMsg(),id);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
-                httpUtilBack.onFail();
+                httpUtilBack.onFail(e.toString(),id);
             }
 
         }

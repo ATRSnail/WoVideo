@@ -284,7 +284,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             mPrevButton.setVisibility(View.GONE);
         }
 
-        mProgress = (AppCompatSeekBar) v.findViewById(R.id.mediacontroller_progress);
+        mProgress = (SeekBar) v.findViewById(R.id.mediacontroller_progress);
         if (mProgress != null) {
             if (mProgress instanceof AppCompatSeekBar) {
                 AppCompatSeekBar seeker = (AppCompatSeekBar) mProgress;

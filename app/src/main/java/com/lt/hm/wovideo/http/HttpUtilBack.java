@@ -7,6 +7,6 @@ package com.lt.hm.wovideo.http;
 public interface HttpUtilBack {
     void onBefore(String dialog);
     <T> void onSuccess(T value, int flag);
-    void onFail();
+    void onFail(String error,int flag);
     void onAfter(int flag);
 }

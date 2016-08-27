@@ -10,6 +10,7 @@ import android.hardware.SensorManager;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlayer;
+import com.lt.hm.wovideo.utils.TLog;
 
 /**
  * An implementation of {@link AVController.MediaPlayerControl} for controlling an {@link ExoPlayer}
@@ -18,7 +19,7 @@ import com.google.android.exoplayer.ExoPlayer;
  * Created by KECB on 7/7/16.
  */
 
-public class AVPlayerControl implements AVController.MediaPlayerControl, SensorEventListener{
+public class AVPlayerControl implements AVController.MediaPlayerControl,SensorEventListener{
 
   private final ExoPlayer mExoPlayer;
   private final Context mContext;
@@ -30,7 +31,7 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
   public AVPlayerControl(ExoPlayer exoPlayer, Context context) {
     mExoPlayer = exoPlayer;
     mContext = context;
-    mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
+   mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
   }
 
   @Override public boolean canPause() {
@@ -67,7 +68,7 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
 
   @Override public void toggleFullScreen() {
     Activity activity = (Activity)mContext;
-    mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+//    mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
     if(isFullScreen()){
       activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
       isLandScape = false;
@@ -114,8 +115,9 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
   @Override
   public void onSensorChanged(SensorEvent event) {
     Activity activity = (Activity) mContext;
+    TLog.error("sensor-->"+isLandScape+"-----"+event.sensor.getType());
     if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-      Log.d("Sensor", "sensor: " + event.sensor + ", x: " + event.values[0] + ", y: " + event.values[1] + ", z: " + event.values[2]);
+      TLog.error("sensor: " + event.sensor + ", x: " + event.values[0] + ", y: " + event.values[1] + ", z: " + event.values[2]);
       if (event.values[0] > 9 || event.values[0] < -9) {
         // rotate 90 degrees or rotate -90 degrees
         if (activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -129,7 +131,8 @@ public class AVPlayerControl implements AVController.MediaPlayerControl, SensorE
         // portait
         if (activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
                 || activity.getRequestedOrientation()==ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT){
-          activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+          TLog.error("sensor--888>");
+          activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
           mSensorManager.unregisterListener(this);
         }
       }

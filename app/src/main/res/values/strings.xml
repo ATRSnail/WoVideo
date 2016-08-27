@@ -65,6 +65,7 @@
     <string name="projection">投屏</string>
     <string name="anthology">选集</string>
     <string name="recommend">推荐</string>
+    <string name="like">点赞</string>
     <string name="movie">电影</string>
     <string name="sport">体育</string>
     <string name="live">直播</string>

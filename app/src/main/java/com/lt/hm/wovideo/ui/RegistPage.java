@@ -31,6 +31,7 @@ import com.lt.hm.wovideo.utils.TimeCountUtil;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -78,7 +79,6 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
 
     @Override
     protected void init(Bundle savedInstanceState) {
-        aCache = ACache.get(getApplicationContext());
         registTopbar.setRightIsVisible(false);
         registTopbar.setLeftIsVisible(true);
         registTopbar.setOnTopbarClickListenter(this);
@@ -170,6 +170,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log("error:" + e.getMessage());
+                UT.showNormal(e.getMessage());
             }
 
             @Override
@@ -192,6 +193,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log("error:" + e.getMessage());
+                UT.showNormal(e.getMessage());
             }
 
             @Override
@@ -205,7 +207,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                     ToLogin();
                     SharedPrefsUtils.setBooleanPreference(getApplicationContext(),"regist",true);
                     UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
-                    Toast.makeText(RegistPage.this, "注册成功", Toast.LENGTH_SHORT).show();
+                    UT.showNormal("注册成功");
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -222,7 +224,6 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
         });
     }
 
-    private ACache aCache;
     private void ToLogin() {
         String account = etResigtAccount.getText().toString();
         String pwd = etRegistPwd.getText().toString();
@@ -234,6 +235,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log("error:" + e.getMessage());
+
             }
 
             @Override
@@ -247,7 +249,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                     UT.showNormal("注册成功");
                     UserModel model = resp.getBody();
                     String json = new Gson().toJson(model);
-                    cacheUserInfo(json);
+                    UserMgr.cacheUserInfo(json);
                     UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -263,10 +265,6 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
         });
     }
 
-    private void cacheUserInfo(String json) {
-        aCache.put("userinfo", json);
-        SharedPrefsUtils.setStringPreference(getApplicationContext(),"userinfo",json);
-    }
 
     private void sendValidateCode() {
         TimeCountUtil counter = new TimeCountUtil(RegistPage.this, 60000, 1000, validateBtn);

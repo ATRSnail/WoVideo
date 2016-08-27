@@ -150,9 +150,9 @@ public class OnekeyShare {
 	}
 
 	/** 设置自定义的外部回调 */
-	public void setCallback(PlatformActionListener callback) {
-		params.put("callback", callback);
-	}
+//	public void setCallback(PlatformActionListener callback) {
+//		params.put("callback", callback);
+//	}
 
 	/** 返回操作回调 */
 	public PlatformActionListener getCallback() {

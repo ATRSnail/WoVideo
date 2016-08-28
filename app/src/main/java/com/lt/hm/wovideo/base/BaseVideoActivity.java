@@ -61,6 +61,7 @@ import com.lt.hm.wovideo.video.player.BulletSendDialog;
 import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.video.player.WoDanmakuParser;
+import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 import com.victor.loading.rotate.RotateLoading;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -115,6 +116,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     private static final int MENU_GROUP_TRACKS = 1;
     private static final int ID_OFFSET = 2;
     private static final CookieManager defaultCookieManager;
+    private ScreenSwitchUtils instance;
 
     static {
         defaultCookieManager = new CookieManager();
@@ -231,6 +233,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View root = findViewById(R.id.video_root);
+        instance = ScreenSwitchUtils.init(this.getApplicationContext());
+
         root.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -398,6 +402,9 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         if (Util.SDK_INT > 23) {
             onShown();
         }
+        if (instance != null) {
+            instance.start(this);
+        }
     }
 
     @Override
@@ -458,6 +465,10 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mDanmakuView.release();
             mDanmakuView = null;
         }
+        if (instance != null){
+            instance.stop();
+        }
+
     }
 
     private void onHidden() {
@@ -608,6 +619,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mPlayerNeedsPrepare = true;
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
             mMediaController.setEnabled(true);
+            mMediaController.setScreenSwitchUtils(instance);
             mMediaController.setInterfaceListener(this);
             mEventLogger = new EventLogger();
             mEventLogger.startSession();

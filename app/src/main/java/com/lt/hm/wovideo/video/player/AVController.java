@@ -32,6 +32,7 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.Bullet;
 import com.lt.hm.wovideo.video.model.VideoModel;
+import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Formatter;
@@ -88,6 +89,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private int mMaxVolume;
     private View mScheduleLayout;
     private TextView mScheduleText;
+    private ScreenSwitchUtils screenSwitchUtils;
 
 
     /**
@@ -661,7 +663,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             return;
         }
 
-        mPlayer.toggleFullScreen();
+        mPlayer.toggleFullScreen(screenSwitchUtils);
     }
 
     // There are two scenarios that can trigger the seekbar listener to trigger:
@@ -719,6 +721,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             mHandler.sendEmptyMessage(SHOW_PROGRESS);
         }
     };
+
+    public void setScreenSwitchUtils(ScreenSwitchUtils screenSwitchUtils){
+        this.screenSwitchUtils = screenSwitchUtils;
+    }
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -952,7 +958,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
         boolean isFullScreen();
 
-        void toggleFullScreen();
+        void toggleFullScreen(ScreenSwitchUtils screenSwitchUtils);
     }
 
     private static class MessageHandler extends Handler {

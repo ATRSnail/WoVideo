@@ -69,6 +69,7 @@ import com.lt.hm.wovideo.video.player.AVController;
 import com.lt.hm.wovideo.video.player.AVPlayer;
 import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
+import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.PipListviwPopuWindow;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
@@ -121,13 +122,15 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     @BindView(R.id.video_play_number)
     TextView videoPlayNumber;
     @BindView(R.id.video_collect)
-    PercentLinearLayout videoCollect;
+    TextView videoCollect;
     @BindView(R.id.video_Pip)
     PercentLinearLayout videoPip;
     @BindView(R.id.video_share)
-    PercentLinearLayout videoShare;
+    TextView videoShare;
     @BindView(R.id.video_projection)
-    PercentLinearLayout videoProjection;
+    TextView videoProjection;
+    @BindView(R.id.video_like)
+    TextView videoLike;
     @BindView(R.id.live_bref_img)
     ImageView liveBrefImg;
     @BindView(R.id.live_bref_txt1)
@@ -175,6 +178,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     private static final String CONTENT_EXT_EXTRA = "type";
     //画中画urls
     public static final String PIP_URLS = "pip_urls";
+    private ScreenSwitchUtils screenSwitchUtils;
 
     private static final int MENU_GROUP_TRACKS = 1;
     private static final int ID_OFFSET = 2;
@@ -388,6 +392,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         super.onCreate(savedInstanceState);
 
         View root = findViewById(R.id.video_root);
+        screenSwitchUtils = ScreenSwitchUtils.init(this.getApplicationContext());
         root.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -528,6 +533,10 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         if (Util.SDK_INT > 23) {
             onShown();
         }
+        if (screenSwitchUtils != null){
+            screenSwitchUtils.start(this);
+        }
+
     }
 
     @Override
@@ -584,6 +593,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             // dont forget release!
             mDanmakuView.release();
             mDanmakuView = null;
+        }
+        if (screenSwitchUtils != null){
+            screenSwitchUtils.stop();
         }
 
     }
@@ -699,6 +711,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             mPlayerNeedsPrepare = true;
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
             mMediaController.setEnabled(true);
+            mMediaController.setScreenSwitchUtils(screenSwitchUtils);
             mEventLogger = new EventLogger();
             mEventLogger.startSession();
             mPlayer.addListener(mEventLogger);
@@ -928,6 +941,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         videoShare.setVisibility(View.GONE);
         videoProjection.setVisibility(View.GONE);
         videoPlayNumber.setVisibility(View.GONE);
+        videoLike.setVisibility(View.GONE);
         videoPip.setVisibility(View.VISIBLE);
 
     }

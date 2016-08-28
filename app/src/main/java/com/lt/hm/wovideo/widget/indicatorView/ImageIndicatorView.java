@@ -13,7 +13,9 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -107,6 +109,16 @@ public class ImageIndicatorView extends RelativeLayout {
 
         this.refreshHandler = new ScrollIndicateHandler(ImageIndicatorView.this);
         this.mContext = context;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        boolean ret = super.dispatchTouchEvent(ev);
+        if(ret)
+        {
+            viewPager.getParent().requestDisallowInterceptTouchEvent(true);
+        }
+        return ret;
     }
 
     /**

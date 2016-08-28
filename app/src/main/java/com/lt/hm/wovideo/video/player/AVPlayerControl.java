@@ -3,10 +3,13 @@ package com.lt.hm.wovideo.video.player;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlayer;
@@ -68,6 +71,7 @@ public class AVPlayerControl implements AVController.MediaPlayerControl,SensorEv
 
   @Override public void toggleFullScreen() {
     Activity activity = (Activity)mContext;
+    isClickFullScreenButton = true;
 //    mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
     if(isFullScreen()){
       activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -116,26 +120,48 @@ public class AVPlayerControl implements AVController.MediaPlayerControl,SensorEv
   public void onSensorChanged(SensorEvent event) {
     Activity activity = (Activity) mContext;
     TLog.error("sensor-->"+isLandScape+"-----"+event.sensor.getType());
-    if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-      TLog.error("sensor: " + event.sensor + ", x: " + event.values[0] + ", y: " + event.values[1] + ", z: " + event.values[2]);
-      if (event.values[0] > 9 || event.values[0] < -9) {
-        // rotate 90 degrees or rotate -90 degrees
-        if (activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                || activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
-          activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-          mSensorManager.unregisterListener(this);
-        }
+    float[] values = event.values;
+    int orientation = 0;
+    float X = -values[SensorManager.DATA_X];
+    float Y = -values[SensorManager.DATA_Y];
+    float Z = -values[SensorManager.DATA_Z];
+    float magnitude = X * X + Y * Y;
+    // Don't trust the angle if the magnitude is small compared to the y
+    // value
+    if (magnitude * 4 >= Z * Z) {
+      float OneEightyOverPi = 57.29577957855f;
+      float angle = (float) Math.atan2(-Y, X) * OneEightyOverPi;
+      orientation = 90 - (int) Math.round(angle);
+      // normalize to 0 - 359 range
+      if (orientation >= 360) {
+        orientation -= 360;
+      }
+      if (orientation < 0) {
+        orientation += 360;
+      }
+    }
+
+    if (isClickFullScreenButton) {
+      // 竖屏
+      if (isLandScape&& (((orientation > 315 && orientation <= 360) || (orientation >= 0 && orientation <= 45)) || (orientation > 135 && orientation <= 225))) {
+        isLandScape = false;
+        isClickFullScreenButton = false;
+        isSennor = true;
       }
 
-      if (event.values[0] > -8 && event.values[0] < 8) {
-        // portait
-        if (activity.getRequestedOrientation() == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                || activity.getRequestedOrientation()==ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT){
-          TLog.error("sensor--888>");
-          activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-          mSensorManager.unregisterListener(this);
-        }
+      // 横屏
+      if (!isLandScape
+              && ((orientation > 45 && orientation <= 135) || (orientation > 225 && orientation <= 315))) {
+        isLandScape = true;
+        isClickFullScreenButton = false;
+        isSennor = true;
       }
+    }
+    if (!isSennor) {// 判断是否要进行中断信息传递
+      return;
+    }
+    if (rotateHandler != null) {//发送消息
+      rotateHandler.obtainMessage(10001, orientation, 0).sendToTarget();
     }
   }
 
@@ -143,5 +169,30 @@ public class AVPlayerControl implements AVController.MediaPlayerControl,SensorEv
   public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
   }
+
+  private boolean isSennor;
+  private boolean isClickFullScreenButton;
+  /** 点击屏幕切换按钮的时候 同时调用该方法 ： 中断Handler信息传递 */
+  public void setIsSennor() {
+    isSennor = false;
+  }
+
+  private Handler rotateHandler = new Handler() {
+    public void handleMessage(Message msg) {
+      switch (msg.what) {
+        case 10001:
+          if ((msg.arg1 > 45 && msg.arg1 <= 135) || (msg.arg1 > 225 && msg.arg1 <= 315)) {
+            ((Activity)mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+          } else {
+            if (((Activity)mContext).getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+              ((Activity)mContext).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+          }
+          break;
+        default:
+          break;
+      }
+    }
+  };
 
 }

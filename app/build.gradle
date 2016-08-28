@@ -85,19 +85,14 @@ dependencies {
     //    compile 'com.github.deano2390:MaterialShowcaseView:1.1.0' // Mask View
     compile 'com.victor:lib:1.0.4'
     //loading
-    compile files('libs/zxing.jar')
     compile project(':share_sdk')
     compile project(path: ':library')
     //    compile 'com.github.ctiao:DanmakuFlameMaster:0.4.9'
-    compile files('libs/mail.jar')
-    compile files('libs/additionnal.jar')
-    compile files('libs/activation.jar')
+
     compile 'com.google.android.gms:play-services-appindexing:8.4.0'
     //    compile 'com.tencent.bugly:crashreport:latest.release'
 
     //    compile 'com.tencent.bugly:nativecrashreport:latest.release'
-    compile files('libs/AMap_Location_V2.7.0_20160726.jar')
-    compile files('libs/nbs.newlens.agent.jar')
     compile 'com.belerweb:pinyin4j:2.5.1'
     //    compile "com.networkbench:tingyun-ea-agent-android:2.4.2"
 

@@ -15,14 +15,14 @@ import java.util.List;
  * @create_date 16/7/10
  * 评论列表 Adapter
  */
-public class CommentAdapter extends BaseQuickAdapter<CommentModel.CommentListBean> {
-    public CommentAdapter(Context context, List<CommentModel.CommentListBean> data) {
+public class CommentAdapter extends BaseQuickAdapter<CommentModel> {
+    public CommentAdapter(Context context, List<CommentModel> data) {
         super(R.layout.item_video_comment,data);
 //        super(context, R.layout.item_video_comment,data);
     }
 
     @Override
-    protected void convert(BaseViewHolder holder, CommentModel.CommentListBean bean) {
+    protected void convert(BaseViewHolder holder, CommentModel bean) {
         String phoneNum = bean.getPhoneNo();
         holder.setText(R.id.comment_account,"手机用户"+phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
         holder.setText(R.id.comment_content,bean.getComment());

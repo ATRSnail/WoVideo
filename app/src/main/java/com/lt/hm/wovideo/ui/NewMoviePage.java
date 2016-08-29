@@ -23,26 +23,28 @@ import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
+import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.adapter.video.BrefIntroAdapter;
-import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.handler.UserHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.CommentModel;
-import com.lt.hm.wovideo.model.LikeList;
+import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.ValidateComment;
-import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.model.response.ResponseComment;
+import com.lt.hm.wovideo.model.response.ResponseLikeList;
 import com.lt.hm.wovideo.model.response.ResponseValidateComment;
 import com.lt.hm.wovideo.utils.ShareUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
@@ -50,14 +52,13 @@ import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.utils.UT;
-import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
 import com.lt.hm.wovideo.widget.CustomListView;
-import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
+import com.lt.hm.wovideo.widget.SpacesItemDecoration;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
@@ -111,11 +112,11 @@ public class NewMoviePage extends BaseVideoActivity {
     CommentAdapter commentAdapter;
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
-    VideoItemGridAdapter grid_adapter;
+    LikeListAdapter grid_adapter;
     BrefIntroAdapter biAdapter;
     String[] names = new String[]{"导演", "主演", "类型", "地区", "年份", "来源"};
     String[] values = new String[]{"王京", "周润发，刘德华"};
-    List<CommentModel.CommentListBean> beans;
+    List<CommentModel> beans;
     @BindView(R.id.video_comment_list)
     RecyclerView videoCommentList;
     @BindView(R.id.empty_view)
@@ -134,6 +135,7 @@ public class NewMoviePage extends BaseVideoActivity {
     private String vfId;
     private String collect_tag;
     private int typeId = 0;
+
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -172,10 +174,14 @@ public class NewMoviePage extends BaseVideoActivity {
         if (typeId == VideoType.SMIML.getId()) {
             brefFl.setVisibility(View.GONE);
         }
-        getYouLikeDatas(10);
+        getYouLikeDatas(6);
 
     }
 
+    /**
+     * 增加访问量
+     * @param vfId
+     */
     private void videoAddHit(String vfId) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("playsId", vfId);
@@ -193,6 +199,10 @@ public class NewMoviePage extends BaseVideoActivity {
     }
 
 
+    /**
+     * 获取评论信息
+     * @param vfId
+     */
     private void getCommentList(String vfId) {
         if (beans.size() > 0) {
             beans.clear();
@@ -205,91 +215,33 @@ public class NewMoviePage extends BaseVideoActivity {
             map.put("pageNum", 1);
             map.put("numPerPage", 50);
             map.put("vfId", vfId);
-            HttpApis.commentList(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log(response);
-                    ResponseObj<CommentModel, RespHeader> resp = new ResponseObj<CommentModel, RespHeader>();
-                    ResponseParser.parse(resp, response, CommentModel.class, RespHeader.class);
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        if (!StringUtils.isNullOrEmpty(resp.getBody().getCommentList()) && resp.getBody().getCommentList().size() > 0) {
-                            if (empty == null) return;
-                            empty.setVisibility(View.GONE);
-                            videoCommentList.setVisibility(View.VISIBLE);
-                            beans.addAll(resp.getBody().getCommentList());
-                            commentAdapter = new CommentAdapter(getApplicationContext(), beans);
-                            videoCommentList.setLayoutManager(new LinearLayoutManager(NewMoviePage.this));
-                            videoCommentList.addItemDecoration(new RecycleViewDivider(NewMoviePage.this, LinearLayoutManager.VERTICAL));
-                            videoCommentList.setItemAnimator(new DefaultItemAnimator());
-                            videoCommentList.setAdapter(commentAdapter);
-                            commentAdapter.notifyDataSetChanged();
-                        } else {
-                            //暂无评论内容布局添加
-                            if (videoCommentList != null) {
-                                videoCommentList.setVisibility(View.GONE);
-                            }
-                            empty.setVisibility(View.VISIBLE);
-                        }
-                    } else {
-                        //评论内容获取失败布局添加
-                        videoCommentList.setVisibility(View.GONE);
-                        empty.setVisibility(View.VISIBLE);
-                        empty.setText("获取评论失败,请稍后重试");
-                    }
-                }
-            });
+            HttpApis.commentList(map,HttpApis.http_for,new HttpCallback<>(ResponseComment.class,this));
         } else {
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
     }
 
-    private void getYouLikeDatas(int size) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("pageNum", 1);
-        map.put("numPerPage", size);
-        map.put("typeid", typeId == 0 ? 1 : typeId);
-        HttpApis.getYouLikeList(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
+    private List<LikeModel> grid_list = new ArrayList<LikeModel>();//猜你喜欢
 
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("youlike" + response);
-                ResponseObj<LikeList, RespHeader> resp = new ResponseObj<LikeList, RespHeader>();
-                ResponseParser.parse(resp, response, LikeList.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    // TODO: 16/6/14 填充 底部数据
-                    List<LikeList.LikeListBean> grid_list = new ArrayList<LikeList.LikeListBean>();
-                    grid_list.addAll(resp.getBody().getLikeList());
-                    initBottomGrid(grid_list);
-                }
-            }
-        });
+    /**
+     * 猜你喜欢接口调用
+     */
+    private void getYouLikeDatas(int size) {
+        NetUtils.getYouLikeData(1, size, "", "", typeId == 0 ? "1" : typeId+"", new HttpCallback<>(ResponseLikeList.class, this));
     }
 
-    private void initBottomGrid(List<LikeList.LikeListBean> grid_list) {
-        if (grid_list.size() > 6) {
-            int tmp = grid_list.size() - 6;
-            for (int i = 0; i < tmp; i++) {
-                grid_list.remove(0);
-            }
-        }
-        if (videoBottomGrid == null) {
-            videoBottomGrid = (RecyclerView) findViewById(R.id.video_bottom_grid);
-        }
-        grid_adapter = new VideoItemGridAdapter(NewMoviePage.this, grid_list);
+
+    /**
+     * 填充猜你喜欢数据
+     * @param grid_list
+     */
+    private void initBottomGrid(List<LikeModel> grid_list) {
+        grid_adapter = new LikeListAdapter(R.layout.layout_new_home_movie_item, grid_list,false);
         videoBottomGrid.setHasFixedSize(true);
         GridLayoutManager manager = new GridLayoutManager(this, 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
         videoBottomGrid.setLayoutManager(manager);
-        videoBottomGrid.addItemDecoration(new RecycleViewDivider(NewMoviePage.this, GridLayoutManager.HORIZONTAL));
+        videoBottomGrid.addItemDecoration(new SpacesItemDecoration(10,false));
         videoBottomGrid.setAdapter(grid_adapter);
         grid_adapter.notifyDataSetChanged();
         grid_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
@@ -531,8 +483,29 @@ public class NewMoviePage extends BaseVideoActivity {
                     UT.showNormal(getResources().getString(R.string.cancel_collect_failed));
                 }
                 break;
+            case HttpApis.http_you_like:
+                ResponseLikeList re = (ResponseLikeList) value;
+                grid_list = re.getBody().getLikeList();
+                if (grid_list.size() == 0) return;
+                initBottomGrid(grid_list);
+                break;
+            case HttpApis.http_for:
+                ResponseComment responseComment = (ResponseComment) value;
+                beans = responseComment.getBody().getCommentList();
+                if (beans == null || beans.size() == 0)return;
+                if (empty == null) return;
+                empty.setVisibility(View.GONE);
+                videoCommentList.setVisibility(View.VISIBLE);
+                beans.addAll(beans);
+                commentAdapter = new CommentAdapter(getApplicationContext(), beans);
+                videoCommentList.setLayoutManager(new LinearLayoutManager(NewMoviePage.this));
+                videoCommentList.addItemDecoration(new RecycleViewDivider(NewMoviePage.this, LinearLayoutManager.VERTICAL));
+                videoCommentList.setItemAnimator(new DefaultItemAnimator());
+                videoCommentList.setAdapter(commentAdapter);
+                break;
         }
     }
+
 
     @Override
     public void onFail(String error, int flag) {
@@ -542,6 +515,13 @@ public class NewMoviePage extends BaseVideoActivity {
             case HttpApis.http_thr:
                 UT.showNormal(error);
                 break;
+            case HttpApis.http_for:
+                //评论内容获取失败布局添加
+                videoCommentList.setVisibility(View.GONE);
+                empty.setVisibility(View.VISIBLE);
+                empty.setText("获取评论失败,请稍后重试");
+                break;
+
         }
     }
 
@@ -834,9 +814,4 @@ public class NewMoviePage extends BaseVideoActivity {
         super.onDestroy();
     }
 
-//    @Override
-//    public void onclicked() {
-//     //   PlaybackCommand.playNewItem("http://video.sinosns.cn/fx7/3.mp4","video");
-////
-//    }
 }

@@ -18,12 +18,10 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.TypeList;
-import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.CustomScrollView;
-import com.lt.hm.wovideo.widget.SelectMenuPop;
 import com.lt.hm.wovideo.widget.ViewPagerIndicator;
 import com.zhy.http.okhttp.callback.StringCallback;
 

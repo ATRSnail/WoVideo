@@ -15,6 +15,12 @@ import java.util.List;
  */
 public class LikeListAdapter extends BaseQuickAdapter<LikeModel> {
 
+    private boolean isHig = true;//判断显示横图还是竖图,默认横图
+
+    public LikeListAdapter(int layoutResId, List<LikeModel> data, boolean isHig) {
+        super(layoutResId, data);
+        this.isHig = isHig;
+    }
 
     public LikeListAdapter(int layoutResId, List<LikeModel> data) {
         super(layoutResId, data);
@@ -24,19 +30,18 @@ public class LikeListAdapter extends BaseQuickAdapter<LikeModel> {
     @Override
     protected void convert(BaseViewHolder baseViewHolder, LikeModel likeModel) {
 
-
         baseViewHolder.setText(R.id.item_title, likeModel.getName());
         baseViewHolder.setText(R.id.item_desc, likeModel.getHit());
-        baseViewHolder.setText(R.id.item_type,likeModel.getTypeName());
+        baseViewHolder.setText(R.id.item_type, likeModel.getTypeName());
 
-        ImageView img =  baseViewHolder.getView(R.id.item_img_bg);
+        ImageView img = baseViewHolder.getView(R.id.item_img_bg);
 
-        ImageLoaderUtil.getInstance().loadImage(img,likeModel.getHImg(),true);
+        ImageLoaderUtil.getInstance().loadImage(img, isHig ? likeModel.getHImg() : likeModel.getImg(), true);
 
-        if (!likeModel.getIsfree().equals("1")){
-            baseViewHolder.setVisible(R.id.item_vip_logo,true);
-        }else{
-            baseViewHolder.setVisible(R.id.item_vip_logo,false);
+        if (!likeModel.getIsfree().equals("1")) {
+            baseViewHolder.setVisible(R.id.item_vip_logo, true);
+        } else {
+            baseViewHolder.setVisible(R.id.item_vip_logo, false);
         }
     }
 }

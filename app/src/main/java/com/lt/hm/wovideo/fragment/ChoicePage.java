@@ -31,7 +31,6 @@ import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.BannerList;
 import com.lt.hm.wovideo.model.RecomList;
-import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.Videos;
 import com.lt.hm.wovideo.utils.ScreenUtils;

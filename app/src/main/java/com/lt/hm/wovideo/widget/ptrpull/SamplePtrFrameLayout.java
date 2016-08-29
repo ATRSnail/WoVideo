@@ -34,4 +34,5 @@ public class SamplePtrFrameLayout extends PtrFrameLayout {
         setHeaderView(mHeaderView);
         addPtrUIHandler(mHeaderView);
     }
+
 }

@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,23 +22,23 @@ import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
-import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
-import com.lt.hm.wovideo.adapter.video.VideoItemListAdapter;
+import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.CommentModel;
-import com.lt.hm.wovideo.model.LikeList;
+import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
-import com.lt.hm.wovideo.model.VideoDetails;
-import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.model.response.ResponseLikeList;
 import com.lt.hm.wovideo.utils.ShareUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
@@ -49,9 +48,8 @@ import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
-import com.lt.hm.wovideo.widget.CustomGridView;
-import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
+import com.lt.hm.wovideo.widget.SpacesItemDecoration;
 import com.lt.hm.wovideo.widget.multiselector.MultiSelector;
 import com.lt.hm.wovideo.widget.multiselector.SingleSelector;
 import com.lt.hm.wovideo.widget.multiselector.SwappingHolder;
@@ -106,8 +104,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     TextView demand_intro_expand;
     @BindView(R.id.demand_intro_all)
     TextView demand_intro_all;
-    VideoItemListAdapter list_adapter;
-    VideoItemGridAdapter grid_adapter;
+    LikeListAdapter grid_adapter;
     CommentAdapter commentAdapter;
     List<PlayList.PlaysListBean> antholys;
     List<CommentModel.CommentListBean> beans;
@@ -134,6 +131,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     private String share_desc;
     private long cur_position;
 
+    private List<LikeModel> grid_list = new ArrayList<LikeModel>();//猜你喜欢
+
     @Override
     protected void onBeforeSetContentLayout() {
         super.onBeforeSetContentLayout();
@@ -144,30 +143,12 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         return R.layout.layout_demand;
     }
 
-    private void initBottomList(List<LikeList.LikeListBean> list_list) {
-        //init bottom  list
-        list_adapter = new VideoItemListAdapter(getApplicationContext(), list_list);
-        LinearLayoutManager line_manager = new LinearLayoutManager(this);
-        line_manager.setOrientation(LinearLayoutManager.VERTICAL);
-//        videoBottomList.setHasFixedSize(false);
-//        videoBottomList.setLayoutManager(line_manager);
-//        videoBottomList.setAdapter(list_adapter);
-        list_adapter.notifyDataSetChanged();
-        list_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
-            @Override
-            public void onItemClick(View view, int i) {
-                getChangePage(list_list.get(i).getId());
-            }
-        });
-    }
-
     @Override
     public void onDestroy() {
         videoHistory.setCurrent_positon(mPlayerPosition);
         videoHistory.setFlag("false");
         history.save(videoHistory);
         super.onDestroy();
-
     }
 
     @Override
@@ -237,7 +218,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     mFreeLabel.setVisibility(UserMgr.isVip() ? View.VISIBLE : View.GONE);
 
                     videoName.setText(details.getName());
-                    setCollectImg(details.getSc() != null && details.getSc().equals("1") );
+                    setCollectImg(details.getSc() != null && details.getSc().equals("1"));
                     videoPlayNumber.setText(details.getHit());
                     if (details.getGxzt().equals("0")) {
                         anthologyText.setText("更新至" + details.getJjs() + "集");
@@ -320,11 +301,11 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     videoAddHit(details.getId());
                     if (StringUtils.isNullOrEmpty(login_info)) {
                         setCollectImg(false);
-                        } else {
+                    } else {
                         if (details.getSc() != null && details.getSc().equals("1")) {
-                             isCollected = true;
+                            isCollected = true;
                         } else {
-                             isCollected = false;
+                            isCollected = false;
                         }
                         setCollectImg(isCollected);
                     }
@@ -398,43 +379,25 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
      * 猜你喜欢接口调用
      */
     private void getYouLikeDatas() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("pageNum", 1);
-        map.put("numPerPage", pageSize);
+        String typeId = "";
         if (getIntent().getExtras().containsKey("typeId")) {
-            map.put("typeid", getIntent().getExtras().getInt("typeId"));
+            typeId = getIntent().getExtras().getInt("typeId") + "";
         } else {
-            map.put("typeid", 2);
+            typeId = "2";
         }
-        HttpApis.getYouLikeList(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
+        NetUtils.getYouLikeData(1, pageSize, "", "", typeId, new HttpCallback<>(ResponseLikeList.class, this));
+    }
 
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("you_like" + response);
-                ResponseObj<LikeList, RespHeader> resp = new ResponseObj<LikeList, RespHeader>();
-                ResponseParser.parse(resp, response, LikeList.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    // TODO: 16/6/14 填充 底部数据
-
-
-                    List<LikeList.LikeListBean> grid_list = new ArrayList<LikeList.LikeListBean>();
-//                    List<LikeList.LikeListBean> list_list = new ArrayList<LikeList.LikeListBean>();
-//                    for (int i = 0; i < 3; i++) {
-//                        grid_list.add(resp.getBody().getLikeList().get(i));
-//                    }
-//                    for (int i = 0; i < 3; i++) {
-//                        resp.getBody().getLikeList().remove(0);
-//                    }
-                    grid_list.addAll(resp.getBody().getLikeList());
-                    initBottomGrid(grid_list);
-//                    initBottomList(list_list);
-                }
-            }
-        });
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        switch (flag) {
+            case HttpApis.http_you_like:
+                ResponseLikeList re = (ResponseLikeList) value;
+                grid_list = re.getBody().getLikeList();
+                if (grid_list.size() == 0) return;
+                initBottomGrid(grid_list);
+                break;
+        }
     }
 
     private void initAnthologys(int length) {
@@ -444,7 +407,6 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         }
         LinearLayoutManager manager = new LinearLayoutManager(this.getApplicationContext());
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        if (anthologyList == null) anthologyList = (RecyclerView) findViewById(R.id.anthology_list);
         anthologyList.addItemDecoration(new RecycleViewDivider(getApplicationContext(), LinearLayoutManager.HORIZONTAL));
         anthologyList.setLayoutManager(manager);
         mMultiSelector.setSelectable(true);
@@ -616,23 +578,13 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         });
     }
 
-    private void initBottomGrid(List<LikeList.LikeListBean> grid_list) {
-        //移除  超过6条的数据
-        if (grid_list.size() > 6) {
-            int tmp = grid_list.size() - 6;
-            for (int i = 0; i < tmp; i++) {
-                grid_list.remove(0);
-            }
-        }
-        if (videoBottomGrid == null) {
-            videoBottomGrid = (RecyclerView) findViewById(R.id.video_bottom_grid);
-        }
-        grid_adapter = new VideoItemGridAdapter(DemandPage.this, grid_list);
+    private void initBottomGrid(List<LikeModel> grid_list) {
+        grid_adapter = new LikeListAdapter(R.layout.layout_new_home_item, grid_list, false);
         videoBottomGrid.setHasFixedSize(true);
         GridLayoutManager manager = new GridLayoutManager(this, 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
         videoBottomGrid.setLayoutManager(manager);
-        videoBottomGrid.addItemDecoration(new RecycleViewDivider(DemandPage.this, GridLayoutManager.HORIZONTAL));
+        videoBottomGrid.addItemDecoration(new SpacesItemDecoration(10, false));
         videoBottomGrid.setAdapter(grid_adapter);
         grid_adapter.notifyDataSetChanged();
         grid_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
@@ -885,7 +837,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                         Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
                         setCollectImg(true);
-                     } else {
+                    } else {
                         setCollectImg(false);
                     }
                 }
@@ -962,18 +914,15 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.layout_video_episode_item, parent, false);
             EpisodeHolder episodeHolder = new EpisodeHolder(view);
-            episodeHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    notifyItemChanged(selectedItem);
-                    selectedItem = anthologyList.getChildAdapterPosition(v);
-                    notifyItemChanged(selectedItem);
-                    if (!mCurrentEpisode.equals(selectedItem + 1 + "")) {
-                        cur_position = 0;
-                        mCurrentEpisode = selectedItem + 1 + "";
-                        videoHistory.setEpisode(mCurrentEpisode);
-                        selectEpisode(mCurrentEpisode);
-                    }
+            episodeHolder.itemView.setOnClickListener(v -> {
+                notifyItemChanged(selectedItem);
+                selectedItem = anthologyList.getChildAdapterPosition(v);
+                notifyItemChanged(selectedItem);
+                if (!mCurrentEpisode.equals(selectedItem + 1 + "")) {
+                    cur_position = 0;
+                    mCurrentEpisode = selectedItem + 1 + "";
+                    videoHistory.setEpisode(mCurrentEpisode);
+                    selectEpisode(mCurrentEpisode);
                 }
             });
             return episodeHolder;

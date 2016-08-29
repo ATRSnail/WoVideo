@@ -17,6 +17,7 @@ public class HttpApis {
     public static final int http_thr = 0xffffff02;
     public static final int http_for = 0xffffff03;
     public static final int http_fiv = 0xffffff04;
+    public static final int http_you_like = 0xffffff05;//猜你喜欢网络请求tag
 
     /**
      * 登录
@@ -280,6 +281,17 @@ public class HttpApis {
     public static void commentList(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblVf/viewComment", map, callback);
     }
+
+    /**
+     * 评论列表
+     *
+     * @param map
+     * @param callback
+     */
+    public static void commentList(HashMap<String, Object> map, int flag,HttpCallback callback) {
+        HttpUtils.formPost("mblVf/viewComment", map, flag,callback);
+    }
+
 
     /**
      * 提交评论

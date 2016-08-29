@@ -34,21 +34,23 @@ import com.google.android.exoplayer.util.Util;
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
+import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.adapter.video.BrefIntroAdapter;
-import com.lt.hm.wovideo.adapter.video.VideoItemGridAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
-import com.lt.hm.wovideo.model.LikeList;
+import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
-import com.lt.hm.wovideo.model.VideoDetails;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.model.response.ResponseLikeList;
 import com.lt.hm.wovideo.utils.ScreenUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -61,7 +63,7 @@ import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.widget.CustomListView;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
-import com.lt.hm.wovideo.widget.RecycleViewDivider;
+import com.lt.hm.wovideo.widget.SpacesItemDecoration;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.net.CookieHandler;
@@ -117,7 +119,7 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
 
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
-    VideoItemGridAdapter grid_adapter;
+    LikeListAdapter grid_adapter;
     boolean flag = false;
 
     // Video thing
@@ -711,47 +713,39 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
     public void initDatas() {
     }
 
+    /**
+     * 猜你喜欢接口调用
+     */
     private void getYouLikeDatas(int size) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("pageNum", 1);
-        map.put("numPerPage", size);
-        HttpApis.getYouLikeList(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("youlike" + response);
-                ResponseObj<LikeList, RespHeader> resp = new ResponseObj<LikeList, RespHeader>();
-                ResponseParser.parse(resp, response, LikeList.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    // TODO: 16/6/14 填充 底部数据
-                    List<LikeList.LikeListBean> grid_list = new ArrayList<LikeList.LikeListBean>();
-                    //                    List<LikeList.LikeListBean> list_list = new ArrayList<LikeList.LikeListBean>();
-                    //                    for (int i = 0; i < 3; i++) {
-                    //                        grid_list.add(resp.getBody().getLikeList().get(i));
-                    //                    }
-                    //                    for (int i = 0; i < 3; i++) {
-                    //                        resp.getBody().getLikeList().remove(0);
-                    //                    }
-                    //                    list_list= resp.getBody().getLikeList();
-                    grid_list.addAll(resp.getBody().getLikeList());
-                    initBottomGrid(grid_list);
-                    //                    initBottomList(list_list);
-                }
-            }
-        });
+        String typeId = "";
+        if (getIntent().getExtras().containsKey("typeId")) {
+            typeId = getIntent().getExtras().getInt("typeId")+"";
+        } else {
+            typeId =  "2";
+        }
+        NetUtils.getYouLikeData(1, size, "", "", typeId, new HttpCallback<>(ResponseLikeList.class, this));
     }
 
-    private void initBottomGrid(List<LikeList.LikeListBean> grid_list) {
-        grid_adapter = new VideoItemGridAdapter(MoviePage.this, grid_list);
+    private List<LikeModel> grid_list = new ArrayList<LikeModel>();//猜你喜欢
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        switch (flag){
+            case HttpApis.http_you_like:
+                ResponseLikeList re = (ResponseLikeList) value;
+                grid_list = re.getBody().getLikeList();
+                if (grid_list.size() == 0) return;
+                initBottomGrid(grid_list);
+                break;
+        }
+    }
+
+    private void initBottomGrid(List<LikeModel> grid_list) {
+        grid_adapter = new LikeListAdapter(R.layout.layout_new_home_item, grid_list);
         videoBottomGrid.setHasFixedSize(true);
         GridLayoutManager manager = new GridLayoutManager(this, 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
         videoBottomGrid.setLayoutManager(manager);
-        videoBottomGrid.addItemDecoration(new RecycleViewDivider(MoviePage.this, GridLayoutManager.HORIZONTAL));
+        videoBottomGrid.addItemDecoration(new SpacesItemDecoration(10));
         videoBottomGrid.setAdapter(grid_adapter);
         grid_adapter.notifyDataSetChanged();
         grid_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {

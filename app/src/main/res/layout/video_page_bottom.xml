@@ -1,50 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.lt.hm.wovideo.widget.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/gray_lighter">
+    android:background="@color/gray_lighter"
+    android:orientation="vertical">
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_marginTop="@dimen/s_5"
-        android:paddingLeft="10dp"
-        android:text="@string/recommend"
+        android:background="@color/white"
         android:gravity="center|left"
-        android:background="@color/white"
-        />
+        android:paddingLeft="10dp"
+        android:text="@string/recommend" />
+
     <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
         android:id="@+id/video_bottom_grid"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:paddingLeft="10dp"
-        android:text="@string/comment"
-        android:gravity="center|left"
         android:layout_marginTop="@dimen/s_5"
         android:background="@color/white"
-        />
+        android:gravity="center|left"
+        android:paddingLeft="10dp"
+        android:text="@string/comment" />
 
     <android.support.v7.widget.RecyclerView
-        android:layout_width="match_parent"
-        android:background="@color/white"
-        android:layout_height="wrap_content"
         android:id="@+id/video_comment_list"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white" />
+
     <TextView
         android:id="@+id/empty_view"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:gravity="center"
-        android:visibility="gone"
         android:background="@color/white"
-        android:text="@string/no_comment_data" />
+        android:gravity="center"
+        android:text="@string/no_comment_data"
+        android:visibility="gone" />
 
 
 </com.lt.hm.wovideo.widget.PercentLinearLayout>

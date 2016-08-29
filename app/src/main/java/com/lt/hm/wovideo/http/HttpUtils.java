@@ -26,11 +26,14 @@ import java.util.Set;
  */
 public class HttpUtils {
     //内网测试
-//    public final static String HOST = "http://172.16.10.15:9100";
-//    private static String API_URL = "http://172.16.10.15:9100/wsp-web-restservice/%s";
+    public final static String HOST = "http://172.16.10.15:9100";
+    private static String API_URL = "http://172.16.10.15:9100/wsp-web-restservice/%s";
     //外网
-    public final static String HOST = "http://59.108.94.40:9100";
-    private static String API_URL = "http://59.108.94.40:9100/wsp-web-restservice/%s";
+//    public final static String HOST = "http://59.108.94.40:9100";
+//    private static String API_URL = "http://59.108.94.40:9100/wsp-web-restservice/%s";
+//    public final static String HOST = "http://111.206.135.50:8080";
+//    private static String API_URL = "http://111.206.133.134:8080/wsp-web-restservice/%s";
+
     public static final String DELETE = "DELETE";
     public static final String GET = "GET";
     public static final String POST = "POST";

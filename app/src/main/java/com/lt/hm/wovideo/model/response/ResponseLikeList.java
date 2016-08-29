@@ -2,7 +2,6 @@ package com.lt.hm.wovideo.model.response;
 
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseObj;
-import com.lt.hm.wovideo.model.LikeList;
 import com.lt.hm.wovideo.model.LikeListModel;
 
 /**

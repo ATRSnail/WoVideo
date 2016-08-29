@@ -465,7 +465,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mDanmakuView.release();
             mDanmakuView = null;
         }
-        if (instance != null){
+        if (instance != null) {
             instance.stop();
         }
 
@@ -671,7 +671,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     mParser = new WoDanmakuParser();
                     TLog.log("getBullet" + mParser);
                     mParser.setmDanmuListData(resp.getBody());
-                    if (mContext == null || mParser == null)
+                    if (mContext == null || mParser == null || mDanmakuView == null)
                         return;
                     mDanmakuView.prepare(mParser, mContext);
                     mDanmakuView.showFPS(false);
@@ -842,11 +842,11 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     public void onSendBulletClick(Bullet bullet) {
         if (mMediaController.getBulletScreen()) {
-            if (TextUtils.isEmpty(bullet.getContent().trim())){
+            if (TextUtils.isEmpty(bullet.getContent().trim())) {
                 UT.showNormal("弹幕不能为空");
                 return;
             }
-            if (!TextUtils.isEmpty(bullet.getContent().trim())&&bullet.getContent().length()>50){
+            if (!TextUtils.isEmpty(bullet.getContent().trim()) && bullet.getContent().length() > 50) {
                 UT.showNormal("弹幕仅限50字");
                 return;
             }

@@ -81,24 +81,22 @@ dependencies {
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.github.ctiao:DanmakuFlameMaster:0.4.9'
     //弹幕
-
     //    compile 'com.github.deano2390:MaterialShowcaseView:1.1.0' // Mask View
     compile 'com.victor:lib:1.0.4'
     //loading
     compile project(':share_sdk')
     compile project(path: ':library')
     //    compile 'com.github.ctiao:DanmakuFlameMaster:0.4.9'
-
     compile 'com.google.android.gms:play-services-appindexing:8.4.0'
     //    compile 'com.tencent.bugly:crashreport:latest.release'
-
     //    compile 'com.tencent.bugly:nativecrashreport:latest.release'
     compile 'com.belerweb:pinyin4j:2.5.1'
     //    compile "com.networkbench:tingyun-ea-agent-android:2.4.2"
-
     //    compile files('libs/nbs.newlens.class.rewriter.jar')
     //compile 'com.bartoszlipinski:recyclerviewheader2:2.0.1'
     compile 'com.github.dongjunkun:BannerLayout:1.0.3@aar'
     /*下拉刷新*/
     compile 'in.srain.cube:ultra-ptr:1.0.11'
+    /*导航控件*/
+    compile 'com.daimajia.slider:library:1.1.5'
 }

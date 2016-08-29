@@ -14,11 +14,13 @@
         android:textSize="@dimen/sp_12"
         android:visibility="gone" />
 
-    <com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView
-        android:id="@+id/img_indicator_vip"
-        android:layout_width="match_parent"
-        android:layout_height="180dp"
-        android:visibility="gone" />
+    <!--<com.lt.hm.wovideo.widget.indicatorView.ImageIndicatorView-->
+        <!--android:id="@+id/img_indicator_vip"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="180dp"-->
+        <!--android:visibility="gone" />-->
+
+    <include layout="@layout/layout_autoloop_viewpage"/>
 
     <!--<com.yyydjk.library.BannerLayout-->
         <!--android:id="@+id/banner"-->

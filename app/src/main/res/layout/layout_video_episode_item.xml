@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="40dp"
+    android:layout_width="40dp"
     android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:clickable="true"
-    android:background="?attr/selectableItemBackgroundBorderless">
+    android:orientation="vertical">
+
     <TextView
-        android:layout_width="40dp"
-        android:padding="10dp"
-        android:layout_height="match_parent"
-        android:textColor="@color/black"
-        android:gravity="center"
-        android:background="@drawable/anthology_selector"
-        android:textSize="15sp"
-        android:text="@string/abort_service"
         android:id="@+id/episode_text"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="2dp"
+        android:background="@drawable/anthology_selector"
+        android:gravity="center"
+        android:text="@string/abort_service"
+        android:textColor="@color/black"
+        android:textSize="14sp" />
 </LinearLayout>

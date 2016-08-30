@@ -17,6 +17,7 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.vip.VipItemAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
@@ -24,8 +25,10 @@ import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.CateTagListModel;
 import com.lt.hm.wovideo.model.CateTagModel;
 import com.lt.hm.wovideo.model.ChannelModel;
-import com.lt.hm.wovideo.model.VideoList;
+import com.lt.hm.wovideo.model.FilmMode;
 import com.lt.hm.wovideo.model.VideoType;
+import com.lt.hm.wovideo.model.response.ResponseFilms;
+import com.lt.hm.wovideo.model.response.ResponseVfinfo;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.SecondTopbar;
@@ -57,7 +60,7 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
     RecyclerView classDetailsList;
     @BindView(R.id.empty_view)
     Button empty_view_button;
-    List<VideoList.TypeListBean> b_list;
+    List<FilmMode> b_list;
     private CateTagListModel cateTagListModel;
     private CateTagModel cateTagModel;
     private String channelCode;
@@ -209,117 +212,57 @@ public class NewClassDetailPage extends BaseActivity implements SecondTopbar.myT
         map.put("sx", sx);
         map.put("dq", dq);
         map.put("nd", nd);
-        HttpApis.getListByType(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
-                ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    b_list.addAll(resp.getBody().getTypeList());
-                    if (b_list == null || b_list.size() == 0 || empty_view_button == null) {
-                        if (classDetailsList != null) {
-                            classDetailsList.setVisibility(View.INVISIBLE);
-                        }
-                        empty_view_button.setVisibility(View.VISIBLE);
-                        return;
-                    }
-                    empty_view_button.setVisibility(View.INVISIBLE);
-                    for (int i = 0; i < b_list.size(); i++) {
-                        b_list.get(i).setDesc(b_list.get(i).getIntroduction());
-                    }
-                    if (b_list != null && b_list.size() > 0) {
-                        if (classDetailsList == null) return;
-                        classDetailsList.setVisibility(View.VISIBLE);
-
-                        bottom_adapter = new VipItemAdapter(getApplicationContext(), b_list);
-                        if (channelCode.equals(ChannelModel.FILM_ID)) {
-
-                            classDetailsList.setLayoutManager(manager);
-//                        vipItemList.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.VERTICAL));
-//                            classDetailsList.addItemDecoration(new RecycleViewDivider(NewClassDetailPage.this, GridLayoutManager.VERTICAL));
-                            for (int i = 0; i < b_list.size(); i++) {
-                                b_list.get(i).setTag("0");
-                            }
-                        } else {
-                            LinearLayoutManager manager = new LinearLayoutManager(NewClassDetailPage.this);
-                            manager.setOrientation(LinearLayoutManager.VERTICAL);
-                            classDetailsList.setLayoutManager(manager);
-                        }
-                        classDetailsList.setHasFixedSize(true);
-                        classDetailsList.setAdapter(bottom_adapter);
-                        bottom_adapter.notifyDataSetChanged();
-                        bottom_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
-                            @Override
-                            public void onItemClick(View view, int i) {
-                                getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
-                            }
-                        });
-
-                    } else {
-                        if (classDetailsList == null) return;
-                        classDetailsList.setVisibility(View.INVISIBLE);
-                    }
-                }
-            }
-        });
+        HttpApis.getListByType(map, HttpApis.http_fiv, new HttpCallback<>(ResponseFilms.class, this));
     }
 
-    /**
-     * 获取视频详情
-     *
-     * @param vfId
-     */
-    public void getVideoDetails(String vfId) {
-        HashMap<String, Object> maps = new HashMap<>();
-        maps.put("vfid", vfId);
-        HttpApis.getVideoInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("result:::" + response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
-                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
-                        // TODO: 16/6/14 跳转电影页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId", VideoType.MOVIE.getId());
-                        UIHelper.ToMoviePage(NewClassDetailPage.this, bundle);
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
-                        // TODO: 16/6/14 跳转电视剧页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId", VideoType.TELEPLAY.getId());
-                        UIHelper.ToDemandPage(NewClassDetailPage.this, bundle);
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
-                        // TODO: 16/6/14 跳转 体育播放页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId", VideoType.SPORTS.getId());
-//                        UIHelper.ToMoviePage(NewClassDetailPage.this, bundle);
-                        UIHelper.ToDemandPage(NewClassDetailPage.this, bundle);
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
-                        // TODO: 16/6/14 跳转综艺界面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId", VideoType.VARIATY.getId());
-                        UIHelper.ToDemandPage(NewClassDetailPage.this, bundle);
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        switch (flag) {
+            case HttpApis.http_fiv:
+                ResponseFilms filmRe = (ResponseFilms) value;
+                b_list.addAll(filmRe.getBody().getTypeList());
+                if (b_list == null || b_list.size() == 0 || empty_view_button == null) {
+                    if (classDetailsList != null) {
+                        classDetailsList.setVisibility(View.INVISIBLE);
                     }
+                    empty_view_button.setVisibility(View.VISIBLE);
+                    return;
                 }
-            }
-        });
+                empty_view_button.setVisibility(View.INVISIBLE);
+                if (b_list != null && b_list.size() > 0) {
+                    if (classDetailsList == null) return;
+                    classDetailsList.setVisibility(View.VISIBLE);
+
+                    bottom_adapter = new VipItemAdapter(getApplicationContext(), b_list);
+                    if (channelCode.equals(ChannelModel.FILM_ID)) {
+
+                        classDetailsList.setLayoutManager(manager);
+//                        vipItemList.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.VERTICAL));
+//                            classDetailsList.addItemDecoration(new RecycleViewDivider(NewClassDetailPage.this, GridLayoutManager.VERTICAL));
+                        for (int i = 0; i < b_list.size(); i++) {
+                            b_list.get(i).setTag("0");
+                        }
+                    } else {
+                        LinearLayoutManager manager = new LinearLayoutManager(NewClassDetailPage.this);
+                        manager.setOrientation(LinearLayoutManager.VERTICAL);
+                        classDetailsList.setLayoutManager(manager);
+                    }
+                    classDetailsList.setHasFixedSize(true);
+                    classDetailsList.setAdapter(bottom_adapter);
+                    bottom_adapter.notifyDataSetChanged();
+                    bottom_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, int i) {
+                            UIHelper.ToAllCateVideo(NewClassDetailPage.this, b_list.get(i).getTypeId(), b_list.get(i).getVfinfo_id());
+                        }
+                    });
+
+                } else {
+                    if (classDetailsList == null) return;
+                    classDetailsList.setVisibility(View.INVISIBLE);
+                }
+                break;
+        }
     }
 
     @Override

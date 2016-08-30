@@ -75,22 +75,25 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <View
+                <include
+                    android:id="@+id/ly_movie_intro"
+                    layout="@layout/video_bref"
                     android:layout_width="match_parent"
-                    android:layout_height="3dp"
-                    android:background="@color/font_gray" />
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp" />
 
-                <include layout="@layout/video_bref" />
-
-                <View
+                <include
+                    android:id="@+id/ly_demand_anthology"
+                    layout="@layout/video_anthology"
+                    android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
-                    android:layout_height="3dp"
-                    android:background="@color/font_gray" />
+                    android:layout_height="wrap_content" />
 
                 <include
                     layout="@layout/video_page_bottom"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:layout_marginTop="10dp"
                     android:layout_weight="1.0" />
 
                 <View
@@ -103,7 +106,7 @@
         <include
             layout="@layout/layout_add_comment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:layout_gravity="bottom" />
     </FrameLayout>
 </LinearLayout>

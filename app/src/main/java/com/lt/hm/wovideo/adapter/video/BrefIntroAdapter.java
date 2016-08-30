@@ -27,7 +27,7 @@ public class BrefIntroAdapter extends BaseAdapter {
         this.mContext = mContext;
         this.names = names;
         this.values = values;
-        mInlater = mInlater.from(mContext);
+        mInlater = LayoutInflater.from(mContext);
     }
 
     @Override

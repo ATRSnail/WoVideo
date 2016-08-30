@@ -246,9 +246,10 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                     .setOnSliderClickListener(this);
 
             //add your extra information
-            textSliderView.bundle(new Bundle());
-            textSliderView.getBundle()
-                    .putString("url", pageIconBean.getOutid());
+            Bundle bundle = new Bundle();
+            bundle.putString("typeId", pageIconBean.getVfType());
+            bundle.putString("id", pageIconBean.getOutid());
+            textSliderView.bundle(bundle);
             sliderLayout.addSlider(textSliderView);
         }
     }
@@ -683,30 +684,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         }
     }
 
-    public void getVideoDetails(String vfId) {
-        HashMap<String, Object> maps = new HashMap<>();
-        maps.put("vfid", vfId);
-        // TODO: 16/6/26 获取app typeId 并填充
-        String typeID = null;
-        maps.put("typeid", typeID);
-        HttpApis.getVideoInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    changePage(resp.getBody().getVfinfo().getTypeId(), vfId);
-                }
-            }
-        });
-    }
-
     private void changePage(int typeId, String vfId) {
         UIHelper.ToAllCateVideo(getActivity(), typeId, vfId);
     }
@@ -729,12 +706,14 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     @Override
     public void onSliderClick(BaseSliderView slider) {
-        String url = slider.getBundle().get("url").toString();
-        if (TextUtils.isEmpty(url)) {
+        Bundle bundle = slider.getBundle();
+        if (bundle == null) {
             UT.showNormal("播放地址无效");
             return;
         }
-        getVideoDetails(url);
+        String typeId = bundle.getString("typeId");
+        String id = bundle.getString("id");
+        changePage(Integer.valueOf(typeId), id);
     }
 
 }

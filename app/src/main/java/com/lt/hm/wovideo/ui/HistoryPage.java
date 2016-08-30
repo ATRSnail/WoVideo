@@ -17,6 +17,7 @@ import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.VfinfoDetailModel;
 import com.lt.hm.wovideo.model.VideoHistory;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.NoDoubleItemClickListener;
@@ -196,8 +197,8 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
             @Override
             public void onResponse(String response, int id) {
                 TLog.log(response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                ResponseObj<VfinfoDetailModel, RespHeader> resp = new ResponseObj<VfinfoDetailModel, RespHeader>();
+                ResponseParser.parse(resp, response, VfinfoDetailModel.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     getChangePage(resp.getBody().getVfinfo().getId(),bean);
                 }
@@ -222,8 +223,8 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
             @Override
             public void onResponse(String response, int id) {
                 TLog.log(response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                ResponseObj<VfinfoDetailModel, RespHeader> resp = new ResponseObj<VfinfoDetailModel, RespHeader>();
+                ResponseParser.parse(resp, response, VfinfoDetailModel.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
 
                     if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {

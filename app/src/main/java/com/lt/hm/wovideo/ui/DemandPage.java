@@ -37,8 +37,11 @@ import com.lt.hm.wovideo.model.CommentModel;
 import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.model.VfinfoModel;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.model.response.ResponseComment;
 import com.lt.hm.wovideo.model.response.ResponseLikeList;
+import com.lt.hm.wovideo.model.response.ResponseVfinfo;
 import com.lt.hm.wovideo.utils.ShareUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
@@ -107,7 +110,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     LikeListAdapter grid_adapter;
     CommentAdapter commentAdapter;
     List<PlayList.PlaysListBean> antholys;
-    List<CommentModel.CommentListBean> beans;
+    List<CommentModel> beans;
     boolean expand_flag = false;
     boolean isCollected = false;
     String vfId;
@@ -189,53 +192,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
     public void getVideoDetails(String id) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", id);
-        HttpApis.getVideoInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("details" + response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    VideoDetails.VfinfoBean details = resp.getBody().getVfinfo();
-                    share_desc = details.getIntroduction();
-                    share_title = details.getName();
-                    img_url = details.getImg();
-//                    String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-//                    if (!StringUtils.isNullOrEmpty(userinfo)){
-//                        UserModel model = new Gson().fromJson(userinfo,UserModel.class);
-//                        String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
-//                        if (!StringUtils.isNullOrEmpty(tag)) {
-////                            free_hint.setText(" "+"已免流");
-//                            mFreeLabel.setVisibility(View.VISIBLE);
-//                        }
-//                    }
-
-                    mFreeLabel.setVisibility(UserMgr.isVip() ? View.VISIBLE : View.GONE);
-
-                    videoName.setText(details.getName());
-                    setCollectImg(details.getSc() != null && details.getSc().equals("1"));
-                    videoPlayNumber.setText(details.getHit());
-                    if (details.getGxzt().equals("0")) {
-                        anthologyText.setText("更新至" + details.getJjs() + "集");
-                    } else {
-                        anthologyText.setText("完结 共" + details.getJjs() + "集");
-                    }
-                    demand_intro_simple.setText("来源：" + details.getCpname() + "\t\t\t\t\t" + "导演：" + details.getDirector() + "\n"
-                            + "地区：" + details.getDq() + "\t\t\t\t\t" + "类型：" + details.getLx() + "\n" + "年代：" + details.getNd()
-                    );
-                    demand_intro_all.setText("简介：\n" + details.getIntroduction());
-                    videoHistory.setmName(details.getName());
-                    videoHistory.setCreate_time(System.currentTimeMillis() + "");
-                    videoHistory.setImg_url(details.getImg());
-//                    videoHistory.setmId(details.getId());
-                }
-            }
-        });
+        HttpApis.getVideoInfo(maps, HttpApis.http_fiv, new HttpCallback<>(ResponseVfinfo.class, this));
     }
 
     private void getAnthologyDatas(String vfId) {
@@ -388,6 +345,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         NetUtils.getYouLikeData(1, pageSize, "", "", typeId, new HttpCallback<>(ResponseLikeList.class, this));
     }
 
+    private VfinfoModel vfinfoModel;
     @Override
     public <T> void onSuccess(T value, int flag) {
         switch (flag) {
@@ -396,6 +354,58 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
                 grid_list = re.getBody().getLikeList();
                 if (grid_list.size() == 0) return;
                 initBottomGrid(grid_list);
+                break;
+            case HttpApis.http_for:
+                ResponseComment responseComment = (ResponseComment) value;
+                beans = responseComment.getBody().getCommentList();
+                if (beans == null || beans.size() == 0) return;
+                if (empty == null) return;
+                empty.setVisibility(View.GONE);
+                videoCommentList.setVisibility(View.VISIBLE);
+                commentAdapter = new CommentAdapter(getApplicationContext(), beans);
+                videoCommentList.setLayoutManager(new LinearLayoutManager(DemandPage.this));
+                videoCommentList.addItemDecoration(new RecycleViewDivider(DemandPage.this, LinearLayoutManager.VERTICAL));
+                videoCommentList.setItemAnimator(new DefaultItemAnimator());
+                videoCommentList.setAdapter(commentAdapter);
+                commentAdapter.notifyDataSetChanged();
+                break;
+            case HttpApis.http_fiv:
+                ResponseVfinfo responseVfinfo = (ResponseVfinfo) value;
+                vfinfoModel = responseVfinfo.getBody().getVfinfo();
+                share_desc = vfinfoModel.getIntroduction();
+                share_title = vfinfoModel.getName();
+                img_url = vfinfoModel.getImg();
+                mFreeLabel.setVisibility(UserMgr.isVip() ? View.VISIBLE : View.GONE);
+
+                videoName.setText(vfinfoModel.getName());
+                setCollectImg(vfinfoModel.getSc() != null && vfinfoModel.getSc().equals("1"));
+                videoPlayNumber.setText(vfinfoModel.getHit());
+                if (vfinfoModel.getGxzt().equals("0")) {
+                    anthologyText.setText("更新至" + vfinfoModel.getJjs() + "集");
+                } else {
+                    anthologyText.setText("完结 共" + vfinfoModel.getJjs() + "集");
+                }
+                demand_intro_simple.setText("来源：" + vfinfoModel.getCpname() + "\t\t\t\t\t" + "导演：" + vfinfoModel.getDirector() + "\n"
+                        + "地区：" + vfinfoModel.getDq() + "\t\t\t\t\t" + "类型：" + vfinfoModel.getLx() + "\n" + "年代：" + vfinfoModel.getNd()
+                );
+                demand_intro_all.setText("简介：\n" + vfinfoModel.getIntroduction());
+                videoHistory.setmName(vfinfoModel.getName());
+                videoHistory.setCreate_time(System.currentTimeMillis() + "");
+                videoHistory.setImg_url(vfinfoModel.getImg());
+//                    videoHistory.setmId(details.getId());
+                break;
+        }
+    }
+
+    @Override
+    public void onFail(String error, int flag) {
+        switch (flag){
+            case HttpApis.http_for:
+                //评论内容获取失败布局添加
+                videoCommentList.setVisibility(View.GONE);
+                empty.setVisibility(View.VISIBLE);
+                empty.setText("获取评论失败,请稍后重试");
+
                 break;
         }
     }
@@ -467,45 +477,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
             map.put("pageNum", 1);
             map.put("numPerPage", pageSize);
             map.put("vfId", vfId);
-            HttpApis.commentList(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log("comments_" + response);
-                    ResponseObj<CommentModel, RespHeader> resp = new ResponseObj<CommentModel, RespHeader>();
-                    ResponseParser.parse(resp, response, CommentModel.class, RespHeader.class);
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        if (!StringUtils.isNullOrEmpty(resp.getBody().getCommentList()) && resp.getBody().getCommentList().size() > 0) {
-                            empty.setVisibility(View.GONE);
-                            videoCommentList.setVisibility(View.VISIBLE);
-                            beans.addAll(resp.getBody().getCommentList());
-                            commentAdapter = new CommentAdapter(getApplicationContext(), beans);
-                            videoCommentList.setLayoutManager(new LinearLayoutManager(DemandPage.this));
-                            videoCommentList.addItemDecoration(new RecycleViewDivider(DemandPage.this, LinearLayoutManager.VERTICAL));
-                            videoCommentList.setItemAnimator(new DefaultItemAnimator());
-                            videoCommentList.setAdapter(commentAdapter);
-                            commentAdapter.notifyDataSetChanged();
-                        } else {
-                            //暂无评论内容布局添加
-                            if (videoCommentList != null) {
-                                videoCommentList.setVisibility(View.GONE);
-                            }
-                            if (empty == null)
-                                return;
-                            empty.setVisibility(View.VISIBLE);
-                        }
-                    } else {
-                        //评论内容获取失败布局添加
-                        videoCommentList.setVisibility(View.GONE);
-                        empty.setVisibility(View.VISIBLE);
-                        empty.setText("获取评论失败,请稍后重试");
-                    }
-                }
-            });
+            HttpApis.commentList(map, HttpApis.http_for, new HttpCallback<>(ResponseComment.class, this));
         } else {
             UnLoginHandler.unLogin(DemandPage.this);
         }
@@ -590,7 +562,8 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         grid_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int i) {
-                getChangePage(grid_list.get(i).getId());
+                UIHelper.ToAllCateVideo(DemandPage.this, grid_list.get(i).getTypeId(), vfId);
+                DemandPage.this.finish();
             }
         });
     }
@@ -663,33 +636,6 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         }
     }
 
-    /**
-     * 跳转页面
-     *
-     * @param vfId
-     */
-    public void getChangePage(String vfId) {
-        HashMap<String, Object> maps = new HashMap<>();
-        maps.put("vfid", vfId);
-        HttpApis.getVideoInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
-                    UIHelper.ToAllCateVideo(DemandPage.this, resp.getBody().getVfinfo().getTypeId(), vfId);
-                    DemandPage.this.finish();
-                }
-            }
-        });
-    }
 
     @Override
     public void initViews() {

@@ -311,7 +311,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         mScheduleLayout.setVisibility(GONE);
         mScheduleText = (TextView) v.findViewById(R.id.schedule_center_text);
 
-
     }
 
     public void setmQualitySwitch(String name) {

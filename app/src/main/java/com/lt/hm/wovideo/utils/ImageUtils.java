@@ -223,8 +223,7 @@ public class ImageUtils {
 
     /**
      * 使用当前时间戳拼接一个唯一的文件名
-     * 
-     * @param format
+     *
      * @return
      */
     public static String getTempFileName() {
@@ -247,7 +246,7 @@ public class ImageUtils {
     /**
      * 判断当前Url是否标准的content://样式，如果不是，则返回绝对路径
      * 
-     * @param uri
+     * @param mUri
      * @return
      */
     public static String getAbsolutePathFromNoStandardUri(Uri mUri) {
@@ -696,7 +695,6 @@ public class ImageUtils {
      * 获取图片路径 2014年8月12日
      *
      * @param uri
-     * @param cursor
      * @return E-mail:mr.huangwenwei@gmail.com
      */
     public static String getImagePath(Uri uri, Activity context) {

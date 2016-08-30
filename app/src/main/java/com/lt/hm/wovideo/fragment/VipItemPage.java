@@ -22,11 +22,10 @@ import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
-import com.lt.hm.wovideo.model.VideoList;
+import com.lt.hm.wovideo.model.FilmMode;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
-import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.lt.hm.wovideo.widget.SpaceItemDecoration;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -45,6 +44,7 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 16/6/6
  */
+@Deprecated
 public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
 	@BindView(R.id.vip_item_list)
 	RecyclerView vipItemList;
@@ -53,7 +53,7 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 	SwipeRefreshLayout refreshView;
 	int pageNum = 1;
 	int pageSize = 60;
-	List<VideoList.TypeListBean> b_list;
+	List<FilmMode> b_list;
 	VipItemAdapter bottom_adapter;
 	int mId;
 	String isvip;
@@ -125,146 +125,146 @@ public class VipItemPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 		map.put("sx", sx);
 		map.put("dq", dq);
 		map.put("nd", nd);
-		HttpApis.getListByType(map, new StringCallback() {
-			@Override
-			public void onError(Call call, Exception e, int id) {
-				TLog.log("error:" + e.getMessage());
-			}
-
-			@TargetApi(Build.VERSION_CODES.M)
-			@Override
-			public void onResponse(String response, int id) {
-				TLog.log(response);
-				ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
-				ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
-				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-					if (b_list != null && b_list.size() > 0) {
-						b_list.clear();
-					}
-					b_list.addAll(resp.getBody().getTypeList());
-					for (int i = 0; i < b_list.size(); i++) {
-						b_list.get(i).setDesc(b_list.get(i).getIntroduction());
-					}
-					if (b_list != null && b_list.size() > 0) {
-						bottom_adapter = new VipItemAdapter(getActivity().getApplicationContext(), b_list);
-						if ((mId) == VideoType.MOVIE.getId()) {
-							GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
-							manager.setOrientation(GridLayoutManager.VERTICAL);
-							vipItemList.setLayoutManager(manager);
-//                        vipItemList.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.VERTICAL));
-							int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.divider_width);
-							vipItemList.addItemDecoration(new SpaceItemDecoration(spacingInPixels));
-							vipItemList.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.HORIZONTAL));
-							for (int i = 0; i < b_list.size(); i++) {
-								b_list.get(i).setTag("0");
-							}
-						} else {
-							LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-							manager.setOrientation(LinearLayoutManager.VERTICAL);
-							vipItemList.setLayoutManager(manager);
-						}
-						TOTAL_COUNTER = b_list.size();
-						vipItemList.setHasFixedSize(false);
-						vipItemList.setAdapter(bottom_adapter);
-						bottom_adapter.notifyDataSetChanged();
-//                        bottom_adapter.setOnLoadMoreListener(PAGE_SIZE, new BaseQuickAdapter.RequestLoadMoreListener() {
-//                            @Override
-//                            public void onLoadMoreRequested() {
-//                                if (b_list.size() % 10 != 0) {
-//                                    vipItemList.post(new Runnable() {
-//                                        @Override
-//                                        public void run() {
-//                                            bottom_adapter.isNextLoad(false);
-//                                        }
-//                                    });
-//                                } else {
-//                                    if (!StringUtils.isNullOrEmpty(mId)) {
-//                                        int pageNum = b_list.size() / 10 + 1;
-//                                        getListDatas(mId, "1", pageNum);
-//                                    }
-//                                }
-//                            }
-//                        });
-						bottom_adapter.openLoadAnimation();
-//                        bottom_adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
-//                            @Override
-//                            public void onLoadMoreRequested() {
-//                                if (!StringUtils.isNullOrEmpty(mId)) {
-//                                    if (b_list.size()%10==0){
-//                                        int pageNum=b_list.size()/10+1;
-//                                        if (StringUtils.isNullOrEmpty(isvip)) {
-//                                            getListDatas(mId, "0",pageNum);
-//                                        } else {
-//                                            getListDatas(mId, "1",pageNum);
-//                                        }
-//                                    }else {
-//                                        if (vipItemList.getScrollState()==RecyclerView.SCROLL_STATE_IDLE)
-//                                                 bottom_adapter.isNextLoad(false);
-//                                    }
-//                                }
-//                            }
-//                        });
-						bottom_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
-							@Override
-							public void onItemClick(View view, int i) {
-								getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
-							}
-						});
-					} else {
-						bottom_adapter.isNextLoad(false);
-					}
-
-				}
-			}
-		});
+//		HttpApis.getListByType(map, new StringCallback() {
+//			@Override
+//			public void onError(Call call, Exception e, int id) {
+//				TLog.log("error:" + e.getMessage());
+//			}
+//
+//			@TargetApi(Build.VERSION_CODES.M)
+//			@Override
+//			public void onResponse(String response, int id) {
+//				TLog.log(response);
+//				ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
+//				ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
+//				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//					if (b_list != null && b_list.size() > 0) {
+//						b_list.clear();
+//					}
+//					b_list.addAll(resp.getBody().getTypeList());
+//					for (int i = 0; i < b_list.size(); i++) {
+//						b_list.get(i).setDesc(b_list.get(i).getIntroduction());
+//					}
+//					if (b_list != null && b_list.size() > 0) {
+//						bottom_adapter = new VipItemAdapter(getActivity().getApplicationContext(), b_list);
+//						if ((mId) == VideoType.MOVIE.getId()) {
+//							GridLayoutManager manager = new GridLayoutManager(getActivity(), 3);
+//							manager.setOrientation(GridLayoutManager.VERTICAL);
+//							vipItemList.setLayoutManager(manager);
+////                        vipItemList.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.VERTICAL));
+//							int spacingInPixels = getResources().getDimensionPixelSize(R.dimen.divider_width);
+//							vipItemList.addItemDecoration(new SpaceItemDecoration(spacingInPixels));
+//							vipItemList.addItemDecoration(new RecycleViewDivider(getActivity(), GridLayoutManager.HORIZONTAL));
+//							for (int i = 0; i < b_list.size(); i++) {
+//								b_list.get(i).setTag("0");
+//							}
+//						} else {
+//							LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+//							manager.setOrientation(LinearLayoutManager.VERTICAL);
+//							vipItemList.setLayoutManager(manager);
+//						}
+//						TOTAL_COUNTER = b_list.size();
+//						vipItemList.setHasFixedSize(false);
+//						vipItemList.setAdapter(bottom_adapter);
+//						bottom_adapter.notifyDataSetChanged();
+////                        bottom_adapter.setOnLoadMoreListener(PAGE_SIZE, new BaseQuickAdapter.RequestLoadMoreListener() {
+////                            @Override
+////                            public void onLoadMoreRequested() {
+////                                if (b_list.size() % 10 != 0) {
+////                                    vipItemList.post(new Runnable() {
+////                                        @Override
+////                                        public void run() {
+////                                            bottom_adapter.isNextLoad(false);
+////                                        }
+////                                    });
+////                                } else {
+////                                    if (!StringUtils.isNullOrEmpty(mId)) {
+////                                        int pageNum = b_list.size() / 10 + 1;
+////                                        getListDatas(mId, "1", pageNum);
+////                                    }
+////                                }
+////                            }
+////                        });
+//						bottom_adapter.openLoadAnimation();
+////                        bottom_adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
+////                            @Override
+////                            public void onLoadMoreRequested() {
+////                                if (!StringUtils.isNullOrEmpty(mId)) {
+////                                    if (b_list.size()%10==0){
+////                                        int pageNum=b_list.size()/10+1;
+////                                        if (StringUtils.isNullOrEmpty(isvip)) {
+////                                            getListDatas(mId, "0",pageNum);
+////                                        } else {
+////                                            getListDatas(mId, "1",pageNum);
+////                                        }
+////                                    }else {
+////                                        if (vipItemList.getScrollState()==RecyclerView.SCROLL_STATE_IDLE)
+////                                                 bottom_adapter.isNextLoad(false);
+////                                    }
+////                                }
+////                            }
+////                        });
+//						bottom_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+//							@Override
+//							public void onItemClick(View view, int i) {
+//								getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
+//							}
+//						});
+//					} else {
+//						bottom_adapter.isNextLoad(false);
+//					}
+//
+//				}
+//			}
+//		});
 	}
 
 	public void getVideoDetails(String vfId) {
 		HashMap<String, Object> maps = new HashMap<>();
 		maps.put("vfid", vfId);
-		HttpApis.getVideoInfo(maps, new StringCallback() {
-			@Override
-			public void onError(Call call, Exception e, int id) {
-				TLog.log("error:" + e.getMessage());
-			}
-
-			@Override
-			public void onResponse(String response, int id) {
-				TLog.log("result:::" + response);
-				ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-				ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
-					if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
-						// TODO: 16/6/14 跳转电影页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						bundle.putInt("typeId", VideoType.MOVIE.getId());
-						UIHelper.ToMoviePage(getActivity(), bundle);
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
-						// TODO: 16/6/14 跳转电视剧页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						bundle.putInt("typeId", VideoType.TELEPLAY.getId());
-
-						UIHelper.ToDemandPage(getActivity(), bundle);
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
-						// TODO: 16/6/14 跳转 体育播放页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						bundle.putInt("typeId", VideoType.SPORTS.getId());
-//                        UIHelper.ToMoviePage(getActivity(), bundle);
-						UIHelper.ToDemandPage(getActivity(), bundle);
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
-						// TODO: 16/6/14 跳转综艺界面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						bundle.putInt("typeId", VideoType.VARIATY.getId());
-						UIHelper.ToDemandPage(getActivity(), bundle);
-					}
-				}
-			}
-		});
+//		HttpApis.getVideoInfo(maps, new StringCallback() {
+//			@Override
+//			public void onError(Call call, Exception e, int id) {
+//				TLog.log("error:" + e.getMessage());
+//			}
+//
+//			@Override
+//			public void onResponse(String response, int id) {
+//				TLog.log("result:::" + response);
+//				ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+//				ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+//				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//
+//					if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+//						// TODO: 16/6/14 跳转电影页面
+//						Bundle bundle = new Bundle();
+//						bundle.putString("id", vfId);
+//						bundle.putInt("typeId", VideoType.MOVIE.getId());
+//						UIHelper.ToMoviePage(getActivity(), bundle);
+//					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
+//						// TODO: 16/6/14 跳转电视剧页面
+//						Bundle bundle = new Bundle();
+//						bundle.putString("id", vfId);
+//						bundle.putInt("typeId", VideoType.TELEPLAY.getId());
+//
+//						UIHelper.ToDemandPage(getActivity(), bundle);
+//					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
+//						// TODO: 16/6/14 跳转 体育播放页面
+//						Bundle bundle = new Bundle();
+//						bundle.putString("id", vfId);
+//						bundle.putInt("typeId", VideoType.SPORTS.getId());
+////                        UIHelper.ToMoviePage(getActivity(), bundle);
+//						UIHelper.ToDemandPage(getActivity(), bundle);
+//					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
+//						// TODO: 16/6/14 跳转综艺界面
+//						Bundle bundle = new Bundle();
+//						bundle.putString("id", vfId);
+//						bundle.putInt("typeId", VideoType.VARIATY.getId());
+//						UIHelper.ToDemandPage(getActivity(), bundle);
+//					}
+//				}
+//			}
+//		});
 	}
 
 	@Override

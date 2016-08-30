@@ -27,7 +27,7 @@ public class AppContext extends BaseApplication {
     @Override
     public void onCreate() {
         super.onCreate();
-        instance=this;
+        instance = this;
         _context = getApplicationContext();
         _resource = _context.getResources();
         ShareSDK.initSDK(this);
@@ -39,20 +39,20 @@ public class AppContext extends BaseApplication {
 //                new OkHttpClient.Factory(OkHttpUtils.getInstance()));
     }
 
-	/**
-   * NBSAppAgent init
-   */
-  private void initNewsLens() {
+    /**
+     * NBSAppAgent init
+     */
+    private void initNewsLens() {
         NBSAppAgent nbsAppAgent = null;
-        nbsAppAgent= NBSAppAgent.setLicenseKey("471bd7f647cc42c6974ef6594675ccc3").setRedirectHost("111.206.135.48:8081").withLocationServiceEnabled(true);
+        nbsAppAgent = NBSAppAgent.setLicenseKey("471bd7f647cc42c6974ef6594675ccc3").setRedirectHost("111.206.135.48:8081").withLocationServiceEnabled(true);
         nbsAppAgent.setHttpEnabled(true);
         nbsAppAgent.start(this.getApplicationContext());
     }
 
     private void initNetWork() {
-        OkHttpClient okHttpClient= new OkHttpClient.Builder()
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .connectTimeout(10000L, TimeUnit.MILLISECONDS)
-                .readTimeout(10000L,TimeUnit.MILLISECONDS)
+                .readTimeout(10000L, TimeUnit.MILLISECONDS)
                 .addInterceptor(new LoggerInterceptor("WoVideo"))
                 .addNetworkInterceptor(new StethoInterceptor())
                 .build();

@@ -26,14 +26,12 @@ import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.FilmMode;
 import com.lt.hm.wovideo.model.UserModel;
-import com.lt.hm.wovideo.model.VideoList;
-import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
-import com.lt.hm.wovideo.utils.UIHelper;
 import com.lt.hm.wovideo.widget.IPhoneDialog;
 import com.lt.hm.wovideo.widget.VerticalSwipeRefreshLayout;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -53,6 +51,7 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 8/4/16
  */
+@Deprecated
 public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, BaseQuickAdapter.RequestLoadMoreListener {
 	private static final String ORDERED_STATUS = "1";
 	Unbinder unbinder;
@@ -73,7 +72,7 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 	VipItemAdapter oly_adapter;
 	private int pageNum = 1;
 	private int pageSize = 30;
-	private List<VideoList.TypeListBean> oly_list;
+	private List<FilmMode> oly_list;
 	private int currentCount;
 	View view;
 
@@ -150,18 +149,18 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 
 			@Override
 			public void onResponse(String response, int id) {
-				TLog.log("olympic_list" + response);
-				ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
-				ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
-				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-					if (resp.getBody().getTypeList().size() > 0) {
-						oly_list.addAll(resp.getBody().getTypeList());
-						oly_adapter = new VipItemAdapter(getApplicationContext(), oly_list);
-						olympicList.setAdapter(oly_adapter);
-						olympicList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-						oly_adapter.openLoadAnimation();
-//		oly_adapter.setOnLoadMoreListener(this);
-						oly_adapter.openLoadMore(pageSize, true);
+//				TLog.log("olympic_list" + response);
+//				ResponseObj<VideoList, RespHeader> resp = new ResponseObj<VideoList, RespHeader>();
+//				ResponseParser.parse(resp, response, VideoList.class, RespHeader.class);
+//				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//					if (resp.getBody().getTypeList().size() > 0) {
+//						oly_list.addAll(resp.getBody().getTypeList());
+//						oly_adapter = new VipItemAdapter(getApplicationContext(), oly_list);
+//						olympicList.setAdapter(oly_adapter);
+//						olympicList.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+//						oly_adapter.openLoadAnimation();
+////		oly_adapter.setOnLoadMoreListener(this);
+//						oly_adapter.openLoadMore(pageSize, true);
 //						oly_adapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
 //							@Override
 //							public void onLoadMoreRequested() {
@@ -179,21 +178,21 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 //								});
 //							}
 //						});
-						oly_adapter.setOnLoadMoreListener(OlympicPage.this);
-						oly_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
-							@Override
-							public void onItemClick(View view, int i) {
-								if (checkAYStatus()) {
-									getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
-								}
-							}
-						});
-					} else {
-						// TODO: 8/4/16 empty view show 
-					}
-				} else {
-					// TODO: 8/4/16 getdata error do something
-				}
+//						oly_adapter.setOnLoadMoreListener(OlympicPage.this);
+//						oly_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
+//							@Override
+//							public void onItemClick(View view, int i) {
+//								if (checkAYStatus()) {
+//									getVideoDetails(resp.getBody().getTypeList().get(i).getVfinfo_id());
+//								}
+//							}
+//						});
+//					} else {
+//						// TODO: 8/4/16 empty view show
+//					}
+//				} else {
+//					// TODO: 8/4/16 getdata error do something
+//				}
 			}
 		});
 	}
@@ -243,37 +242,37 @@ public class OlympicPage extends BaseFragment implements SwipeRefreshLayout.OnRe
 			@Override
 			public void onResponse(String response, int id) {
 				TLog.log("result:::" + response);
-				ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-				ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
-					if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
-						// TODO: 16/6/14 跳转电影页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						bundle.putInt("typeId", VideoType.MOVIE.getId());
-						UIHelper.ToMoviePage(getActivity(), bundle);
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
-						// TODO: 16/6/14 跳转电视剧页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						bundle.putInt("typeId", VideoType.TELEPLAY.getId());
-
-						UIHelper.ToDemandPage(getActivity(), bundle);
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
-						// TODO: 16/6/14 跳转 体育播放页面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						bundle.putInt("typeId", VideoType.SPORTS.getId());
-						UIHelper.ToDemandPage(getActivity(), bundle);
-					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
-						// TODO: 16/6/14 跳转综艺界面
-						Bundle bundle = new Bundle();
-						bundle.putString("id", vfId);
-						bundle.putInt("typeId", VideoType.VARIATY.getId());
-						UIHelper.ToDemandPage(getActivity(), bundle);
-					}
-				}
+//				ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+//				ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+//				if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//
+//					if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+//						// TODO: 16/6/14 跳转电影页面
+//						Bundle bundle = new Bundle();
+//						bundle.putString("id", vfId);
+//						bundle.putInt("typeId", VideoType.MOVIE.getId());
+//						UIHelper.ToMoviePage(getActivity(), bundle);
+//					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
+//						// TODO: 16/6/14 跳转电视剧页面
+//						Bundle bundle = new Bundle();
+//						bundle.putString("id", vfId);
+//						bundle.putInt("typeId", VideoType.TELEPLAY.getId());
+//
+//						UIHelper.ToDemandPage(getActivity(), bundle);
+//					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
+//						// TODO: 16/6/14 跳转 体育播放页面
+//						Bundle bundle = new Bundle();
+//						bundle.putString("id", vfId);
+//						bundle.putInt("typeId", VideoType.SPORTS.getId());
+//						UIHelper.ToDemandPage(getActivity(), bundle);
+//					} else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
+//						// TODO: 16/6/14 跳转综艺界面
+//						Bundle bundle = new Bundle();
+//						bundle.putString("id", vfId);
+//						bundle.putInt("typeId", VideoType.VARIATY.getId());
+//						UIHelper.ToDemandPage(getActivity(), bundle);
+//					}
+//				}
 			}
 		});
 	}

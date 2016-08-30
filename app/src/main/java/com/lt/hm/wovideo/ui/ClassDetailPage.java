@@ -15,10 +15,8 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.TypeList;
-import com.lt.hm.wovideo.model.VideoList;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.widget.SecondTopbar;
-import com.lt.hm.wovideo.widget.SelectMenuPop;
 import com.lt.hm.wovideo.widget.ViewPagerIndicator;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -35,6 +33,7 @@ import okhttp3.Call;
  * @create_date 16/6/8
  * @deprecated
  */
+@Deprecated
 public class ClassDetailPage extends BaseActivity implements SecondTopbar.myTopbarClicklistenter {
 
 
@@ -163,12 +162,12 @@ public class ClassDetailPage extends BaseActivity implements SecondTopbar.myTopb
             @Override
             public void onResponse(String response, int id) {
                 TLog.log(response);
-                ResponseObj<VideoList,RespHeader> resp= new ResponseObj<VideoList, RespHeader>();
-                ResponseParser.parse(resp,response,VideoList.class,RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    // TODO: 16/7/9 待定
-
-                }
+//                ResponseObj<VideoList,RespHeader> resp= new ResponseObj<VideoList, RespHeader>();
+//                ResponseParser.parse(resp,response,VideoList.class,RespHeader.class);
+//                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//                    // TODO: 16/7/9 待定
+//
+//                }
             }
         });
     }

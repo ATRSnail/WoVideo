@@ -76,14 +76,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!--<com.lt.hm.wovideo.video.WoVideoPlayer-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="200dp"-->
-                <!--android:layout_gravity="top"-->
-                <!--android:layout_centerHorizontal="true"-->
-                <!--android:layout_centerVertical="true"-->
-                <!--android:visibility="gone"-->
-                <!--android:id="@+id/video_player" />-->
                 <include
                     layout="@layout/layout_intro_demand"
                     android:layout_width="match_parent"

@@ -533,7 +533,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 mDanmakuView.hide();
             }
         }
-//        mMediaController.doToggleFullscreen();
     }
 
     // Surface Life cycle

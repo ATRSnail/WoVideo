@@ -39,6 +39,7 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 16/5/30
  */
+@Deprecated
 public class VipPage extends BaseFragment implements CustomScrollView.OnScrollListener {
     @BindView(R.id.vip_view_indicator)
     ViewPagerIndicator vipViewIndicator;
@@ -218,48 +219,48 @@ public class VipPage extends BaseFragment implements CustomScrollView.OnScrollLi
     public void getVideoDetails(String vfId) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", vfId);
-        HttpApis.getVideoInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
-                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
-                        // TODO: 16/6/14 跳转电影页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.MOVIE.getId());
-                        UIHelper.ToMoviePage(getActivity(), bundle);
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
-                        // TODO: 16/6/14 跳转电视剧页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
-                        UIHelper.ToDemandPage(getActivity(), bundle);
-
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
-                        // TODO: 16/6/14 跳转 体育播放页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.SPORTS.getId());
-                        UIHelper.ToDemandPage(getActivity(), bundle);
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
-                        // TODO: 16/6/14 跳转综艺界面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        bundle.putInt("typeId",VideoType.VARIATY.getId());
-                        UIHelper.ToDemandPage(getActivity(), bundle);
-                    }
-                }
-            }
-        });
+//        HttpApis.getVideoInfo(maps, new StringCallback() {
+//            @Override
+//            public void onError(Call call, Exception e, int id) {
+//                TLog.log("error:" + e.getMessage());
+//            }
+//
+//            @Override
+//            public void onResponse(String response, int id) {
+//                TLog.log(response);
+//                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+//                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+//                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//
+//                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+//                        // TODO: 16/6/14 跳转电影页面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        bundle.putInt("typeId",VideoType.MOVIE.getId());
+//                        UIHelper.ToMoviePage(getActivity(), bundle);
+//                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
+//                        // TODO: 16/6/14 跳转电视剧页面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        bundle.putInt("typeId",VideoType.TELEPLAY.getId());
+//                        UIHelper.ToDemandPage(getActivity(), bundle);
+//
+//                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
+//                        // TODO: 16/6/14 跳转 体育播放页面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        bundle.putInt("typeId",VideoType.SPORTS.getId());
+//                        UIHelper.ToDemandPage(getActivity(), bundle);
+//                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
+//                        // TODO: 16/6/14 跳转综艺界面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        bundle.putInt("typeId",VideoType.VARIATY.getId());
+//                        UIHelper.ToDemandPage(getActivity(), bundle);
+//                    }
+//                }
+//            }
+//        });
     }
     @Override
     public void onScroll(int scrollY) {

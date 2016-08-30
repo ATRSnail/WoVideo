@@ -26,31 +26,73 @@ public class BannerList {
     }
 
     public class Banner{
-        private String id;
-        private String utime;
-        private String img;
-        private String type;//banner类型 0视频1广告
-        private String ctime;
-        private String outid;//跳转 视频播放页，使用 该ID outid
-        private String isvip;
-        private String vfName;
-        private  String hit;
-        private String typeName;
 
-        public String getId() {
+        /**
+         * typeName : 电影
+         * id : 13
+         * utime : 1465904126000
+         * cb :
+         * hit : null
+         * img : /banner/0bce60b57d824908968d88d078783a85.jpg
+         * vfType : 1
+         * type : 0
+         * ctime : 1465724716000
+         * url :
+         * outid : 3
+         * isvip : 0
+         */
+
+        private String typeName;
+        private int id;
+        private long utime;
+        private String cb;
+        private String hit;
+        private String img;
+        private String vfType;
+        private String type;
+        private long ctime;
+        private String url;
+        private String outid;
+        private String isvip;
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public void setTypeName(String typeName) {
+            this.typeName = typeName;
+        }
+
+        public int getId() {
             return id;
         }
 
-        public void setId(String id) {
+        public void setId(int id) {
             this.id = id;
         }
 
-        public String getUtime() {
+        public long getUtime() {
             return utime;
         }
 
-        public void setUtime(String utime) {
+        public void setUtime(long utime) {
             this.utime = utime;
+        }
+
+        public String getCb() {
+            return cb;
+        }
+
+        public void setCb(String cb) {
+            this.cb = cb;
+        }
+
+        public String getHit() {
+            return hit;
+        }
+
+        public void setHit(String hit) {
+            this.hit = hit;
         }
 
         public String getImg() {
@@ -61,6 +103,14 @@ public class BannerList {
             this.img = img;
         }
 
+        public String getVfType() {
+            return vfType;
+        }
+
+        public void setVfType(String vfType) {
+            this.vfType = vfType;
+        }
+
         public String getType() {
             return type;
         }
@@ -69,12 +119,20 @@ public class BannerList {
             this.type = type;
         }
 
-        public String getCtime() {
+        public long getCtime() {
             return ctime;
         }
 
-        public void setCtime(String ctime) {
+        public void setCtime(long ctime) {
             this.ctime = ctime;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
         }
 
         public String getOutid() {
@@ -91,30 +149,6 @@ public class BannerList {
 
         public void setIsvip(String isvip) {
             this.isvip = isvip;
-        }
-
-        public String getVfName() {
-            return vfName;
-        }
-
-        public void setVfName(String vfName) {
-            this.vfName = vfName;
-        }
-
-        public String getHit() {
-            return hit;
-        }
-
-        public void setHit(String hit) {
-            this.hit = hit;
-        }
-
-        public String getTypeName() {
-            return typeName;
-        }
-
-        public void setTypeName(String typeName) {
-            this.typeName = typeName;
         }
     }
 }

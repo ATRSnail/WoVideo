@@ -1,15 +1,21 @@
 package com.lt.hm.wovideo.ui;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.percent.PercentRelativeLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -41,11 +47,13 @@ import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.PlayList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.ValidateComment;
+import com.lt.hm.wovideo.model.VfinfoModel;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
 import com.lt.hm.wovideo.model.response.ResponseComment;
 import com.lt.hm.wovideo.model.response.ResponseLikeList;
 import com.lt.hm.wovideo.model.response.ResponseValidateComment;
+import com.lt.hm.wovideo.model.response.ResponseVfinfo;
 import com.lt.hm.wovideo.utils.ShareUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
@@ -59,6 +67,10 @@ import com.lt.hm.wovideo.video.player.AVController;
 import com.lt.hm.wovideo.widget.CustomListView;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.lt.hm.wovideo.widget.SpacesItemDecoration;
+import com.lt.hm.wovideo.widget.SpacesVideoItemDecoration;
+import com.lt.hm.wovideo.widget.multiselector.MultiSelector;
+import com.lt.hm.wovideo.widget.multiselector.SingleSelector;
+import com.lt.hm.wovideo.widget.multiselector.SwappingHolder;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
@@ -75,8 +87,6 @@ import okhttp3.Call;
  */
 public class NewMoviePage extends BaseVideoActivity {
 
-    //    @BindView(R.id.video_player)
-//    WoVideoPlayer videoPlayer;
     @BindView(R.id.video_name)
     TextView videoName;
     @BindView(R.id.video_play_number)
@@ -108,7 +118,7 @@ public class NewMoviePage extends BaseVideoActivity {
     @BindView(R.id.free_label)
     TextView mFreeLabel;
     @BindView(R.id.fl_bref)
-    FrameLayout brefFl;
+    PercentRelativeLayout brefFl;
     CommentAdapter commentAdapter;
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
@@ -125,6 +135,24 @@ public class NewMoviePage extends BaseVideoActivity {
     EditText etAddComment;
     @BindView(R.id.add_comment)
     LinearLayout addComment;
+
+
+    @BindView(R.id.ly_demand_anthology)
+    View demandSelectView;
+    @BindView(R.id.anthology_list)
+    RecyclerView anthologyList;
+    @BindView(R.id.anthology_text)
+    TextView anthologyText;
+    @BindView(R.id.anthology_all)
+    Button anthologyALL;
+
+    private MultiSelector mMultiSelector = new SingleSelector();
+    private long cur_position;
+    private String mCurrentEpisode = "1";
+    private ArrayList<String> mEpisodes;
+    boolean expand_flag = false;
+    private LinearLayoutManager manager;
+
     boolean text_flag = false;
     private boolean isCollected;
 
@@ -136,6 +164,11 @@ public class NewMoviePage extends BaseVideoActivity {
     private String collect_tag;
     private int typeId = 0;
 
+    public static void startToMovie(Activity activity, Bundle bundle) {
+        Intent intent = new Intent(activity, NewMoviePage.class);
+        intent.putExtras(bundle);
+        activity.startActivity(intent);
+    }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
@@ -156,9 +189,8 @@ public class NewMoviePage extends BaseVideoActivity {
     protected void init(Bundle savedInstanceState) {
 
         beans = new ArrayList<>();
-        hideSomething();
-//        videoPlayer.setVideoPlayCallback(mVideoPlayCallback);
         Bundle bundle = getIntent().getExtras();
+
         if (bundle.containsKey("id")) {
             vfId = bundle.getString("id");
             getVideoDetails(vfId);
@@ -171,15 +203,37 @@ public class NewMoviePage extends BaseVideoActivity {
         if (bundle.containsKey("typeId")) {
             typeId = bundle.getInt("typeId");
         }
-        if (typeId == VideoType.SMIML.getId()) {
-            brefFl.setVisibility(View.GONE);
-        }
+
+
+        hideSomething();
         getYouLikeDatas(6);
 
     }
 
     /**
+     * 在正式项目中需要 解禁
+     */
+    private void hideSomething() {
+        videoCollect.setVisibility(View.VISIBLE);
+        videoShare.setVisibility(View.VISIBLE);
+        videoProjection.setVisibility(View.VISIBLE);
+        bref_txt_short.setVisibility(View.VISIBLE);
+        brefExpand.setVisibility(View.VISIBLE);
+        movieBrefPurch.setVisibility(View.GONE);
+        if (typeId == 1 || typeId == 5) {
+            if (typeId == VideoType.SMIML.getId()) {
+                brefFl.setVisibility(View.GONE);
+            }
+        }
+        if (typeId == 2 || typeId == 3 || typeId == 4) {
+            brefFl.setVisibility(View.GONE);
+            demandSelectView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    /**
      * 增加访问量
+     *
      * @param vfId
      */
     private void videoAddHit(String vfId) {
@@ -201,6 +255,7 @@ public class NewMoviePage extends BaseVideoActivity {
 
     /**
      * 获取评论信息
+     *
      * @param vfId
      */
     private void getCommentList(String vfId) {
@@ -215,7 +270,7 @@ public class NewMoviePage extends BaseVideoActivity {
             map.put("pageNum", 1);
             map.put("numPerPage", 50);
             map.put("vfId", vfId);
-            HttpApis.commentList(map,HttpApis.http_for,new HttpCallback<>(ResponseComment.class,this));
+            HttpApis.commentList(map, HttpApis.http_for, new HttpCallback<>(ResponseComment.class, this));
         } else {
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
@@ -227,53 +282,33 @@ public class NewMoviePage extends BaseVideoActivity {
      * 猜你喜欢接口调用
      */
     private void getYouLikeDatas(int size) {
-        NetUtils.getYouLikeData(1, size, "", "", typeId == 0 ? "1" : typeId+"", new HttpCallback<>(ResponseLikeList.class, this));
+        NetUtils.getYouLikeData(1, size, "", "", typeId == 0 ? "1" : typeId + "", new HttpCallback<>(ResponseLikeList.class, this));
     }
 
 
     /**
      * 填充猜你喜欢数据
+     *
      * @param grid_list
      */
     private void initBottomGrid(List<LikeModel> grid_list) {
-        grid_adapter = new LikeListAdapter(R.layout.layout_new_home_movie_item, grid_list,false);
+        grid_adapter = new LikeListAdapter(R.layout.layout_new_home_movie_item, grid_list, false);
         videoBottomGrid.setHasFixedSize(true);
         GridLayoutManager manager = new GridLayoutManager(this, 3);
         manager.setOrientation(GridLayoutManager.VERTICAL);
         videoBottomGrid.setLayoutManager(manager);
-        videoBottomGrid.addItemDecoration(new SpacesItemDecoration(10,false));
+        videoBottomGrid.addItemDecoration(new SpacesItemDecoration(10, false));
         videoBottomGrid.setAdapter(grid_adapter);
         grid_adapter.notifyDataSetChanged();
         grid_adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int i) {
-                getChangePage(grid_list.get(i).getId());
+                UIHelper.ToAllCateVideo(NewMoviePage.this, grid_list.get(i).getTypeId(), grid_list.get(i).getId());
+                NewMoviePage.this.finish();
             }
         });
     }
 
-    public void getChangePage(String vfId) {
-        HashMap<String, Object> maps = new HashMap<>();
-        maps.put("vfid", vfId);
-        maps.put("typeid", typeId == 0 ? 1 : typeId);
-        HttpApis.getVideoInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("getchange" + response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    UIHelper.ToAllCateVideo(NewMoviePage.this, resp.getBody().getVfinfo().getTypeId(), vfId);
-                    NewMoviePage.this.finish();
-                }
-            }
-        });
-    }
 
     private void setCollectImg(boolean isCollected) {
         videoCollect.setCompoundDrawablesWithIntrinsicBounds(null, getResources().getDrawable(isCollected ? R.drawable.icon_collect_press : R.drawable.icon_collect), null, null);
@@ -285,80 +320,15 @@ public class NewMoviePage extends BaseVideoActivity {
      *
      * @param id
      */
+    private VfinfoModel vfinfoModel;
+
     public void getVideoDetails(String id) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", id);
-        HttpApis.getVideoInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("video-details" + response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    VideoDetails.VfinfoBean details = resp.getBody().getVfinfo();
-                    img_url = details.getImg();
-                    share_title = details.getName();
-                    share_desc = details.getIntroduction();
-                    videoHistory.setmName(details.getName());
-                    videoHistory.setmId(details.getId());
-                    videoHistory.setCreate_time(System.currentTimeMillis() + "");
-                    videoHistory.setImg_url(details.getImg());
-                    values = new String[]{details.getDirector(), details.getStars(), details.getLx(), details.getDq(), details.getNd(), details.getCpname()};
-                    biAdapter = new BrefIntroAdapter(NewMoviePage.this, names, values);
-                    if (videoBrefIntros == null)
-                        videoBrefIntros = (CustomListView) findViewById(R.id.video_bref_intros);
-                    videoBrefIntros.setAdapter(biAdapter);
-                    String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
-                    if (!StringUtils.isNullOrEmpty(userinfo)) {
-                        UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-                        if (model.getIsVip() != null && model.getIsVip().equals("1")) {
-                            mFreeLabel.setVisibility(View.VISIBLE);
-                        }
-//                        String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
-//                        if (!StringUtils.isNullOrEmpty(tag)) {
-////                            free_hint.setText(" "+"已免流");
-//                        }
-                    }
-
-                    videoName.setText(details.getName());
-                    bref_txt_short.setText(details.getIntroduction());
-                    bref_txt_long.setText(details.getIntroduction());
-                    videoPlayNumber.setText(details.getHit());
-                    Glide.with(NewMoviePage.this).load(HttpUtils.appendUrl(details.getImg())).placeholder(R.drawable.default_vertical).centerCrop().crossFade().into(movieBrefImg);
-
-
-                }
-            }
-        });
+        HttpApis.getVideoInfo(maps, HttpApis.http_fiv, new HttpCallback<>(ResponseVfinfo.class, this));
     }
 
-    /**
-     * 在正式项目中需要 解禁
-     */
-    private void hideSomething() {
-        videoCollect.setVisibility(View.VISIBLE);
-        videoShare.setVisibility(View.VISIBLE);
-        videoProjection.setVisibility(View.VISIBLE);
-        bref_txt_short.setVisibility(View.VISIBLE);
-        brefExpand.setVisibility(View.VISIBLE);
-        movieBrefPurch.setVisibility(View.GONE);
-    }
-
-    public static final String DIALOG_FRAGMENT_TAG = "dialog";
-    public static final int PLAY_ACTION = 0xa1;
-    public static final int PAUSE_ACTION = 0xa2;
-    public static final int STOP_ACTION = 0xa3;
-    public static final int GET_MEDIA_INFO_ACTION = 0xa4;
-    public static final int GET_POSITION_INFO_ACTION = 0xa5;
-    public static final int RESUME_SEEKBAR_ACTION = 0xa6;
-    public static final int GET_VOLUME_ACTION = 0xa7;
-    public static final int SET_VOLUME_ACTION = 0xa8;
-
+    private RecyclerView.ItemDecoration itemDecoration;
     @Override
     public void initViews() {
         videoProjection.setOnClickListener(new View.OnClickListener() {
@@ -431,13 +401,31 @@ public class NewMoviePage extends BaseVideoActivity {
                 bref_txt_long.setVisibility(View.GONE);
             }
         });
+
+        itemDecoration = new SpacesVideoItemDecoration(10, false);
+        anthologyALL.setOnClickListener((View v) -> {
+            if (expand_flag) {
+                manager = new LinearLayoutManager(this);
+                manager.setOrientation(GridLayoutManager.HORIZONTAL);
+                expand_flag = false;
+            } else {
+                manager = new GridLayoutManager(this, 6);
+                manager.setOrientation(GridLayoutManager.VERTICAL);
+                anthologyList.invalidateItemDecorations();
+                anthologyList.removeItemDecoration(itemDecoration);
+                anthologyList.addItemDecoration(itemDecoration);
+                expand_flag = true;
+            }
+            anthologyList.setLayoutManager(manager);
+            anthologyList.scrollToPosition(currentEpisode - 1 > 0 ? currentEpisode - 1 : currentEpisode);
+        });
     }
 
     /**
      * 点赞
      */
     private void clickZan() {
-        if (details == null) {
+        if (playIntro == null) {
             UT.showNormal("点赞失败");
             return;
         }
@@ -447,7 +435,7 @@ public class NewMoviePage extends BaseVideoActivity {
         }
         UserModel model = UserMgr.getUseInfo();
         HashMap<String, Object> map = new HashMap<>();
-        map.put("vfplayId", details.getId());
+        map.put("vfplayId", playIntro.getId());
         map.put("userId", model.getId());
         HttpApis.clickZan(map, HttpApis.http_one, new HttpCallback<>(String.class, this));
     }
@@ -492,18 +480,54 @@ public class NewMoviePage extends BaseVideoActivity {
             case HttpApis.http_for:
                 ResponseComment responseComment = (ResponseComment) value;
                 beans = responseComment.getBody().getCommentList();
-                if (beans == null || beans.size() == 0)return;
+                if (beans == null || beans.size() == 0) return;
                 if (empty == null) return;
                 empty.setVisibility(View.GONE);
                 videoCommentList.setVisibility(View.VISIBLE);
-                beans.addAll(beans);
                 commentAdapter = new CommentAdapter(getApplicationContext(), beans);
                 videoCommentList.setLayoutManager(new LinearLayoutManager(NewMoviePage.this));
                 videoCommentList.addItemDecoration(new RecycleViewDivider(NewMoviePage.this, LinearLayoutManager.VERTICAL));
                 videoCommentList.setItemAnimator(new DefaultItemAnimator());
                 videoCommentList.setAdapter(commentAdapter);
                 break;
+            case HttpApis.http_fiv://详情
+                ResponseVfinfo responseVfinfo = (ResponseVfinfo) value;
+                vfinfoModel = responseVfinfo.getBody().getVfinfo();
+                img_url = vfinfoModel.getImg();
+                share_title = vfinfoModel.getName();
+                share_desc = vfinfoModel.getIntroduction();
+                mFreeLabel.setVisibility(UserMgr.isVip() ? View.VISIBLE : View.GONE);
+
+                saveVideoHistory(vfinfoModel);
+                setCollectImg(vfinfoModel.getSc() != null && vfinfoModel.getSc().equals("1"));
+
+                if (typeId == 1 || typeId == 5) {
+                    values = new String[]{vfinfoModel.getDirector(), vfinfoModel.getStars(), vfinfoModel.getLx(), vfinfoModel.getDq(), vfinfoModel.getNd(), vfinfoModel.getCpname()};
+                    biAdapter = new BrefIntroAdapter(NewMoviePage.this, names, values);
+                    videoBrefIntros.setAdapter(biAdapter);
+                    Glide.with(NewMoviePage.this).load(HttpUtils.appendUrl(vfinfoModel.getImg())).placeholder(R.drawable.default_vertical).centerCrop().crossFade().into(movieBrefImg);
+                }
+                if (typeId == 2 || typeId == 3 || typeId == 4) {
+                    if (vfinfoModel.getGxzt().equals("0")) {
+                        anthologyText.setText("更新至" + vfinfoModel.getJjs() + "集");
+                    } else {
+                        anthologyText.setText("完结 共" + vfinfoModel.getJjs() + "集");
+                    }
+                }
+
+                videoName.setText(share_title);
+                bref_txt_short.setText(share_desc);
+                bref_txt_long.setText(share_desc);
+                videoPlayNumber.setText(vfinfoModel.getHit());
+                break;
         }
+    }
+
+    private void saveVideoHistory(VfinfoModel vfinfoModel) {
+        videoHistory.setmName(vfinfoModel.getName());
+        videoHistory.setmId(vfinfoModel.getId());
+        videoHistory.setCreate_time(System.currentTimeMillis() + "");
+        videoHistory.setImg_url(vfinfoModel.getImg());
     }
 
 
@@ -525,6 +549,39 @@ public class NewMoviePage extends BaseVideoActivity {
         }
     }
 
+    private void initAnthologys(int length) {
+        mEpisodes = new ArrayList<>();
+        for (int i = 0; i < length; i++) {
+            mEpisodes.add(i + 1 + "");
+        }
+        LinearLayoutManager manager = new LinearLayoutManager(this.getApplicationContext());
+        manager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        anthologyList.addItemDecoration(itemDecoration);
+        anthologyList.setLayoutManager(manager);
+        mMultiSelector.setSelectable(true);
+        EpisodeAdapter adapter = new EpisodeAdapter();
+        anthologyList.setAdapter(adapter);
+        if (getIntent().getExtras().containsKey("episode")) {
+            if (!getIntent().getExtras().getString("episode").equals("null")) {
+                int c_episode = Integer.parseInt(getIntent().getExtras().getString("episode"));
+                mMultiSelector.setSelected(c_episode - 1, 0, true);
+                adapter.setSelectedItem(c_episode - 1);
+                selectEpisode(c_episode + "");
+            } else {
+                mMultiSelector.setSelected(0, 0, true);
+                adapter.notifyItemChanged(0);
+                selectEpisode("1");
+            }
+        } else {
+            selectEpisode("1");
+            adapter.notifyItemChanged(0);
+            mMultiSelector.setSelected(0, 0, true);
+        }
+//        mMultiSelector.setSelected(0,0,true);
+
+
+    }
+
     /**
      * 检查言论是否合规
      *
@@ -540,9 +597,8 @@ public class NewMoviePage extends BaseVideoActivity {
      * 取消收藏
      */
     private void CancelCollect() {
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)) {
-            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+        UserModel model = UserMgr.getUseInfo();
+        if (model != null) {
             HashMap<String, Object> map = new HashMap<>();
             map.put("userid", model.getId());
             map.put("vfids", collect_tag);
@@ -638,7 +694,7 @@ public class NewMoviePage extends BaseVideoActivity {
         }
     }
 
-    private PlayList.PlaysListBean details;
+    private PlayList.PlaysListBean playIntro;
 
     /**
      * 获取 视频播放地址，并播放
@@ -648,12 +704,11 @@ public class NewMoviePage extends BaseVideoActivity {
     public void getFirstURL(String vfId) {
         HashMap<String, Object> maps = new HashMap<>();
         maps.put("vfid", vfId);
-        String login_info = ACache.get(this).getAsString("userinfo");
-        if (StringUtils.isNullOrEmpty(login_info)) {
-
-        } else {
-            UserModel model = new Gson().fromJson(login_info, UserModel.class);
+        UserModel model = UserMgr.getUseInfo();
+        if (model != null) {
             maps.put("userid", model.getId());
+        } else {
+            setCollectImg(false);
         }
         HttpApis.getVideoListInfo(maps, new StringCallback() {
             @Override
@@ -667,55 +722,56 @@ public class NewMoviePage extends BaseVideoActivity {
                 ResponseObj<PlayList, RespHeader> resp = new ResponseObj<PlayList, RespHeader>();
                 ResponseParser.parse(resp, response, PlayList.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    details = resp.getBody().getPlaysList().get(0);
-                    if (StringUtils.isNullOrEmpty(login_info)) {
-                        setCollectImg(false);
-                    } else {
-                        if (details.getSc() != null && details.getSc().equals("1")) {
-                            isCollected = true;
-                        } else {
-                            isCollected = false;
-                        }
-                        setCollectImg(isCollected);
+                    if (resp.getBody().getPlaysList().size() < 0 || resp.getBody().getPlaysList().size() == 0)
+                        return;
+                    playIntro = resp.getBody().getPlaysList().get(0);
+
+                    if (typeId == 2 || typeId == 3 || typeId == 4) {
+                        antholys.addAll(resp.getBody().getPlaysList());
+                        initAnthologys(resp.getBody().getPlaysList().size());
                     }
-                    collect_tag = details.getId();
-                    videoAddHit(details.getId());
+
+                    isCollected = playIntro.getSc() != null && playIntro.getSc().equals("1");
+                    setCollectImg(isCollected);
+
+                    collect_tag = playIntro.getId();
+                    videoAddHit(playIntro.getId());
                     VideoModel model = new VideoModel();
                     ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
-                    if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {
+                    if (!StringUtils.isNullOrEmpty(playIntro.getFluentUrl())) {
                         VideoUrl url = new VideoUrl();
                         url.setFormatName("流畅");
-                        url.setFormatUrl(details.getFluentUrl());
+                        url.setFormatUrl(playIntro.getFluentUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getStandardUrl())) {
+                    if (!StringUtils.isNullOrEmpty(playIntro.getStandardUrl())) {
                         VideoUrl url = new VideoUrl();
                         url.setFormatName("标清");
-                        url.setFormatUrl(details.getStandardUrl());
+                        url.setFormatUrl(playIntro.getStandardUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getBlueUrl())) {
+                    if (!StringUtils.isNullOrEmpty(playIntro.getBlueUrl())) {
                         VideoUrl url = new VideoUrl();
                         url.setFormatName("蓝光");
-                        url.setFormatUrl(details.getBlueUrl());
+                        url.setFormatUrl(playIntro.getBlueUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getHighUrl())) {
+                    if (!StringUtils.isNullOrEmpty(playIntro.getHighUrl())) {
                         VideoUrl url = new VideoUrl();
                         url.setFormatName("高清");
-                        url.setFormatUrl(details.getHighUrl());
+                        url.setFormatUrl(playIntro.getHighUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getSuperUrl())) {
+                    if (!StringUtils.isNullOrEmpty(playIntro.getSuperUrl())) {
                         VideoUrl url = new VideoUrl();
                         url.setFormatName("超清");
-                        url.setFormatUrl(details.getSuperUrl());
+                        url.setFormatUrl(playIntro.getSuperUrl());
                         urls.add(url);
                     }
-                    if (!StringUtils.isNullOrEmpty(details.getFkUrl())) {
+                    if (!StringUtils.isNullOrEmpty(playIntro.getFkUrl())) {
                         VideoUrl url = new VideoUrl();
                         url.setFormatName("4K");
-                        url.setFormatUrl(details.getFkUrl());
+                        url.setFormatUrl(playIntro.getFkUrl());
                         urls.add(url);
                     }
                     model.setmVideoUrl(urls);
@@ -728,11 +784,9 @@ public class NewMoviePage extends BaseVideoActivity {
                         }
                     });
                     if (model.getmVideoUrl().size() > 0) {
-                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, details.getId());
+                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, playIntro.getId());
                         mQualityName = model.getmVideoUrl().get(0).getFormatName();
                     }
-//                    getRealURL(details.getFluentUrl());
-//                    getRealURL(details.getStandardUrl());
                 }
             }
         });
@@ -751,13 +805,6 @@ public class NewMoviePage extends BaseVideoActivity {
         }
         HashMap<String, Object> maps = new HashMap<String, Object>();
         maps.put("videoSourceURL", url);
-//        String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
-//        if (StringUtils.isNullOrEmpty(userinfo)){
-//            return;
-//        }
-        //FIXME: hardcode cellphone freetag
-//        maps.put("cellphone", "18513179404");
-//        maps.put("freetag", 1);
         String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
         if (!StringUtils.isNullOrEmpty(userinfo)) {
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
@@ -806,12 +853,148 @@ public class NewMoviePage extends BaseVideoActivity {
         });
     }
 
+    int currentEpisode = 0;
+    String per_Id;//单集Id
+    List<PlayList.PlaysListBean> antholys = new ArrayList<>();
+
+    private void selectEpisode(String episode) {
+        int i = Integer.valueOf(episode) - 1;
+        currentEpisode = i;
+        if (antholys.size() > 0) {
+            videoHistory.setEpisode(episode);
+        } else {
+            videoHistory.setEpisode("0");
+        }
+        vfId = antholys.get(i).getVfId();
+        per_Id = antholys.get(i).getId();
+        PlayList.PlaysListBean details = antholys.get(i);
+        videoHistory.setmId(details.getVfId());
+        VideoModel model = new VideoModel();
+        ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
+        if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("流畅");
+            url.setFormatUrl(details.getFluentUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getStandardUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("标清");
+            url.setFormatUrl(details.getStandardUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getBlueUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("蓝光");
+            url.setFormatUrl(details.getBlueUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getHighUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("高清");
+            url.setFormatUrl(details.getHighUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getSuperUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("超清");
+            url.setFormatUrl(details.getSuperUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(details.getFkUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("4K");
+            url.setFormatUrl(details.getFkUrl());
+            urls.add(url);
+        }
+        model.setmVideoUrl(urls);
+
+        setVideoModel(model);
+        setQualityListener(new AVController.OnQualitySelected() {
+            @Override
+            public void onQualitySelect(String key, String value) {
+                getRealURL(value, true, "");
+            }
+        });
+        if (model.getmVideoUrl().size() > 0) {
+            getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, details.getId());
+            mQualityName = model.getmVideoUrl().get(0).getFormatName();
+        }
+    }
+
     @Override
     public void onDestroy() {
         videoHistory.setCurrent_positon(mPlayerPosition);
         videoHistory.setFlag("false");
         history.save(videoHistory);
         super.onDestroy();
+    }
+
+    private class EpisodeAdapter extends RecyclerView.Adapter<EpisodeHolder> {
+        private int selectedItem = 0;
+
+        @Override
+        public EpisodeHolder onCreateViewHolder(ViewGroup parent, int pos) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.layout_video_episode_item, parent, false);
+            EpisodeHolder episodeHolder = new EpisodeHolder(view);
+            episodeHolder.itemView.setOnClickListener(v -> {
+                notifyItemChanged(selectedItem);
+                selectedItem = anthologyList.getChildAdapterPosition(v);
+                notifyItemChanged(selectedItem);
+                if (!mCurrentEpisode.equals(selectedItem + 1 + "")) {
+                    cur_position = 0;
+                    mCurrentEpisode = selectedItem + 1 + "";
+                    videoHistory.setEpisode(mCurrentEpisode);
+                    selectEpisode(mCurrentEpisode);
+                }
+            });
+            return episodeHolder;
+        }
+
+        @Override
+        public void onBindViewHolder(EpisodeHolder holder, int pos) {
+            String episode = mEpisodes.get(pos);
+            holder.bindCrime(episode);
+            holder.setSelectionModeBackgroundDrawable(null);
+            if (selectedItem == pos) {
+                holder.mTitleTextView.setBackground(getResources().getDrawable(R.drawable.blue_circle));
+                mMultiSelector.setSelected(holder, true);
+                holder.mTitleTextView.setTextColor(getResources().getColor(R.color.white));
+            } else {
+                holder.mTitleTextView.setBackground(getResources().getDrawable(R.drawable.grey_circle));
+                holder.mTitleTextView.setTextColor(getResources().getColor(R.color.class_font_color));
+            }
+        }
+
+        @Override
+        public int getItemCount() {
+            return mEpisodes.size();
+        }
+
+        public void setSelectedItem(int pos) {
+            notifyItemChanged(pos);
+            selectedItem = pos;
+        }
+    }
+
+    private class EpisodeHolder extends SwappingHolder {
+        private final TextView mTitleTextView;
+        private String mEposide;
+
+        public EpisodeHolder(View itemView) {
+            super(itemView, mMultiSelector);
+
+            mTitleTextView = (TextView) itemView.findViewById(R.id.episode_text);
+            itemView.setLongClickable(true);
+        }
+
+
+        public void bindCrime(String episode) {
+            mEposide = episode;
+            mTitleTextView.setText(episode);
+        }
+
     }
 
 }

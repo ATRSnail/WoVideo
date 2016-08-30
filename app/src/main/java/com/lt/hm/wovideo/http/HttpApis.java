@@ -138,6 +138,17 @@ public class HttpApis {
     }
 
     /**
+     * 获取视频详情信息
+     *
+     * @param map
+     * @param callback
+     */
+    public static void getVideoInfo(HashMap<String, Object> map, int flag,HttpCallback callback) {
+        HttpUtils.formPost("mblVf/getVfInfo", map,flag, callback);
+    }
+
+
+    /**
      * 获取视频第一级播放地址使用
      *
      * @param map

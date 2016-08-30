@@ -275,39 +275,13 @@ public class UIHelper {
 	}
 
 	public static void ToAllCateVideo(Activity activity,int typeId, String vfId){
-		if (typeId == VideoType.MOVIE.getId()) {
-			// TODO: 16/6/14 跳转电影页面
+		if (typeId == VideoType.LIVE.getId()) {
+			UIHelper.ToLivePage(activity);
+		}else {
 			Bundle bundle = new Bundle();
 			bundle.putString("id", vfId);
 			bundle.putInt("typeId", typeId);
 			ToMoviePage(activity, bundle);
-		} else if (typeId == VideoType.TELEPLAY.getId()) {
-			// TODO: 16/6/14 跳转电视剧页面
-			Bundle bundle = new Bundle();
-			bundle.putString("id", vfId);
-			bundle.putInt("typeId", VideoType.TELEPLAY.getId());
-			ToDemandPage(activity, bundle);
-
-		} else if (typeId == VideoType.SPORTS.getId()) {
-			// TODO: 16/6/14 跳转 体育播放页面
-			Bundle bundle = new Bundle();
-			bundle.putString("id", vfId);
-			bundle.putInt("typeId", VideoType.SPORTS.getId());
-			ToDemandPage(activity, bundle);
-		} else if (typeId == VideoType.VARIATY.getId()) {
-			// TODO: 16/6/14 跳转综艺界面
-			Bundle bundle = new Bundle();
-			bundle.putString("id", vfId);
-			bundle.putInt("typeId", VideoType.VARIATY.getId());
-			ToDemandPage(activity, bundle);
-		} else if (typeId == VideoType.SMIML.getId()){
-			// TODO: 16/6/14 跳转小视屏页面
-			Bundle bundle = new Bundle();
-			bundle.putString("id", vfId);
-			bundle.putInt("typeId", VideoType.SMIML.getId());
-			ToMoviePage(activity, bundle);
-		}else if (typeId == VideoType.LIVE.getId()) {
-			UIHelper.ToLivePage(activity);
 		}
 	}
 

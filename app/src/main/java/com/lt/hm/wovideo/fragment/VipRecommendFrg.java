@@ -306,35 +306,11 @@ public class VipRecommendFrg extends BaseFragment {
             public void OnItemClick(View view, int position) {
 //                            changePage(mList.get(position),typeListBean.getId());
 //                            changePage(mList.get(position).getId(),);
-                               getVideoDetails(mList.get(position).getOutid());
+                              changePage(Integer.valueOf(mList.get(position).getVfType()),mList.get(position).getOutid());
                 // TODO: 16/6/29 跳转页面
             }
         });
         loopIndicatorView();
-    }
-
-    public void getVideoDetails(String vfId) {
-        HashMap<String, Object> maps = new HashMap<>();
-        maps.put("vfid", vfId);
-        // TODO: 16/6/26 获取app typeId 并填充
-        String typeID = null;
-        maps.put("typeid", typeID);
-        HttpApis.getVideoInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    changePage(resp.getBody().getVfinfo().getTypeId(),vfId);
-                }
-            }
-        });
     }
 
     private void loopIndicatorView() {

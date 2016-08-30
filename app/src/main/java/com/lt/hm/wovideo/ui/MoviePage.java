@@ -600,17 +600,17 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
 
             @Override
             public void onResponse(String response, int id) {
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    VideoDetails.VfinfoBean details = resp.getBody().getVfinfo();
-                    values = new String[]{details.getDirector(), details.getStars()};
-                    biAdapter = new BrefIntroAdapter(MoviePage.this, names, values);
-                    videoBrefIntros.setAdapter(biAdapter);
-                    videoName.setText(details.getName());
-                    videoPlayNumber.setText(details.getHit());
-                    Glide.with(MoviePage.this).load(HttpUtils.appendUrl(details.getImg())).crossFade().into(movieBrefImg);
-                }
+//                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+//                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+//                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//                    VideoDetails.VfinfoBean details = resp.getBody().getVfinfo();
+//                    values = new String[]{details.getDirector(), details.getStars()};
+//                    biAdapter = new BrefIntroAdapter(MoviePage.this, names, values);
+//                    videoBrefIntros.setAdapter(biAdapter);
+//                    videoName.setText(details.getName());
+//                    videoPlayNumber.setText(details.getHit());
+//                    Glide.with(MoviePage.this).load(HttpUtils.appendUrl(details.getImg())).crossFade().into(movieBrefImg);
+//                }
             }
         });
     }
@@ -770,44 +770,44 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
             @Override
             public void onResponse(String response, int id) {
                 TLog.log("getchange" + response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-
-                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
-                        // TODO: 16/6/14 跳转电影页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        UIHelper.ToMoviePage(MoviePage.this, bundle);
-                        MoviePage.this.finish();
-
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
-                        // TODO: 16/6/14 跳转电视剧页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        UIHelper.ToDemandPage(MoviePage.this, bundle);
-                        MoviePage.this.finish();
-
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
-                        // TODO: 16/6/14 跳转 体育播放页面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        UIHelper.ToDemandPage(MoviePage.this, bundle);
-                        MoviePage.this.finish();
-
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
-                        // TODO: 16/6/14 跳转综艺界面
-                        Bundle bundle = new Bundle();
-                        bundle.putString("id", vfId);
-                        UIHelper.ToDemandPage(MoviePage.this, bundle);
-                        MoviePage.this.finish();
-
-                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.LIVE.getId()) {
-                        UIHelper.ToLivePage(MoviePage.this);
-                        MoviePage.this.finish();
-
-                    }
-                }
+//                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
+//                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+//                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
+//
+//                    if (resp.getBody().getVfinfo().getTypeId() == VideoType.MOVIE.getId()) {
+//                        // TODO: 16/6/14 跳转电影页面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        UIHelper.ToMoviePage(MoviePage.this, bundle);
+//                        MoviePage.this.finish();
+//
+//                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.TELEPLAY.getId()) {
+//                        // TODO: 16/6/14 跳转电视剧页面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        UIHelper.ToDemandPage(MoviePage.this, bundle);
+//                        MoviePage.this.finish();
+//
+//                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.SPORTS.getId()) {
+//                        // TODO: 16/6/14 跳转 体育播放页面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        UIHelper.ToDemandPage(MoviePage.this, bundle);
+//                        MoviePage.this.finish();
+//
+//                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.VARIATY.getId()) {
+//                        // TODO: 16/6/14 跳转综艺界面
+//                        Bundle bundle = new Bundle();
+//                        bundle.putString("id", vfId);
+//                        UIHelper.ToDemandPage(MoviePage.this, bundle);
+//                        MoviePage.this.finish();
+//
+//                    } else if (resp.getBody().getVfinfo().getTypeId() == VideoType.LIVE.getId()) {
+//                        UIHelper.ToLivePage(MoviePage.this);
+//                        MoviePage.this.finish();
+//
+//                    }
+//                }
             }
         });
     }

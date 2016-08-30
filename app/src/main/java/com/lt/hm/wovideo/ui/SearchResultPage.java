@@ -17,6 +17,7 @@ import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.SearchResult;
+import com.lt.hm.wovideo.model.VfinfoDetailModel;
 import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -133,8 +134,8 @@ public class SearchResultPage extends BaseActivity implements SecondTopbar.myTop
             @Override
             public void onResponse(String response, int id) {
                 TLog.log("getchange" + response);
-                ResponseObj<VideoDetails, RespHeader> resp = new ResponseObj<VideoDetails, RespHeader>();
-                ResponseParser.parse(resp, response, VideoDetails.class, RespHeader.class);
+                ResponseObj<VfinfoDetailModel, RespHeader> resp = new ResponseObj<VfinfoDetailModel, RespHeader>();
+                ResponseParser.parse(resp, response, VfinfoDetailModel.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     UIHelper.ToAllCateVideo(SearchResultPage.this,resp.getBody().getVfinfo().getTypeId(),vfId);
                 }

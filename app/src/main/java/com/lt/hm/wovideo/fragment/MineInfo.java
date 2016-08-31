@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -135,6 +136,8 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
     private final static int CROP = 500;
     private View view;
     private Unbinder unbinder;
+    private String bgDrawable;
+    private String headDrawable;
 
     @Override
     protected int getLayoutId() {
@@ -159,20 +162,20 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
     }
 
     private void initPersonInfo() {
-        if (!TextUtils.isEmpty(ACache.get(getApplicationContext()).getAsString("img_back_url"))) {
-            personHeadBg.setBackground(FileUtil.getImageDrawable(ACache.get(getApplicationContext()).getAsString("img_back_url")));
+        bgDrawable = ACache.get(getApplicationContext()).getAsString("img_back_url");
+        headDrawable = ACache.get(getApplicationContext()).getAsString("img_url");
+        if (!TextUtils.isEmpty(bgDrawable)) {
+            personHeadBg.setBackground(FileUtil.getImageDrawable(bgDrawable));
         }
         UserModel model = UserHandler.getUserInfo(getApplicationContext());
         netUsageDatabase = new NetUsageDatabase(getApplicationContext());
-        if (FILE_SAVEPATH != null) {
-            Glide.with(this).load(ACache.get(getApplicationContext()).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
+        if (!TextUtils.isEmpty(headDrawable)) {
+            Glide.with(this).load(headDrawable).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
         }
         if (model != null) {
-            if (!StringUtils.isNullOrEmpty(model.getHeadImg())) {
-                TLog.log(HttpUtils.appendUrl(model.getHeadImg().toString()));
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg()) && TextUtils.isEmpty(headDrawable)) {
+                TLog.log(HttpUtils.appendUrl(model.getHeadImg()));
                 Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).asBitmap().centerCrop().into(headIcon);
-            } else {
-                headIcon.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
             }
             if (model.getNickName() != null) {
                 tv_username.setText(model.getNickName());
@@ -258,9 +261,6 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
             case R.id.active:
                 UIHelper.ToEventPage(getActivity());
                 break;
-            case R.id.btn_person_back:
-                getActivity().finish();
-                break;
             case pc_username:
                 UIHelper.ToPersonInfoPage(getActivity());
                 break;
@@ -342,6 +342,10 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         File out = new File(savePath, fileName);
         Uri uri = Uri.fromFile(out);
         origUri = uri;
+        if (origUri == null){
+            origUri = Uri.fromFile(out);
+        }
+        TLog.error("origUri---->"+origUri);
 
         theLarge = savePath + fileName;// 该照片的绝对路径
 

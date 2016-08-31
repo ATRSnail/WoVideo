@@ -26,11 +26,13 @@
                 android:text="Title"
                 android:textColor="@color/class_font_color"
                 android:textSize="14sp" />
+
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:orientation="horizontal">
 
             <TextView
@@ -40,6 +42,7 @@
                 android:drawableLeft="@drawable/icon_v_play"
                 android:drawablePadding="5dp"
                 android:text="1.2亿"
+                android:gravity="center"
                 android:textColor="@color/acount_color"
                 android:textSize="10sp" />
 
@@ -47,8 +50,13 @@
                 android:id="@+id/free_hint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@android:color/holo_green_light"
-                android:textSize="@dimen/sp_14" />
+                android:layout_marginLeft="10dp"
+                android:gravity="center"
+                android:drawableLeft="@drawable/icon_like_amounts"
+                android:drawablePadding="5dp"
+                android:text="12"
+                android:textColor="@color/acount_color"
+                android:textSize="10sp" />
         </LinearLayout>
 
     </com.lt.hm.wovideo.widget.PercentLinearLayout>

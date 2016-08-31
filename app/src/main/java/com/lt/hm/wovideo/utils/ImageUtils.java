@@ -252,6 +252,9 @@ public class ImageUtils {
     public static String getAbsolutePathFromNoStandardUri(Uri mUri) {
         String filePath = null;
 
+        if (mUri == null){
+            throw new NullPointerException("图片地址为空");
+        }
         String mUriString = mUri.toString();
         mUriString = Uri.decode(mUriString);
 

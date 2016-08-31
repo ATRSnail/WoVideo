@@ -253,6 +253,11 @@ public class SetPage extends BaseActivity implements SecondTopbar.myTopbarClickl
         File out = new File(savePath, fileName);
         Uri uri = Uri.fromFile(out);
         origUri = uri;
+        if (origUri == null){
+            origUri = Uri.fromFile(out);
+        }
+        TLog.error("origUri---->"+origUri);
+
 
         theLarge = savePath + fileName;// 该照片的绝对路径
 

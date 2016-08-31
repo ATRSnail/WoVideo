@@ -33,6 +33,7 @@ public class PlayList {
         private String vfId;//视频主信息ID
         private int index;//集数下标
         private int hitCount;//点击量
+        private int zan;//点赞量
         private String freePlayUrl;//
         private String isfree;//是否免费 1 免费 0 收费
         private String img;//封面图片
@@ -49,6 +50,14 @@ public class PlayList {
 
         public String getFluentUrl() {
             return fluentUrl;
+        }
+
+        public int getZan() {
+            return zan;
+        }
+
+        public void setZan(int zan) {
+            this.zan = zan;
         }
 
         public void setFluentUrl(String fluentUrl) {

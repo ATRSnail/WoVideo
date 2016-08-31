@@ -58,7 +58,6 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
     ImageView vipSelector;
     @BindView(R.id.choice_view_page)
     ViewPager choiceViewPage;
-    int CURRENT_POSITION;
     private TabFragmentAdapter tabFragmentAdapter;
     private List<ChannelModel> channels = new ArrayList<>();
     private ChannelModel bean;

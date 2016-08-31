@@ -735,6 +735,7 @@ public class NewMoviePage extends BaseVideoActivity {
                     setCollectImg(isCollected);
 
                     collect_tag = playIntro.getId();
+                    free_hint.setText(playIntro.getZan()+"");
                     videoAddHit(playIntro.getId());
                     VideoModel model = new VideoModel();
                     ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();

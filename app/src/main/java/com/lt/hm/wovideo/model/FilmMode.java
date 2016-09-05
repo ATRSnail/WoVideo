@@ -1,9 +1,11 @@
 package com.lt.hm.wovideo.model;
 
+import com.chad.library.adapter.base.entity.MultiItemEntity;
+
 /**
  * Created by xuchunhui on 16/8/12.
  */
-public class FilmMode {
+public class FilmMode extends MultiItemEntity {
 
     /**
      * utime : 1468809257000

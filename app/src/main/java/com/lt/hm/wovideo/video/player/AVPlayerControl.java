@@ -26,16 +26,9 @@ import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 public class AVPlayerControl implements AVController.MediaPlayerControl {
 
     private final ExoPlayer mExoPlayer;
-    private final Context mContext;
 
-    // Sensor
-    private SensorManager mSensorManager;
-    private boolean isLandScape = false;
-
-    public AVPlayerControl(ExoPlayer exoPlayer, Context context) {
+    public AVPlayerControl(ExoPlayer exoPlayer) {
         mExoPlayer = exoPlayer;
-        mContext = context;
-        mSensorManager = (SensorManager) mContext.getSystemService(Context.SENSOR_SERVICE);
     }
 
     @Override
@@ -69,14 +62,8 @@ public class AVPlayerControl implements AVController.MediaPlayerControl {
     }
 
     @Override
-    public boolean isFullScreen() {
-        //TODO depends on accelarate
-      return isLandScape;
-    }
-
-    @Override
     public void toggleFullScreen(ScreenSwitchUtils screenSwitchUtils) {
-        if (screenSwitchUtils != null){
+        if (screenSwitchUtils != null) {
             screenSwitchUtils.toggleScreen();
         }
 

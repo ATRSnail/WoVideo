@@ -7,7 +7,7 @@
     android:background="@color/white"
     android:visibility="gone">
 
-    <com.daimajia.slider.library.SliderLayout
+    <com.lt.hm.wovideo.widget.SliderLayout
         android:id="@+id/slider"
         android:layout_width="match_parent"
         android:layout_height="180dp"

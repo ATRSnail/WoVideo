@@ -56,5 +56,7 @@
     <color name="item_alpha_back">#43000000</color>
 
     <color name="bg_new_color">#f4f4f4</color>
+    <color name="bg_smell_video_item">#e8e7ed</color>
+    <color name="bg_smell_video_whit_item">#e4e3e9</color>
 
 </resources>

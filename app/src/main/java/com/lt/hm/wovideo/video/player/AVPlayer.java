@@ -193,7 +193,7 @@ public class AVPlayer implements ExoPlayer.Listener, HlsSampleSource.EventListen
     this.mRendererBuilder = rendererBuilder;
     mPlayer = ExoPlayer.Factory.newInstance(RENDERER_COUNT, 1000, 5000);
     mPlayer.addListener(this);
-    mPlayerControl = new AVPlayerControl(mPlayer, context);
+    mPlayerControl = new AVPlayerControl(mPlayer);
     mMainHandler = new Handler();
     mListeners = new CopyOnWriteArrayList<>();
     lastReportedPlaybackState = STATE_IDLE;

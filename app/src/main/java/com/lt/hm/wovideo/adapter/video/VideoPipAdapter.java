@@ -31,20 +31,23 @@ public class VideoPipAdapter extends BaseAdapter {
     private static HashMap<Integer, Boolean> isSelected;     // 初始化isSelected的数据
 
 
-    private  int checkNum;
-    public  VideoPipAdapter(Context contenxt,List<LiveModles> livemodles){
-        this.mContext =contenxt;
-        this.list=livemodles;
+    private int checkNum;
+
+    public VideoPipAdapter(Context contenxt, List<LiveModles> livemodles) {
+        this.mContext = contenxt;
+        this.list = livemodles;
         initDate();
     }
+
     private void initDate() {
         int size = getCount();
         isSelected = new HashMap<Integer, Boolean>();
-        for (int i = 0; i <size; i++) {
+        for (int i = 0; i < size; i++) {
             getIsSelected().put(i, false);
         }
 
     }
+
     @Override
     public int getCount() {
         int count = 0;
@@ -62,7 +65,7 @@ public class VideoPipAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         // 异常情况处理
-        if (null == list || position <  0|| position > getCount()) {
+        if (null == list || position < 0 || position > getCount()) {
             return null;
         }
 
@@ -75,7 +78,7 @@ public class VideoPipAdapter extends BaseAdapter {
             int categoryIndex = position - categroyFirstIndex;
             // item在当前分类内
             if (categoryIndex < size) {
-                return  category.getItem( categoryIndex );
+                return category.getItem(categoryIndex);
             }
 
             // 索引移动到当前分类结尾，即下一个分类第一个元素索引
@@ -93,7 +96,7 @@ public class VideoPipAdapter extends BaseAdapter {
     @Override
     public int getItemViewType(int position) {
         // 异常情况处理
-        if (null == list || position <  0|| position > getCount()) {
+        if (null == list || position < 0 || position > getCount()) {
             return TYPE_CONTENT;
         }
 
@@ -128,17 +131,17 @@ public class VideoPipAdapter extends BaseAdapter {
 
         switch (type) {
             case TYPE_CONTENT:
-                if (null==convertView) {
-                    viewhold=new ViewHolde();
+                if (null == convertView) {
+                    viewhold = new ViewHolde();
                     convertView = LayoutInflater.from(mContext).inflate(R.layout.vido_pip__item, parent, false);
-                    viewhold.checkbox= (CheckBox) convertView.findViewById(R.id.video_pip_ck);
-                    viewhold.tv_content= (TextView) convertView.findViewById(R.id.video_pip_content);
+                    viewhold.checkbox = (CheckBox) convertView.findViewById(R.id.video_pip_ck);
+                    viewhold.tv_content = (TextView) convertView.findViewById(R.id.video_pip_content);
                     convertView.setTag(viewhold);
-                }else{
+                } else {
                     viewhold = (ViewHolde) convertView.getTag();
                 }
-               LiveModles.LiveModel modles =(LiveModles.LiveModel)getItem(position);
-                    viewhold.tv_content.setText(modles.getTvName());
+                LiveModles.LiveModel modles = (LiveModles.LiveModel) getItem(position);
+                viewhold.tv_content.setText(modles.getTvName());
                 viewhold.checkbox.setClickable(false);
 //                    viewhold.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 //                        @Override
@@ -158,56 +161,57 @@ public class VideoPipAdapter extends BaseAdapter {
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                       if (checkNum<=4) {
-                           if (isSelected.get(position)) {
-                               isSelected.put(position, false);
-                               setIsSelected(isSelected);
-                               viewhold.checkbox.setChecked(getIsSelected().get(position));
-                               checkNum--;
-                           } else if(checkNum!=4){
-                               isSelected.put(position, true);
-                               setIsSelected(isSelected);
-                               viewhold.checkbox.setChecked(getIsSelected().get(position));
-                               checkNum++;
+                        if (checkNum <= 4) {
+                            if (isSelected.get(position)) {
+                                isSelected.put(position, false);
+                                setIsSelected(isSelected);
+                                viewhold.checkbox.setChecked(getIsSelected().get(position));
+                                checkNum--;
+                            } else if (checkNum != 4) {
+                                isSelected.put(position, true);
+                                setIsSelected(isSelected);
+                                viewhold.checkbox.setChecked(getIsSelected().get(position));
+                                checkNum++;
 
-                           }else if (checkNum==4){
-                               Toast.makeText(mContext,"最能只能选择四个",Toast.LENGTH_SHORT).show();
+                            } else if (checkNum == 4) {
+                                Toast.makeText(mContext, "最能只能选择四个", Toast.LENGTH_SHORT).show();
 
-                           }
+                            }
 
-                       }
+                        }
                     }
                 });
                 break;
             case TYPE_HEAD:
-                if (null==convertView) {
-                    viewhold1=new ViewHolde1();
+                if (null == convertView) {
+                    viewhold1 = new ViewHolde1();
                     convertView = LayoutInflater.from(mContext).inflate(R.layout.vido_pip__head_item, parent, false);
-                    viewhold1.tv_head= (TextView) convertView.findViewById(R.id.video_pip_head);
+                    viewhold1.tv_head = (TextView) convertView.findViewById(R.id.video_pip_head);
                     convertView.setTag(viewhold1);
-                }else{
+                } else {
                     viewhold1 = (ViewHolde1) convertView.getTag();
                 }
-                String  modles1= (String) getItem(position);
-                if (null!=modles1)
-                viewhold1.tv_head.setText(modles1);
+                String modles1 = (String) getItem(position);
+                if (null != modles1)
+                    viewhold1.tv_head.setText(modles1);
 
                 break;
         }
 
         return convertView;
     }
-    public ArrayList<String> getUrls(){
-       ArrayList<String> urls = new ArrayList<>();
+
+    public ArrayList<String> getUrls() {
+        ArrayList<String> urls = new ArrayList<>();
         Iterator iterator = isSelected.entrySet().iterator();
-        while (iterator.hasNext()){
-            Map.Entry entry = (Map.Entry)iterator.next();
+        while (iterator.hasNext()) {
+            Map.Entry entry = (Map.Entry) iterator.next();
             int position = (int) entry.getKey();
             boolean flag = (boolean) entry.getValue();
-            if (flag){
+            if (flag) {
                 LiveModles.LiveModel liveModel = (LiveModles.LiveModel) getItem(position);
                 if (!urls.contains(liveModel.getUrl()))
-                urls.add(liveModel.getUrl());
+                    urls.add(liveModel.getUrl());
             }
         }
         return urls;
@@ -218,13 +222,16 @@ public class VideoPipAdapter extends BaseAdapter {
         public TextView tv_content;
 
     }
+
     public final class ViewHolde1 {
         public TextView tv_head;
 
     }
+
     public interface ItemClickCallBack {
         void pipBtnCallBack(ArrayList<String> str);
     }
+
     public static HashMap<Integer, Boolean> getIsSelected() {
         return isSelected;
     }

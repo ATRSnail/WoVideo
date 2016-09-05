@@ -13,6 +13,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -21,11 +22,11 @@ import android.widget.TextView;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.daimajia.slider.library.Indicators.PagerIndicator;
-import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.home.FilmListAdapter;
 import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
+import com.lt.hm.wovideo.adapter.home.SmallVideoAdapter;
 import com.lt.hm.wovideo.adapter.recommend.GridAdapter;
 import com.lt.hm.wovideo.adapter.recommend.LiveAdapter;
 import com.lt.hm.wovideo.base.BaseLazyFragment;
@@ -33,10 +34,6 @@ import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.NetUtils;
-import com.lt.hm.wovideo.http.RespHeader;
-import com.lt.hm.wovideo.http.ResponseCode;
-import com.lt.hm.wovideo.http.ResponseObj;
-import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.interf.OnPlaceChangeListener;
 import com.lt.hm.wovideo.interf.OnUpdateLocationListener;
 import com.lt.hm.wovideo.interf.onChangeLister;
@@ -65,10 +62,10 @@ import com.lt.hm.wovideo.utils.imageloader.ImageLoaderUtil;
 import com.lt.hm.wovideo.widget.AutoSliderView;
 import com.lt.hm.wovideo.widget.CustomGridView;
 import com.lt.hm.wovideo.widget.CustomListView;
+import com.lt.hm.wovideo.widget.SliderLayout;
 import com.lt.hm.wovideo.widget.SpacesItemDecoration;
 import com.lt.hm.wovideo.widget.TopTileView;
 import com.lt.hm.wovideo.widget.ptrpull.SamplePtrFrameLayout;
-import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,7 +77,6 @@ import butterknife.Unbinder;
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrHandler;
-import okhttp3.Call;
 
 import static android.support.v7.widget.RecyclerView.GONE;
 import static android.support.v7.widget.RecyclerView.OnClickListener;
@@ -90,7 +86,7 @@ import static android.support.v7.widget.RecyclerView.VISIBLE;
  * Created by xuchunhui on 16/8/8.
  */
 public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayout.OnRefreshListener, OnUpdateLocationListener, onChangeLister
-        , BaseSliderView.OnSliderClickListener {
+        , BaseSliderView.OnSliderClickListener,SliderLayout.disScroll {
 
     public static final String CHANNEL = "channel";
     private View view;
@@ -226,7 +222,28 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         sliderLayout.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
         sliderLayout.setDuration(4000);
         sliderLayout.setCustomIndicator(pagerIndicator);
+        sliderLayout.setDisScroll(this);
         //       sliderLayout.addOnPageChangeListener(this);
+        sliderLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        TLog.error("333334433");
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        TLog.error("33333");
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                    case MotionEvent.ACTION_CANCEL:
+                        TLog.error("33dd333");
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+                return false;
+            }
+        });
     }
 
     /**
@@ -257,6 +274,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     @Override
     public void initView(View view) {
         addLikeListView();
+        initLiveTopView();
 
         ptrFrameLayout.disableWhenHorizontalMove(true);
         ptrFrameLayout.setPtrHandler(new PtrHandler() {
@@ -282,10 +300,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                         if (localCityModel != null)
                             ToLivePage(localCityModel.getUrl(), localCityModel.getTvName(), localCityModel.getProperty());
                         break;
-                    case ChannelModel.FILM_ID://电影
-                    case ChannelModel.TELEPLAY_ID://电视剧
-                    case ChannelModel.SPORTS_ID://体育
-                    case ChannelModel.VARIATY_ID://综艺
                     default:
                         // 跳转视频详情页面
                         if (filmMode != null)
@@ -297,12 +311,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     }
 
     private void autoRefresh() {
-        ptrFrameLayout.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ptrFrameLayout.autoRefresh();
-            }
-        }, 500);
+        ptrFrameLayout.postDelayed(() -> ptrFrameLayout.autoRefresh(), 500);
     }
 
     /**
@@ -404,7 +413,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         }
 
         tvDesc.setText(descStr);
-
     }
 
     /**
@@ -446,8 +454,10 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                     decoration = new SpacesItemDecoration(10);
                 mRecyclerView.addItemDecoration(decoration);
                 listAdapter = new FilmListAdapter(R.layout.layout_new_home_movie_item, films, isNotFilm);
-            } else {
+            } else if (channelCode.equals(ChannelModel.TELEPLAY_ID) || channelCode.equals(ChannelModel.VARIATY_ID) || channelCode.equals(ChannelModel.SPORTS_ID)) {
                 listAdapter = new FilmListAdapter(R.layout.layout_new_home_item, films, isNotFilm);
+            } else {
+                listAdapter = new SmallVideoAdapter(films);
             }
             listAdapter.setOnRecyclerViewItemClickListener((view1, i) -> {
                 filmmode = (FilmMode) listAdapter.getData().get(i);
@@ -471,10 +481,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                     case ChannelModel.LOCAL_ID://地方
                         getYouLikeData();
                         break;
-                    case ChannelModel.FILM_ID://电影
-                    case ChannelModel.TELEPLAY_ID://电视剧
-                    case ChannelModel.SPORTS_ID://体育
-                    case ChannelModel.VARIATY_ID://综艺
                     default://其他
                         getListByType();
                 }
@@ -483,6 +489,13 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         mRecyclerView.setAdapter(listAdapter);
 
 
+
+    }
+
+    /**
+     * 初始化直播列表
+     */
+    private void initLiveTopView(){
         TopTileView headView1 = new TopTileView(context);
         headView1.setTitleTv("北京直播");
         headView1.setImageVisiable(true);
@@ -614,17 +627,25 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 ResponseFilms filmRe = (ResponseFilms) value;
                 films = filmRe.getBody().getTypeList();
                 if (films == null || films.size() == 0) return;
-                topPageFl.setVisibility(View.VISIBLE);
+
                 if (pageNum == 1) {
-                    filmMode = films.get(0);
-                    setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getHit(), filmMode.gethImg());
-                    films.remove(0);
+                    if (judgeIsSmallVideo()) {
+                        topPageFl.setVisibility(View.VISIBLE);
+                        filmMode = films.get(0);
+                        setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getHit(), filmMode.gethImg());
+                        films.remove(0);
+                    }
                 }
+                if (!judgeIsSmallVideo()) {
+                    setSmallViewItemType(films);
+                }
+
                 if (films.size() == 0) {
                     isNoData = true;
                     UT.showNormal("暂无数据");
                     return;
                 }
+
                 if (pageNum == 1) {
                     listAdapter.setNewData(films);
                 } else {
@@ -633,6 +654,27 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 pageNum++;
                 break;
         }
+    }
+
+    /**
+     * 小视屏列表需要插入type值
+     * @param films
+     */
+    private void setSmallViewItemType(List<FilmMode> films) {
+        for (int i = 0; i < films.size(); i++) {
+            films.get(i).setItemType(i % 4 == 0 ? 0 : 1);
+        }
+    }
+
+    /**
+     * 判断是不是小视屏列表
+     * @return
+     */
+    private boolean judgeIsSmallVideo(){
+        return channelCode.equals(ChannelModel.TELEPLAY_ID) ||
+                channelCode.equals(ChannelModel.FILM_ID) ||
+                channelCode.equals(ChannelModel.VARIATY_ID) ||
+                channelCode.equals(ChannelModel.SPORTS_ID);
     }
 
     @Override
@@ -716,4 +758,9 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         changePage(Integer.valueOf(typeId), id);
     }
 
+    @Override
+    public void disScroll(boolean dis) {
+        TLog.error("slider---ACTION_DOWN"+dis);
+        ptrFrameLayout.setDisScroll(dis);
+    }
 }

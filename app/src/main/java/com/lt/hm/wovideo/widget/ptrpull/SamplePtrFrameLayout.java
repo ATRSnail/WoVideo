@@ -2,6 +2,9 @@ package com.lt.hm.wovideo.widget.ptrpull;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
+
+import com.lt.hm.wovideo.utils.TLog;
 
 import in.srain.cube.views.ptr.PtrFrameLayout;
 
@@ -11,6 +14,8 @@ import in.srain.cube.views.ptr.PtrFrameLayout;
  * @create_date 16/8/25
  */
 public class SamplePtrFrameLayout extends PtrFrameLayout {
+
+    private boolean disScroll = false;
     public SamplePtrFrameLayout(Context context) {
         this(context, null);
     }
@@ -35,4 +40,18 @@ public class SamplePtrFrameLayout extends PtrFrameLayout {
         addPtrUIHandler(mHeaderView);
     }
 
+    public void setDisScroll(boolean disScroll){
+        this.disScroll = disScroll;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent e) {
+        TLog.error("slider---ACTION_DOWN"+disScroll);
+        if (disScroll) {
+            disScroll = false;
+            return false;
+        }
+
+        return super.dispatchTouchEvent(e);
+    }
 }

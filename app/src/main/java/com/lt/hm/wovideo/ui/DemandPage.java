@@ -70,6 +70,7 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 16/6/7
  */
+@Deprecated
 public class DemandPage extends BaseVideoActivity implements View.OnClickListener {
 
     @BindView(R.id.video_name)

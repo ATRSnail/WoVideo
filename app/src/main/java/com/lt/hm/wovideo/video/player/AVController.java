@@ -205,7 +205,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         mRoot = inflate.inflate(R.layout.media_controller, null);
 
         initControllerView(mRoot);
-
         return mRoot;
     }
 
@@ -594,30 +593,33 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     private View.OnClickListener mBackListener = new View.OnClickListener() {
         public void onClick(View v) {
-            if (mPlayer == null) {
-                ((Activity) mContext).finish();
-                return;
-            }
-            if (mPlayer.isFullScreen()) {
-                doToggleFullscreen();
-            } else {
-                ((Activity) mContext).finish();
-            }
+            doBackClick();
         }
     };
 
-    private View.OnClickListener mPauseListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            doPauseResume();
-//      show(sDefaultTimeout);
+    /**
+     * 返回处理
+     */
+    public void doBackClick(){
+        if (mPlayer == null || screenSwitchUtils == null) {
+            ((Activity) mContext).finish();
+            return;
         }
-    };
-
-    private View.OnClickListener mFullscreenListener = new View.OnClickListener() {
-        public void onClick(View v) {
+        if (!screenSwitchUtils.isPortrait()) {
             doToggleFullscreen();
-//      show(sDefaultTimeout);
+        } else {
+            ((Activity) mContext).finish();
         }
+    }
+
+    private View.OnClickListener mPauseListener = v -> {
+        doPauseResume();
+//      show(sDefaultTimeout);
+    };
+
+    private View.OnClickListener mFullscreenListener = v -> {
+        doToggleFullscreen();
+//      show(sDefaultTimeout);
     };
 
     public void updatePausePlay() {
@@ -633,11 +635,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     }
 
     public void updateFullScreen() {
-        if (mRoot == null || mFullscreenButton == null || mPlayer == null) {
+        if (mRoot == null || mFullscreenButton == null || mPlayer == null || screenSwitchUtils == null) {
             return;
         }
 
-        if (mPlayer.isFullScreen()) {
+        if (screenSwitchUtils.isPortrait()) {
             mFullscreenButton.setImageResource(R.drawable.ic_media_fullscreen_shrink);
         } else {
             mFullscreenButton.setImageResource(R.drawable.ic_media_fullscreen_stretch);
@@ -721,7 +723,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     };
 
-    public void setScreenSwitchUtils(ScreenSwitchUtils screenSwitchUtils){
+    public void setScreenSwitchUtils(ScreenSwitchUtils screenSwitchUtils) {
         this.screenSwitchUtils = screenSwitchUtils;
     }
 
@@ -903,8 +905,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private void updateBrightness(float delta) {
         mCurBrightness = ((Activity) mContext).getWindow().getAttributes().screenBrightness;
         //获取当前亮度,获取失败则返回255
-       // mCurBrightness= BrightnessTools.getScreenBrightness((Activity) mContext)*(1f/255f);
-        TLog.error("mCurBrightness--->"+mCurBrightness);
+        // mCurBrightness= BrightnessTools.getScreenBrightness((Activity) mContext)*(1f/255f);
+        TLog.error("mCurBrightness--->" + mCurBrightness);
         if (mCurBrightness <= 0.01f) {
             mCurBrightness = 0.01f;
         }
@@ -954,8 +956,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
          * @return The audio session, or 0 if there was an error.
          */
         int getAudioSessionId();
-
-        boolean isFullScreen();
 
         void toggleFullScreen(ScreenSwitchUtils screenSwitchUtils);
     }

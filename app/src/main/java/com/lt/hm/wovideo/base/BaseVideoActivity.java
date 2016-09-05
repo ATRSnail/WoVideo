@@ -639,6 +639,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mPlayerPosition = mPlayer.getCurrentPosition();
             mPlayer.release();
             mPlayer = null;
+            if (mEventLogger == null) return;
             mEventLogger.endSession();
             mEventLogger = null;
         }
@@ -852,7 +853,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             addDanmaku(bullet);
             addBullet(bullet);
         } else {
-            UT.showNormal("open switch first");
+            UT.showNormal("请先开启弹幕功能");
         }
     }
 
@@ -955,4 +956,13 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 != PackageManager.PERMISSION_GRANTED;
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (mMediaController != null) {
+                mMediaController.doBackClick();
+            }
+        }
+        return false;
+    }
 }

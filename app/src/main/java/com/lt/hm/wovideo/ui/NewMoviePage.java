@@ -14,6 +14,8 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -164,10 +166,13 @@ public class NewMoviePage extends BaseVideoActivity {
     private String collect_tag;
     private int typeId = 0;
 
-    public static void startToMovie(Activity activity, Bundle bundle) {
-        Intent intent = new Intent(activity, NewMoviePage.class);
-        intent.putExtras(bundle);
-        activity.startActivity(intent);
+    @Override
+    protected void onBeforeSetContentLayout() {
+        //取消标题
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        //取消状态栏
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @Override

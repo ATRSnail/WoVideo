@@ -53,9 +53,9 @@ public class PipListviwPopuWindow extends PopupWindow implements PopupWindow.OnD
         mListView = (ListView) rootView.findViewById(R.id.lv_pop_datas);
         mListView.setDivider(new ColorDrawable(Color.GRAY));
         mListView.setDividerHeight(1);
-        mButton= (Button) rootView.findViewById(R.id.pip_btn_sure);
+        mButton = (Button) rootView.findViewById(R.id.pip_btn_sure);
         this.setContentView(rootView);
-        this.setWidth(ScreenUtils.getScreenWidth(mContext)/3*2);
+        this.setWidth(ScreenUtils.getScreenWidth(mContext) / 3 * 2);
         this.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
         this.setFocusable(true);
         this.setOnDismissListener(this);

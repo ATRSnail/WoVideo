@@ -4,59 +4,63 @@
     android:layout_height="match_parent"
     android:keepScreenOn="true"
     android:orientation="vertical">
- <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="0dp"
-    android:layout_weight="2"
-    android:orientation="horizontal">
-    <FrameLayout
-        android:layout_width="0dp"
-        android:id="@+id/pip_video1"
-        android:layout_weight="1"
 
-        android:layout_marginRight="5dp"
-        android:layout_height="match_parent">
-             <include
-                 android:id="@+id/pip_video2_a"
-                 android:layout_width="match_parent"
-                 layout="@layout/item_video_pip"
-                 android:layout_height="match_parent"
-                 />
-
-        <ImageView
-            android:id="@+id/pip_iv_back"
-            android:layout_width="@dimen/s_40"
-            android:layout_height="@dimen/s_40"
-            android:padding="5dp"
-            android:layout_margin="10dp"
-            android:src="@drawable/icon_back"/>
-    </FrameLayout>
-
-    <include
-        android:id="@+id/pip_video2"
-        android:layout_width="0dp"
-        layout="@layout/item_video_pip"
-        android:layout_height="match_parent"
-        android:layout_weight="1"/>
-</LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-         android:layout_marginTop="5dp"
         android:orientation="horizontal">
+
+        <FrameLayout
+            android:id="@+id/pip_video1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginRight="5dp"
+            android:layout_weight="1">
+
+            <include
+                android:id="@+id/pip_video2_a"
+                layout="@layout/item_video_pip"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <ImageView
+                android:id="@+id/pip_iv_back"
+                android:layout_width="@dimen/s_40"
+                android:layout_height="@dimen/s_40"
+                android:layout_margin="10dp"
+                android:padding="5dp"
+                android:src="@drawable/icon_back" />
+        </FrameLayout>
+
+        <include
+            android:id="@+id/pip_video2"
+            layout="@layout/item_video_pip"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
+
         <include
             android:id="@+id/pip_video3"
-            android:layout_width="0dp"
             layout="@layout/item_video_pip"
-            android:layout_marginRight="5dp"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_marginRight="5dp"
+            android:layout_weight="1" />
+
         <include
             android:id="@+id/pip_video4"
-            android:layout_width="0dp"
             layout="@layout/item_video_pip"
+            android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"/>
+            android:layout_weight="1" />
     </LinearLayout>
 </LinearLayout>

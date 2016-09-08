@@ -3,82 +3,50 @@ package com.lt.hm.wovideo.fragment;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.text.Editable;
 import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
-import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.base.BaseFragment;
 import com.lt.hm.wovideo.db.NetUsageDatabase;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
-import com.lt.hm.wovideo.handler.UserHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
-import com.lt.hm.wovideo.http.RespHeader;
-import com.lt.hm.wovideo.http.ResponseCode;
-import com.lt.hm.wovideo.http.ResponseObj;
-import com.lt.hm.wovideo.http.parser.ResponseParser;
-import com.lt.hm.wovideo.model.SearchResult;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
 import com.lt.hm.wovideo.utils.ImageUtils;
-import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
-import com.lt.hm.wovideo.utils.UT;
-import com.lt.hm.wovideo.widget.CircleImageView;
-import com.lt.hm.wovideo.widget.SecondTopbar;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.io.File;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import okhttp3.Call;
 
-import static com.lt.hm.wovideo.R.id.bref_expand;
-import static com.lt.hm.wovideo.R.id.p_info_logo;
 import static com.lt.hm.wovideo.R.id.pc_username;
 import static com.lt.hm.wovideo.utils.FileUtil.*;
 
@@ -167,7 +135,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         if (!TextUtils.isEmpty(bgDrawable)) {
             personHeadBg.setBackground(FileUtil.getImageDrawable(bgDrawable));
         }
-        UserModel model = UserHandler.getUserInfo(getApplicationContext());
+        UserModel model = UserMgr.getUseInfo();
         netUsageDatabase = new NetUsageDatabase(getApplicationContext());
         if (!TextUtils.isEmpty(headDrawable)) {
             Glide.with(this).load(headDrawable).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
@@ -206,7 +174,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         history.setOnClickListener(this);
         collect.setOnClickListener(this);
 
-        mineTag.setVisibility(UserHandler.isLogin(getApplicationContext()) ? View.VISIBLE : View.GONE);
+        mineTag.setVisibility(UserMgr.isLogin() ? View.VISIBLE : View.GONE);
 
         mineTag.setOnClickListener(this);
         active.setOnClickListener(this);
@@ -225,7 +193,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
             case R.id.head_icon:
                 // TODO: 16/6/6  变更头像 上传头像
 //                String user = ACache.get(getApplicationContext()).getAsString("userinfo");
-                if (UserHandler.isLogin(getApplicationContext())) {
+                if (UserMgr.isLogin()) {
                     handleSelectPicture();
                 } else {
                     UnLoginHandler.unLogin(getActivity());
@@ -250,7 +218,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
                 break;
             case R.id.collect:
                 // TODO: 16/6/6 我的收藏
-                if (UserHandler.isLogin(getApplicationContext())) {
+                if (UserMgr.isLogin()) {
                     UIHelper.ToCollectPage(getActivity());
                 }
 
@@ -407,7 +375,7 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
             String img64 = ImageUtils.imgToBase64(protraitFile.getAbsolutePath(), protraitBitmap, "JPG");
             HashMap<String, Object> map = new HashMap<>();
             String string = ACache.get(getApplicationContext()).getAsString("userinfo");
-            map.put("phone", UserHandler.getUserInfo(getApplicationContext()).getPhoneNo());
+            map.put("phone", UserMgr.getUseInfo().getPhoneNo());
             map.put("base", "image/jpg;base64," + img64);
             TLog.log(map.toString());
             HttpApis.uploadHeadImg(map, new StringCallback() {

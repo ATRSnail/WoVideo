@@ -115,6 +115,19 @@
         android:textColor="@color/acount_color"
         android:textSize="12sp" />
 
+    <TextView
+        android:id="@+id/video_live"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@id/video_like"
+        android:drawableTop="@drawable/icon_like_nor"
+        android:gravity="center"
+        android:paddingRight="10dp"
+        android:text="@string/like"
+        android:textColor="@color/acount_color"
+        android:textSize="12sp" />
+
 
     <com.lt.hm.wovideo.widget.PercentLinearLayout
         android:id="@+id/video_Pip"

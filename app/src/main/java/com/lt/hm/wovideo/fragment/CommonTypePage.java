@@ -86,7 +86,7 @@ import static android.support.v7.widget.RecyclerView.VISIBLE;
  * Created by xuchunhui on 16/8/8.
  */
 public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayout.OnRefreshListener, OnUpdateLocationListener, onChangeLister
-        , BaseSliderView.OnSliderClickListener,SliderLayout.disScroll {
+        , BaseSliderView.OnSliderClickListener, SliderLayout.disScroll {
 
     public static final String CHANNEL = "channel";
     private View view;
@@ -223,27 +223,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         sliderLayout.setDuration(4000);
         sliderLayout.setCustomIndicator(pagerIndicator);
         sliderLayout.setDisScroll(this);
-        //       sliderLayout.addOnPageChangeListener(this);
-        sliderLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        TLog.error("333334433");
-                        break;
-                    case MotionEvent.ACTION_MOVE:
-                        TLog.error("33333");
-                        v.getParent().requestDisallowInterceptTouchEvent(true);
-                        break;
-                    case MotionEvent.ACTION_UP:
-                    case MotionEvent.ACTION_CANCEL:
-                        TLog.error("33dd333");
-                        v.getParent().requestDisallowInterceptTouchEvent(false);
-                        break;
-                }
-                return false;
-            }
-        });
     }
 
     /**
@@ -411,7 +390,6 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         } else {
             tvType.setText(typeStr);
         }
-
         tvDesc.setText(descStr);
     }
 
@@ -435,6 +413,9 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     private SpacesItemDecoration decoration;
 
 
+    /**
+     * 初始化recyclerview
+     */
     private void addLikeListView() {
         layoutManager = new LinearLayoutManager(getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -467,7 +448,9 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         }
 
         mRecyclerView.setLayoutManager(layoutManager);
-        listAdapter.addHeaderView(mHeadView);
+        if (judgeIsSmallVideo() || channelCode.equals(ChannelModel.RECOMMEND_ID) || channelCode.equals(ChannelModel.LOCAL_ID)) {
+            listAdapter.addHeaderView(mHeadView);
+        }
         listAdapter.openLoadMore(numPerPage, true);
         listAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
             @Override
@@ -489,13 +472,12 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         mRecyclerView.setAdapter(listAdapter);
 
 
-
     }
 
     /**
      * 初始化直播列表
      */
-    private void initLiveTopView(){
+    private void initLiveTopView() {
         TopTileView headView1 = new TopTileView(context);
         headView1.setTitleTv("北京直播");
         headView1.setImageVisiable(true);
@@ -515,45 +497,35 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
      * 获取bar滚动条
      */
     private void getBarData() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("isVip", 0);
-        HttpApis.getBanners(map, HttpApis.http_two, new HttpCallback<>(ResponseBanner.class, this));
+        NetUtils.getBarData(0, this);
     }
 
     /**
      * 获取兴趣列表
      */
     private void getYouLikeData() {
-        NetUtils.getYouLikeData(pageNum, numPerPage, seed, tag, "", new HttpCallback<>(ResponseLikeList.class, this));
+        NetUtils.getYouLikeData(pageNum, numPerPage, seed, tag, "", this);
     }
 
     /*
      *获取标签
      */
     private void getCateTag(String type) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("type", type);
-        HttpApis.getCategoryTag(map, HttpApis.http_one, new HttpCallback<>(ResponseCateTag.class, this));
+        NetUtils.getCateTag(type, this);
     }
 
     /**
      * 获取电台列表
      */
     private void getTvsByCityCode() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("code", TextUtils.isEmpty(cityCode) ? "010" : cityCode);
-        HttpApis.getTvsByCityCode(map, HttpApis.http_for, new HttpCallback<>(ResponseLocalCityModel.class, this));
+        NetUtils.getTvsByCityCode(cityCode, this);
     }
 
     /**
      * 获取电影,电视剧列表
      */
     private void getListByType() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("channelCode", channelCode);
-        map.put("pageNum", pageNum);
-        map.put("numPerPage", numPerPage + 1);
-        HttpApis.getListByType(map, HttpApis.http_fiv, new HttpCallback<>(ResponseFilms.class, this));
+        NetUtils.getListByType(channelCode, pageNum, numPerPage, this);
     }
 
     /**
@@ -581,14 +553,14 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
     public <T> void onSuccess(T value, int flag) {
         super.onSuccess(value, flag);
         switch (flag) {//电影,电视剧标签
-            case HttpApis.http_one:
+            case HttpApis.http_cate_tag:
                 ResponseCateTag responseCateTag = (ResponseCateTag) value;
                 cateTags = responseCateTag.getBody().getLx();
                 cateTagListModel = responseCateTag.getBody();
                 if (cateTags == null || cateTags.size() == 0) return;
                 addCateView();
                 break;
-            case HttpApis.http_two://获取bar
+            case HttpApis.http_bar://获取bar
                 ResponseBanner responseBar = (ResponseBanner) value;
                 banner_list = responseBar.getBody().getBannerList();
                 if (banner_list == null || banner_list.size() == 0) return;
@@ -617,25 +589,24 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
                 }
                 pageNum++;
                 break;
-            case HttpApis.http_for://获取城市电台
+            case HttpApis.http_city_tv://获取城市电台
                 ResponseLocalCityModel cityRe = (ResponseLocalCityModel) value;
                 localCites = cityRe.getBody().getCitys();
                 if (localCites == null || localCites.size() == 0) return;
                 addLocalListView();
                 break;
-            case HttpApis.http_fiv:
+            case HttpApis.http_video_list:
                 ResponseFilms filmRe = (ResponseFilms) value;
                 films = filmRe.getBody().getTypeList();
                 if (films == null || films.size() == 0) return;
 
-                if (pageNum == 1) {
-                    if (judgeIsSmallVideo()) {
-                        topPageFl.setVisibility(View.VISIBLE);
-                        filmMode = films.get(0);
-                        setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getHit(), filmMode.gethImg());
-                        films.remove(0);
-                    }
+                if (pageNum == 1 && judgeIsSmallVideo()) {
+                    topPageFl.setVisibility(View.VISIBLE);
+                    filmMode = films.get(0);
+                    setDataToTopView(filmMode.getName(), filmMode.getTypeName(), filmMode.getHit(), filmMode.gethImg());
+                    films.remove(0);
                 }
+
                 if (!judgeIsSmallVideo()) {
                     setSmallViewItemType(films);
                 }
@@ -658,6 +629,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     /**
      * 小视屏列表需要插入type值
+     *
      * @param films
      */
     private void setSmallViewItemType(List<FilmMode> films) {
@@ -668,9 +640,10 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     /**
      * 判断是不是小视屏列表
+     *
      * @return
      */
-    private boolean judgeIsSmallVideo(){
+    private boolean judgeIsSmallVideo() {
         return channelCode.equals(ChannelModel.TELEPLAY_ID) ||
                 channelCode.equals(ChannelModel.FILM_ID) ||
                 channelCode.equals(ChannelModel.VARIATY_ID) ||
@@ -682,7 +655,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
         super.onAfter(flag);
         switch (flag) {
             case HttpApis.http_you_like:
-            case HttpApis.http_fiv:
+            case HttpApis.http_video_list:
                 isLoading = false;
                 if (ptrFrameLayout != null && ptrFrameLayout.isRefreshing()) {
                     ptrFrameLayout.refreshComplete();
@@ -760,7 +733,7 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
 
     @Override
     public void disScroll(boolean dis) {
-        TLog.error("slider---ACTION_DOWN"+dis);
+        TLog.error("slider---ACTION_DOWN" + dis);
         ptrFrameLayout.setDisScroll(dis);
     }
 }

@@ -59,6 +59,10 @@ public class LikeModel {
     private String introduction;
     private String sx;
 
+    public LikeModel(String name) {
+        this.name = name;
+    }
+
     public long getUtime() {
         return utime;
     }

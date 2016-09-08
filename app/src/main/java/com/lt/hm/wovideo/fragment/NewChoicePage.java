@@ -1,7 +1,6 @@
 package com.lt.hm.wovideo.fragment;
 
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,7 +17,6 @@ import android.widget.TextView;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.recommend.TabFragmentAdapter;
 import com.lt.hm.wovideo.base.BaseFragment;
-import com.lt.hm.wovideo.handler.UserHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.interf.OnPlaceChangeListener;
@@ -26,9 +24,6 @@ import com.lt.hm.wovideo.interf.OnUpdateLocationListener;
 import com.lt.hm.wovideo.model.ChannelModel;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
-import com.lt.hm.wovideo.ui.CityListPage;
-import com.lt.hm.wovideo.ui.MainPage2;
-import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -102,7 +97,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
     public void initView(View view) {
         super.initView(view);
         vipSelector.setOnClickListener(v -> {
-            if (UserHandler.isLogin(getContext())) {
+            if (UserMgr.isLogin()) {
                 UIHelper.ToPersonlitySetPage(getContext());
              } else {
                 DialogHelp.getMessageDialog(getContext(),"请先登录").show();

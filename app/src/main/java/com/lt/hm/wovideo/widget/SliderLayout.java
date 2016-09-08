@@ -310,8 +310,6 @@ public class SliderLayout extends RelativeLayout {
         }
     }
 
-
-
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
         int action = event.getAction();
@@ -320,15 +318,12 @@ public class SliderLayout extends RelativeLayout {
                 TLog.error("slider---ACTION_DOWN");
                 pauseAutoCycle();
                 disScroll.disScroll(true);
-                break;
-            case MotionEvent.ACTION_UP:
-                disScroll.disScroll(false);
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                disScroll.disScroll(false);
+                return false;
+            case MotionEvent.ACTION_MOVE:
+                disScroll.disScroll(true);
                 break;
         }
-        return false;
+        return super.onInterceptTouchEvent(event);
     }
 
     private disScroll disScroll;

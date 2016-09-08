@@ -343,7 +343,7 @@ public class DemandPage extends BaseVideoActivity implements View.OnClickListene
         } else {
             typeId = "2";
         }
-        NetUtils.getYouLikeData(1, pageSize, "", "", typeId, new HttpCallback<>(ResponseLikeList.class, this));
+        NetUtils.getYouLikeData(1, pageSize, "", "", typeId, this);
     }
 
     private VfinfoModel vfinfoModel;

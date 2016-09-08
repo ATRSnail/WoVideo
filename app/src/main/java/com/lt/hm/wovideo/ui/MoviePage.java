@@ -723,7 +723,7 @@ public class MoviePage extends BaseActivity implements SurfaceHolder.Callback, A
         } else {
             typeId =  "2";
         }
-        NetUtils.getYouLikeData(1, size, "", "", typeId, new HttpCallback<>(ResponseLikeList.class, this));
+        NetUtils.getYouLikeData(1, size, "", "", typeId, this);
     }
 
     private List<LikeModel> grid_list = new ArrayList<LikeModel>();//猜你喜欢

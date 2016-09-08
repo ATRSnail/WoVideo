@@ -12,6 +12,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -23,6 +24,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -30,6 +32,8 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -55,10 +59,12 @@ import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.model.LiveModel;
 import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.model.LiveTVList;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.utils.ScreenUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -70,6 +76,7 @@ import com.lt.hm.wovideo.video.player.AVPlayer;
 import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
+import com.lt.hm.wovideo.widget.LivePlaysPopw;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.PipListviwPopuWindow;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
@@ -123,6 +130,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     TextView videoPlayNumber;
     @BindView(R.id.video_collect)
     TextView videoCollect;
+    @BindView(R.id.video_live)
+    TextView liveVideo;
     @BindView(R.id.video_Pip)
     PercentLinearLayout videoPip;
     @BindView(R.id.video_share)
@@ -165,10 +174,10 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     Button[] btns;
 
     List<LiveTVList.LiveTvListBean> mList;
-    List<LiveModles.LiveModel> sinaList;
-    List<LiveModles.LiveModel> localList;
-    List<LiveModles.LiveModel> cctvList;
-    List<LiveModles.LiveModel> otherList;
+    List<LiveModel> sinaList;
+    List<LiveModel> localList;
+    List<LiveModel> cctvList;
+    List<LiveModel> otherList;
     LiveTVListAdapter adapter;
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
@@ -265,6 +274,15 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             // TODO 重要:清理含有ImageSpan的text中的一些占用内存的资源 例如drawable
         }
     };
+
+    @Override
+    protected void onBeforeSetContentLayout() {
+//        //取消标题
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        //取消状态栏
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    }
 
     @Override
     public void pipBtnCallBack(ArrayList<String> str) {
@@ -391,6 +409,24 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            statueHight = ScreenUtils.getStatusHeight(getApplicationContext());
+
+            WindowManager manager = this.getWindowManager();
+            DisplayMetrics outMetrics = new DisplayMetrics();
+            manager.getDefaultDisplay().getMetrics(outMetrics);
+            width = outMetrics.widthPixels;
+            height = outMetrics.heightPixels;
+
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        } else {
+            setSystemUiVisibility();
+        }
+
         View root = findViewById(R.id.video_root);
         screenSwitchUtils = ScreenSwitchUtils.init(this.getApplicationContext());
         root.setOnTouchListener(new View.OnTouchListener() {
@@ -511,6 +547,17 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     }
 
+    private void setSystemUiVisibility() {
+        //hit status bar
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        //      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        //       | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        //       | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
     private Intent onUrlGot() {
         Intent mpdIntent = new Intent(this, MoviePage.class)
                 .setData(Uri.parse(video.getmPlayUrl().getFormatUrl()))
@@ -533,7 +580,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         if (Util.SDK_INT > 23) {
             onShown();
         }
-        if (screenSwitchUtils != null){
+        if (screenSwitchUtils != null) {
             screenSwitchUtils.start(this);
         }
 
@@ -594,7 +641,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             mDanmakuView.release();
             mDanmakuView = null;
         }
-        if (screenSwitchUtils != null){
+        if (screenSwitchUtils != null) {
             screenSwitchUtils.stop();
         }
 
@@ -621,6 +668,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         }
     }
 
+    private int width, height;
+    private int statueHight;//5.0以上的状态栏高度
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -630,43 +680,28 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_root));
             FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
                     Gravity.CENTER
             );
             mMediaController.setTitle(videoName.getText().toString());
             mMediaController.setSwitchVisibility(View.INVISIBLE);
             mVideoFrame.setLayoutParams(lp);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mVideoFrame.setAspectRatio((float) height / (width + statueHight));
+            } else {
+                mVideoFrame.requestLayout();
+            }
             mVideoFrame.requestLayout();
             //show status bar
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+            //         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             //hide status bar
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            //        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         }
-//        if (null == woPlayer) return;
-//        /***
-//         * 根据屏幕方向重新设置播放器的大小
-//         */
-//        if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().getDecorView().invalidate();
-//            woPlayer.getLayoutParams().height = ScreenUtils.getScreenHeight(this);
-//            woPlayer.getLayoutParams().width = ScreenUtils.getScreenWidth(this);
-//            getWindow().getDecorView().invalidate();
-//        } else if (this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-//            final WindowManager.LayoutParams attrs = getWindow().getAttributes();
-//            attrs.flags &= (WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//            getWindow().setAttributes(attrs);
-//            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-//            float width = DensityUtil.getWidthInPx(this);
-//            float height = DensityUtil.dip2px(this, 200);
-//            woPlayer.getLayoutParams().height = (int) height;
-//            woPlayer.getLayoutParams().width = (int) width;
-//        }
+        setSystemUiVisibility();
     }
 
     // Surface Life cycle
@@ -1044,6 +1079,13 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             }
         });
 
+        liveVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new LivePlaysPopw(LivePage.this).showAsDropDown(v);
+            }
+        });
+
     }
 
     private void changeState(Button btn) {
@@ -1116,7 +1158,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         });
     }
 
-    private void initListViews(List<LiveModles.LiveModel> liveTvList) {
+    private void initListViews(List<LiveModel> liveTvList) {
         if (liveProgramList == null) return;
         adapter = new LiveTVListAdapter(getApplicationContext(), liveTvList);
         liveProgramList.setAdapter(adapter);

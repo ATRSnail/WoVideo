@@ -37,15 +37,14 @@ public class UserMgr {
      * @return
      */
     public static boolean isVip() {
-        String userinfo = SharedPrefsUtils.getStringPreference(context, USER_INFO);
-        if (!StringUtils.isNullOrEmpty(userinfo)) {
-            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            if (model.getIsVip() != null && model.getIsVip().equals("1")) {
-                return true;
-            }
+        UserModel model = getUseInfo();
+        if (model != null && model.getIsVip().equals("1")) {
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
+
 
     /**
      * 缓存用户信息
@@ -55,5 +54,19 @@ public class UserMgr {
     public static void cacheUserInfo(String json) {
         ACache.get(context).put(USER_INFO, json);
         SharedPrefsUtils.setStringPreference(context, USER_INFO, json);
+    }
+
+    /**
+     * 判断是否已登录
+     *
+     * @return
+     */
+    public static boolean isLogin() {
+        UserModel model = getUseInfo();
+        if (model != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

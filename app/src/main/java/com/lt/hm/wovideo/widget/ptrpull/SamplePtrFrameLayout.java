@@ -48,8 +48,14 @@ public class SamplePtrFrameLayout extends PtrFrameLayout {
     public boolean dispatchTouchEvent(MotionEvent e) {
         TLog.error("slider---ACTION_DOWN"+disScroll);
         if (disScroll) {
-            disScroll = false;
-            return false;
+            int action = e.getAction();
+            switch (action){
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    disScroll = false;
+                    break;
+            }
+            return dispatchTouchEventSupper(e);
         }
 
         return super.dispatchTouchEvent(e);

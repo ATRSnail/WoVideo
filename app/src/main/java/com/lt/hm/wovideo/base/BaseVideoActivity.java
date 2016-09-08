@@ -13,6 +13,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -20,6 +21,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ImageSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -29,8 +31,8 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.google.android.exoplayer.AspectRatioFrameLayout;
 import com.google.android.exoplayer.audio.AudioCapabilities;
@@ -42,17 +44,17 @@ import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
-import com.lt.hm.wovideo.http.RespHeader;
+import com.lt.hm.wovideo.http.HttpCallback;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.ResponseCode;
-import com.lt.hm.wovideo.http.ResponseObj;
-import com.lt.hm.wovideo.http.parser.ResponseParser;
-import com.lt.hm.wovideo.model.BulletModel;
 import com.lt.hm.wovideo.model.NetUsage;
 import com.lt.hm.wovideo.model.UserModel;
+import com.lt.hm.wovideo.model.response.ResponseBullet;
+import com.lt.hm.wovideo.utils.ScreenUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
-import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UT;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.Bullet;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.player.AVController;
@@ -63,7 +65,6 @@ import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.video.player.WoDanmakuParser;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 import com.victor.loading.rotate.RotateLoading;
-import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,7 +92,6 @@ import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
 import master.flame.danmaku.danmaku.parser.IDataSource;
 import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.danmaku.util.IOUtils;
-import okhttp3.Call;
 
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_TYPE_EXTRA;
@@ -148,6 +148,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     private DanmakuContext mContext;
 
     private long mLoadedBytes;
+    private int statueHight;//5.0以上的状态栏高度
 
     /**
      * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
@@ -229,11 +230,33 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     }
 
     // Activity lifecycle
+
+    private int width, height;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         View root = findViewById(R.id.video_root);
         instance = ScreenSwitchUtils.init(this.getApplicationContext());
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            statueHight = ScreenUtils.getStatusHeight(getApplicationContext());
+
+            WindowManager manager = this.getWindowManager();
+            DisplayMetrics outMetrics = new DisplayMetrics();
+            manager.getDefaultDisplay().getMetrics(outMetrics);
+            width = outMetrics.widthPixels;
+            height = outMetrics.heightPixels;
+
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(Color.TRANSPARENT);
+        } else {
+            setSystemUiVisibility();
+        }
 
         root.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -501,6 +524,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -514,17 +538,31 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     Gravity.CENTER
             );
+
             //TODO set title
 //            mMediaController.setTitle(videoName.getText().toString());
             mVideoFrame.setLayoutParams(lp);
-            mVideoFrame.requestLayout();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mVideoFrame.setAspectRatio((float) height / (width + statueHight));
+            } else {
+                mVideoFrame.requestLayout();
+            }
+
             mMediaController.setBulletScreen(true);
-            //show status bar
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+
+//            //hit status bar
+//            getWindow().getDecorView().setSystemUiVisibility(
+//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                            //      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                            //       | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                            //       | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
             //show danmu
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            //hide status bar
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+            //show status bar
+            //  getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             mMediaController.setBulletScreen(false);
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
@@ -533,7 +571,20 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 mDanmakuView.hide();
             }
         }
+        setSystemUiVisibility();
     }
+
+    private void setSystemUiVisibility() {
+        //hit status bar
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        //      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                        //       | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        //       | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
 
     // Surface Life cycle
     @Override
@@ -645,50 +696,58 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         }
     }
 
+    /**
+     * 获取弹幕
+     */
     protected void getBullets() {
         TLog.log("Bullet", "get bullets" + mVideoId);
         if (mDanmakuView != null) {
             mDanmakuView.release();
         }
-        HashMap<String, Object> maps = new HashMap<String, Object>();
-        maps.put("pageNum", 1);
-        maps.put("numPerPage", 10000);
-        maps.put("vfPlayId", mVideoId);
-
-//        maps.put("vfPlayId", );
-        HttpApis.getBulletByVideoId(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("getBullet" + response);
-                ResponseObj<BulletModel, RespHeader> resp = new ResponseObj<BulletModel, RespHeader>();
-                ResponseParser.parse(resp, response, BulletModel.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    mParser = new WoDanmakuParser();
-                    TLog.log("getBullet" + mParser);
-                    mParser.setmDanmuListData(resp.getBody());
-                    if (mContext == null || mParser == null || mDanmakuView == null)
-                        return;
-                    mDanmakuView.prepare(mParser, mContext);
-                    mDanmakuView.showFPS(false);
-                    mDanmakuView.enableDanmakuDrawingCache(true);
-                    if (mMediaController.getBulletScreen()) {
-                        mDanmakuView.hide();
-                    } else {
-                        mDanmakuView.show();
-                    }
-//                                mDanmakuView.hide();
-
-                } else {
-                    TLog.log(resp.getHead().getRspMsg());
-                }
-            }
-        });
+        NetUtils.getBullets(mVideoId, this);
     }
+
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value, flag);
+        switch (flag) {
+            case HttpApis.http_bullet:
+                ResponseBullet res = (ResponseBullet) value;
+                mParser = new WoDanmakuParser();
+                TLog.log("getBullet" + mParser);
+                mParser.setmDanmuListData(res.getBody());
+                if (mContext == null || mParser == null || mDanmakuView == null)
+                    return;
+                mDanmakuView.prepare(mParser, mContext);
+                mDanmakuView.showFPS(false);
+                mDanmakuView.enableDanmakuDrawingCache(true);
+                if (mMediaController.getBulletScreen()) {
+                    mDanmakuView.hide();
+                } else {
+                    mDanmakuView.show();
+                }
+                break;
+            case HttpApis.http_add_bullet:
+                String str = (String) value;
+                if (TextUtils.isEmpty(str) || !str.equals(ResponseCode.Success)) return;
+                UT.showNormal("弹幕成功");
+                addDanmaku(bullet);
+                break;
+        }
+    }
+
+    @Override
+    public void onFail(String error, int flag) {
+        super.onFail(error, flag);
+        switch (flag) {
+            case HttpApis.http_add_bullet:
+                UT.showNormal(error);
+                break;
+
+        }
+    }
+
+    private Bullet bullet;
 
     /**
      * 添加弹幕
@@ -696,10 +755,9 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
      * @param bullet {@link Bullet}
      */
     protected void addBullet(Bullet bullet) {
-        HashMap<String, Object> map = new HashMap<>();
-        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
-        if (!StringUtils.isNullOrEmpty(string)) {
-            UserModel model = new Gson().fromJson(string, UserModel.class);
+        if (UserMgr.isLogin()) {
+            HashMap<String, Object> map = new HashMap<>();
+            UserModel model = UserMgr.getUseInfo();
             //FIXME user id is incorrect!
             map.put("userId", model.getId());
             map.put("vfPlayId", mVideoId);
@@ -713,33 +771,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     + "; content: " + bullet.getContent() + "; fontColor: " + bullet.getFontColor()
                     + "; fontSize: " + bullet.getFontSize());
 
-            HttpApis.addBullet(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log(response);
-                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        Toast.makeText(getApplicationContext(), "弹幕成功", Toast.LENGTH_SHORT).show();
-                        TLog.log("Bullet" + mVideoId);
-                        addDanmaku(bullet);
-//                            getBullets();
-                    } else {
-                        if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
-                            Toast.makeText(getApplicationContext(), "弹幕失败", Toast.LENGTH_SHORT).show();
-                        } else {
-                            TLog.log(resp.getHead().getRspMsg());
-                            Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
-
-                        }
-                    }
-                }
-            });
+            HttpApis.addBullet(map, HttpApis.http_add_bullet, new HttpCallback<>(String.class, this));
         } else {
             UnLoginHandler.unLogin(this);
         }
@@ -757,14 +789,13 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         danmaku.isLive = false; //是否是直播弹幕
         danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
         danmaku.time = mDanmakuView.getCurrentTime() + 1200;
-        danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
+        danmaku.textSize = 22f * (mParser.getDisplayer().getDensity() - 0.6f);
 //            danMaKu.textColor = Color.parseColor(bullet.getFontColor());
         danmaku.textShadowColor = Color.WHITE;
-        danmaku.underlineColor = Color.GREEN;
-        danmaku.borderColor = Color.GREEN;
+//        danmaku.underlineColor = Color.GREEN;
+//        danmaku.borderColor = Color.GREEN;
         mDanmakuView.addDanmaku(danmaku);
 //            getBullets();
-
 
     }
 
@@ -850,7 +881,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 UT.showNormal("弹幕仅限50字");
                 return;
             }
-            addDanmaku(bullet);
+            this.bullet = bullet;
             addBullet(bullet);
         } else {
             UT.showNormal("请先开启弹幕功能");

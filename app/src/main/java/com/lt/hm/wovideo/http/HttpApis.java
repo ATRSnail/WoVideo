@@ -18,6 +18,12 @@ public class HttpApis {
     public static final int http_for = 0xffffff03;
     public static final int http_fiv = 0xffffff04;
     public static final int http_you_like = 0xffffff05;//猜你喜欢网络请求tag
+    public static final int http_bullet = 0xffffff06;//获取弹幕
+    public static final int http_add_bullet = 0xffffff07; //添加弹幕
+    public static final int http_cate_tag = 0xffffff08; //标签
+    public static final int http_city_tv = 0xffffff09; //本地电台
+    public static final int http_video_list = 0xffffff10; //视频列表
+    public static final int http_bar = 0xffffff11; //bar条
 
     /**
      * 登录
@@ -325,6 +331,16 @@ public class HttpApis {
     }
 
     /**
+     * 根据类型获取 弹幕数据
+     *
+     * @param map
+     * @param callback
+     */
+    public static void getBulletByVideoId(HashMap<String, Object> map,int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/viewBarrage", map, flag,callback);
+    }
+
+    /**
      * 对指定视频添加弹幕
      *
      * @param map
@@ -332,6 +348,16 @@ public class HttpApis {
      */
     public static void addBullet(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblVf/addBarrage", map, callback);
+    }
+
+    /**
+     * 对指定视频添加弹幕
+     *
+     * @param map
+     * @param callback
+     */
+    public static void addBullet(HashMap<String, Object> map, int flag,HttpCallback callback) {
+        HttpUtils.formPost("mblVf/addBarrage", map, flag,callback);
     }
 
     /**

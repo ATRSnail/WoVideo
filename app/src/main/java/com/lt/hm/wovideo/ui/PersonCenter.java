@@ -20,10 +20,8 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
-import com.lt.hm.wovideo.handler.UserHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
-import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
@@ -31,6 +29,7 @@ import com.lt.hm.wovideo.utils.ImageUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.io.File;
@@ -41,8 +40,6 @@ import java.util.HashMap;
 import butterknife.BindView;
 import okhttp3.Call;
 
-import static com.lt.hm.wovideo.R.id.bref_expand;
-import static com.lt.hm.wovideo.R.id.cache;
 import static com.lt.hm.wovideo.R.id.pc_username;
 
 /**
@@ -113,7 +110,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
     }
 
     private void initPersonInfo() {
-        UserModel model = UserHandler.getUserInfo(PersonCenter.this);
+        UserModel model = UserMgr.getUseInfo();
         if (FILE_SAVEPATH!=null){
             Glide.with(this).load(ACache.get(this).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
         }
@@ -177,7 +174,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
             case R.id.head_icon:
                 // TODO: 16/6/6  变更头像 上传头像
 //                String user = ACache.get(getApplicationContext()).getAsString("userinfo");
-                if (UserHandler.isLogin(PersonCenter.this)){
+                if (UserMgr.isLogin()){
                     handleSelectPicture();
                 }else{
                     UnLoginHandler.unLogin(PersonCenter.this);
@@ -202,7 +199,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
                 break;
             case R.id.collect:
                 // TODO: 16/6/6 我的收藏
-                if (UserHandler.isLogin(PersonCenter.this)){
+                if (UserMgr.isLogin()){
                     UIHelper.ToCollectPage(this);
                 }
 
@@ -359,7 +356,7 @@ public class PersonCenter extends BaseActivity implements View.OnClickListener {
             String img64= ImageUtils.imgToBase64(protraitFile.getAbsolutePath(),protraitBitmap,"JPG");
             HashMap<String,Object> map= new HashMap<>();
             String string = ACache.get(this).getAsString("userinfo");
-            map.put("phone",UserHandler.getUserInfo(PersonCenter.this).getPhoneNo());
+            map.put("phone",UserMgr.getUseInfo().getPhoneNo());
             map.put("base","image/jpg;base64,"+img64);
             TLog.log(map.toString());
             HttpApis.uploadHeadImg(map, new StringCallback() {

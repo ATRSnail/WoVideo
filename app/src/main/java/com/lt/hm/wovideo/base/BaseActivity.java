@@ -2,20 +2,17 @@ package com.lt.hm.wovideo.base;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.db.HistoryDataBase;
 import com.lt.hm.wovideo.db.NetUsageDatabase;
-import com.lt.hm.wovideo.http.HttpUtilBack;
 import com.lt.hm.wovideo.model.VideoHistory;
 import com.lt.hm.wovideo.utils.TLog;
 
@@ -49,17 +46,12 @@ public abstract class BaseActivity extends BaseRequestActivity implements BaseVi
             setContentView(getLayoutId());
         }
 
-
         unbinder = ButterKnife.bind(this);
         mInflater = getLayoutInflater();
         history = new HistoryDataBase(getApplicationContext());
         videoHistory = new VideoHistory();
         netUsageDatabase = new NetUsageDatabase(this);
         init(savedInstanceState);
-//		//透明状态栏
-//		getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-//		//透明导航栏
-//		getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
         initViews();
         initDatas();
         _isVisible = true;

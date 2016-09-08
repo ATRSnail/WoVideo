@@ -19,6 +19,7 @@ import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.MD5Utils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.widget.SecondTopbar;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -110,6 +111,7 @@ public class UpdatePwdActivity extends BaseActivity implements SecondTopbar.myTo
                 @Override
                 public void onError(Call call, Exception e, int id) {
                     TLog.log("error:" + e.getMessage());
+                    UT.showNormal(e.getMessage());
                 }
 
                 @Override

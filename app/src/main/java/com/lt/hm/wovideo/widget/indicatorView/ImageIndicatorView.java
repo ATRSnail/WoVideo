@@ -204,10 +204,10 @@ public class ImageIndicatorView extends RelativeLayout {
                 TextView item_desc = (TextView) view.findViewById(R.id.item_desc);
                 ImageView img_vip = (ImageView) view.findViewById(R.id.item_vip_logo);
                 img_vip.setVisibility(bar.getIsvip().equals("0") ? VISIBLE : GONE);
-//                title.setText(bar.getVfName());
-//                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(imageView).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(bar.getImg())).build());
-//                item_type.setText(bar.getTypeName());
-//                item_desc.setText(bar.getHit());
+                title.setText(bar.getVfName());
+                ImageLoaderUtil.getInstance().loadImage(mContext, new ImageLoader.Builder().imgView(imageView).placeHolder(R.drawable.default_vertical).url(HttpUtils.appendUrl(bar.getImg())).build());
+                item_type.setText(bar.getTypeName());
+                item_desc.setText(bar.getHit());
                 addViewItem(view);
             }
         }

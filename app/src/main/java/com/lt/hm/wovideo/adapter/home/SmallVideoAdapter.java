@@ -30,7 +30,7 @@ public class SmallVideoAdapter extends BaseMultiItemQuickAdapter<FilmMode> {
     @Override
     protected void convert(BaseViewHolder baseViewHolder, FilmMode filmMode) {
         int pos = baseViewHolder.getAdapterPosition();
-        int type = getDefItemViewType(pos - 1);
+        int type = getDefItemViewType(pos);
         switch (type) {
             case TYPE_HEAD:
                 baseViewHolder.setText(R.id.item_title, filmMode.getName());
@@ -54,7 +54,7 @@ public class SmallVideoAdapter extends BaseMultiItemQuickAdapter<FilmMode> {
                 ImageView img = baseViewHolder.getView(R.id.item_img_bg);
 
                 ImageLoaderUtil.getInstance().loadImage(img, filmMode.gethImg(), true);
-                if (pos % 4 == 3) {
+                if (pos % 4 == 2) {
                     baseViewHolder.getView(R.id.ly_movie_item).setBackgroundColor(mContext.getResources().getColor(R.color.bg_smell_video_whit_item));
                 } else {
                     baseViewHolder.getView(R.id.ly_movie_item).setBackgroundColor(mContext.getResources().getColor(R.color.bg_smell_video_item));

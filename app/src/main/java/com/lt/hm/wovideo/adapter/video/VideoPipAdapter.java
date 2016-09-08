@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.model.LiveModel;
 import com.lt.hm.wovideo.model.LiveModles;
 
 import java.util.ArrayList;
@@ -140,7 +141,7 @@ public class VideoPipAdapter extends BaseAdapter {
                 } else {
                     viewhold = (ViewHolde) convertView.getTag();
                 }
-                LiveModles.LiveModel modles = (LiveModles.LiveModel) getItem(position);
+                LiveModel modles = (LiveModel) getItem(position);
                 viewhold.tv_content.setText(modles.getTvName());
                 viewhold.checkbox.setClickable(false);
 //                    viewhold.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -209,7 +210,7 @@ public class VideoPipAdapter extends BaseAdapter {
             int position = (int) entry.getKey();
             boolean flag = (boolean) entry.getValue();
             if (flag) {
-                LiveModles.LiveModel liveModel = (LiveModles.LiveModel) getItem(position);
+                LiveModel liveModel = (LiveModel) getItem(position);
                 if (!urls.contains(liveModel.getUrl()))
                     urls.add(liveModel.getUrl());
             }

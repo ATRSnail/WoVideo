@@ -1,8 +1,6 @@
 package com.lt.hm.wovideo.ui;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.percent.PercentRelativeLayout;
@@ -14,12 +12,9 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -35,7 +30,6 @@ import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.adapter.video.BrefIntroAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
-import com.lt.hm.wovideo.handler.UserHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
@@ -168,11 +162,11 @@ public class NewMoviePage extends BaseVideoActivity {
 
     @Override
     protected void onBeforeSetContentLayout() {
-        //取消标题
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        //取消状态栏
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+//        //取消标题
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        //取消状态栏
+//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
     }
 
     @Override
@@ -287,7 +281,7 @@ public class NewMoviePage extends BaseVideoActivity {
      * 猜你喜欢接口调用
      */
     private void getYouLikeDatas(int size) {
-        NetUtils.getYouLikeData(1, size, "", "", typeId == 0 ? "1" : typeId + "", new HttpCallback<>(ResponseLikeList.class, this));
+        NetUtils.getYouLikeData(1, size, "", "", typeId == 0 ? "1" : typeId + "", this);
     }
 
 
@@ -434,7 +428,7 @@ public class NewMoviePage extends BaseVideoActivity {
             UT.showNormal("点赞失败");
             return;
         }
-        if (!UserHandler.isLogin(this)) {
+        if (!UserMgr.isLogin()) {
             UT.showNormal("请先登录");
             return;
         }
@@ -447,6 +441,7 @@ public class NewMoviePage extends BaseVideoActivity {
 
     @Override
     public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value,flag);
         switch (flag) {
             case HttpApis.http_one:
                 String val = (String) value;

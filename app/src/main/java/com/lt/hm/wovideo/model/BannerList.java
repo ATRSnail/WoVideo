@@ -54,6 +54,15 @@ public class BannerList {
         private String url;
         private String outid;
         private String isvip;
+        private String vfName;
+
+        public String getVfName() {
+            return vfName;
+        }
+
+        public void setVfName(String vfName) {
+            this.vfName = vfName;
+        }
 
         public String getTypeName() {
             return typeName;

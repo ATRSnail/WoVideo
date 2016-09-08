@@ -180,6 +180,8 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 ResponseParser.parse(resp, response, String.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     ToRegist();
+                }else {
+                    UT.showNormal(resp.getHead().getRspMsg());
                 }
             }
         });
@@ -217,7 +219,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                     }, 1000);
 
                 } else {
-                    Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
+                    UT.showNormal(resp.getHead().getRspMsg());
                     TLog.log(resp.toString());
                 }
             }
@@ -235,7 +237,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
             @Override
             public void onError(Call call, Exception e, int id) {
                 TLog.log("error:" + e.getMessage());
-
+                UT.showNormal(e.getMessage());
             }
 
             @Override
@@ -277,6 +279,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 TLog.log("error:" + e.getMessage());
                 counter.cancel();
                 counter.onFinish();
+                UT.showNormal(e.getMessage());
             }
 
             @Override
@@ -287,6 +290,8 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                     etResigtAccount.setHint(resp.getHead().getRspMsg());
                     counter.cancel();
 
+                }else {
+                    UT.showNormal(resp.getHead().getRspMsg());
                 }
                 TLog.log(response);
             }

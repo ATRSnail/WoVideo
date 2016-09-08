@@ -56,7 +56,7 @@ public class HttpCallback<T> extends StringCallback {
 
     @Override
     public void onResponse(String response, int id) {
-        TLog.error("onResponse==string==" + response);
+        TLog.error("onResponse==string==" + response + "---id---"+id);
         if (clazz == String.class) {
             JSONObject obj = null;
             try {

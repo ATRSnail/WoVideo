@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.model.LiveModel;
 import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
@@ -17,7 +18,7 @@ import java.util.List;
  * @version 1.0
  * @create_date 16/6/13
  */
-public class LiveTVListAdapter extends BaseQuickAdapter<LiveModles.LiveModel> {
+public class LiveTVListAdapter extends BaseQuickAdapter<LiveModel> {
     //    public interface  ItemOnClick{
 //        void onClick( BaseViewHolder holder,int position);
 //    }
@@ -28,18 +29,18 @@ public class LiveTVListAdapter extends BaseQuickAdapter<LiveModles.LiveModel> {
 //    }
     private String selectedText = "";
 
-    public void updateShowText(List<LiveModles.LiveModel> data, String selectedText) {
+    public void updateShowText(List<LiveModel> data, String selectedText) {
         this.selectedText = selectedText;
         setNewData(data);
     }
 
-    public LiveTVListAdapter(Context context, List<LiveModles.LiveModel> data) {
+    public LiveTVListAdapter(Context context, List<LiveModel> data) {
         super(R.layout.layout_tv_list_item, data);
 //        super(context, R.layout.layout_tv_list_item, data);
     }
 
     @Override
-    protected void convert(BaseViewHolder holder, LiveModles.LiveModel liveTvListBean) {
+    protected void convert(BaseViewHolder holder, LiveModel liveTvListBean) {
         holder.setText(R.id.live_list_item_text, liveTvListBean.getTvName());
         if (!StringUtils.isNullOrEmpty(liveTvListBean.getNowPro())) {
             holder.setText(R.id.live_list_item_current_text, "正在播放：" + liveTvListBean.getNowPro());

@@ -21,6 +21,7 @@ import com.lt.hm.wovideo.base.BaseFragment;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
@@ -124,23 +125,23 @@ public class VipRecommendFrg extends BaseFragment {
             Glide.with(this).load(ACache.get(getActivity()).getAsString("img_url")).centerCrop().error(R.drawable.icon_head).into(vipPersonLogo);
         }
 
-        String userinfo=  SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)){
-            UserModel model= new Gson().fromJson(userinfo,UserModel.class);
-            String phoneNum= model.getPhoneNo();
+        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
+        if (!StringUtils.isNullOrEmpty(userinfo)) {
+            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
+            String phoneNum = model.getPhoneNo();
             vipPersonAccount.setText(phoneNum.substring(0, phoneNum.length() - (phoneNum.substring(3)).length()) + "****" + phoneNum.substring(7));
-            if (model.getIsVip().equals("1")){
+            if (model.getIsVip().equals("1")) {
                 vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_opened));
-            }else{
+            } else {
                 vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
             }
-            if (!StringUtils.isNullOrEmpty(model.getHeadImg())){
+            if (!StringUtils.isNullOrEmpty(model.getHeadImg())) {
                 Glide.with(this).load(HttpUtils.appendUrl(model.getHeadImg())).thumbnail(1f).into(vipPersonLogo);
-            }else{
+            } else {
                 vipPersonLogo.setImageDrawable(getResources().getDrawable(R.drawable.icon_head));
             }
 
-        }else{
+        } else {
             vipPersonAccount.setText(getResources().getText(R.string.unlogin_hint));
             vipPersonVipicon.setImageDrawable(getResources().getDrawable(R.drawable.icon_vip_unopened));
         }
@@ -152,8 +153,8 @@ public class VipRecommendFrg extends BaseFragment {
         rightTv.setText("换一换");
         tv_title.setText("热门电影");
         rightTv.setVisibility(View.VISIBLE);
-        rightTv.setCompoundDrawablesWithIntrinsicBounds(null,null,getResources().getDrawable(R.drawable.icon_change),null);
-        rightTv.setCompoundDrawablePadding(ScreenUtils.dp2px(getContext(),10));
+        rightTv.setCompoundDrawablesWithIntrinsicBounds(null, null, getResources().getDrawable(R.drawable.icon_change), null);
+        rightTv.setCompoundDrawablePadding(ScreenUtils.dp2px(getContext(), 10));
         TopTileView teleHeadView = new TopTileView(getContext());
         teleHeadView.setTitleTv("热播剧");
         teleHeadView.setImageVisiable(true);
@@ -198,7 +199,7 @@ public class VipRecommendFrg extends BaseFragment {
         teleLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                likemodel = teleList.get(position-1);
+                likemodel = teleList.get(position - 1);
                 // 跳转视频详情页面
                 changePage(likemodel.getTypeId(), likemodel.getId());
             }
@@ -206,7 +207,7 @@ public class VipRecommendFrg extends BaseFragment {
         varLv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                likemodel = varlist.get(position-1);
+                likemodel = varlist.get(position - 1);
                 // 跳转视频详情页面
                 changePage(likemodel.getTypeId(), likemodel.getId());
 
@@ -227,42 +228,28 @@ public class VipRecommendFrg extends BaseFragment {
     }
 
     private void getBannerDatas() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("isVip", 1);
-        HttpApis.getBanners(map, HttpApis.http_one, new HttpCallback<>(ResponseBanner.class, this));
+        NetUtils.getBarData(1, this);
     }
 
     /**
      * 获取兴趣列表
      */
     private void getYouLikeData1() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("pageNum", 1);
-        map.put("numPerPage", 6);
-        map.put("typeid", 1);
-        HttpApis.getYouLikeList(map, HttpApis.http_two, new HttpCallback<>(ResponseLikeList.class, this));
+        NetUtils.getYouLikeData(1, 6, "1", HttpApis.http_two, this);
     }
 
     private void getYouLikeData2() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("pageNum", 1);
-        map.put("numPerPage", 3);
-        map.put("typeid", 2);
-        HttpApis.getYouLikeList(map, HttpApis.http_thr, new HttpCallback<>(ResponseLikeList.class, this));
+        NetUtils.getYouLikeData(1, 3, "2", HttpApis.http_thr, this);
     }
 
     private void getYouLikeData3() {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("pageNum", 1);
-        map.put("numPerPage", 3);
-        map.put("typeid", 3);
-        HttpApis.getYouLikeList(map, HttpApis.http_for, new HttpCallback<>(ResponseLikeList.class, this));
+        NetUtils.getYouLikeData(1, 3, "3", HttpApis.http_for, this);
     }
 
     @Override
     public <T> void onSuccess(T value, int flag) {
         switch (flag) {
-            case HttpApis.http_one:
+            case HttpApis.http_bar:
                 ResponseBanner responseBar = (ResponseBanner) value;
                 banner_list = responseBar.getBody().getBannerList();
                 if (banner_list == null || banner_list.size() == 0) return;
@@ -306,7 +293,7 @@ public class VipRecommendFrg extends BaseFragment {
             public void OnItemClick(View view, int position) {
 //                            changePage(mList.get(position),typeListBean.getId());
 //                            changePage(mList.get(position).getId(),);
-                              changePage(Integer.valueOf(mList.get(position).getVfType()),mList.get(position).getOutid());
+                changePage(Integer.valueOf(mList.get(position).getVfType()), mList.get(position).getOutid());
                 // TODO: 16/6/29 跳转页面
             }
         });

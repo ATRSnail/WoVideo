@@ -2,28 +2,17 @@ package com.lt.hm.wovideo.ui;
 
 import android.Manifest;
 import android.annotation.TargetApi;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Spannable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.style.BackgroundColorSpan;
-import android.text.style.ImageSpan;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -48,24 +37,19 @@ import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.util.Util;
-import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.video.LiveTVListAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoPipAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
-import com.lt.hm.wovideo.http.RespHeader;
-import com.lt.hm.wovideo.http.ResponseCode;
-import com.lt.hm.wovideo.http.ResponseObj;
-import com.lt.hm.wovideo.http.parser.ResponseParser;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.model.LiveModel;
 import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.model.LiveTVList;
-import com.lt.hm.wovideo.model.UserModel;
-import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.model.response.ResponseLiveList;
+import com.lt.hm.wovideo.model.response.ResponseVideoRealUrl;
 import com.lt.hm.wovideo.utils.ScreenUtils;
-import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UserMgr;
@@ -81,37 +65,16 @@ import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.PipListviwPopuWindow;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.victor.loading.rotate.RotateLoading;
-import com.zhy.http.okhttp.callback.StringCallback;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import master.flame.danmaku.controller.IDanmakuView;
-import master.flame.danmaku.danmaku.loader.ILoader;
-import master.flame.danmaku.danmaku.loader.IllegalDataException;
-import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
-import master.flame.danmaku.danmaku.model.DanmakuTimer;
-import master.flame.danmaku.danmaku.model.IDisplayer;
-import master.flame.danmaku.danmaku.model.android.BaseCacheStuffer;
-import master.flame.danmaku.danmaku.model.android.DanmakuContext;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
-import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.IDataSource;
-import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
-import master.flame.danmaku.danmaku.util.IOUtils;
-import okhttp3.Call;
 
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_TYPE_EXTRA;
@@ -222,68 +185,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     private String share_desc;
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
 
-    // Bullet Screen
-    private BaseDanmakuParser mParser;
-    private IDanmakuView mDanmakuView;
-    private DanmakuContext mContext;
-    private BaseCacheStuffer.Proxy mCacheStufferAdapter = new BaseCacheStuffer.Proxy() {
-
-        private Drawable mDrawable;
-
-        @Override
-        public void prepareDrawing(final BaseDanmaku danmaku, boolean fromWorkerThread) {
-            if (danmaku.text instanceof Spanned) { // 根据你的条件检查是否需要需要更新弹幕
-                // FIXME 这里只是简单启个线程来加载远程url图片，请使用你自己的异步线程池，最好加上你的缓存池
-                new Thread() {
-
-                    @Override
-                    public void run() {
-                        String url = "http://www.bilibili.com/favicon.ico";
-                        InputStream inputStream = null;
-                        Drawable drawable = mDrawable;
-                        if (drawable == null) {
-                            try {
-                                URLConnection urlConnection = new URL(url).openConnection();
-                                inputStream = urlConnection.getInputStream();
-                                drawable = BitmapDrawable.createFromStream(inputStream, "bitmap");
-                                mDrawable = drawable;
-                            } catch (MalformedURLException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } finally {
-                                IOUtils.closeQuietly(inputStream);
-                            }
-                        }
-                        if (drawable != null) {
-                            drawable.setBounds(0, 0, 100, 100);
-                            SpannableStringBuilder spannable = createSpannable(drawable);
-                            danmaku.text = spannable;
-                            if (mDanmakuView != null) {
-                                mDanmakuView.invalidateDanmaku(danmaku, false);
-                            }
-                            return;
-                        }
-                    }
-                }.start();
-            }
-        }
-
-        @Override
-        public void releaseResource(BaseDanmaku danmaku) {
-            // TODO 重要:清理含有ImageSpan的text中的一些占用内存的资源 例如drawable
-        }
-    };
-
-    @Override
-    protected void onBeforeSetContentLayout() {
-//        //取消标题
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        //取消状态栏
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    }
-
     @Override
     public void pipBtnCallBack(ArrayList<String> str) {
         if (str != null && str.size() > 0) {
@@ -298,104 +199,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         }
     }
 
-    /**
-     * 绘制背景(自定义弹幕样式)
-     */
-    private static class BackgroundCacheStuffer extends SpannedCacheStuffer {
-        // 通过扩展SimpleTextCacheStuffer或SpannedCacheStuffer个性化你的弹幕样式
-        final Paint paint = new Paint();
-
-        @Override
-        public void measure(BaseDanmaku danmaku, TextPaint paint, boolean fromWorkerThread) {
-            danmaku.padding = 10;  // 在背景绘制模式下增加padding
-            super.measure(danmaku, paint, fromWorkerThread);
-        }
-
-        @Override
-        public void drawBackground(BaseDanmaku danmaku, Canvas canvas, float left, float top) {
-            paint.setColor(0x8125309b);
-            canvas.drawRect(left + 2, top + 2, left + danmaku.paintWidth - 2, top + danmaku.paintHeight - 2, paint);
-        }
-
-        @Override
-        public void drawStroke(BaseDanmaku danmaku, String lineText, Canvas canvas, float left, float top, Paint paint) {
-            // 禁用描边绘制
-        }
-    }
-
-    private BaseDanmakuParser createParser(InputStream stream) {
-
-        if (stream == null) {
-            return new BaseDanmakuParser() {
-
-                @Override
-                protected Danmakus parse() {
-                    return new Danmakus();
-                }
-            };
-        }
-
-        ILoader loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
-
-        try {
-            loader.load(stream);
-        } catch (IllegalDataException e) {
-            e.printStackTrace();
-        }
-        BaseDanmakuParser parser = new BiliDanmukuParser();
-        IDataSource<?> dataSource = loader.getDataSource();
-        parser.load(dataSource);
-        return parser;
-
-    }
-
-    private void addDanmaku(boolean islive) {
-        BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
-        if (danmaku == null || mDanmakuView == null) {
-            return;
-        }
-        // for(int i=0;i<100;i++){
-        // }
-        danmaku.text = "这是一条弹幕" + System.nanoTime();
-        danmaku.padding = 5;
-        danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
-        danmaku.isLive = islive;
-        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
-        danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
-        danmaku.textColor = Color.RED;
-        danmaku.textShadowColor = Color.WHITE;
-        // danmaku.underlineColor = Color.GREEN;
-        danmaku.borderColor = Color.GREEN;
-        mDanmakuView.addDanmaku(danmaku);
-
-    }
-
-    private void addDanmaKuShowTextAndImage(boolean islive) {
-        BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL);
-        Drawable drawable = getResources().getDrawable(R.drawable.ic_launcher);
-        drawable.setBounds(0, 0, 100, 100);
-        SpannableStringBuilder spannable = createSpannable(drawable);
-        danmaku.text = spannable;
-        danmaku.padding = 5;
-        danmaku.priority = 1;  // 一定会显示, 一般用于本机发送的弹幕
-        danmaku.isLive = islive;
-        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
-        danmaku.textSize = 25f * (mParser.getDisplayer().getDensity() - 0.6f);
-        danmaku.textColor = Color.RED;
-        danmaku.textShadowColor = 0; // 重要：如果有图文混排，最好不要设置描边(设textShadowColor=0)，否则会进行两次复杂的绘制导致运行效率降低
-        danmaku.underlineColor = Color.GREEN;
-        mDanmakuView.addDanmaku(danmaku);
-    }
-
-    private SpannableStringBuilder createSpannable(Drawable drawable) {
-        String text = "bitmap";
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
-        ImageSpan span = new ImageSpan(drawable);//ImageSpan.ALIGN_BOTTOM);
-        spannableStringBuilder.setSpan(span, 0, text.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        spannableStringBuilder.append("图文混排");
-        spannableStringBuilder.setSpan(new BackgroundColorSpan(Color.parseColor("#8A2233B1")), 0, spannableStringBuilder.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        return spannableStringBuilder;
-    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -454,14 +257,12 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
         mRotateLoading = (RotateLoading) findViewById(R.id.loading);
         mShutterView = findViewById(R.id.shutter);
-        mDanmakuView = (IDanmakuView) findViewById(R.id.sv_danmaku);
-
         mVideoFrame = (AspectRatioFrameLayout) findViewById(R.id.video_frame);
 
         mSurfaceView = (SurfaceView) findViewById(R.id.surface_view);
         mSurfaceView.getHolder().addCallback(this);
 
-        mMediaController = new KeyCompatibleMediaController(this, mDanmakuView);
+        mMediaController = new AVController(this);
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         mMediaController.setGestureListener(this);
         CookieHandler currentHanlder = CookieHandler.getDefault();
@@ -482,69 +283,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
 
-        mContext = DanmakuContext.create();
-        mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setScrollSpeedFactor(1.2f).setScaleTextSize(1.2f)
-                .setCacheStuffer(new SpannedCacheStuffer(), mCacheStufferAdapter) // 图文混排使用SpannedCacheStuffer
-//        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
-                .setMaximumLines(maxLinesPair)
-                .preventOverlapping(overlappingEnablePair);
-        if (mDanmakuView != null) {
-            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
-            mDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
-                @Override
-                public void updateTimer(DanmakuTimer timer) {
-                }
-
-                @Override
-                public void drawingFinished() {
-
-                }
-
-                @Override
-                public void danmakuShown(BaseDanmaku danmaku) {
-//                    Log.d("DFM", "danmakuShown(): text=" + danmaku.text);
-                }
-
-                @Override
-                public void prepared() {
-                    mDanmakuView.start();
-                }
-            });
-//            mDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
-//                @Override
-//                public void onDanmakuClick(BaseDanmaku latest) {
-//                    Log.d("DFM", "onDanmakuClick text:" + latest.text);
-//                }
-//
-//                @Override
-//                public void onDanmakuClick(IDanmakus danmakus) {
-//                    Log.d("DFM", "onDanmakuClick danmakus size:" + danmakus.size());
-//                }
-//            });
-            mDanmakuView.prepare(mParser, mContext);
-            mDanmakuView.showFPS(false);
-            mDanmakuView.enableDanmakuDrawingCache(true);
-            mDanmakuView.hide();
-//            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
-//
-//                @Override
-//                public void onClick(View view) {
-//                    mMediaController.setVisibility(View.VISIBLE);
-//                }
-//            });
-            ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                        //toggleControlsVisibility();
-                    } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                        v.performClick();
-                    }
-                    return false;
-                }
-            });
-        }
-
     }
 
     private void setSystemUiVisibility() {
@@ -559,7 +297,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     }
 
     private Intent onUrlGot() {
-        Intent mpdIntent = new Intent(this, MoviePage.class)
+        Intent mpdIntent = new Intent(this, NewMoviePage.class)
                 .setData(Uri.parse(video.getmPlayUrl().getFormatUrl()))
                 .putExtra(CONTENT_ID_EXTRA, video.getmVideoName())
                 .putExtra(CONTENT_TYPE_EXTRA, Util.TYPE_HLS)
@@ -592,9 +330,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         if (Util.SDK_INT <= 23 || mPlayer == null) {
             onShown();
         }
-        if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
-            mDanmakuView.resume();
-        }
     }
 
     private void onShown() {
@@ -625,9 +360,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         if (Util.SDK_INT <= 23) {
             onHidden();
         }
-        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
-            mDanmakuView.pause();
-        }
     }
 
     @Override
@@ -635,11 +367,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         super.onStop();
         if (Util.SDK_INT > 23) {
             onHidden();
-        }
-        if (mDanmakuView != null) {
-            // dont forget release!
-            mDanmakuView.release();
-            mDanmakuView = null;
         }
         if (screenSwitchUtils != null) {
             screenSwitchUtils.stop();
@@ -661,11 +388,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         super.onDestroy();
         mAudioCapabilitiesReceiver.unregister();
         releasePlayer();
-        if (mDanmakuView != null) {
-            // dont forget release!
-            mDanmakuView.release();
-            mDanmakuView = null;
-        }
     }
 
     private int width, height;
@@ -885,68 +607,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         return Util.inferContentType(lastPathSegment);
     }
 
-    private static final class KeyCompatibleMediaController extends AVController {
-
-        private AVController.MediaPlayerControl playerControl;
-        private IDanmakuView mDanmakuView;
-
-        public KeyCompatibleMediaController(Context context) {
-            super(context);
-        }
-
-        public KeyCompatibleMediaController(Context context, IDanmakuView danmakuView) {
-            super(context);
-            mDanmakuView = danmakuView;
-        }
-
-        @Override
-        public void toggleBulletScreen(boolean isShow) {
-            super.toggleBulletScreen(isShow);
-            if (isShow) {
-                mDanmakuView.show();
-            } else {
-                mDanmakuView.hide();
-            }
-        }
-
-        @Override
-        public void show() {
-            super.show();
-        }
-
-        @Override
-        public void setTitle(String titleName) {
-            super.setTitle(titleName);
-        }
-
-        @Override
-        public void setMediaPlayer(AVController.MediaPlayerControl playerControl) {
-            super.setMediaPlayer(playerControl);
-            this.playerControl = playerControl;
-        }
-
-        @Override
-        public boolean dispatchKeyEvent(KeyEvent event) {
-            int keyCode = event.getKeyCode();
-            if (playerControl.canSeekForward() && (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
-                    || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    playerControl.seekTo(playerControl.getCurrentPosition() + 15000); // milliseconds
-                    show();
-                }
-                return true;
-            } else if (playerControl.canSeekBackward() && (keyCode == KeyEvent.KEYCODE_MEDIA_REWIND
-                    || keyCode == KeyEvent.KEYCODE_DPAD_LEFT)) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    playerControl.seekTo(playerControl.getCurrentPosition() - 5000); // milliseconds
-                    show();
-                }
-                return true;
-            }
-            return super.dispatchKeyEvent(event);
-        }
-    }
-
     // Old thing
     @Override
     protected int getLayoutId() {
@@ -1121,41 +781,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     }
 
     private void getLiveList() {
-        HashMap<String, Object> map = new HashMap<>();
-        HttpApis.getLiveTvList(map, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-//                ResponseObj<LiveTVList, RespHeader> resp = new ResponseObj<LiveTVList, RespHeader>();
-                ResponseObj<LiveModles, RespHeader> resp = new ResponseObj<LiveModles, RespHeader>();
-                ResponseParser.parse(resp, response, LiveModles.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    sinaList.addAll(resp.getBody().getSinatv());
-                    localList.addAll(resp.getBody().getLocalTV());
-                    cctvList.addAll(resp.getBody().getCctv());
-                    otherList.addAll(resp.getBody().getOtherTv());
-
-//                    mList.addAll(resp.getBody().getLiveTvList());
-
-                    if (TextUtils.isEmpty(intentProperty) || Integer.valueOf(intentProperty) == 0) {
-                        initListViews(cctvList);
-                    } else if (Integer.valueOf(intentProperty) == 1) {
-                        initListViews(sinaList);
-                    } else if (Integer.valueOf(intentProperty) == 2) {
-                        initListViews(localList);
-                    } else if (Integer.valueOf(intentProperty) == 3) {
-                        initListViews(otherList);
-                    }
-
-
-                }
-            }
-        });
+        NetUtils.getLiveList(this);
     }
 
     private void initListViews(List<LiveModel> liveTvList) {
@@ -1183,10 +809,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             public void onItemClick(View view, int i) {
 
                 String url = liveTvList.get(i).getUrl();
-                String userinfo = ACache.get(getApplicationContext()).getAsString("userinfo");
-                if (!StringUtils.isNullOrEmpty(userinfo)) {
-                    UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-                    String tag = ACache.get(getApplicationContext()).getAsString(model.getId() + "free_tag");
+                if (UserMgr.isLogin()) {
+                    String tag = ACache.get(getApplicationContext()).getAsString(UserMgr.getUseId() + "free_tag");
                     if (!StringUtils.isNullOrEmpty(tag)) {
 //                        free_hint.setText(" "+"已免流");
                         mFreeLabel.setVisibility(View.VISIBLE);
@@ -1204,90 +828,47 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     }
 
-//    private void getRealURL(String url) {
-//        HashMap<String, Object> maps = new HashMap<String, Object>();
-//        maps.put("videoSourceURL", url);
-//        maps.put("cellphone", "18513179404");
-//        maps.put("freetag", "1");
-//        HttpApis.getVideoRealURL(maps, new StringCallback() {
-//            @Override
-//            public void onError(Call call, Exception e, int id) {
-//                TLog.log("error:" + e.getMessage());
-//            }
-//
-//            @Override
-//            public void onResponse(String response, int id) {
-//                TLog.log(response);
-//                ResponseObj<VideoURL, RespHeader> resp = new ResponseObj<VideoURL, RespHeader>();
-//                ResponseParser.parse(resp, response, VideoURL.class, RespHeader.class);
-//                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-//                    videoUrl.setFormatUrl(resp.getBody().getUrl());
-//                    video.setmPlayUrl(videoUrl);
-//                    // Reset player and params.
-//                    releasePlayer();
-//                    mPlayerPosition = 0;
-//                    // Set play URL and play it
-//                    setIntent(onUrlGot());
-//                    onShown();
-////                    mDanmakuView.show();
-//                } else {
-//                    TLog.log(resp.getHead().getRspMsg());
-//                }
-//            }
-//        });
-//    }
-
-
     /**
      * 获取视频播放地址
      *
      * @param url
      */
     private void getRealURL(String url) {
-        HashMap<String, Object> maps = new HashMap<String, Object>();
-        maps.put("videoSourceURL", url);
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)) {
-            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            maps.put("cellphone", model.getPhoneNo());
-            if (model.getIsVip() != null && model.getIsVip().equals("1")) {
-                maps.put("freetag", "1");
-            } else {
-                maps.put("freetag", "0");
-            }
-
-        } else {
-            maps.put("cellphone", StringUtils.generateOnlyID());
-            maps.put("freetag", "0");
-        }
-//        maps.put("cellphone", "18513179404");
-//        maps.put("freetag", "1");
-        HttpApis.getVideoRealURL(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<VideoURL, RespHeader> resp = new ResponseObj<VideoURL, RespHeader>();
-                ResponseParser.parse(resp, response, VideoURL.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    videoUrl.setFormatUrl(resp.getBody().getUrl());
-                    video.setmPlayUrl(videoUrl);
-                    // Reset player and params.
-                    mFreeLabel.setVisibility(UserMgr.isVip() ? View.VISIBLE : View.GONE);
-                    releasePlayer();
-                    // Set Player
-                    setIntent(onUrlGot());
-                    onShown();
-
-                } else {
-                    TLog.log(resp.getHead().getRspMsg());
-                }
-            }
-        });
+        NetUtils.getVideoRealURL(url,UserMgr.getUsePhone(),this);
     }
 
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value, flag);
+        switch (flag){
+            case HttpApis.http_video_real_url:
+                ResponseVideoRealUrl va = (ResponseVideoRealUrl) value;
+                videoUrl.setFormatUrl(va.getBody().getUrl());
+                video.setmPlayUrl(videoUrl);
+                // Reset player and params.
+                mFreeLabel.setVisibility(UserMgr.isVip() ? View.VISIBLE : View.GONE);
+                releasePlayer();
+                // Set Player
+                setIntent(onUrlGot());
+                onShown();
+                break;
+            case HttpApis.http_video_lives_url:
+                ResponseLiveList vaList = (ResponseLiveList) value;
+                sinaList.addAll(vaList.getBody().getSinatv());
+                localList.addAll(vaList.getBody().getLocalTV());
+                cctvList.addAll(vaList.getBody().getCctv());
+                otherList.addAll(vaList.getBody().getOtherTv());
+
+                if (TextUtils.isEmpty(intentProperty) || Integer.valueOf(intentProperty) == 0) {
+                    initListViews(cctvList);
+                } else if (Integer.valueOf(intentProperty) == 1) {
+                    initListViews(sinaList);
+                } else if (Integer.valueOf(intentProperty) == 2) {
+                    initListViews(localList);
+                } else if (Integer.valueOf(intentProperty) == 3) {
+                    initListViews(otherList);
+                }
+                break;
+        }
+    }
 }

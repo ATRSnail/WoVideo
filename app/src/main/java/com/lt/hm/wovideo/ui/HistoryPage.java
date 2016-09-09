@@ -246,7 +246,7 @@ public class HistoryPage extends BaseActivity implements CustomTopbar.myTopbarCl
                                 +"-episode"+bean.getEpisode()
                                 +"-typeId"+VideoType.TELEPLAY.getId()
                         );
-                        UIHelper.ToDemandPage(HistoryPage.this, bundle);
+                  //      UIHelper.ToDemandPage(HistoryPage.this, bundle);
                     }
                 }
             }

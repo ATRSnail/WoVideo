@@ -25,6 +25,7 @@ import butterknife.Unbinder;
  * @version 1.0
  * @create_date 16/6/8
  */
+@Deprecated
 public class Class_Item_Page extends BaseFragment {
     Unbinder unbinder;
     @BindView(R.id.class_details_list)

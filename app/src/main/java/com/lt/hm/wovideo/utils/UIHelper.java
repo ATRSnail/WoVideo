@@ -10,7 +10,6 @@ import com.lt.hm.wovideo.ui.AboutPage;
 import com.lt.hm.wovideo.ui.BillsPage;
 import com.lt.hm.wovideo.ui.ChangePassword1Aty;
 import com.lt.hm.wovideo.ui.CollectPage;
-import com.lt.hm.wovideo.ui.DemandPage;
 import com.lt.hm.wovideo.ui.EventsPageActivity;
 import com.lt.hm.wovideo.ui.FindPwdAty;
 import com.lt.hm.wovideo.ui.GuidPage;
@@ -22,7 +21,6 @@ import com.lt.hm.wovideo.ui.MineIntegral;
 import com.lt.hm.wovideo.ui.NewClassDetailPage;
 import com.lt.hm.wovideo.ui.NewMoviePage;
 import com.lt.hm.wovideo.ui.OpenVipActivity;
-import com.lt.hm.wovideo.ui.PersonCenter;
 import com.lt.hm.wovideo.ui.PersonInfoPage;
 import com.lt.hm.wovideo.ui.PersonalitySet;
 import com.lt.hm.wovideo.ui.RecallBackPage;
@@ -55,14 +53,6 @@ public class UIHelper {
 	public static void ToRegister(Context context) {
 		Intent intent = new Intent(context, RegistPage.class);
 		context.startActivity(intent);
-	}
-
-
-	public static void ToPerson(Context context) {
-		Intent intent = new Intent(context, PersonCenter.class);
-		context.startActivity(intent);
-//        context.overridePendingTransition(R.anim.activity_open,0);
-
 	}
 
 	public static void ToSetPage(Context context) {
@@ -172,17 +162,7 @@ public class UIHelper {
 		context.startActivity(intent);
 	}
 
-	/**
-	 * 跳转点播页面
-	 *
-	 * @param context
-	 */
 
-	public static void ToDemandPage(Context context, Bundle bundle) {
-		Intent intent = new Intent(context, DemandPage.class);
-		intent.putExtras(bundle);
-		context.startActivity(intent);
-	}
 
 	/**
 	 * 跳转 开通VIp 页面

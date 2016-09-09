@@ -72,10 +72,6 @@
 
         </activity>
         <activity
-            android:name=".ui.PersonCenter"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".ui.EventsPageActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait" />

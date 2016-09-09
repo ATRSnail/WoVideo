@@ -26,6 +26,7 @@ import butterknife.Unbinder;
  * @version 1.0
  * @create_date 16/5/30
  */
+@Deprecated
 public class EventsPage extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
 	@BindView(R.id.lv_huodong)
 	ListView lvHuodong;

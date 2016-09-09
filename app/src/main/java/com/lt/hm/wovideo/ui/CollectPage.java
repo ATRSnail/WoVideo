@@ -155,20 +155,20 @@ public class CollectPage extends BaseActivity implements CustomTopbar.myTopbarCl
                         Bundle bundle = new Bundle();
                         bundle.putString("id", bean.getIid());
                         bundle.putInt("typeId",VideoType.TELEPLAY.getId());
-                        UIHelper.ToDemandPage(CollectPage.this, bundle);
+      //                  UIHelper.ToDemandPage(CollectPage.this, bundle);
 
                     } else if (VideoType.SPORTS.getId()== typeId) {
                         // TODO: 16/6/14 跳转 体育播放页面
                         Bundle bundle = new Bundle();
                         bundle.putString("id",  bean.getIid());
                         bundle.putInt("typeId",VideoType.TELEPLAY.getId());
-                        UIHelper.ToDemandPage(CollectPage.this, bundle);
+       //                 UIHelper.ToDemandPage(CollectPage.this, bundle);
                     } else if (VideoType.VARIATY.getId()== typeId) {
                         // TODO: 16/6/14 跳转综艺界面
                         Bundle bundle = new Bundle();
                         bundle.putString("id", bean.getIid());
                         bundle.putInt("typeId",VideoType.VARIATY.getId());
-                        UIHelper.ToDemandPage(CollectPage.this, bundle);
+        //                UIHelper.ToDemandPage(CollectPage.this, bundle);
                     }
 
 

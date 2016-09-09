@@ -110,4 +110,6 @@ dependencies {
     compile 'in.srain.cube:ultra-ptr:1.0.11'
     /*导航控件*/
     compile 'com.daimajia.slider:library:1.1.5'
+     /*图片选择器*/
+   // compile 'cn.finalteam:galleryfinal:1.4.3'
 }

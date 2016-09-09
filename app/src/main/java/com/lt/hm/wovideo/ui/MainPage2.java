@@ -283,10 +283,10 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
     @Override
     public void initViews() {
         personCenter.setOnClickListener((View v) -> {
-            UIHelper.ToPerson(this);
+     //       UIHelper.ToPerson(this);
         });
         choicePersonCenter.setOnClickListener((View v) -> {
-            UIHelper.ToPerson(this);
+     //       UIHelper.ToPerson(this);
         });
 
         qrScan.setOnClickListener((View v) -> {

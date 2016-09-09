@@ -265,20 +265,20 @@ public class RecommendPage extends BaseFragment implements SwipeRefreshLayout.On
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
             bundle.putInt("typeId",VideoType.TELEPLAY.getId());
-            UIHelper.ToDemandPage(getActivity(), bundle);
+ //           UIHelper.ToDemandPage(getActivity(), bundle);
 
         } else if (typeId == VideoType.SPORTS.getId()) {
             // TODO: 16/6/14 跳转 体育播放页面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
             bundle.putInt("typeId",VideoType.SPORTS.getId());
-            UIHelper.ToDemandPage(getActivity(), bundle);
+//            UIHelper.ToDemandPage(getActivity(), bundle);
         } else if (typeId == VideoType.VARIATY.getId()) {
             // TODO: 16/6/14 跳转综艺界面
             Bundle bundle = new Bundle();
             bundle.putString("id", vfId);
             bundle.putInt("typeId",VideoType.VARIATY.getId());
-            UIHelper.ToDemandPage(getActivity(), bundle);
+  //          UIHelper.ToDemandPage(getActivity(), bundle);
         }
     }
 

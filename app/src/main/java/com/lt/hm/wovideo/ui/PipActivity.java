@@ -32,15 +32,18 @@ import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.http.ResponseObj;
 import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.VideoURL;
+import com.lt.hm.wovideo.model.response.ResponseVideoRealUrl;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.player.AVPlayer;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -48,13 +51,13 @@ import com.zhy.http.okhttp.callback.StringCallback;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.Call;
 
 
 public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataListener,
-       View.OnClickListener{
-
+        View.OnClickListener {
 
 
     private int contentType;
@@ -62,7 +65,7 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
     private boolean playerNeedsPrepare;
     private boolean enableBackgroundAudio;
 
-    private static  final String TAG="MainActivity";
+    private static final String TAG = "MainActivity";
     private View view1;
     private View view2;
     private View view3;
@@ -74,18 +77,20 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
     播放集合urls
      */
     private ArrayList<String> stringLit;
+
     @Override
     protected void init(Bundle savedInstanceState) {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         Bundle bundle = getIntent().getExtras();
-        Log.e(getClass().getSimpleName(),"oncreate");
-        if (bundle!=null) {
+        Log.e(getClass().getSimpleName(), "oncreate");
+        if (bundle != null) {
             stringLit = bundle.getStringArrayList(LivePage.PIP_URLS);
-        }else{
+        } else {
             stringLit = new ArrayList<>();
         }
 
     }
+
     @Override
     public void initViews() {
         view1 = findViewById(R.id.pip_video1);
@@ -95,72 +100,81 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
     }
 
 
-
     @Override
     public void initDatas() {
 
-        switch (stringLit.size()){
+        switch (stringLit.size()) {
             case 1:
-                for (int i=1;i<4;i++){
+                for (int i = 1; i < 4; i++) {
                     stringLit.add("");
                 }
                 break;
             case 2:
-                for (int i=2;i<4;i++){
+                for (int i = 2; i < 4; i++) {
                     stringLit.add("");
                 }
                 break;
             case 3:
-                for (int i=3;i<4;i++){
+                for (int i = 3; i < 4; i++) {
                     stringLit.add("");
                 }
                 break;
             default:
                 break;
         }
-        sparseArray= new SparseArray<>();
-        demoPlayerSparseArray=new SparseArray<>();
-        sparseArray.put(0,view1);
-        sparseArray.put(1,view2);
-        sparseArray.put(2,view3);
-        sparseArray.put(3,view4);
-        for (int i=0;i<sparseArray.size();i++){
-            View view1=sparseArray.get(i);
-            if (0==i){
-                ImageView imageView= (ImageView)view1.findViewById(R.id.pip_iv_back);
+        sparseArray = new SparseArray<>();
+        demoPlayerSparseArray = new SparseArray<>();
+        sparseArray.put(0, view1);
+        sparseArray.put(1, view2);
+        sparseArray.put(2, view3);
+        sparseArray.put(3, view4);
+        for (int i = 0; i < sparseArray.size(); i++) {
+            View view1 = sparseArray.get(i);
+            if (0 == i) {
+                ImageView imageView = (ImageView) view1.findViewById(R.id.pip_iv_back);
                 imageView.setOnClickListener(v -> finish());
             }
             String url = stringLit.get(i);
-            if (!TextUtils.isEmpty(url)&&!"".equals(url)) {
-                AspectRatioFrameLayout videoFrame = (AspectRatioFrameLayout) view1.findViewById(R.id.video_frame);
-                SurfaceView surfaceView = (SurfaceView) view1.findViewById(R.id.surface_view);
+            if (!TextUtils.isEmpty(url) && !"".equals(url)) {
+                videoFrame = (AspectRatioFrameLayout) view1.findViewById(R.id.video_frame);
+                surfaceView = (SurfaceView) view1.findViewById(R.id.surface_view);
                 surfaceView.getHolder().addCallback(new MyCllback(i));
                 videoFrame.setTag(i);
                 videoFrame.setOnClickListener(this);
-                Log.e(getClass().getSimpleName(),"url"+url);
-                getRealURL(url,videoFrame,surfaceView);
+                Log.e(getClass().getSimpleName(), "url" + url);
+                frameLayoutMap.put(FRAME_KEY+flags[i],videoFrame);
+                surfaceViewMap.put(SURF_KEY+flags[i],surfaceView);
+                getRealURL(url, flags[i]);
             }
         }
     }
+
+    private Map<String,AspectRatioFrameLayout> frameLayoutMap = new HashMap<>();
+    private Map<String,SurfaceView> surfaceViewMap = new HashMap<>();
+    private static final String FRAME_KEY = "frame";
+    private static final String SURF_KEY = "surf";
+    private int[] flags = new int[]{120, 121, 123, 124};
+    private AspectRatioFrameLayout videoFrame;
+    private SurfaceView surfaceView;
 
     @Override
     protected int getLayoutId() {
         return R.layout.activity_video_pip;
     }
-   @Override
+
+    @Override
     protected void onNewIntent(Intent intent) {
         releasePlayer();
     }
 
-    private void onShown(String url,AspectRatioFrameLayout videoFrame, SurfaceView surfaceView) {
+    private void onShown(String url, AspectRatioFrameLayout videoFrame, SurfaceView surfaceView) {
         Uri videoUri = Uri.parse(url);
 
         contentType = Util.TYPE_HLS;
-        AVPlayer player = demoPlayerSparseArray.get((int)videoFrame.getTag());
+        AVPlayer player = demoPlayerSparseArray.get((int) videoFrame.getTag());
         if (!maybeRequestPermission(videoUri)) {
-            preparePlayer(videoUri,true,videoFrame,surfaceView, player);
-        }
-        else if (null!=player){
+            preparePlayer(videoUri, true, videoFrame, surfaceView, player);
+        } else if (null != player) {
             player.setBackgrounded(false);
         }
 
@@ -179,9 +193,9 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
         }
     }
 
-    private void preparePlayer(Uri contentUri,boolean playWhenReady, AspectRatioFrameLayout videoFrame, SurfaceView surfaceView, AVPlayer player) {
+    private void preparePlayer(Uri contentUri, boolean playWhenReady, AspectRatioFrameLayout videoFrame, SurfaceView surfaceView, AVPlayer player) {
         if (player == null) {
-            player = new AVPlayer(getRendererBuilder(contentUri),this);
+            player = new AVPlayer(getRendererBuilder(contentUri), this);
             player.addListener(new MyPlayListener(videoFrame));
             player.setMetadataListener(this);
             playerNeedsPrepare = true;
@@ -193,14 +207,11 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
         }
         player.setSurface(surfaceView.getHolder().getSurface());
         player.setPlayWhenReady(playWhenReady);
-        if (demoPlayerSparseArray.size()>=1){
+        if (demoPlayerSparseArray.size() >= 1) {
             player.setSelectedTrack(AVPlayer.TYPE_AUDIO, -1);
         }
-        demoPlayerSparseArray.put((int)videoFrame.getTag(),player);
+        demoPlayerSparseArray.put((int) videoFrame.getTag(), player);
     }
-
-
-
 
 
     @Override
@@ -234,12 +245,12 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
     @Override
     public void onClick(View view) {
         //点击哪个哪个播放声音
-        int tag= (int)view.getTag();
+        int tag = (int) view.getTag();
         int size = demoPlayerSparseArray.size();
 //        DemoPlayer player2 = demoPlayerSparseArray.get(tag);
-        for (int i=0;i<size;i++){
+        for (int i = 0; i < size; i++) {
             AVPlayer player = demoPlayerSparseArray.get(i);
-            if (null!=player) {
+            if (null != player) {
                 if (tag == i) {
                     player.setSelectedTrack(AVPlayer.TYPE_AUDIO, 0);
                 } else {
@@ -251,13 +262,14 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
     }
 
 
-
     class MyCllback implements SurfaceHolder.Callback {
 
         final AVPlayer player;
-       MyCllback(int position){
-           player = demoPlayerSparseArray.get(position);
-       }
+
+        MyCllback(int position) {
+            player = demoPlayerSparseArray.get(position);
+        }
+
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
 
@@ -289,7 +301,7 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
         @Override
         public void onStateChanged(boolean playWhenReady, int playbackState) {
             String text = "playWhenReady=" + playWhenReady + ", playbackState=";
-            switch(playbackState) {
+            switch (playbackState) {
                 case ExoPlayer.STATE_BUFFERING:
                     text += "buffering";
                     break;
@@ -309,7 +321,7 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
                     text += "unknown";
                     break;
             }
-            Log.e(TAG,text);
+            Log.e(TAG, text);
         }
 
         @Override
@@ -343,19 +355,19 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
     }
 
     @TargetApi(23)
-    private boolean maybeRequestPermission(Uri contentUri){
-        if (requiresPermission(contentUri)){
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},0);
+    private boolean maybeRequestPermission(Uri contentUri) {
+        if (requiresPermission(contentUri)) {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 0);
             return true;
         }
 
         return false;
     }
 
-    private boolean requiresPermission(Uri contentUri){
-        return Util.SDK_INT >23 &&
+    private boolean requiresPermission(Uri contentUri) {
+        return Util.SDK_INT > 23 &&
                 Util.isLocalFileUri(contentUri) &&
-                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED ;
+                checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -378,27 +390,27 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
 
     private void releasePlayer() {
         int size = demoPlayerSparseArray.size();
-       for (int i=0;i<size;i++){
-          AVPlayer player=demoPlayerSparseArray.get(i);
-           if (player != null) {
-               player.release();
-           }
-       }
+        for (int i = 0; i < size; i++) {
+            AVPlayer player = demoPlayerSparseArray.get(i);
+            if (player != null) {
+                player.release();
+            }
+        }
         sparseArray.clear();
         demoPlayerSparseArray.clear();
 
     }
+
     private void onHidden() {
         if (!enableBackgroundAudio) {
             releasePlayer();
         } else {
             int size = demoPlayerSparseArray.size();
-            for (int i=0;i<size;i++){
-                AVPlayer player=demoPlayerSparseArray.get(i);
-                if (null!=player)
-                player.setBackgrounded(true);
+            for (int i = 0; i < size; i++) {
+                AVPlayer player = demoPlayerSparseArray.get(i);
+                if (null != player)
+                    player.setBackgrounded(true);
             }
-
         }
     }
 
@@ -413,53 +425,16 @@ public class PipActivity extends BaseActivity implements AVPlayer.Id3MetadataLis
      * 获取视频播放地址
      *
      * @param url
-     * @param videoFrame
-     * @param surfaceView
      */
-    private void getRealURL(String url, AspectRatioFrameLayout videoFrame, SurfaceView surfaceView) {
-        HashMap<String, Object> maps = new HashMap<>();
-        maps.put("videoSourceURL", url);
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)){
-            UserModel model = new Gson().fromJson(userinfo,UserModel.class);
-            maps.put("cellphone", model.getPhoneNo());
-            if (model.getIsVip()!=null && model.getIsVip().equals("1")){
-                maps.put("freetag", "1");
-            }else{
-                maps.put("freetag", "0");
-            }
-
-        }else{
-            maps.put("cellphone", StringUtils.generateOnlyID());
-            maps.put("freetag", "0");
-        }
-//        maps.put("cellphone", "18513179404");
-//        maps.put("freetag", "1");
-        HttpApis.getVideoRealURL(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<VideoURL, RespHeader> resp = new ResponseObj<VideoURL, RespHeader>();
-                ResponseParser.parse(resp, response, VideoURL.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-//                    videoUrl.setFormatUrl(resp.getBody().getUrl());
-//                    video.setmPlayUrl(videoUrl);
-//                    // Reset player and params.
-//                    releasePlayer();
-//                    // Set Player
-//                    setIntent(onUrlGot());
-//                    onShown();
-                    onShown(resp.getBody().getUrl(), videoFrame, surfaceView);
-
-                } else {
-                    TLog.log(resp.getHead().getRspMsg());
-                }
-            }
-        });
+    private void getRealURL(String url, int flag) {
+        NetUtils.getVideoRealURL(url, UserMgr.getUsePhone(), flag, this);
     }
+
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value, flag);
+        ResponseVideoRealUrl va = (ResponseVideoRealUrl) value;
+        onShown(va.getBody().getUrl(), frameLayoutMap.get(FRAME_KEY+flag), surfaceViewMap.get(SURF_KEY+flag));
+    }
+
 }

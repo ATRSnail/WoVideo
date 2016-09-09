@@ -24,6 +24,19 @@ public class HttpApis {
     public static final int http_city_tv = 0xffffff09; //本地电台
     public static final int http_video_list = 0xffffff10; //视频列表
     public static final int http_bar = 0xffffff11; //bar条
+    public static final int http_upload_head_img = 0xffffff12; //上传头像
+    public static final int http_personal_tag = 0xffffff13; //个性化标签
+    public static final int http_personal_channel = 0xffffff14; //个性化频道
+    public static final int http_update_personal_channel = 0xffffff15; //保存个性化频道
+    public static final int http_update_personal_tag = 0xffffff16; //保存个性化标签
+    public static final int http_zan = 0xffffff17; //点赞
+    public static final int http_valide_comment = 0xffffff18; //验证敏感词
+    public static final int http_video_uncollect = 0xffffff19; //取消收藏
+    public static final int http_video_collect = 0xffffff20; //收藏
+    public static final int http_push_comment = 0xffffff21; //发表评论
+    public static final int http_video_real_url = 0xffffff22; //视频真实地址
+    public static final int http_video_fake_url = 0xffffff23; //视频网络地址
+    public static final int http_video_lives_url = 0xffffff24; //直播视频网络地址
 
     /**
      * 登录
@@ -108,6 +121,9 @@ public class HttpApis {
     public static void getLiveTvList(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblLive/getLiveTvList", map, callback);
     }
+    public static void getLiveTvList(HashMap<String, Object> map,int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblLive/getLiveTvList", map,flag, callback);
+    }
 
     /**
      * 获取视频 真实播放地址
@@ -117,6 +133,10 @@ public class HttpApis {
      */
     public static void getVideoRealURL(HashMap<String, Object> map, StringCallback callback) {
         HttpUtils.formPost("mblIndex/getPlayVideoURL", map, callback);
+    }
+
+    public static void getVideoRealURL(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblIndex/getPlayVideoURL", map, flag, callback);
     }
 
     /**
@@ -129,8 +149,8 @@ public class HttpApis {
         HttpUtils.formPost("mblVf/getVfListByType", map, callback);
     }
 
-    public static void getListByType(HashMap<String, Object> map,int flag, HttpCallback callback) {
-        HttpUtils.formPost("mblVf/getVfListByType", map,flag, callback);
+    public static void getListByType(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/getVfListByType", map, flag, callback);
     }
 
     /**
@@ -149,8 +169,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void getVideoInfo(HashMap<String, Object> map, int flag,HttpCallback callback) {
-        HttpUtils.formPost("mblVf/getVfInfo", map,flag, callback);
+    public static void getVideoInfo(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/getVfInfo", map, flag, callback);
     }
 
 
@@ -160,8 +180,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void getVideoListInfo(HashMap<String, Object> map, StringCallback callback) {
-        HttpUtils.formPost("mblVf/getPlaysListByVf", map, callback);
+    public static void getVideoListInfo(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/getPlaysListByVf", map, flag, callback);
     }
 
     /**
@@ -170,10 +190,6 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void getYouLikeList(HashMap<String, Object> map, StringCallback callback) {
-        HttpUtils.formPost("mblVf/youLike", map, callback);
-    }
-
     public static void getYouLikeList(HashMap<String, Object> map, int flag, HttpCallback callback) {
         HttpUtils.formPost("mblVf/youLike", map, flag, callback);
     }
@@ -240,6 +256,16 @@ public class HttpApis {
     }
 
     /**
+     * 上传头像
+     *
+     * @param map
+     * @param callback
+     */
+    public static void uploadHeadImg(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblUser/upHeadImg", map, flag, callback);
+    }
+
+    /**
      * 获取开屏广告信息
      *
      * @param map
@@ -275,8 +301,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void collectVideo(HashMap<String, Object> map, StringCallback callback) {
-        HttpUtils.formPost("mblCollection/saveMyColl", map, callback);
+    public static void collectVideo(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblCollection/saveMyColl", map, flag, callback);
     }
 
     /**
@@ -295,18 +321,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void commentList(HashMap<String, Object> map, StringCallback callback) {
-        HttpUtils.formPost("mblVf/viewComment", map, callback);
-    }
-
-    /**
-     * 评论列表
-     *
-     * @param map
-     * @param callback
-     */
-    public static void commentList(HashMap<String, Object> map, int flag,HttpCallback callback) {
-        HttpUtils.formPost("mblVf/viewComment", map, flag,callback);
+    public static void commentList(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/viewComment", map, flag, callback);
     }
 
 
@@ -316,8 +332,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void pushComment(HashMap<String, Object> map, StringCallback callback) {
-        HttpUtils.formPost("mblVf/addComment", map, callback);
+    public static void pushComment(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/addComment", map, flag, callback);
     }
 
     /**
@@ -326,18 +342,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void getBulletByVideoId(HashMap<String, Object> map, StringCallback callback) {
-        HttpUtils.formPost("mblVf/viewBarrage", map, callback);
-    }
-
-    /**
-     * 根据类型获取 弹幕数据
-     *
-     * @param map
-     * @param callback
-     */
-    public static void getBulletByVideoId(HashMap<String, Object> map,int flag, HttpCallback callback) {
-        HttpUtils.formPost("mblVf/viewBarrage", map, flag,callback);
+    public static void getBulletByVideoId(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/viewBarrage", map, flag, callback);
     }
 
     /**
@@ -346,18 +352,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void addBullet(HashMap<String, Object> map, StringCallback callback) {
-        HttpUtils.formPost("mblVf/addBarrage", map, callback);
-    }
-
-    /**
-     * 对指定视频添加弹幕
-     *
-     * @param map
-     * @param callback
-     */
-    public static void addBullet(HashMap<String, Object> map, int flag,HttpCallback callback) {
-        HttpUtils.formPost("mblVf/addBarrage", map, flag,callback);
+    public static void addBullet(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblVf/addBarrage", map, flag, callback);
     }
 
     /**
@@ -386,8 +382,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void cancelCollect(HashMap<String, Object> map,int flag, HttpCallback callback) {
-        HttpUtils.formPost("mblCollection/cancelMyColls", map,flag, callback);
+    public static void cancelCollect(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblCollection/cancelMyColls", map, flag, callback);
     }
 
     /**
@@ -406,18 +402,8 @@ public class HttpApis {
      * @param map
      * @param callback
      */
-    public static void CommentVerification(HashMap<String, Object> map, StringCallback callback) {
-        HttpUtils.formPost("mblSensitiveWord/filter", map, callback);
-    }
-
-    /**
-     * 评论敏感词校验
-     *
-     * @param map
-     * @param callback
-     */
-    public static void CommentVerification(HashMap<String, Object> map, int flag,HttpCallback callback) {
-        HttpUtils.formPost("mblSensitiveWord/filter", map, flag,callback);
+    public static void CommentVerification(HashMap<String, Object> map, int flag, HttpCallback callback) {
+        HttpUtils.formPost("mblSensitiveWord/filter", map, flag, callback);
     }
 
     /**
@@ -493,6 +479,7 @@ public class HttpApis {
 
     /**
      * 根据城市的code值,获取电台
+     *
      * @param map
      * @param flag
      * @param callback
@@ -502,8 +489,8 @@ public class HttpApis {
     }
 
     /**
-     *
      * 获取个性化频道
+     *
      * @param map
      * @param flag
      * @param callback
@@ -513,8 +500,8 @@ public class HttpApis {
     }
 
     /**
-     *
      * 获取个性化标签
+     *
      * @param map
      * @param flag
      * @param callback
@@ -525,7 +512,8 @@ public class HttpApis {
 
 
     /**
-     *更新频道接口
+     * 更新频道接口
+     *
      * @param map
      * @param flag
      * @param callback
@@ -535,7 +523,8 @@ public class HttpApis {
     }
 
     /**
-     *更新tag接口
+     * 更新tag接口
+     *
      * @param map
      * @param flag
      * @param callback
@@ -545,7 +534,8 @@ public class HttpApis {
     }
 
     /**
-     *点赞接口
+     * 点赞接口
+     *
      * @param map
      * @param flag
      * @param callback

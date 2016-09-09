@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -27,6 +28,7 @@ import com.lt.hm.wovideo.db.NetUsageDatabase;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpUtils;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.utils.DialogHelp;
 import com.lt.hm.wovideo.utils.FileUtil;
@@ -34,6 +36,7 @@ import com.lt.hm.wovideo.utils.ImageUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
+import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -65,18 +68,16 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
     TextView registTag;
     @BindView(R.id.person_head_bg)
     LinearLayout personHeadBg;
-    @BindView(R.id.order)
-    RelativeLayout order;
-    @BindView(R.id.integral)
-    RelativeLayout integral;
-    @BindView(R.id.history)
-    RelativeLayout history;
-    @BindView(R.id.collect)
-    RelativeLayout collect;
-    @BindView(R.id.mine_tag)
-    RelativeLayout mineTag;
-    @BindView(R.id.active)
-    RelativeLayout active;
+    @BindView(R.id.tv_order)
+    TextView order;
+    @BindView(R.id.tv_history)
+    TextView history;
+    @BindView(R.id.tv_collect)
+    TextView collect;
+    @BindView(R.id.tv_mine_tag)
+    TextView mineTag;
+    @BindView(R.id.tv_active)
+    TextView active;
     @BindView(R.id.btn_set)
     ImageView btnSet;
     @BindView(R.id.btn_person_back)
@@ -87,10 +88,10 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
     LinearLayout login_layout;
     @BindView(pc_username)
     TextView tv_username;
-    @BindView(R.id.network_usage_text)
-    TextView tv_network_usage;
     @BindView(R.id.person_etime)
     TextView person_etime;
+    @BindView(R.id.view_line)
+    View line;
     private Uri origUri;
     private Uri cropUri;
     private String theLarge;
@@ -169,19 +170,16 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         loginTag.setOnClickListener(this);
         registTag.setOnClickListener(this);
         order.setOnClickListener(this);
-        integral.setVisibility(View.GONE);
-        integral.setOnClickListener(this);
         history.setOnClickListener(this);
         collect.setOnClickListener(this);
 
         mineTag.setVisibility(UserMgr.isLogin() ? View.VISIBLE : View.GONE);
+        line.setVisibility(UserMgr.isLogin() ? View.VISIBLE : View.GONE);
 
         mineTag.setOnClickListener(this);
         active.setOnClickListener(this);
         btnPersonBack.setVisibility(View.GONE);
         tv_username.setOnClickListener(this);
-        String text = String.format(getResources().getString(R.string.network), netUsageDatabase.querySum("") / 1024 / 1024);
-        tv_network_usage.setText(text);
     }
 
     @Override
@@ -206,27 +204,24 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
             case R.id.regist_tag:
                 UIHelper.ToRegister(getActivity());
                 break;
-            case R.id.order:
+            case R.id.tv_order:
                 UIHelper.ToBillsPage(getActivity());
                 break;
-            case R.id.integral:
-                UIHelper.ToMineIntegral(getActivity());
-                break;
-            case R.id.history:
+            case R.id.tv_history:
                 // TODO: 16/6/6 观看历史
                 UIHelper.ToHistoryPage(getActivity());
                 break;
-            case R.id.collect:
+            case R.id.tv_collect:
                 // TODO: 16/6/6 我的收藏
                 if (UserMgr.isLogin()) {
                     UIHelper.ToCollectPage(getActivity());
                 }
 
                 break;
-            case R.id.mine_tag:
+            case R.id.tv_mine_tag:
                 UIHelper.ToTagPage(getActivity(), true);
                 break;
-            case R.id.active:
+            case R.id.tv_active:
                 UIHelper.ToEventPage(getActivity());
                 break;
             case pc_username:
@@ -310,10 +305,10 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         File out = new File(savePath, fileName);
         Uri uri = Uri.fromFile(out);
         origUri = uri;
-        if (origUri == null){
+        if (origUri == null) {
             origUri = Uri.fromFile(out);
         }
-        TLog.error("origUri---->"+origUri);
+        TLog.error("origUri---->" + origUri);
 
         theLarge = savePath + fileName;// 该照片的绝对路径
 
@@ -373,25 +368,28 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
 
         if (protraitBitmap != null) {
             String img64 = ImageUtils.imgToBase64(protraitFile.getAbsolutePath(), protraitBitmap, "JPG");
-            HashMap<String, Object> map = new HashMap<>();
-            String string = ACache.get(getApplicationContext()).getAsString("userinfo");
-            map.put("phone", UserMgr.getUseInfo().getPhoneNo());
-            map.put("base", "image/jpg;base64," + img64);
-            TLog.log(map.toString());
-            HttpApis.uploadHeadImg(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
+            NetUtils.uploadHeadImg(img64, this);
+        }
+    }
 
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log(response);
-                    Glide.with(getApplicationContext()).load(ACache.get(getApplicationContext()).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
-                    // TODO: 16/7/6 刷新个人中心头像图片
-                }
-            });
+    @Override
+    public <T> void onSuccess(T value, int flag) {
+        super.onSuccess(value, flag);
+        switch (flag) {
+            case HttpApis.http_upload_head_img:
+                UT.showNormal("更新头像成功");
+                Glide.with(getApplicationContext()).load(ACache.get(getApplicationContext()).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(headIcon);
+                break;
+        }
+    }
 
+    @Override
+    public void onFail(String error, int flag) {
+        super.onFail(error, flag);
+        switch (flag) {
+            case HttpApis.http_upload_head_img:
+                UT.showNormal("更新头像失败");
+                break;
         }
     }
 

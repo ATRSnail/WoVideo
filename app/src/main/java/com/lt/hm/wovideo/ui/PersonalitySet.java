@@ -14,6 +14,7 @@ import com.lt.hm.wovideo.adapter.category.CategoryAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
+import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.interf.OnCateItemListener;
@@ -123,48 +124,28 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
      * 获取标签
      */
     private void getTagInfos() {
-        HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo();
-        if (userModel != null)
-            map.put("userid", userModel.getId());
-        HttpApis.getIndividuationTag(map, HttpApis.http_thr, new HttpCallback<>(ResponseTag.class, this));
+        NetUtils.getPersonalTag(UserMgr.getUseId(), this);
     }
 
     /**
      * 从网络获取频道
      */
     private void getClassInfos() {
-        HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo();
-        if (userModel != null)
-            map.put("userid", userModel.getId());
-        HttpApis.getIndividuationChannel(map, HttpApis.http_one, new HttpCallback<>(ResponseChannel.class, this));
+        NetUtils.getPersonalChannel(UserMgr.getUseId(), this);
     }
 
     /**
      * 保存个性化频道
      */
     private void updateChannel(String channel) {
-        TLog.error("channel--->" + channel);
-        HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo();
-        if (userModel != null)
-            map.put("userid", userModel.getId());
-        map.put("channel", channel);
-        HttpApis.updateChannel(map, HttpApis.http_two, new HttpCallback<>(String.class, this));
+        NetUtils.updateChannel(channel, UserMgr.getUseId(), this);
     }
 
     /**
      * 保存个性化tag
      */
     private void updateTag(String channel) {
-        TLog.error("channel--->" + channel);
-        HashMap<String, Object> map = new HashMap<>();
-        UserModel userModel = UserMgr.getUseInfo();
-        if (userModel != null)
-            map.put("userid", userModel.getId());
-        map.put("tag", channel);
-        HttpApis.updateTag(map, HttpApis.http_two, new HttpCallback<>(String.class, this));
+        NetUtils.updateTag(channel, UserMgr.getUseId(), this);
     }
 
     @Override
@@ -276,25 +257,25 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
     public <T> void onSuccess(T value, int flag) {
         super.onSuccess(value, flag);
         switch (flag) {
-
-            case HttpApis.http_one:
+            case HttpApis.http_personal_channel:
                 ResponseChannel channelRe = (ResponseChannel) value;
                 seleChannelList = channelRe.getBody().getSelectedChannels();
                 unSelecChannels = channelRe.getBody().getNotSelectedChannels();
                 initCateView();
                 break;
-            case HttpApis.http_two:
+            case HttpApis.http_update_personal_channel:
+            case HttpApis.http_update_personal_tag:
                 String val = (String) value;
-                if (!TextUtils.isEmpty(val) && val.equals(ResponseCode.Success)){
+                if (!TextUtils.isEmpty(val) && val.equals(ResponseCode.Success)) {
                     UT.showNormal("保存成功");
                     if (!isTag)
                         UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
                     this.finish();
-                }else {
+                } else {
                     UT.showNormal("保存失败");
                 }
                 break;
-            case HttpApis.http_thr:
+            case HttpApis.http_personal_tag:
                 ResponseTag responseTag = (ResponseTag) value;
                 seleTags = responseTag.getBody().getSelectedDicList();
                 unSeleTags = responseTag.getBody().getNotSelectedDicList();
@@ -306,8 +287,10 @@ public class PersonalitySet extends BaseActivity implements CustomTopbar.myTopba
 
     @Override
     public void onFail(String error, int flag) {
-        switch (flag){
-            case HttpApis.http_two:
+        super.onFail(error, flag);
+        switch (flag) {
+            case HttpApis.http_update_personal_channel:
+            case HttpApis.http_update_personal_tag:
                 UT.showNormal(error);
                 break;
         }

@@ -48,8 +48,10 @@ import com.lt.hm.wovideo.model.VideoType;
 import com.lt.hm.wovideo.model.VideoURL;
 import com.lt.hm.wovideo.model.response.ResponseComment;
 import com.lt.hm.wovideo.model.response.ResponseLikeList;
+import com.lt.hm.wovideo.model.response.ResponsePlayList;
 import com.lt.hm.wovideo.model.response.ResponseValidateComment;
 import com.lt.hm.wovideo.model.response.ResponseVfinfo;
+import com.lt.hm.wovideo.model.response.ResponseVideoRealUrl;
 import com.lt.hm.wovideo.utils.ShareUtils;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
@@ -328,6 +330,7 @@ public class NewMoviePage extends BaseVideoActivity {
     }
 
     private RecyclerView.ItemDecoration itemDecoration;
+
     @Override
     public void initViews() {
         videoProjection.setOnClickListener(new View.OnClickListener() {
@@ -432,18 +435,14 @@ public class NewMoviePage extends BaseVideoActivity {
             UT.showNormal("请先登录");
             return;
         }
-        UserModel model = UserMgr.getUseInfo();
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("vfplayId", playIntro.getId());
-        map.put("userId", model.getId());
-        HttpApis.clickZan(map, HttpApis.http_one, new HttpCallback<>(String.class, this));
+        NetUtils.clickZan(playIntro.getId(), UserMgr.getUseId(), this);
     }
 
     @Override
     public <T> void onSuccess(T value, int flag) {
-        super.onSuccess(value,flag);
+        super.onSuccess(value, flag);
         switch (flag) {
-            case HttpApis.http_one:
+            case HttpApis.http_zan:
                 String val = (String) value;
                 if (!TextUtils.isEmpty(val) && val.equals(ResponseCode.Success)) {
                     UT.showNormal("点赞成功");
@@ -451,7 +450,17 @@ public class NewMoviePage extends BaseVideoActivity {
                     UT.showNormal("点赞失败");
                 }
                 break;
-            case HttpApis.http_two:
+            case HttpApis.http_video_collect:
+                String va = (String) value;
+                if (!TextUtils.isEmpty(va) && va.equals(ResponseCode.Success)) {
+                    UT.showNormal("收藏成功");
+                    setCollectImg(true);
+                } else {
+                    UT.showNormal("收藏失败");
+                    setCollectImg(false);
+                }
+                break;
+            case HttpApis.http_valide_comment:
                 ResponseValidateComment responseValidateComment = (ResponseValidateComment) value;
                 ValidateComment validate = responseValidateComment.getBody();
                 if (validate.getIsPass().equals("1")) {
@@ -461,7 +470,7 @@ public class NewMoviePage extends BaseVideoActivity {
                     UT.showNormal("言论不当，请斟酌发言");
                 }
                 break;
-            case HttpApis.http_thr:
+            case HttpApis.http_video_uncollect:
                 String valColl = (String) value;
                 if (!TextUtils.isEmpty(valColl) && valColl.equals(ResponseCode.Success)) {
                     isCollected = false;
@@ -469,6 +478,15 @@ public class NewMoviePage extends BaseVideoActivity {
                     UT.showNormal(getResources().getString(R.string.cancel_collect_success));
                 } else {
                     UT.showNormal(getResources().getString(R.string.cancel_collect_failed));
+                }
+                break;
+            case HttpApis.http_push_comment:
+                String vaC = (String) value;
+                if (!TextUtils.isEmpty(vaC) && vaC.equals(ResponseCode.Success)) {
+                    UT.showNormal("评论成功");
+                    getCommentList(vfId);
+                } else {
+                    UT.showNormal("评论失败");
                 }
                 break;
             case HttpApis.http_you_like:
@@ -520,6 +538,95 @@ public class NewMoviePage extends BaseVideoActivity {
                 bref_txt_long.setText(share_desc);
                 videoPlayNumber.setText(vfinfoModel.getHit());
                 break;
+            case HttpApis.http_video_real_url:
+                ResponseVideoRealUrl realUrl = (ResponseVideoRealUrl) value;
+                if (videoUrl != null && video != null) {
+                    videoUrl.setFormatUrl(realUrl.getBody().getUrl());
+                    video.setmPlayUrl(videoUrl);
+                    // Reset player and params.
+                    releasePlayer();
+                    mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
+                    if (getIntent().getExtras().containsKey("cur_position")) {
+                        long cur_position = getIntent().getExtras().getLong("cur_position");
+                        mPlayerPosition = cur_position;
+                        seekTo(mPlayerPosition);
+                    }
+                    // Set play URL and play it
+                    setIntent(onUrlGot(video));
+                    onShown();
+                }
+                break;
+            case HttpApis.http_video_fake_url:
+                ResponsePlayList vaP = (ResponsePlayList) value;
+                if (vaP.getBody().getPlaysList().size() < 0 || vaP.getBody().getPlaysList().size() == 0)
+                    return;
+                playIntro = vaP.getBody().getPlaysList().get(0);
+
+                if (typeId == 2 || typeId == 3 || typeId == 4) {
+                    antholys.addAll(vaP.getBody().getPlaysList());
+                    initAnthologys(vaP.getBody().getPlaysList().size());
+                }
+
+                isCollected = playIntro.getSc() != null && playIntro.getSc().equals("1");
+                setCollectImg(isCollected);
+
+                collect_tag = playIntro.getId();
+                free_hint.setText(playIntro.getZan() + "");
+                videoAddHit(playIntro.getId());
+                VideoModel model = new VideoModel();
+                ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
+                if (!StringUtils.isNullOrEmpty(playIntro.getFluentUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("流畅");
+                    url.setFormatUrl(playIntro.getFluentUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(playIntro.getStandardUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("标清");
+                    url.setFormatUrl(playIntro.getStandardUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(playIntro.getBlueUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("蓝光");
+                    url.setFormatUrl(playIntro.getBlueUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(playIntro.getHighUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("高清");
+                    url.setFormatUrl(playIntro.getHighUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(playIntro.getSuperUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("超清");
+                    url.setFormatUrl(playIntro.getSuperUrl());
+                    urls.add(url);
+                }
+                if (!StringUtils.isNullOrEmpty(playIntro.getFkUrl())) {
+                    VideoUrl url = new VideoUrl();
+                    url.setFormatName("4K");
+                    url.setFormatUrl(playIntro.getFkUrl());
+                    urls.add(url);
+                }
+                model.setmVideoUrl(urls);
+
+                setVideoModel(model);
+                setQualityListener(new AVController.OnQualitySelected() {
+                    @Override
+                    public void onQualitySelect(String key, String value) {
+                        getRealURL(value, "");
+                        isQualitySwitch = true;
+                    }
+                });
+                if (model.getmVideoUrl().size() > 0) {
+                    isQualitySwitch = false;
+                    getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), playIntro.getId());
+                    mQualityName = model.getmVideoUrl().get(0).getFormatName();
+                }
+                break;
         }
     }
 
@@ -534,9 +641,11 @@ public class NewMoviePage extends BaseVideoActivity {
     @Override
     public void onFail(String error, int flag) {
         switch (flag) {
-            case HttpApis.http_one:
-            case HttpApis.http_two:
-            case HttpApis.http_thr:
+            case HttpApis.http_zan:
+            case HttpApis.http_valide_comment:
+            case HttpApis.http_video_uncollect:
+            case HttpApis.http_video_collect:
+            case HttpApis.http_push_comment:
                 UT.showNormal(error);
                 break;
             case HttpApis.http_for:
@@ -578,8 +687,6 @@ public class NewMoviePage extends BaseVideoActivity {
             mMultiSelector.setSelected(0, 0, true);
         }
 //        mMultiSelector.setSelected(0,0,true);
-
-
     }
 
     /**
@@ -588,21 +695,15 @@ public class NewMoviePage extends BaseVideoActivity {
      * @param s
      */
     private void checkCommentValide(String s) {
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("context", s);
-        HttpApis.CommentVerification(map, HttpApis.http_two, new HttpCallback<>(ResponseValidateComment.class, this));
+        NetUtils.checkCommentValide(s, this);
     }
 
     /**
      * 取消收藏
      */
     private void CancelCollect() {
-        UserModel model = UserMgr.getUseInfo();
-        if (model != null) {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("userid", model.getId());
-            map.put("vfids", collect_tag);
-            HttpApis.cancelCollect(map, HttpApis.http_thr, new HttpCallback<>(String.class, this));
+        if (UserMgr.isLogin()) {
+            NetUtils.CancelVideoCollect(collect_tag, UserMgr.getUseId(), this);
         } else {
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
@@ -612,32 +713,8 @@ public class NewMoviePage extends BaseVideoActivity {
      * 收藏 视频接口调用
      */
     private void CollectVideo() {
-        HashMap<String, Object> map = new HashMap<>();
-        String string = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
-        if (!StringUtils.isNullOrEmpty(string)) {
-            UserModel model = new Gson().fromJson(string, UserModel.class);
-            map.put("userid", model.getId());
-            map.put("vfid", collect_tag);
-            HttpApis.collectVideo(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log("collect->" + response);
-                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        Toast.makeText(getApplicationContext(), "收藏成功", Toast.LENGTH_SHORT).show();
-                        setCollectImg(true);
-                    } else {
-                        setCollectImg(false);
-                    }
-                }
-            });
-
+        if (UserMgr.isLogin()) {
+            NetUtils.VideoCollect(collect_tag, UserMgr.getUseId(), this);
         } else {
             // TODO: 16/7/8 未登录跳转登录页面
             UnLoginHandler.unLogin(NewMoviePage.this);
@@ -655,40 +732,8 @@ public class NewMoviePage extends BaseVideoActivity {
      * @param s
      */
     private void SendComment(String s) {
-        HashMap<String, Object> map = new HashMap<>();
-        String string = ACache.get(this).getAsString("userinfo");
-        if (!StringUtils.isNullOrEmpty(string)) {
-            UserModel model = new Gson().fromJson(string, UserModel.class);
-            map.put("userId", model.getId());
-            map.put("vfId", vfId);
-            map.put("comment", s);
-            HttpApis.pushComment(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log(response);
-                    ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
-                    ResponseParser.parse(resp, response, String.class, RespHeader.class);
-                    etAddComment.setText("");
-                    if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                        Toast.makeText(getApplicationContext(), "评论成功", Toast.LENGTH_SHORT).show();
-                        TLog.log("comment_list" + vfId);
-                        getCommentList(vfId);
-                    } else {
-                        if (StringUtils.isNullOrEmpty(resp.getHead().getRspMsg())) {
-                            Toast.makeText(getApplicationContext(), "评论失败", Toast.LENGTH_SHORT).show();
-                        } else {
-                            TLog.log(resp.getHead().getRspMsg());
-                            Toast.makeText(getApplicationContext(), resp.getHead().getRspMsg(), Toast.LENGTH_SHORT).show();
-
-                        }
-                    }
-                }
-            });
+        if (UserMgr.isLogin()) {
+            NetUtils.SendComment(s, vfId, UserMgr.getUseId(), this);
         } else {
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
@@ -702,156 +747,23 @@ public class NewMoviePage extends BaseVideoActivity {
      * @param vfId
      */
     public void getFirstURL(String vfId) {
-        HashMap<String, Object> maps = new HashMap<>();
-        maps.put("vfid", vfId);
-        UserModel model = UserMgr.getUseInfo();
-        if (model != null) {
-            maps.put("userid", model.getId());
-        } else {
-            setCollectImg(false);
-        }
-        HttpApis.getVideoListInfo(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log("first-url" + response);
-                ResponseObj<PlayList, RespHeader> resp = new ResponseObj<PlayList, RespHeader>();
-                ResponseParser.parse(resp, response, PlayList.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    if (resp.getBody().getPlaysList().size() < 0 || resp.getBody().getPlaysList().size() == 0)
-                        return;
-                    playIntro = resp.getBody().getPlaysList().get(0);
-
-                    if (typeId == 2 || typeId == 3 || typeId == 4) {
-                        antholys.addAll(resp.getBody().getPlaysList());
-                        initAnthologys(resp.getBody().getPlaysList().size());
-                    }
-
-                    isCollected = playIntro.getSc() != null && playIntro.getSc().equals("1");
-                    setCollectImg(isCollected);
-
-                    collect_tag = playIntro.getId();
-                    free_hint.setText(playIntro.getZan()+"");
-                    videoAddHit(playIntro.getId());
-                    VideoModel model = new VideoModel();
-                    ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
-                    if (!StringUtils.isNullOrEmpty(playIntro.getFluentUrl())) {
-                        VideoUrl url = new VideoUrl();
-                        url.setFormatName("流畅");
-                        url.setFormatUrl(playIntro.getFluentUrl());
-                        urls.add(url);
-                    }
-                    if (!StringUtils.isNullOrEmpty(playIntro.getStandardUrl())) {
-                        VideoUrl url = new VideoUrl();
-                        url.setFormatName("标清");
-                        url.setFormatUrl(playIntro.getStandardUrl());
-                        urls.add(url);
-                    }
-                    if (!StringUtils.isNullOrEmpty(playIntro.getBlueUrl())) {
-                        VideoUrl url = new VideoUrl();
-                        url.setFormatName("蓝光");
-                        url.setFormatUrl(playIntro.getBlueUrl());
-                        urls.add(url);
-                    }
-                    if (!StringUtils.isNullOrEmpty(playIntro.getHighUrl())) {
-                        VideoUrl url = new VideoUrl();
-                        url.setFormatName("高清");
-                        url.setFormatUrl(playIntro.getHighUrl());
-                        urls.add(url);
-                    }
-                    if (!StringUtils.isNullOrEmpty(playIntro.getSuperUrl())) {
-                        VideoUrl url = new VideoUrl();
-                        url.setFormatName("超清");
-                        url.setFormatUrl(playIntro.getSuperUrl());
-                        urls.add(url);
-                    }
-                    if (!StringUtils.isNullOrEmpty(playIntro.getFkUrl())) {
-                        VideoUrl url = new VideoUrl();
-                        url.setFormatName("4K");
-                        url.setFormatUrl(playIntro.getFkUrl());
-                        urls.add(url);
-                    }
-                    model.setmVideoUrl(urls);
-
-                    setVideoModel(model);
-                    setQualityListener(new AVController.OnQualitySelected() {
-                        @Override
-                        public void onQualitySelect(String key, String value) {
-                            getRealURL(value, true, "");
-                        }
-                    });
-                    if (model.getmVideoUrl().size() > 0) {
-                        getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, playIntro.getId());
-                        mQualityName = model.getmVideoUrl().get(0).getFormatName();
-                    }
-                }
-            }
-        });
+        NetUtils.getVideoFakeUrl(vfId, UserMgr.getUseId(), this);
     }
+
+    private boolean isQualitySwitch;
 
     /**
      * 获取视频播放地址
      *
      * @param url
      */
-    private void getRealURL(String url, boolean isQualitySwitch, String videoId) {
+    private void getRealURL(String url, String videoId) {
         if (!isQualitySwitch) {
             TLog.log("Bullet", "get real url" + videoId);
             setVideoId(videoId); // Set Video Id for Bullet Screen usage
             getBullets(); // get Bullet list after set Video Id.
         }
-        HashMap<String, Object> maps = new HashMap<String, Object>();
-        maps.put("videoSourceURL", url);
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)) {
-            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            maps.put("cellphone", model.getPhoneNo());
-            if (model.getIsVip() != null && model.getIsVip().equals("1")) {
-                maps.put("freetag", "1");
-            } else {
-                maps.put("freetag", "0");
-            }
-        } else {
-            maps.put("cellphone", StringUtils.generateOnlyID());
-            maps.put("freetag", "0");
-        }
-
-        HttpApis.getVideoRealURL(maps, new StringCallback() {
-            @Override
-            public void onError(Call call, Exception e, int id) {
-                TLog.log("error:" + e.getMessage());
-            }
-
-            @Override
-            public void onResponse(String response, int id) {
-                TLog.log(response);
-                ResponseObj<VideoURL, RespHeader> resp = new ResponseObj<VideoURL, RespHeader>();
-                ResponseParser.parse(resp, response, VideoURL.class, RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
-                    if (videoUrl != null && video != null) {
-                        videoUrl.setFormatUrl(resp.getBody().getUrl());
-                        video.setmPlayUrl(videoUrl);
-                        // Reset player and params.
-                        releasePlayer();
-                        mPlayerPosition = isQualitySwitch ? mPlayerPosition : 0;
-                        if (getIntent().getExtras().containsKey("cur_position")) {
-                            long cur_position = getIntent().getExtras().getLong("cur_position");
-                            mPlayerPosition = cur_position;
-                            seekTo(mPlayerPosition);
-                        }
-                        // Set play URL and play it
-                        setIntent(onUrlGot(video));
-                        onShown();
-                    }
-                } else {
-                    TLog.log(resp.getHead().getRspMsg());
-                }
-            }
-        });
+        NetUtils.getVideoRealURL(url, UserMgr.getUsePhone(), this);
     }
 
     int currentEpisode = 0;
@@ -914,11 +826,13 @@ public class NewMoviePage extends BaseVideoActivity {
         setQualityListener(new AVController.OnQualitySelected() {
             @Override
             public void onQualitySelect(String key, String value) {
-                getRealURL(value, true, "");
+                getRealURL(value, "");
+                isQualitySwitch = true;
             }
         });
         if (model.getmVideoUrl().size() > 0) {
-            getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), false, details.getId());
+            isQualitySwitch = false;
+            getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), details.getId());
             mQualityName = model.getmVideoUrl().get(0).getFormatName();
         }
     }

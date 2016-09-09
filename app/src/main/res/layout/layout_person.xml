@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:orientation="vertical">
 
     <include layout="@layout/layout_person_head" />
@@ -9,161 +10,71 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/integral"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:id="@+id/integral_icon"
-                style="@style/person_menu_img"
-                android:src="@drawable/icon_integral" />
-
-            <TextView
-                style="@style/person_menu_text"
-                android:layout_toRightOf="@id/integral_icon"
-                android:text="@string/my_integral" />
-        </RelativeLayout>
+        <TextView
+            android:id="@+id/tv_history"
+            style="@style/mine_info_text"
+            android:drawableLeft="@drawable/icon_history"
+            android:text="@string/history_string" />
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/font_gray" />
+            android:layout_height="0.5dp"
+            android:background="@drawable/list_view_divider" />
 
-        <RelativeLayout
-            android:id="@+id/history"
+        <TextView
+            android:id="@+id/tv_collect"
+            style="@style/mine_info_text"
+            android:drawableLeft="@drawable/icon_collect_press"
+            android:text="@string/my_collect" />
+
+
+        <View
+            android:id="@+id/view_line"
             android:layout_width="match_parent"
-            android:layout_height="50dp">
+            android:layout_height="0.5dp"
+            android:background="@drawable/list_view_divider" />
 
-            <TextView
-                style="@style/person_menu_text"
-                android:layout_alignParentLeft="true"
-                android:drawableLeft="@drawable/icon_history"
-                android:drawablePadding="12dp"
-                android:paddingLeft="15dp"
-                android:text="@string/history_string" />
-        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_mine_tag"
+            style="@style/mine_info_text"
+            android:drawableLeft="@drawable/icon_label"
+            android:text="@string/my_tag" />
+
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/font_gray" />
+            android:layout_height="0.5dp"
+            android:background="@drawable/list_view_divider" />
 
-        <RelativeLayout
-            android:id="@+id/cache"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:visibility="gone">
 
-            <TextView
-                style="@style/person_menu_text"
-                android:layout_alignParentLeft="true"
-                android:drawableLeft="@mipmap/ic_launcher"
-                android:drawablePadding="12dp"
-                android:paddingLeft="15dp"
-                android:text="@string/cache_offline" />
-        </RelativeLayout>
+        <TextView
+            android:id="@+id/tv_order"
+            style="@style/mine_info_text"
+            android:drawableLeft="@drawable/icon_order"
 
-        <RelativeLayout
-            android:id="@+id/collect"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
+            android:text="@string/my_order" />
 
-            <TextView
-                style="@style/person_menu_text"
-                android:layout_alignParentLeft="true"
-                android:drawableLeft="@drawable/icon_collect_press"
-                android:drawablePadding="12dp"
-                android:paddingLeft="15dp"
-                android:text="@string/my_collect" />
-        </RelativeLayout>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/font_gray" />
+            android:layout_height="0.5dp"
+            android:background="@drawable/list_view_divider" />
 
-        <RelativeLayout
-            android:id="@+id/mine_tag"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <TextView
-                style="@style/person_menu_text"
-                android:layout_alignParentLeft="true"
-                android:drawableLeft="@drawable/icon_label"
-                android:drawablePadding="12dp"
-                android:paddingLeft="15dp"
-                android:text="@string/my_tag" />
-        </RelativeLayout>
+        <TextView
+            android:id="@+id/tv_active"
+            style="@style/mine_info_text"
+            android:drawableLeft="@drawable/icon_event"
+            android:text="热门活动" />
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/font_gray" />
+            android:layout_height="0.5dp"
+            android:background="@drawable/list_view_divider" />
 
-        <RelativeLayout
-            android:id="@+id/order"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
 
-            <TextView
-                style="@style/person_menu_text"
-                android:layout_alignParentLeft="true"
-                android:drawableLeft="@drawable/icon_order"
-                android:drawablePadding="12dp"
-                android:paddingLeft="15dp"
-                android:text="@string/my_order" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/font_gray" />
-
-        <RelativeLayout
-            android:id="@+id/active"
-            android:layout_width="match_parent"
-            android:layout_height="50dp">
-
-            <TextView
-                style="@style/person_menu_text"
-                android:layout_alignParentLeft="true"
-                android:drawableLeft="@drawable/icon_event"
-                android:drawablePadding="12dp"
-                android:paddingLeft="15dp"
-                android:text="热门活动" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/font_gray" />
-
-        <RelativeLayout
-            android:id="@+id/netwrok_usage"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/network_usage_text"
-                style="@style/person_menu_text"
-                android:layout_alignParentLeft="true"
-                android:drawablePadding="12dp"
-                android:paddingLeft="15dp"
-                android:text="@string/network" />
-        </RelativeLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/font_gray"
-            android:visibility="gone" />
     </LinearLayout>
 
 </LinearLayout>

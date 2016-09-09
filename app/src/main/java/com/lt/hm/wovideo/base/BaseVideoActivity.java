@@ -756,22 +756,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
      */
     protected void addBullet(Bullet bullet) {
         if (UserMgr.isLogin()) {
-            HashMap<String, Object> map = new HashMap<>();
-            UserModel model = UserMgr.getUseInfo();
-            //FIXME user id is incorrect!
-            map.put("userId", model.getId());
-            map.put("vfPlayId", mVideoId);
-            map.put("time", mPlayer.getCurrentPosition() / 1000);
-//            map.put("time", bullet.getTime());
-            map.put("context", bullet.getContent());
-            map.put("fontColor", bullet.getFontColor());
-            map.put("fontSize", bullet.getFontSize());
-            TLog.log("Bullet", "userId: " + model.getId()
-                    + "; videoId: " + mVideoId + "; time: " + mPlayer.getCurrentPosition() / 1000
-                    + "; content: " + bullet.getContent() + "; fontColor: " + bullet.getFontColor()
-                    + "; fontSize: " + bullet.getFontSize());
-
-            HttpApis.addBullet(map, HttpApis.http_add_bullet, new HttpCallback<>(String.class, this));
+            NetUtils.addBullet(bullet, mVideoId, mPlayer.getCurrentPosition() / 1000, this);
         } else {
             UnLoginHandler.unLogin(this);
         }

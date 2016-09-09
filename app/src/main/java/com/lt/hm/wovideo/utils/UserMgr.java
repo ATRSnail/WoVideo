@@ -32,6 +32,24 @@ public class UserMgr {
     }
 
     /**
+     * 获取用户Id
+     * @return
+     */
+    public static String getUseId() {
+        UserModel model = getUseInfo();
+        return model != null ? model.getId() : "";
+    }
+
+    /**
+     * 获取用户电话
+     * @return
+     */
+    public static String getUsePhone() {
+        UserModel model = getUseInfo();
+        return model != null ? model.getPhoneNo() : "";
+    }
+
+    /**
      * 判断是否是vip
      *
      * @return

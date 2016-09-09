@@ -35,6 +35,7 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 16/5/27
  */
+@Deprecated
 public class ClassPage extends BaseFragment {
     @BindView(R.id.img_movie)
     ImageView imgMovie;

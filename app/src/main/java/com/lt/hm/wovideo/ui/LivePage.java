@@ -86,15 +86,13 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  * @create_date 16/6/12
  */
 public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener, VideoPipAdapter.ItemClickCallBack {
+        AudioCapabilitiesReceiver.Listener, VideoPipAdapter.ItemClickCallBack,AVController.OnChooseChannel {
     @BindView(R.id.video_name)
     TextView videoName;
     @BindView(R.id.video_play_number)
     TextView videoPlayNumber;
     @BindView(R.id.video_collect)
     TextView videoCollect;
-    @BindView(R.id.video_live)
-    TextView liveVideo;
     @BindView(R.id.video_Pip)
     PercentLinearLayout videoPip;
     @BindView(R.id.video_share)
@@ -122,8 +120,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     TextView free_hint;
     @BindView(R.id.free_label)
     TextView mFreeLabel;
-    int newIndex = 0;
-    int oldIndex = -1;
     private boolean first_open = false;
 
     @BindView(R.id.live_btn_sina)
@@ -145,15 +141,14 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
 
+    private LivePlaysPopw livePlaysPopw;
+
     // Video thing
     // For use when launching the demo app using adb.
     private static final String CONTENT_EXT_EXTRA = "type";
     //画中画urls
     public static final String PIP_URLS = "pip_urls";
     private ScreenSwitchUtils screenSwitchUtils;
-
-    private static final int MENU_GROUP_TRACKS = 1;
-    private static final int ID_OFFSET = 2;
 
     private static final CookieManager defaultCookieManager;
 
@@ -220,14 +215,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             manager.getDefaultDisplay().getMetrics(outMetrics);
             width = outMetrics.widthPixels;
             height = outMetrics.heightPixels;
-
-            Window window = getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.TRANSPARENT);
-        } else {
-            setSystemUiVisibility();
         }
 
         View root = findViewById(R.id.video_root);
@@ -265,6 +252,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         mMediaController = new AVController(this);
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         mMediaController.setGestureListener(this);
+        mMediaController.setmChooseChannelListener(this);
         CookieHandler currentHanlder = CookieHandler.getDefault();
         if (currentHanlder != defaultCookieManager) {
             CookieHandler.setDefault(defaultCookieManager);
@@ -273,36 +261,29 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         mAudioCapabilitiesReceiver.register();
 
-        // DanmakuView
-
-        // 设置最大显示行数
-        HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
-        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 5); // 滚动弹幕最大显示5行
-        // 设置是否禁止重叠
-        HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<Integer, Boolean>();
-        overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
-        overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
-
     }
 
-    private void setSystemUiVisibility() {
-        //hit status bar
-        getWindow().getDecorView().setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                        //      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                        //       | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                        //       | View.SYSTEM_UI_FLAG_FULLSCREEN
-                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    private void setSystemUiVisibility(boolean systemUiVisibility) {
+        if (systemUiVisibility) { //显示状态栏
+            WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+            getWindow().setAttributes(lp);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        } else { //隐藏状态栏
+            WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().setAttributes(lp);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        }
+
     }
 
     private Intent onUrlGot() {
-        Intent mpdIntent = new Intent(this, NewMoviePage.class)
+        return new Intent(this, NewMoviePage.class)
                 .setData(Uri.parse(video.getmPlayUrl().getFormatUrl()))
                 .putExtra(CONTENT_ID_EXTRA, video.getmVideoName())
                 .putExtra(CONTENT_TYPE_EXTRA, Util.TYPE_HLS)
                 .putExtra(PROVIDER_EXTRA, "");
-        return mpdIntent;
     }
 
     @Override
@@ -414,16 +395,14 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 mVideoFrame.requestLayout();
             }
             mVideoFrame.requestLayout();
-            //show status bar
-            //         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+            setSystemUiVisibility(true);
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            //hide status bar
-            //        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
+            setSystemUiVisibility(false);
         }
-        setSystemUiVisibility();
+
     }
 
     // Surface Life cycle
@@ -648,33 +627,38 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     private List<LiveModles> getPipDatas() {
         liveModlesList = new ArrayList<>();
+        LiveModles modles;
         if (cctvList != null) {
-            LiveModles modles = new LiveModles();
+            modles = new LiveModles();
             modles.title = str[0];
             modles.setSinatv(cctvList);
+            modles.setParentId(0);
             liveModlesList.add(modles);
         }
         if (sinaList != null) {
-            LiveModles modles1 = new LiveModles();
-            modles1.title = str[1];
-            modles1.setSinatv(sinaList);
-            liveModlesList.add(modles1);
+            modles = new LiveModles();
+            modles.title = str[1];
+            modles.setSinatv(sinaList);
+            modles.setParentId(1);
+            liveModlesList.add(modles);
         }
 
 
         if (localList != null) {
-            LiveModles modles2 = new LiveModles();
-            modles2.title = str[2];
-            modles2.setSinatv(localList);
-            liveModlesList.add(modles2);
+            modles = new LiveModles();
+            modles.title = str[2];
+            modles.setSinatv(localList);
+            modles.setParentId(2);
+            liveModlesList.add(modles);
         }
 
 
         if (otherList != null) {
-            LiveModles modles3 = new LiveModles();
-            modles3.title = str[3];
-            modles3.setSinatv(otherList);
-            liveModlesList.add(modles3);
+            modles = new LiveModles();
+            modles.title = str[3];
+            modles.setSinatv(otherList);
+            modles.setParentId(3);
+            liveModlesList.add(modles);
         }
 
 
@@ -734,15 +718,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 if (null != liveModlesList && liveModlesList.size() > 0) {
                     mListPopupWindow = new PipListviwPopuWindow(LivePage.this, liveModlesList, LivePage.this);
                     mListPopupWindow.showAsDropDown(v);
-
                 }
-            }
-        });
-
-        liveVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new LivePlaysPopw(LivePage.this).showAsDropDown(v);
             }
         });
 
@@ -870,5 +846,14 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onChooseChannel(View v) {
+        if (livePlaysPopw == null){
+            livePlaysPopw =  new LivePlaysPopw(LivePage.this,liveModlesList);
+        }
+        livePlaysPopw.showAtLocation(v,Gravity.RIGHT,0,-25);
+
     }
 }

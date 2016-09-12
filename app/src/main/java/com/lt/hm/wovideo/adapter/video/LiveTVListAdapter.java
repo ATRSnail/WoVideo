@@ -51,19 +51,5 @@ public class LiveTVListAdapter extends BaseQuickAdapter<LiveModel> {
         }else {
             holder.setBackgroundColor(R.id.rl_tv_item,mContext.getResources().getColor(R.color.white));
         }
-//        TextView view = (TextView) holder.itemView.findViewById(R.id.live_list_item_current_text);
-//        view.setTag("测试"+holder.getPosition());
-//        view.setOnClickListener((View v)->{
-//            if (listener!=null){
-//                listener.onClick(holder,holder.getPosition());
-//            }
-//        });
-
-//        if (StringUtils.isNullOrEmpty(liveTvListBean.getNowPro()) || liveTvListBean.getNowPro().equals("暂无")){
-//            holder.setVisible(R.id.live_list_item_current_text,false);
-//        }else{
-//            holder.setText(R.id.live_list_item_current_text,liveTvListBean.getNowPro());
-//        }
-//            live_list_item_current_text
     }
 }

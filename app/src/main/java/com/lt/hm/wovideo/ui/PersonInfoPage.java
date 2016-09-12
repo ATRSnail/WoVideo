@@ -529,30 +529,30 @@ public class PersonInfoPage extends BaseActivity implements SecondTopbar.myTopba
         }
         ACache.get(this).put("img_url", protraitFile.getAbsolutePath());
 
-        if (protraitBitmap != null) {
-            String img64 = ImageUtils.imgToBase64(protraitFile.getAbsolutePath(), protraitBitmap, "JPG");
-            HashMap<String, Object> map = new HashMap<>();
-            String string = ACache.get(this).getAsString("userinfo");
-            map.put("phone", new Gson().fromJson(string, UserModel.class).getPhoneNo());
-            map.put("base", "image/jpg;base64," + img64);
-            TLog.log(map.toString());
-            HttpApis.uploadHeadImg(map, new StringCallback() {
-                @Override
-                public void onError(Call call, Exception e, int id) {
-                    TLog.log(e.getMessage());
-                }
-
-                @Override
-                public void onResponse(String response, int id) {
-                    TLog.log(response);
-                    updateUserInfo();
-                    Glide.with(PersonInfoPage.this).load(ACache.get(PersonInfoPage.this).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(pInfoLogo);
-
-                    // TODO: 16/7/6 刷新个人中心头像图片
-                }
-            });
-
-        }
+//        if (protraitBitmap != null) {
+//            String img64 = ImageUtils.imgToBase64(protraitFile.getAbsolutePath(), protraitBitmap, "JPG");
+//            HashMap<String, Object> map = new HashMap<>();
+//            String string = ACache.get(this).getAsString("userinfo");
+//            map.put("phone", new Gson().fromJson(string, UserModel.class).getPhoneNo());
+//            map.put("base", "image/jpg;base64," + img64);
+//            TLog.log(map.toString());
+//            HttpApis.uploadHeadImg(map, new StringCallback() {
+//                @Override
+//                public void onError(Call call, Exception e, int id) {
+//                    TLog.log(e.getMessage());
+//                }
+//
+//                @Override
+//                public void onResponse(String response, int id) {
+//                    TLog.log(response);
+//                    updateUserInfo();
+//                    Glide.with(PersonInfoPage.this).load(ACache.get(PersonInfoPage.this).getAsString("img_url")).asBitmap().centerCrop().error(R.drawable.icon_head).into(pInfoLogo);
+//
+//                    // TODO: 16/7/6 刷新个人中心头像图片
+//                }
+//            });
+//
+//        }
     }
 
     /**

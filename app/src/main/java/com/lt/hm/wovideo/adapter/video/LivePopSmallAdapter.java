@@ -20,5 +20,6 @@ public class LivePopSmallAdapter extends BaseQuickAdapter<LiveModel> {
     @Override
     protected void convert(BaseViewHolder baseViewHolder, LiveModel likeModel) {
         baseViewHolder.setText(R.id.tv_small_name,likeModel.getTvName());
+        baseViewHolder.setText(R.id.tv_small_playing,"正在播出:"+likeModel.getNowPro());
     }
 }

@@ -9,10 +9,19 @@ import java.util.List;
  */
 public class LiveModles {
     public String  title;
+    public int parentId;
     public List<LiveModel> sinatv;
     private List<LiveModel> localTV;
     private List<LiveModel> cctv;
     private List<LiveModel> otherTv;
+
+    public int getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(int parentId) {
+        this.parentId = parentId;
+    }
 
     public String getTitle() {
         return title;

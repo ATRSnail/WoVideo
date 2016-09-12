@@ -172,4 +172,6 @@
     <string name="personality_set">个性化</string>
     <string name="mine_set">我的频道</string>
     <string name="all_set">频道栏目</string>
+
+    <string name="no_data">无数据</string>
 </resources>

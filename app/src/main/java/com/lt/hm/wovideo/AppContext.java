@@ -3,12 +3,18 @@ package com.lt.hm.wovideo;
 import com.facebook.stetho.Stetho;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 import com.lt.hm.wovideo.base.BaseApplication;
+import com.lt.hm.wovideo.widget.GlideImageLoader;
 import com.networkbench.agent.impl.NBSAppAgent;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.log.LoggerInterceptor;
 
 import java.util.concurrent.TimeUnit;
 
+import cn.finalteam.galleryfinal.CoreConfig;
+import cn.finalteam.galleryfinal.FunctionConfig;
+import cn.finalteam.galleryfinal.GalleryFinal;
+import cn.finalteam.galleryfinal.ImageLoader;
+import cn.finalteam.galleryfinal.ThemeConfig;
 import cn.sharesdk.framework.ShareSDK;
 import okhttp3.OkHttpClient;
 
@@ -37,6 +43,29 @@ public class AppContext extends BaseApplication {
 //        CrashReport.initCrashReport(getApplicationContext(), "3a002a01fb", false);
 //        Glide.get(this).register(GlideUrl.class, InputStream.class,
 //                new OkHttpClient.Factory(OkHttpUtils.getInstance()));
+        initGalleryFinal();
+    }
+
+    private void initGalleryFinal() {
+        ThemeConfig theme = ThemeConfig.DARK;
+//        ThemeConfig theme = new ThemeConfig.Builder()
+//                .build();
+        //配置功能
+        FunctionConfig functionConfig = new FunctionConfig.Builder()
+                .setEnableCamera(true)
+                .setEnableEdit(true)
+                .setCropSquare(true)
+                .setEnablePreview(true)
+                .setEnableCrop(true)
+                .setForceCrop(true)//强制裁剪
+                .build();
+       //配置imageloader
+        ImageLoader imageloader = new GlideImageLoader();
+        CoreConfig coreConfig = new CoreConfig.Builder(this, imageloader, theme)
+                .setFunctionConfig(functionConfig)
+                .setAnimation(0)
+                .build();
+        GalleryFinal.init(coreConfig);
     }
 
     /**

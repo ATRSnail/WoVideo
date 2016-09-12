@@ -83,6 +83,10 @@
         <item name="android:src">@drawable/right_arrow</item>
     </style>
 
+    <style name="AnimationRightFade">
+        <item name="android:windowEnterAnimation">@anim/in_righttoleft</item>
+        <item name="android:windowExitAnimation">@anim/out_lefttoright</item>
+    </style>
 
     <declare-styleable name="secondTopbar">
         <attr name="leftTextColor" format="color"/>

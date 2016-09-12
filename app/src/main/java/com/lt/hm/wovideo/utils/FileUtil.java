@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.lt.hm.wovideo.model.City;
 import com.lt.hm.wovideo.model.CityArrayModel;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -698,6 +700,32 @@ public class FileUtil {
         AssetManager manager = context.getAssets();
         InputStream is = manager.open("citys.json");
         JsonToModel(FileUtil.readInStream(is));
+    }
+
+    public static String readAssetFileData(Context context, String nameString) {
+        BufferedReader in = null;
+
+        try {
+            StringBuilder buf = new StringBuilder();
+            InputStream is;
+            is = context.getAssets().open(nameString);
+            in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String str;
+            while ((str = in.readLine()) != null) {
+                buf.append(str);
+            }
+            return buf.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Exception e2) {
+                }
+            }
+        }
+        return null;
     }
 
     public static Map<String, String> map = new HashMap<>();

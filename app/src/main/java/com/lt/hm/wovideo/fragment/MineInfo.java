@@ -19,6 +19,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.lt.hm.wovideo.R;
@@ -44,10 +45,13 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import cn.finalteam.galleryfinal.GalleryFinal;
+import cn.finalteam.galleryfinal.model.PhotoInfo;
 import okhttp3.Call;
 
 import static com.lt.hm.wovideo.R.id.pc_username;
@@ -92,17 +96,9 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
     TextView person_etime;
     @BindView(R.id.view_line)
     View line;
-    private Uri origUri;
-    private Uri cropUri;
-    private String theLarge;
     protected NetUsageDatabase netUsageDatabase;
-    private final static String FILE_SAVEPATH = Environment
-            .getExternalStorageDirectory().getAbsolutePath()
-            + "/WoVideo/Portrait/";
-    private File protraitFile;
     private Bitmap protraitBitmap;
     private String protraitPath;
-    private final static int CROP = 500;
     private View view;
     private Unbinder unbinder;
     private String bgDrawable;
@@ -240,115 +236,38 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         }).show();
     }
 
+    private final int REQUEST_CODE_CAMERA = 1000;
+    private final int REQUEST_CODE_GALLERY = 1001;
+    private final int REQUEST_CODE_CROP = 1002;
+    private final int REQUEST_CODE_EDIT = 1003;
     private void goToSelectPicture(int position) {
         switch (position) {
             case ACTION_TYPE_ALBUM:
-                startImagePick();
+                GalleryFinal.openGallerySingle(REQUEST_CODE_GALLERY, mOnHanlderResultCallback);
                 break;
             case ACTION_TYPE_PHOTO:
-                startTakePhoto();
+                GalleryFinal.openCamera(REQUEST_CODE_CAMERA, mOnHanlderResultCallback);
                 break;
             default:
                 break;
         }
     }
 
-    /**
-     * 选择图片裁剪
-     */
-    private void startImagePick() {
-        Intent intent;
-        if (Build.VERSION.SDK_INT < 19) {
-            intent = new Intent();
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            startActivityForResult(Intent.createChooser(intent, "选择图片"),
-                    ImageUtils.REQUEST_CODE_GETIMAGE_BYCROP);
-        } else {
-            intent = new Intent(Intent.ACTION_PICK,
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            intent.setType("image/*");
-            startActivityForResult(Intent.createChooser(intent, "选择图片"),
-                    ImageUtils.REQUEST_CODE_GETIMAGE_BYCROP);
-        }
-    }
-
-    private void startTakePhoto() {
-        Intent intent;
-        // 判断是否挂载了SD卡
-        String savePath = "";
-        String storageState = Environment.getExternalStorageState();
-        if (storageState.equals(Environment.MEDIA_MOUNTED)) {
-            savePath = Environment.getExternalStorageDirectory()
-                    .getAbsolutePath() + "/WoVideo/Camera/";
-            TLog.log(savePath);
-            File savedir = new File(savePath);
-            if (!savedir.exists()) {
-                boolean flagg = savedir.mkdirs();
-                if (!flagg) {
-                    TLog.log("图片保存失败，请稍后重试");
-                    savedir.mkdir();
-                }
+    private GalleryFinal.OnHanlderResultCallback mOnHanlderResultCallback = new GalleryFinal.OnHanlderResultCallback() {
+        @Override
+        public void onHanlderSuccess(int reqeustCode, List<PhotoInfo> resultList) {
+            if (resultList != null) {
+                TLog.error("photo--->"+resultList.get(0).getPhotoPath());
+                protraitPath = resultList.get(0).getPhotoPath();
+                uploadNewPhoto();
             }
         }
 
-        // 没有挂载SD卡，无法保存文件
-        if (StringUtils.isEmpty(savePath)) {
-//            ToastUtils.showToastShort("无法保存照片，请检查SD卡是否挂载");
-            TLog.log("无法保存照片，请检查SD卡是否挂载");
-            return;
+        @Override
+        public void onHanlderFailure(int requestCode, String errorMsg) {
+            UT.showNormal(errorMsg);
         }
-
-        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss")
-                .format(new Date());
-        String fileName = "osc_" + timeStamp + ".jpg";// 照片命名
-        File out = new File(savePath, fileName);
-        Uri uri = Uri.fromFile(out);
-        origUri = uri;
-        if (origUri == null) {
-            origUri = Uri.fromFile(out);
-        }
-        TLog.error("origUri---->" + origUri);
-
-        theLarge = savePath + fileName;// 该照片的绝对路径
-
-        intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-        startActivityForResult(intent,
-                ImageUtils.REQUEST_CODE_GETIMAGE_BYCAMERA);
-    }
-
-    // 裁剪头像的绝对路径
-    private Uri getUploadTempFile(Uri uri) {
-        String storageState = Environment.getExternalStorageState();
-        if (storageState.equals(Environment.MEDIA_MOUNTED)) {
-            File savedir = new File(FILE_SAVEPATH);
-            if (!savedir.exists()) {
-                savedir.mkdirs();
-            }
-        } else {
-//            AppContext.showToast("无法保存上传的头像，请检查SD卡是否挂载");
-            return null;
-        }
-        String timeStamp = new SimpleDateFormat("yyyyMMddHHmmss")
-                .format(new Date());
-        String thePath = ImageUtils.getAbsolutePathFromNoStandardUri(uri);
-
-        // 如果是标准Uri
-        if (StringUtils.isEmpty(thePath)) {
-            thePath = ImageUtils.getAbsoluteImagePath(getActivity(), uri);
-        }
-        String ext = getFileFormat(thePath);
-        ext = StringUtils.isEmpty(ext) ? "jpg" : ext;
-        // 照片命名
-        String cropFileName = "wovideo_crop_" + timeStamp + "." + ext;
-        // 裁剪头像的绝对路径
-        protraitPath = FILE_SAVEPATH + cropFileName;
-        protraitFile = new File(protraitPath);
-
-        cropUri = Uri.fromFile(protraitFile);
-        return this.cropUri;
-    }
+    };
 
     /**
      * 上传新照片
@@ -357,17 +276,18 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
 //        showWaitDialog("正在上传头像...");
 
         // 获取头像缩略图
-        if (!StringUtils.isEmpty(protraitPath) && protraitFile.exists()) {
+        if (!StringUtils.isEmpty(protraitPath)) {
             protraitBitmap = ImageUtils
                     .loadImgThumbnail(protraitPath, 200, 200);
         } else {
 //            AppContext.showToast("图像不存在，上传失败");
-            TLog.log("图像不存在，上传失败");
+            UT.showNormal("图像不存在，上传失败");
+            return;
         }
-        ACache.get(getApplicationContext()).put("img_url", protraitFile.getAbsolutePath());
+        ACache.get(getApplicationContext()).put("img_url", protraitPath);
 
         if (protraitBitmap != null) {
-            String img64 = ImageUtils.imgToBase64(protraitFile.getAbsolutePath(), protraitBitmap, "JPG");
+            String img64 = ImageUtils.imgToBase64(protraitBitmap, "JPG");
             NetUtils.uploadHeadImg(img64, this);
         }
     }
@@ -389,44 +309,6 @@ public class MineInfo extends BaseFragment implements View.OnClickListener {
         switch (flag) {
             case HttpApis.http_upload_head_img:
                 UT.showNormal("更新头像失败");
-                break;
-        }
-    }
-
-    /**
-     * 拍照后裁剪
-     *
-     * @param data 原始图片
-     */
-    private void startActionCrop(Uri data) {
-        Intent intent = new Intent("com.android.camera.action.CROP");
-        intent.setDataAndType(data, "image/*");
-        intent.putExtra("output", this.getUploadTempFile(data));
-        intent.putExtra("crop", "true");
-        intent.putExtra("aspectX", 1);// 裁剪框比例
-        intent.putExtra("aspectY", 1);
-        intent.putExtra("outputX", CROP);// 输出图片大小
-        intent.putExtra("outputY", CROP);
-        intent.putExtra("scale", true);// 去黑边
-        startActivityForResult(intent,
-                ImageUtils.REQUEST_CODE_GETIMAGE_BYSDCARD);
-    }
-
-
-    @Override
-    public void onActivityResult(final int requestCode, final int resultCode,
-                                 final Intent imageReturnIntent) {
-        if (resultCode != Activity.RESULT_OK)
-            return;
-        switch (requestCode) {
-            case ImageUtils.REQUEST_CODE_GETIMAGE_BYCAMERA:
-                startActionCrop(origUri);// 拍照后裁剪
-                break;
-            case ImageUtils.REQUEST_CODE_GETIMAGE_BYCROP:
-                startActionCrop(imageReturnIntent.getData());// 选图后裁剪
-                break;
-            case ImageUtils.REQUEST_CODE_GETIMAGE_BYSDCARD:
-                uploadNewPhoto();
                 break;
         }
     }

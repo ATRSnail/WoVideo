@@ -35,7 +35,6 @@ public class PipListviwPopuWindow extends PopupWindow implements PopupWindow.OnD
     /**
      * @param context
      * @param liveModles    数据集
-     * @param checkedUId    被选中的item
      * @param mItemCallBack item的点击事件
      */
     public PipListviwPopuWindow(Context context, List<LiveModles> liveModles, VideoPipAdapter.ItemClickCallBack mItemCallBack) {

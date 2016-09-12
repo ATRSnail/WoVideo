@@ -9,10 +9,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="央视"
-        android:textSize="20sp"
+        android:textSize="14sp"
+        android:textColor="@color/acount_color"
         android:textStyle="bold"
         android:gravity="center_vertical"
         android:drawableLeft="@drawable/line"
-        android:drawablePadding="20dp"/>
+        android:drawablePadding="10dp"/>
 
 </LinearLayout>

@@ -761,18 +761,12 @@ public class ImageUtils {
 
     /**
      *
-     * @param imgPath
      * @param bitmap
      * @param imgFormat 图片格式
      * @return
      */
-    public static String imgToBase64(String imgPath, Bitmap bitmap,String imgFormat) {
-        if (imgPath !=null && imgPath.length() > 0) {
-            bitmap = readBitmap(imgPath);
-        }
-        if(bitmap == null){
-            //bitmap not found!!
-        }
+    public static String imgToBase64(Bitmap bitmap,String imgFormat) {
+
         ByteArrayOutputStream out = null;
         try {
             out = new ByteArrayOutputStream();

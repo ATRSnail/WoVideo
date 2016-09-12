@@ -64,6 +64,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     Formatter mFormatter;
     private TextView mVideoTitle;
     private TextView mQualitySwitch;
+    private TextView mChooseChannel;
     private SwitchCompat mBulletSwitch;
     private ImageButton mPauseButton;
     private ImageButton mFfwdButton;
@@ -97,6 +98,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
      */
     private OnQualitySelected listener;
     private OnInterfaceInteract mInterfaceListener;
+    private OnChooseChannel onChooseChannelListener;
 
     private VideoModel videoModel;
     QualityPopWindow window;
@@ -107,6 +109,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     public void setListener(OnQualitySelected listener) {
         this.listener = listener;
+    }
+
+    public void setmChooseChannelListener(OnChooseChannel listener) {
+        this.onChooseChannelListener = listener;
     }
 
     public void setInterfaceListener(OnInterfaceInteract interfaceListener) {
@@ -211,6 +217,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     private void initControllerView(View v) {
         mVideoTitle = (TextView) v.findViewById(R.id.video_title);
+        mChooseChannel = (TextView) v.findViewById(R.id.tv_choose_channel);
+
+        if (mChooseChannel != null) {
+            mChooseChannel.setOnClickListener(mChooseChannelListener);
+        }
 
         mQualitySwitch = (TextView) v.findViewById(R.id.quality_switch);
         if (mQualitySwitch != null) {
@@ -563,6 +574,17 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             }
         }
     };
+
+    private OnClickListener mChooseChannelListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (onChooseChannelListener != null){
+                onChooseChannelListener.onChooseChannel(v);
+            }
+        }
+    };
+
+
 
     private CompoundButton.OnCheckedChangeListener mBulletSwitchListener = new CompoundButton.OnCheckedChangeListener() {
         @Override
@@ -1000,6 +1022,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         void onSendBulletClick(Bullet bullet);
 
         void onBulletSwitchCheck(boolean isChecked);
+
+    }
+
+    public interface OnChooseChannel{
+        void onChooseChannel(View v);
     }
 
 }

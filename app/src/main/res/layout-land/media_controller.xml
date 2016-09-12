@@ -180,7 +180,6 @@
         android:layout_centerInParent="true" />
 
     <RelativeLayout
-        android:layout_marginTop="25dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -205,6 +204,7 @@
             android:layout_centerVertical="true"
             android:text="高清" />
 
+
         <android.support.v7.widget.SwitchCompat
             android:id="@+id/bullet_switch"
             style="@style/Switch"
@@ -215,6 +215,12 @@
             android:textOn="弹"
             app:showText="true"
             app:switchTextAppearance="@style/SwitchTextAppearance" />
+
+        <TextView
+            android:id="@+id/tv_choose_channel"
+            style="@style/PlayerMenuText"
+            android:layout_toLeftOf="@id/bullet_switch"
+            android:text="选台" />
 
     </RelativeLayout>
 

@@ -23,6 +23,9 @@ import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.LiveModel;
 import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.utils.ScreenUtils;
+import com.lt.hm.wovideo.utils.TLog;
+import com.lt.hm.wovideo.widget.ViewMiddle.ViewMiddle;
+import com.lt.hm.wovideo.widget.ViewMiddle.ViewMiddleModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,14 +43,11 @@ public class LivePlaysPopw extends PopupWindow implements PopupWindow.OnDismissL
     private View rootView;
     RecyclerView bigRecycle;
     RecyclerView smallRecycle;
+    private ViewMiddle viewMiddle;
+    private ViewMiddleModel viewMiddleModel;
 
     private LivePopBigAdapter bigAdapter;
     private LivePopSmallAdapter smallAdapter;
-
-    private LiveModles live;
-    private LiveModel likeModel;
-    private ArrayList<LiveModles> mList = new ArrayList<>();
-    private List<LiveModel> liveModels = new ArrayList<>();
 
     private final String[] str = {"央视", "卫士", "地方台", "专业"};
 
@@ -55,58 +55,49 @@ public class LivePlaysPopw extends PopupWindow implements PopupWindow.OnDismissL
 
     private  LinearLayoutManager layoutManager;
     private  LinearLayoutManager layoutManager2;
+    private List<LiveModles> mList;
 
-    public LivePlaysPopw(Context context) {
+    public LivePlaysPopw(Context context,List<LiveModles> liveModlesList) {
         super(context);
         this.mContext = context;
+        this.mList = liveModlesList;
+        TLog.error("mmlist--->"+mList.toString());
         initPop();
     }
 
     private void initViews() {
-        smallRecycle = (RecyclerView) rootView.findViewById(R.id.rv_small);
-        bigRecycle = (RecyclerView) rootView.findViewById(R.id.rv_big);
-        layoutManager = new LinearLayoutManager(mContext);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        layoutManager2 = new LinearLayoutManager(mContext);
-        layoutManager2.setOrientation(LinearLayoutManager.VERTICAL);
-        bigAdapter = new LivePopBigAdapter(R.layout.item_live_big_pop,mList);
-        smallAdapter = new LivePopSmallAdapter(R.layout.item_live_small_pop,liveModels);
-        bigRecycle.setLayoutManager(layoutManager);
-        smallRecycle.setLayoutManager(layoutManager2);
-        bigRecycle.setAdapter(bigAdapter);
-        smallRecycle.setAdapter(smallAdapter);
 
-    }
+//        viewMiddle.setOnSelectListener(new HotBroadcastOnSelectListener(this, viewMiddle));
 
-    private void initData() {
-        for (int j = 0 ;j<5;j++){
-            likeModel = new LiveModel("ddd"+j);
-            liveModels.add(likeModel);
-        }
-
-        for (int i = 0;i<str.length;i++){
-            live = new LiveModles();
-            live.setTitle(str[i]);
-            live.setCctv(liveModels);
-            mList.add(live);
-        }
+//        smallRecycle = (RecyclerView) rootView.findViewById(R.id.rv_small);
+//        bigRecycle = (RecyclerView) rootView.findViewById(R.id.rv_big);
+//        layoutManager = new LinearLayoutManager(mContext);
+//        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+//        layoutManager2 = new LinearLayoutManager(mContext);
+//        layoutManager2.setOrientation(LinearLayoutManager.VERTICAL);
+//        bigAdapter = new LivePopBigAdapter(R.layout.item_live_big_pop,mList);
+//        smallAdapter = new LivePopSmallAdapter(R.layout.item_live_small_pop,mList.get(0).getSinatv());
+//        bigRecycle.setLayoutManager(layoutManager);
+//        smallRecycle.setLayoutManager(layoutManager2);
+//        bigRecycle.setAdapter(bigAdapter);
+//        smallRecycle.setAdapter(smallAdapter);
     }
 
     private void initPop() {
         // TODO Auto-generated method stub
-        rootView = LayoutInflater.from(mContext).inflate(R.layout.layout_live_popu, null);
-        ButterKnife.bind(rootView);
-
-        this.setContentView(rootView);
-        this.setWidth(ScreenUtils.getScreenWidth(mContext) / 3 * 2);
+        viewMiddle = new ViewMiddle(mContext,mList);
+        this.setContentView(viewMiddle);
+        this.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
         this.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
         this.setFocusable(true);
         this.setOnDismissListener(this);
+        this.setAnimationStyle(R.style.AnimationRightFade);
         this.setBackgroundDrawable(new ColorDrawable(0x00000000));
-        //this.setAnimationStyle(animStyle);
-        initData();
-        initViews();
+        initVaule();
+    }
 
+    private void initVaule() {
+        viewMiddle.updateShowText("卫士", "江西卫视");
     }
 
     @Override

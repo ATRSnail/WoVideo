@@ -1,8 +1,10 @@
 package com.lt.hm.wovideo.video.player;
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.WindowManager;
@@ -33,8 +35,18 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
 
   @Override
   public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+
+    //获取坐标点
+    float mOldX = e1.getX(), mOldY = e1.getY();
     float deltaX = e2.getX() - e1.getX();
-    float deltaY = e2.getRawY() - e1.getY();
+    float deltaY = e1.getY() - e2.getRawY();
+
+    //窗口管理器
+    Display disp = ((Activity)mContext).getWindowManager().getDefaultDisplay();
+    //获得屏幕宽高
+    int windowWidth = disp.getWidth();
+    int windowHeight = disp.getHeight();
+
     if (Math.abs(deltaX) > Math.abs(deltaY)) {
       if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
         mListener.onHorizontalScroll(e2, deltaX);
@@ -42,12 +54,12 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
       return true;
     } else {
       if (Math.abs(deltaY) > SWIPE_THRESHOLD) {
-        if (e1.getRawX() < getDeviceWidth(mContext) * 1.0 / 2) {//left edge
-          Log.e("-deltaY", "" + -deltaY);
-          mListener.onVerticalScroll(e2, -deltaY * 0.2f, SWIPE_LEFT);
-        } else if (e1.getRawX() > getDeviceWidth(mContext) * 1.0 / 2) {//right edge
-          Log.e("-deltaY", "" + -deltaY);
-          mListener.onVerticalScroll(e2, -deltaY * 0.5f, SWIPE_RIGHT);
+        if (mOldX > windowWidth * 4.0 / 5) {//left edge
+          Log.e("deltaY", "" + deltaY);
+          mListener.onVerticalScroll(e2, deltaY/windowHeight, SWIPE_LEFT);
+        } else if (mOldX < windowWidth / 5) {//right edge
+          Log.e("deltaY", "" + deltaY);
+          mListener.onVerticalScroll(e2, deltaY/windowHeight, SWIPE_RIGHT);
         }
         return true;
       }
@@ -71,19 +83,5 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
   @Override
   public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
     return false;
-  }
-
-  public static int getDeviceWidth(Context context) {
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-    wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
-    return mDisplayMetrics.widthPixels;
-  }
-
-  public static int getDeviceHeight(Context context) {
-    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    DisplayMetrics mDisplayMetrics = new DisplayMetrics();
-    wm.getDefaultDisplay().getMetrics(mDisplayMetrics);
-    return mDisplayMetrics.heightPixels;
   }
 }

@@ -132,4 +132,19 @@ public class ScreenUtils
 
 	}
 
+	public static void setSystemUiVisibility(Activity activity,boolean systemUiVisibility) {
+		if (systemUiVisibility) { //显示状态栏
+			WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+			lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+			activity.getWindow().setAttributes(lp);
+			activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+		} else { //隐藏状态栏
+			WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+			lp.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			activity.getWindow().setAttributes(lp);
+			activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+		}
+
+	}
+
 }

@@ -542,16 +542,9 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             }
 
             mMediaController.setBulletScreen(true);
-            setSystemUiVisibility(true);
+            mMediaController.setmChooseChannel(View.GONE);
+            ScreenUtils.setSystemUiVisibility(this,true);
 
-//            //hit status bar
-//            getWindow().getDecorView().setSystemUiVisibility(
-//                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                            //      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                            //       | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                            //       | View.SYSTEM_UI_FLAG_FULLSCREEN
-//                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
             //show danmu
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             //show status bar
@@ -563,33 +556,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             if (mDanmakuView != null) {
                 mDanmakuView.hide();
             }
-            setSystemUiVisibility(false);
-        }
-
-    }
-
-//    private void setSystemUiVisibility() {
-//        //hit status bar
-//        getWindow().getDecorView().setSystemUiVisibility(
-//                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                        //      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                        //       | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                        //       | View.SYSTEM_UI_FLAG_FULLSCREEN
-//                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-//    }
-
-    private void setSystemUiVisibility(boolean systemUiVisibility) {
-        if (systemUiVisibility) { //显示状态栏
-            WindowManager.LayoutParams lp = getWindow().getAttributes();
-            lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-            getWindow().setAttributes(lp);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        } else { //隐藏状态栏
-            WindowManager.LayoutParams lp = getWindow().getAttributes();
-            lp.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            getWindow().setAttributes(lp);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+            ScreenUtils.setSystemUiVisibility(this,false);
         }
 
     }

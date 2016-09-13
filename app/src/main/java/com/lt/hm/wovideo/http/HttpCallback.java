@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.zhy.http.okhttp.callback.Callback;
@@ -89,7 +90,7 @@ public class HttpCallback<T> extends StringCallback {
                 } else {
                     httpUtilBack.onFail(((RespHeader) bean.getHead()).getRspMsg(),id);
                 }
-            } catch (Exception e) {
+            } catch (JsonSyntaxException e) {
                 e.printStackTrace();
                 httpUtilBack.onFail(e.toString(),id);
             }

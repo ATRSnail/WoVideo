@@ -128,7 +128,7 @@ public class ViewMiddle extends LinearLayout implements ViewBaseAction {
 
                 showString = childrenItem.get(position);
                 if (mOnSelectListener != null) {
-                    mOnSelectListener.getValue(showString.getmSoundType(), id_name);
+                    mOnSelectListener.getValue(showString.getParent_id(), position);
                 }
 
             }
@@ -149,7 +149,7 @@ public class ViewMiddle extends LinearLayout implements ViewBaseAction {
     }
 
     public interface OnSelectListener {
-        public void getValue(int showId, Map<Integer, ViewMiddleModel> name_ids);
+        public void getValue(int parentId, int position);
     }
 
     @Override

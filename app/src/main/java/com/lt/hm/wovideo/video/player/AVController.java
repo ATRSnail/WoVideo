@@ -23,6 +23,7 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -49,7 +50,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private Context mContext;
     private ViewGroup mAnchor;
     private View mRoot;
-    private ProgressBar mProgress;
+    private AppCompatSeekBar mProgress;
     private TextView mEndTime, mCurrentTime;
     private boolean mShowing;
     private boolean mDragging;
@@ -64,7 +65,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     Formatter mFormatter;
     private TextView mVideoTitle;
     private TextView mQualitySwitch;
-    private TextView mChooseChannel;
+    private ImageView mChooseChannel;
     private SwitchCompat mBulletSwitch;
     private ImageButton mPauseButton;
     private ImageButton mFfwdButton;
@@ -74,6 +75,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private ImageButton mFullscreenButton;
     private ImageView mBackButton;
     private ImageButton mSendBulletButton;
+    private LinearLayout ly_seek;
     private QualityPopWindow mQualityPopWindow;
     private Handler mHandler = new MessageHandler(this);
     private boolean mIsBulletScreenOn = false;
@@ -84,8 +86,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private View mCenterLayout;
     private ImageView mCenterImage;
     private ProgressBar mCenterPorgress;
-    private float mCurBrightness;
-    private float mCurVolume;
+    private float mCurBrightness = -1;
+    private float mCurVolume = -1;
     private AudioManager mAudioManager;
     private int mMaxVolume;
     private View mScheduleLayout;
@@ -217,7 +219,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     private void initControllerView(View v) {
         mVideoTitle = (TextView) v.findViewById(R.id.video_title);
-        mChooseChannel = (TextView) v.findViewById(R.id.tv_choose_channel);
+        mChooseChannel = (ImageView) v.findViewById(R.id.tv_choose_channel);
+        ly_seek = (LinearLayout) v.findViewById(R.id.ly_seek);
 
         if (mChooseChannel != null) {
             mChooseChannel.setOnClickListener(mChooseChannelListener);
@@ -296,12 +299,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             mPrevButton.setVisibility(View.GONE);
         }
 
-        mProgress = (SeekBar) v.findViewById(R.id.mediacontroller_progress);
+        mProgress = (AppCompatSeekBar) v.findViewById(R.id.mediacontroller_progress);
         if (mProgress != null) {
-            if (mProgress instanceof AppCompatSeekBar) {
-                AppCompatSeekBar seeker = (AppCompatSeekBar) mProgress;
-                seeker.setOnSeekBarChangeListener(mSeekListener);
-            }
+            mProgress.setOnSeekBarChangeListener(mSeekListener);
             mProgress.setMax(1000);
         }
 
@@ -341,9 +341,21 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     }
 
+    public void setmChooseChannel(int visible){
+        if (mChooseChannel != null){
+            mChooseChannel.setVisibility(visible);
+        }
+    }
+
     public void setmSendBulletVisible(int visible) {
         if (mSendBulletButton != null) {
             mSendBulletButton.setVisibility(visible);
+        }
+    }
+
+    public void setSeekBarVisible(int visible){
+        if (ly_seek != null){
+            ly_seek.setVisibility(visible);
         }
     }
 
@@ -492,8 +504,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     public boolean onTouchEvent(MotionEvent event) {
         if (null != mGestureDetector) {
             mGestureDetector.onTouchEvent(event);
+            return true;
         }
-        return false;
+        return super.onTouchEvent(event);
     }
 
     @Override
@@ -552,8 +565,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         return super.dispatchKeyEvent(event);
     }
 
-
-    boolean shown = false;
     private OnClickListener mQualitySwitchListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -578,12 +589,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private OnClickListener mChooseChannelListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (onChooseChannelListener != null){
+            if (onChooseChannelListener != null) {
                 onChooseChannelListener.onChooseChannel(v);
             }
         }
     };
-
 
 
     private CompoundButton.OnCheckedChangeListener mBulletSwitchListener = new CompoundButton.OnCheckedChangeListener() {
@@ -622,7 +632,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     /**
      * 返回处理
      */
-    public void doBackClick(){
+    public void doBackClick() {
         if (mPlayer == null || screenSwitchUtils == null) {
             ((Activity) mContext).finish();
             return;
@@ -718,7 +728,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             if (mPlayer == null) {
                 return;
             }
-
             if (!fromuser) {
                 // We're not interested in programmatically generated changes to
                 // the progress bar's position.
@@ -883,10 +892,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         Log.i(TAG, delta + "");
         if (event.getPointerCount() == 1) {
             if (direction == ViewGestureListener.SWIPE_LEFT) {
-                updateBrightness(delta);
+                onBrightnessSlide(delta);
                 Log.i(TAG, "onVerticalScroll: Brightness");
             } else {
-                updateVolume(delta);
+                onVolumeSlide(delta);
                 Log.i(TAG, "onVerticalScroll: Volume");
             }
             postDelayed(new Runnable() {
@@ -898,56 +907,70 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     }
 
-    private void updateVolume(float delta) {
+    /**
+     * 改变音量
+     *
+     * @param percent
+     */
+    private void onVolumeSlide(float percent) {
         mCenterImage.setImageResource(R.drawable.video_volumn_bg);
         mCenterLayout.setVisibility(VISIBLE);
-        mCurVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        if (mCurVolume < 0) {
-            mCurVolume = 0;
+        //判断当前音量是否是-1，是则没有获取当前系统音量
+        if (mCurVolume == -1) {
+            //获得系统当前音量
+            mCurVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            //判断当前音量是否为负数，是则设置最小为0
+            if (mCurVolume < 0) {
+                //如果当前音量小于0则给变量赋最小的值0
+                mCurVolume = 0;
+            }
         }
-
-        Log.e("mCurVolume:", "" + mCurVolume);
-        Log.e("delta:", "" + delta);
-        int volume = (int) (delta * mMaxVolume / ViewGestureListener.getDeviceHeight(mContext) + mCurVolume);
-        if (volume > mMaxVolume) {
-            volume = mMaxVolume;
+        mCurVolume = (percent * mMaxVolume) + mCurVolume;
+        //计算用户滑动的距离
+        int index = (int) mCurVolume;
+        //判断该距离是否大于最大音量值，是则把给变量赋值为最大值，否则最小值
+        if (index > mMaxVolume) {
+            index = mMaxVolume;
+        } else if (index < 0) {
+            index = 0;
         }
-
-        if (volume < 0) {
-            volume = 0;
-        }
-        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
-
-        float percent = (float) ((volume * 1.0 / mMaxVolume) * 100);
-        Log.e("volume:", "" + volume);
-        Log.e("percent:", "" + percent);
-        mCenterPorgress.setProgress((int) percent);
+        //设置音量
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, index, 0);
+        float per = (float) ((index * 1.0 / mMaxVolume) * 100);
+        mCenterPorgress.setProgress((int) per);
     }
-
-    private void updateBrightness(float delta) {
-        mCurBrightness = ((Activity) mContext).getWindow().getAttributes().screenBrightness;
-        //获取当前亮度,获取失败则返回255
-        // mCurBrightness= BrightnessTools.getScreenBrightness((Activity) mContext)*(1f/255f);
-        TLog.error("mCurBrightness--->" + mCurBrightness);
-        if (mCurBrightness <= 0.01f) {
-            mCurBrightness = 0.01f;
-        }
-
+    /**
+     * 滑动改变亮度
+     *
+     * @param percent
+     */
+    private void onBrightnessSlide(float percent) {
         mCenterImage.setImageResource(R.drawable.video_bright_bg);
         mCenterLayout.setVisibility(VISIBLE);
-
-        WindowManager.LayoutParams layoutParams = ((Activity) mContext).getWindow().getAttributes();
-        layoutParams.screenBrightness =
-                mCurBrightness + delta / ViewGestureListener.getDeviceHeight(mContext);
-        if (layoutParams.screenBrightness >= 1.0f) {
-            layoutParams.screenBrightness = 1.0f;
-        } else if (layoutParams.screenBrightness <= 0.01f) {
-            layoutParams.screenBrightness = 0.01f;
+        if (mCurBrightness < 0) {
+            //获得屏幕亮度
+            mCurBrightness = ((Activity) mContext).getWindow().getAttributes().screenBrightness;
+            //判断当前亮度是否小于0.01f，是的话则给变量赋值0.01f放置屏幕变黑
+            if (mCurBrightness <= 0.01f)
+                mCurBrightness = 0.01f;
         }
-        ((Activity) mContext).getWindow().setAttributes(layoutParams);
-
-        float percent = layoutParams.screenBrightness * 100;
-        mCenterPorgress.setProgress((int) percent);
+        /**WindowManager.LayoutParams 是 WindowManager 接口的嵌套类；
+         它继承于 ViewGroup.LayoutParams； 它用于向WindowManager描述Window的管理策略。**/
+        //获取window窗口属性
+        WindowManager.LayoutParams lpa = ((Activity) mContext).getWindow().getAttributes();
+        //将当前屏幕亮度加上我们移动的距离的值赋给lpa（窗口管理）
+        mCurBrightness += percent;
+        lpa.screenBrightness = mCurBrightness;
+        //判断当前亮度是否大于1，是则设置为1,（亮度最大只能是1）
+        if (lpa.screenBrightness > 1.0f)
+            lpa.screenBrightness = 1.0f;
+            //判断是否小于0.01，防止黑屏最小设置成0.01
+        else if (lpa.screenBrightness < 0.01f)
+            lpa.screenBrightness = 0.01f;
+        //让设置好的亮度生效
+        ((Activity) mContext).getWindow().setAttributes(lpa);
+        float per = lpa.screenBrightness * 100;
+        mCenterPorgress.setProgress((int) per);
     }
 
     public interface MediaPlayerControl {
@@ -1025,7 +1048,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     }
 
-    public interface OnChooseChannel{
+    public interface OnChooseChannel {
         void onChooseChannel(View v);
     }
 

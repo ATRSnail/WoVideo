@@ -52,11 +52,9 @@ public class QualityPopWindow extends PopupWindow {
 //            button.setBackgroundDrawable(mContext.getResources().getDrawable(R.drawable.anthology_selector));
             button.setBackgroundColor(mContext.getResources().getColor(R.color.black));
             button.setTextColor(mContext.getResources().getColor(R.color.white));
-            LinearLayout.LayoutParams params1=new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-            params1.leftMargin=20;
-            params1.gravity= Gravity.RIGHT;
+            LinearLayout.LayoutParams params1=new LinearLayout.LayoutParams(RadioGroup.LayoutParams.MATCH_PARENT, RadioGroup.LayoutParams.WRAP_CONTENT);
+            params1.gravity= Gravity.CENTER;
             button.setLayoutParams(params1);
-            button.setPadding(20,0,20,0);
             button.setText(videoUrl.getFormatName());
             button.setButtonDrawable(null);
             button.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -85,9 +83,7 @@ public class QualityPopWindow extends PopupWindow {
 
     public void showPopupWindow(View parent) {
             // 以下拉方式显示popupwindow
-            this.showAsDropDown(parent, parent.getLayoutParams().width / 2, 18);
-//            this.showAtLocation(parent, Gravity.LEFT, 0, -90);
-//            this.showAsDropDown(parent);
+            this.showAtLocation(parent, Gravity.RIGHT, 0,0);
             this.setFocusable(true);
     }
 

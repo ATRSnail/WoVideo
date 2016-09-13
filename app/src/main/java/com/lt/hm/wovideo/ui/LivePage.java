@@ -2,16 +2,18 @@ package com.lt.hm.wovideo.ui;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -21,12 +23,11 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,21 +61,21 @@ import com.lt.hm.wovideo.video.player.AVPlayer;
 import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
-import com.lt.hm.wovideo.widget.LivePlaysPopw;
 import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.PipListviwPopuWindow;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
+import com.lt.hm.wovideo.widget.ViewMiddle.ViewMiddle;
+import com.lt.hm.wovideo.widget.ViewMiddle.ViewMiddleModel;
 import com.victor.loading.rotate.RotateLoading;
 
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import butterknife.BindView;
-import master.flame.danmaku.danmaku.model.BaseDanmaku;
 
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
 import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_TYPE_EXTRA;
@@ -86,7 +87,7 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  * @create_date 16/6/12
  */
 public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener, VideoPipAdapter.ItemClickCallBack,AVController.OnChooseChannel {
+        AudioCapabilitiesReceiver.Listener, VideoPipAdapter.ItemClickCallBack, AVController.OnChooseChannel, PopupWindow.OnDismissListener, ViewMiddle.OnSelectListener {
     @BindView(R.id.video_name)
     TextView videoName;
     @BindView(R.id.video_play_number)
@@ -101,21 +102,10 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     TextView videoProjection;
     @BindView(R.id.video_like)
     TextView videoLike;
-    @BindView(R.id.live_bref_img)
-    ImageView liveBrefImg;
-    @BindView(R.id.live_bref_txt1)
-    TextView liveBrefTxt1;
-    @BindView(R.id.live_bref_txt2)
-    TextView liveBrefTxt2;
-    @BindView(R.id.live_expand)
-    ImageView liveExpand;
-    boolean ex_flag = false;
     @BindView(R.id.live_program_list)
     RecyclerView liveProgramList;
     @BindView(R.id.live_video_bottom)
     PercentRelativeLayout live_video_bottom;
-    @BindView(R.id.live_video_bref)
-    LinearLayout live_video_bref;
     @BindView(R.id.free_hint)
     TextView free_hint;
     @BindView(R.id.free_label)
@@ -140,8 +130,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     LiveTVListAdapter adapter;
     VideoModel video = new VideoModel();
     VideoUrl videoUrl = new VideoUrl();
-
-    private LivePlaysPopw livePlaysPopw;
+    private Context mContext;
 
     // Video thing
     // For use when launching the demo app using adb.
@@ -175,9 +164,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     private String mContentId;
     private String mProvider;
 
-    private String img_url;
-    private String share_title;
-    private String share_desc;
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
 
     @Override
@@ -219,17 +205,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
         View root = findViewById(R.id.video_root);
         screenSwitchUtils = ScreenSwitchUtils.init(this.getApplicationContext());
-        root.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //toggleControlsVisibility();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    v.performClick();
-                }
-                return false;
-            }
-        });
+
         root.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -251,6 +227,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
         mMediaController = new AVController(this);
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
+        mMediaController.setSeekBarVisible(View.GONE);
         mMediaController.setGestureListener(this);
         mMediaController.setmChooseChannelListener(this);
         CookieHandler currentHanlder = CookieHandler.getDefault();
@@ -260,21 +237,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
         mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         mAudioCapabilitiesReceiver.register();
-
-    }
-
-    private void setSystemUiVisibility(boolean systemUiVisibility) {
-        if (systemUiVisibility) { //显示状态栏
-            WindowManager.LayoutParams lp = getWindow().getAttributes();
-            lp.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
-            getWindow().setAttributes(lp);
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        } else { //隐藏状态栏
-            WindowManager.LayoutParams lp = getWindow().getAttributes();
-            lp.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);
-            getWindow().setAttributes(lp);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-        }
 
     }
 
@@ -388,6 +350,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             );
             mMediaController.setTitle(videoName.getText().toString());
             mMediaController.setSwitchVisibility(View.INVISIBLE);
+            mMediaController.setBulletVisible(View.GONE);
+            mMediaController.setSeekBarVisible(View.GONE);
+            mMediaController.setmSendBulletVisible(View.GONE);
             mVideoFrame.setLayoutParams(lp);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mVideoFrame.setAspectRatio((float) height / (width + statueHight));
@@ -395,12 +360,13 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 mVideoFrame.requestLayout();
             }
             mVideoFrame.requestLayout();
-            setSystemUiVisibility(true);
+            ScreenUtils.setSystemUiVisibility(this,true);
 
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
-            setSystemUiVisibility(false);
+            mMediaController.setSeekBarVisible(View.GONE);
+            ScreenUtils.setSystemUiVisibility(this,false);
         }
 
     }
@@ -520,18 +486,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         mPlayer.setBackgrounded(backgrounded);
     }
 
-    private void toggleControlsVisibility() {
-        if (mMediaController.isShowing()) {
-            mMediaController.hide();
-        } else {
-            showControls();
-        }
-    }
-
-    private void showControls() {
-        mMediaController.show(0);
-    }
-
     // Permission request listener method
 
     @Override
@@ -594,6 +548,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     @Override
     protected void init(Bundle savedInstanceState) {
+        mContext = this;
         mList = new ArrayList<>();
         sinaList = new ArrayList<>();
         localList = new ArrayList<>();
@@ -606,18 +561,16 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 //        liveProgramList.addItemDecoration(new SpaceItemDecoration(10));
 //        liveProgramList.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         hideSomething();
-
     }
 
     private void hideSomething() {
-        live_video_bref.setVisibility(View.GONE);
         videoCollect.setVisibility(View.GONE);
         videoShare.setVisibility(View.GONE);
         videoProjection.setVisibility(View.GONE);
         videoPlayNumber.setVisibility(View.GONE);
         videoLike.setVisibility(View.GONE);
         videoPip.setVisibility(View.VISIBLE);
-
+        free_hint.setVisibility(View.GONE);
     }
 
 
@@ -667,49 +620,21 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     @Override
     public void initViews() {
-        liveExpand.setOnClickListener((View v) -> {
-            if (ex_flag) {
-                liveExpand.setImageResource(R.drawable.icon_expand);
-                liveBrefTxt2.setVisibility(View.GONE);
-                ex_flag = false;
-            } else {
-                liveExpand.setImageResource(R.drawable.icon_zoom);
-                liveBrefTxt2.setVisibility(View.VISIBLE);
-                ex_flag = true;
-            }
-        });
-
-//        videoShare.setOnClickListener((View v)->{
-//            ShareUtils.showShare(this, null, true, share_title,share_desc, HttpUtils.appendUrl(img_url));
-//
-//        });
 
         liveBtnCctv.setOnClickListener((View v) -> {
-            changeState(btns[0]);
-            if (cctvList.size() > 0) {
-                initListViews(cctvList);
-            }
+            touchProperty(0);
         });
 
         liveBtnSina.setOnClickListener((View v) -> {
-            changeState(btns[1]);
-            if (sinaList.size() > 0) {
-                initListViews(sinaList);
-            }
+            touchProperty(1);
         });
 
         liveBtnLocal.setOnClickListener((View v) -> {
-            changeState(btns[2]);
-            if (localList.size() > 0) {
-                initListViews(localList);
-            }
+            touchProperty(2);
         });
 
         liveBtnOthertv.setOnClickListener((View v) -> {
-            changeState(btns[3]);
-            if (otherList.size() > 0) {
-                initListViews(otherList);
-            }
+            touchProperty(3);
         });
         //显示视频画中画弹框
         videoPip.setOnClickListener(new View.OnClickListener() {
@@ -721,7 +646,37 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 }
             }
         });
+    }
 
+    /**
+     * 选择频道分类
+     *
+     * @param index
+     */
+    private void touchProperty(int index) {
+        currentProperty = index;
+        initCurrentList(index);
+        changeState(btns[currentProperty]);
+        if (currentList.size() > 0) {
+            initListViews();
+        }
+    }
+
+    private void initCurrentList(int index) {
+        switch (index) {
+            case 0:
+                currentList = cctvList;
+                break;
+            case 1:
+                currentList = sinaList;
+                break;
+            case 2:
+                currentList = localList;
+                break;
+            case 3:
+                currentList = otherList;
+                break;
+        }
     }
 
     private void changeState(Button btn) {
@@ -741,6 +696,8 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
     private String intentPlayName = "";
     private String intentProperty = "";//电视台属性:0:央视;1:卫视2地方台;3:其他
     private String currentPlayName = "";
+    private int currentProperty;
+    private List<LiveModel> currentList;
     public static final String PLAY_URL = "play_url";
     public static final String PLAY_NAME = "play_name";
     public static final String PLAY_PROPERTY = "property";
@@ -760,48 +717,49 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         NetUtils.getLiveList(this);
     }
 
-    private void initListViews(List<LiveModel> liveTvList) {
-        if (liveProgramList == null) return;
-        adapter = new LiveTVListAdapter(getApplicationContext(), liveTvList);
-        liveProgramList.setAdapter(adapter);
+
+    private void initListViews() {
+        if (liveProgramList == null || currentList == null || currentList.size() <= 0) return;
 
         if (!first_open) {
-            currentPlayName = TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getTvName() : intentPlayName;
-            getRealURL(TextUtils.isEmpty(intentPlayUrl) ? liveTvList.get(0).getUrl() : intentPlayUrl);
+            currentPlayName = TextUtils.isEmpty(intentPlayUrl) ? currentList.get(0).getTvName() : intentPlayName;
+            getRealURL(TextUtils.isEmpty(intentPlayUrl) ? currentList.get(0).getUrl() : intentPlayUrl);
             videoName.setText(currentPlayName);
             if (!TextUtils.isEmpty(intentProperty) && Integer.valueOf(intentProperty) < 4) {
                 TLog.error("intentproperty--->" + intentProperty);
-                changeState(btns[Integer.valueOf(intentProperty)]);
+                currentProperty = Integer.valueOf(intentProperty);
             } else {
-                changeState(btns[0]);
+                currentProperty = 0;
             }
+            changeState(btns[currentProperty]);
             first_open = true;
         }
-        adapter.updateShowText(liveTvList, currentPlayName);
-//        videoName.setText(liveTvList.get(0).getTvName());
+
+        if (adapter == null){
+            adapter = new LiveTVListAdapter(getApplicationContext(), currentList);
+            liveProgramList.setAdapter(adapter);
+        }else {
+            adapter.updateShowText(currentList, currentPlayName);
+        }
 
         adapter.setOnRecyclerViewItemClickListener(new BaseQuickAdapter.OnRecyclerViewItemClickListener() {
             @Override
             public void onItemClick(View view, int i) {
 
-                String url = liveTvList.get(i).getUrl();
-                if (UserMgr.isLogin()) {
-                    String tag = ACache.get(getApplicationContext()).getAsString(UserMgr.getUseId() + "free_tag");
-                    if (!StringUtils.isNullOrEmpty(tag)) {
-//                        free_hint.setText(" "+"已免流");
-                        mFreeLabel.setVisibility(View.VISIBLE);
-                    }
-                }
-                currentPlayName = liveTvList.get(i).getTvName();
-                videoName.setText(currentPlayName);
-                adapter.updateShowText(liveTvList, currentPlayName);
-//                videoName.setText(liveTvList.get(i).getTvName());
+                String url = currentList.get(i).getUrl();
+                resetPlayInfo(currentList, i);
+                initVaule();
                 getRealURL(url);
             }
         });
         //初始化画中画弹框
         liveModlesList = getPipDatas();
+    }
 
+    private void resetPlayInfo(List<LiveModel> liveTvList, int position) {
+        currentPlayName = liveTvList.get(position).getTvName();
+        videoName.setText(currentPlayName);
+        adapter.updateShowText(liveTvList, currentPlayName);
     }
 
     /**
@@ -810,13 +768,13 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
      * @param url
      */
     private void getRealURL(String url) {
-        NetUtils.getVideoRealURL(url,UserMgr.getUsePhone(),this);
+        NetUtils.getVideoRealURL(url, UserMgr.getUsePhone(), this);
     }
 
     @Override
     public <T> void onSuccess(T value, int flag) {
         super.onSuccess(value, flag);
-        switch (flag){
+        switch (flag) {
             case HttpApis.http_video_real_url:
                 ResponseVideoRealUrl va = (ResponseVideoRealUrl) value;
                 videoUrl.setFormatUrl(va.getBody().getUrl());
@@ -836,24 +794,79 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                 otherList.addAll(vaList.getBody().getOtherTv());
 
                 if (TextUtils.isEmpty(intentProperty) || Integer.valueOf(intentProperty) == 0) {
-                    initListViews(cctvList);
+                    currentList = cctvList;
                 } else if (Integer.valueOf(intentProperty) == 1) {
-                    initListViews(sinaList);
+                    currentList = sinaList;
                 } else if (Integer.valueOf(intentProperty) == 2) {
-                    initListViews(localList);
+                    currentList = localList;
                 } else if (Integer.valueOf(intentProperty) == 3) {
-                    initListViews(otherList);
+                    currentList = otherList;
                 }
+                initListViews();
                 break;
         }
     }
 
     @Override
     public void onChooseChannel(View v) {
-        if (livePlaysPopw == null){
-            livePlaysPopw =  new LivePlaysPopw(LivePage.this,liveModlesList);
+        if (changeChannelPop == null) {
+            initPop();
         }
-        livePlaysPopw.showAtLocation(v,Gravity.RIGHT,0,-25);
+        changeChannelPop.showAtLocation(v, Gravity.RIGHT, 0, -25);
+    }
 
+    private ViewMiddle viewMiddle;
+    private PopupWindow changeChannelPop;
+
+    private void initPop() {
+        // TODO Auto-generated method stub
+        viewMiddle = new ViewMiddle(mContext, liveModlesList);
+        viewMiddle.setOnSelectListener(this);
+        changeChannelPop = new PopupWindow();
+        changeChannelPop.setContentView(viewMiddle);
+        changeChannelPop.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        changeChannelPop.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
+        changeChannelPop.setFocusable(true);
+        changeChannelPop.setOnDismissListener(this);
+        changeChannelPop.setAnimationStyle(R.style.AnimationRightFade);
+        changeChannelPop.setBackgroundDrawable(new ColorDrawable(0x00000000));
+    }
+
+    /**
+     * 动态改变选台popu选项
+     */
+    private void initVaule() {
+        TLog.error("currentProperty--->"+currentProperty+"----"+currentPlayName);
+        if (viewMiddle != null)
+            viewMiddle.updateShowText(str[currentProperty], currentPlayName);
+    }
+
+    @Override
+    public void onDismiss() {
+
+    }
+
+    @Override
+    public void getValue(int parentId, int position) {
+        initCurrentList(parentId);
+        changeState(btns[parentId]);
+        currentProperty = parentId;
+        resetPlayInfo(currentList, position);
+        mMediaController.setTitle(currentPlayName);
+        getRealURL(currentList.get(position).getUrl());
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (changeChannelPop != null && changeChannelPop.isShowing()) {
+                changeChannelPop.dismiss();
+            } else {
+                if (mMediaController != null) {
+                    mMediaController.doBackClick();
+                }
+            }
+        }
+        return false;
     }
 }

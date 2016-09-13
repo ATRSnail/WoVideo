@@ -65,10 +65,6 @@
         android:layout_height="5dp"
         android:background="@color/font_gray" />
 
-    <include
-        android:id="@+id/live_video_bref"
-        layout="@layout/layout_video_live_bref" />
-
     <View
         android:layout_width="match_parent"
         android:layout_height="3dp"

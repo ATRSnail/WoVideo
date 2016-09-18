@@ -108,7 +108,7 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  */
 
 public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener, AVController.OnInterfaceInteract {
+        AudioCapabilitiesReceiver.Listener, AVController.OnInterfaceInteract,AVController.onTouchAd {
 
     // Video thing
     // For use when launching the demo app using adb.
@@ -251,17 +251,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
         }
 
-        root.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //toggleControlsVisibility();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    v.performClick();
-                }
-                return false;
-            }
-        });
         root.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -283,11 +272,14 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         mSurfaceView = (SurfaceView) findViewById(R.id.surface_view);
         mSurfaceView.getHolder().addCallback(this);
 
-//        mMediaController = new KeyCompatibleMediaController(this);
         mMediaController = new KeyCompatibleMediaController(this, mDanmakuView);
 
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         mMediaController.setGestureListener(this);
+        mMediaController.setonTouchAd(this);
+
+        mMediaController.setIsAd(isAd);
+        mMediaController.setAdUiVisibility(isAd);
 
         CookieHandler currentHanlder = CookieHandler.getDefault();
         if (currentHanlder != defaultCookieManager) {
@@ -296,7 +288,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
         mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         mAudioCapabilitiesReceiver.register();
-
 
         // 设置最大显示行数
         HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
@@ -333,28 +324,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     mDanmakuView.start();
                 }
             });
-//            mDanmakuView.setOnDanmakuClickListener(new IDanmakuView.OnDanmakuClickListener() {
-//                @Override
-//                public void onDanmakuClick(BaseDanmaku latest) {
-//                    Log.d("DFM", "onDanmakuClick text:" + latest.text);
-//                }
-//
-//                @Override
-//                public void onDanmakuClick(IDanmakus danmakus) {
-//                    Log.d("DFM", "onDanmakuClick danmakus size:" + danmakus.size());
-//                }
-//            });
-//            mDanmakuView.prepare(mParser, mContext);
-//            mDanmakuView.showFPS(false);
-//            mDanmakuView.enableDanmakuDrawingCache(true);
             mDanmakuView.hide();
-//            ((View) mDanmakuView).setOnClickListener(new View.OnClickListener() {
-//
-//                @Override
-//                public void onClick(View view) {
-//                    mMediaController.setVisibility(View.VISIBLE);
         }
-//            });
         ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -531,7 +502,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     Gravity.CENTER
             );
-
             //TODO set title
 //            mMediaController.setTitle(videoName.getText().toString());
             mVideoFrame.setLayoutParams(lp);
@@ -543,6 +513,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
             mMediaController.setBulletScreen(true);
             mMediaController.setmChooseChannel(View.GONE);
+
             ScreenUtils.setSystemUiVisibility(this,true);
 
             //show danmu
@@ -551,6 +522,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             //  getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
             mMediaController.setBulletScreen(false);
             mMediaController.hide();
+
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
             // when in portrait screen, turn off bullet screen.
             if (mDanmakuView != null) {
@@ -558,6 +530,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             }
             ScreenUtils.setSystemUiVisibility(this,false);
         }
+        mMediaController.setIsAd(isAd);
+        mMediaController.setAdUiVisibility(isAd);
 
     }
 
@@ -598,24 +572,37 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     public void onId3Metadata(List<Id3Frame> id3Frames) {
 
     }
+    public boolean isAd = true;
 
     @Override
     public void onStateChanged(boolean playWhenReady, int playbackState) {
         if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
+           TLog.error("playbackState--->"+playbackState);
             mRotateLoading.stop();
             //TODO play next if exist.
+
             mDanmakuView.show();
             mDanmakuView.seekTo(mPlayer.getCurrentPosition());
+            if (isAd && playbackState == AVPlayer.STATE_ENDED){
+                adOnComplete();
+            }
         } else {
             mRotateLoading.start();
             if (mDanmakuView == null) return;
             mDanmakuView.hide();
         }
+        mMediaController.updatePausePlay();
     }
 
     @Override
     public void onError(Exception e) {
 
+    }
+
+    public void adOnComplete(){
+        isAd = false;
+        mMediaController.setIsAd(false);
+        mMediaController.setAdUiVisibility(false);
     }
 
     @Override
@@ -860,6 +847,16 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         }
     }
 
+    @Override
+    public void onPassAd() {
+
+    }
+
+    @Override
+    public void onTouchAd() {
+        UT.showNormal("点击的广告");
+    }
+
     private static final class KeyCompatibleMediaController extends AVController {
 
         private MediaPlayerControl playerControl;
@@ -905,6 +902,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         @Override
         public boolean dispatchKeyEvent(KeyEvent event) {
             int keyCode = event.getKeyCode();
+            TLog.error("keyCode---->"+keyCode);
             if (playerControl.canSeekForward() && (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
                     || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)) {
                 if (event.getAction() == KeyEvent.ACTION_DOWN) {

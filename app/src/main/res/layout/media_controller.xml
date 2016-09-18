@@ -195,4 +195,16 @@
         android:layout_margin="10dp"
         android:padding="5dp"
         android:src="@drawable/icon_back" />
+
+    <TextView
+        android:id="@+id/tv_pass_ad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="18dp"
+        android:text="跳过广告"
+        android:textColor="@color/green_bullet" />
+
+
 </RelativeLayout>

@@ -1,0 +1,194 @@
+package com.lt.hm.wovideo.widget.BlurPopuwindow;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.widget.Toolbar;
+
+/**
+ * @author xch
+ * @version 1.0
+ * @create_date 16/9/14
+ */
+public class BlurPopuwindow extends Fragment{
+
+    /**
+     * Engine used to blur.
+     */
+    private BlurDialogEngine mBlurEngine;
+
+    /**
+     * Allow to set a Toolbar which isn't set as actionbar.
+     */
+    private Toolbar mToolbar;
+
+    /**
+     * Dimming policy.
+     */
+    private boolean mDimmingEffect;
+
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        if (mBlurEngine != null) {
+            mBlurEngine.onAttach(activity); // re attached
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        mBlurEngine = new BlurDialogEngine(getActivity());
+
+        if (mToolbar != null) {
+            mBlurEngine.setToolbar(mToolbar);
+        }
+
+        int radius = getBlurRadius();
+        if (radius <= 0) {
+            throw new IllegalArgumentException("Blur radius must be strictly positive. Found : " + radius);
+        }
+        mBlurEngine.setBlurRadius(radius);
+
+        float factor = getDownScaleFactor();
+        if (factor <= 1.0) {
+            throw new IllegalArgumentException("Down scale must be strictly greater than 1.0. Found : " + factor);
+        }
+        mBlurEngine.setDownScaleFactor(factor);
+
+        mBlurEngine.setUseRenderScript(isRenderScriptEnable());
+
+        mBlurEngine.debug(isDebugEnable());
+
+        mBlurEngine.setBlurActionBar(isActionBarBlurred());
+
+        mDimmingEffect = isDimmingEnable();
+    }
+
+    @Override
+    public void onStart() {
+
+        super.onStart();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mBlurEngine.onResume(getRetainInstance());
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mBlurEngine.onDetach();
+    }
+
+    @Override
+    public void onDestroyView() {
+        mBlurEngine.onDismiss();
+        super.onDestroyView();
+    }
+
+    /**
+     * Allow to set a Toolbar which isn't set as ActionBar.
+     * <p/>
+     * Must be called before onCreate.
+     *
+     * @param toolBar toolBar
+     */
+    public void setToolbar(Toolbar toolBar) {
+        mToolbar = toolBar;
+        if (mBlurEngine != null) {
+            mBlurEngine.setToolbar(toolBar);
+        }
+    }
+
+    /**
+     * For inheritance purpose.
+     * <p/>
+     * Enable or disable debug mode.
+     *
+     * @return true if debug mode should be enabled.
+     */
+    protected boolean isDebugEnable() {
+        return BlurDialogEngine.DEFAULT_DEBUG_POLICY;
+    }
+
+    /**
+     * For inheritance purpose.
+     * <p/>
+     * Allow to customize the down scale factor.
+     * <p/>
+     * The factor down scaled factor used to reduce the size of the source image.
+     * Range :  ]1.0,infinity)
+     *
+     * @return customized down scaled factor.
+     */
+    protected float getDownScaleFactor() {
+        return BlurDialogEngine.DEFAULT_BLUR_DOWN_SCALE_FACTOR;
+    }
+
+    /**
+     * For inheritance purpose.
+     * <p/>
+     * Allow to customize the blur radius factor.
+     * <p/>
+     * radius down scaled factor used to reduce the size of the source image.
+     * Range :  [1,infinity)
+     *
+     * @return customized blur radius.
+     */
+    protected int getBlurRadius() {
+        return BlurDialogEngine.DEFAULT_BLUR_RADIUS;
+    }
+
+    /**
+     * For inheritance purpose.
+     * <p/>
+     * Enable or disable the dimming effect.
+     * <p/>
+     * Disabled by default.
+     *
+     * @return true to enable the dimming effect.
+     */
+    protected boolean isDimmingEnable() {
+        return BlurDialogEngine.DEFAULT_DIMMING_POLICY;
+    }
+
+    /**
+     * For inheritance purpose.
+     * <p/>
+     * Enable or disable the blur effect on the action bar.
+     * <p/>
+     * Disable by default.
+     *
+     * @return true to enable the blur effect on the action bar.
+     */
+    protected boolean isActionBarBlurred() {
+        return BlurDialogEngine.DEFAULT_ACTION_BAR_BLUR;
+    }
+
+    /**
+     * For inheritance purpose.
+     * <p/>
+     * Enable or disable RenderScript.
+     * <p/>
+     * Disable by default.
+     * <p/>
+     * Don't forget to add those lines to your build.gradle if your are using Renderscript
+     * <pre>
+     *  defaultConfig {
+     *  ...
+     *  renderscriptTargetApi 22
+     *  renderscriptSupportModeEnabled true
+     *  ...
+     *  }
+     * </pre>
+     *
+     * @return true to enable RenderScript.
+     */
+    protected boolean isRenderScriptEnable() {
+        return BlurDialogEngine.DEFAULT_USE_RENDERSCRIPT;
+    }
+}

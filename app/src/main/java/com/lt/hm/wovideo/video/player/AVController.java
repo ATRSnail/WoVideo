@@ -2,6 +2,7 @@ package com.lt.hm.wovideo.video.player;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Message;
@@ -73,8 +74,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
     private ImageButton mFullscreenButton;
+    private TextView tv_pass_ad;//跳过广告按钮
     private ImageView mBackButton;
     private ImageButton mSendBulletButton;
+    private View layout_bottom;//进度条布局
     private LinearLayout ly_seek;
     private QualityPopWindow mQualityPopWindow;
     private Handler mHandler = new MessageHandler(this);
@@ -94,13 +97,12 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private TextView mScheduleText;
     private ScreenSwitchUtils screenSwitchUtils;
 
-
-    /**
-     * @author leo
-     */
     private OnQualitySelected listener;
     private OnInterfaceInteract mInterfaceListener;
     private OnChooseChannel onChooseChannelListener;
+    private onTouchAd onTouchAdListener;
+
+    private boolean isAd = false;
 
     private VideoModel videoModel;
     QualityPopWindow window;
@@ -111,6 +113,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     public void setListener(OnQualitySelected listener) {
         this.listener = listener;
+    }
+
+    public void setonTouchAd(onTouchAd listener) {
+        this.onTouchAdListener = listener;
     }
 
     public void setmChooseChannelListener(OnChooseChannel listener) {
@@ -144,6 +150,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         this(context, true);
 
         Log.i(TAG, TAG);
+    }
+
+    public void setIsAd(boolean isAd) {
+        this.isAd = isAd;
     }
 
     @Override
@@ -218,6 +228,12 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
 
     private void initControllerView(View v) {
+
+        tv_pass_ad = (TextView) v.findViewById(R.id.tv_pass_ad);
+        tv_pass_ad.setOnClickListener(mPassAdListener);
+
+        layout_bottom = v.findViewById(R.id.layout_bottom);
+
         mVideoTitle = (TextView) v.findViewById(R.id.video_title);
         mChooseChannel = (ImageView) v.findViewById(R.id.tv_choose_channel);
         ly_seek = (LinearLayout) v.findViewById(R.id.ly_seek);
@@ -329,6 +345,16 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     }
 
+    public void setAdUiVisibility(boolean isAd) {
+        if (isAd) {
+            layout_bottom.setBackgroundColor(Color.parseColor("#00000000"));
+        } else {
+            layout_bottom.setBackgroundColor(Color.parseColor("#CC000000"));
+        }
+        setSeekBarVisible(isAd ? GONE : VISIBLE);
+        show(0);
+    }
+
     public void setSwitchVisibility(int visibility) {
         if (mQualitySwitch != null) {
             mQualitySwitch.setVisibility(visibility);
@@ -341,8 +367,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     }
 
-    public void setmChooseChannel(int visible){
-        if (mChooseChannel != null){
+    public void setmChooseChannel(int visible) {
+        if (mChooseChannel != null) {
             mChooseChannel.setVisibility(visible);
         }
     }
@@ -353,8 +379,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     }
 
-    public void setSeekBarVisible(int visible){
-        if (ly_seek != null){
+    public void setSeekBarVisible(int visible) {
+        if (ly_seek != null) {
             ly_seek.setVisibility(visible);
         }
     }
@@ -523,6 +549,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         int keyCode = event.getKeyCode();
         final boolean uniqueDown = event.getRepeatCount() == 0
                 && event.getAction() == KeyEvent.ACTION_DOWN;
+
         if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK
                 || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE
                 || keyCode == KeyEvent.KEYCODE_SPACE) {
@@ -591,6 +618,15 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         public void onClick(View v) {
             if (onChooseChannelListener != null) {
                 onChooseChannelListener.onChooseChannel(v);
+            }
+        }
+    };
+
+    private OnClickListener mPassAdListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (onTouchAdListener != null) {
+                onTouchAdListener.onPassAd();
             }
         }
     };
@@ -715,7 +751,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             show(3600000);
 
             mDragging = true;
-
             // By removing these pending progress messages we make sure
             // that a) we won't update the progress while the user adjusts
             // the seekbar and b) once the user is done dragging the thumb
@@ -744,7 +779,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         public void onStopTrackingTouch(SeekBar bar) {
             mDragging = false;
             setProgress();
-            updatePausePlay();
 //      show(sDefaultTimeout);
 
             // Ensure that progress is properly updated in the future,
@@ -855,10 +889,16 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     @Override
     public void onSingleTap() {
-        if (isShowing()) {
-            hide();
+        if (isAd) {
+            if (onTouchAdListener != null) {
+                onTouchAdListener.onTouchAd();
+            }
         } else {
-            show(0);
+            if (isShowing()) {
+                hide();
+            } else {
+                show(0);
+            }
         }
     }
 
@@ -939,6 +979,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         float per = (float) ((index * 1.0 / mMaxVolume) * 100);
         mCenterPorgress.setProgress((int) per);
     }
+
     /**
      * 滑动改变亮度
      *
@@ -1003,13 +1044,14 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         int getAudioSessionId();
 
         void toggleFullScreen(ScreenSwitchUtils screenSwitchUtils);
+
     }
 
     private static class MessageHandler extends Handler {
         private final WeakReference<AVController> mView;
 
         MessageHandler(AVController view) {
-            mView = new WeakReference<AVController>(view);
+            mView = new WeakReference<>(view);
         }
 
         @Override
@@ -1050,6 +1092,13 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     public interface OnChooseChannel {
         void onChooseChannel(View v);
+    }
+
+
+    public interface onTouchAd {
+        void onPassAd();
+
+        void onTouchAd();
     }
 
 }

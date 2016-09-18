@@ -14,6 +14,7 @@ import com.lt.hm.wovideo.model.response.ResponseBanner;
 import com.lt.hm.wovideo.model.response.ResponseBullet;
 import com.lt.hm.wovideo.model.response.ResponseCateTag;
 import com.lt.hm.wovideo.model.response.ResponseChannel;
+import com.lt.hm.wovideo.model.response.ResponseComment;
 import com.lt.hm.wovideo.model.response.ResponseFilms;
 import com.lt.hm.wovideo.model.response.ResponseLikeList;
 import com.lt.hm.wovideo.model.response.ResponseLiveList;
@@ -338,5 +339,20 @@ public class NetUtils {
     public static void getLiveList(HttpUtilBack httpUtilBack) {
         HashMap<String, Object> map = new HashMap<>();
         HttpApis.getLiveTvList(map, HttpApis.http_video_lives_url, new HttpCallback<>(ResponseLiveList.class, httpUtilBack));
+    }
+
+    /**
+     * 获取评论列表
+     *
+     * @param vfId
+     * @param httpUtilBack
+     */
+    public static void getCommentList(String vfId, HttpUtilBack httpUtilBack) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("userId", UserMgr.getUseId());
+        map.put("pageNum", 1);
+        map.put("numPerPage", 50);
+        map.put("vfId", vfId);
+        HttpApis.commentList(map, HttpApis.http_comments, new HttpCallback<>(ResponseComment.class, httpUtilBack));
     }
 }

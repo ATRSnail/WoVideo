@@ -3,7 +3,6 @@
     android:id="@+id/search_view_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/font_gray"
     android:orientation="vertical">
 
     <!--<RelativeLayout-->
@@ -36,9 +35,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:background="@color/white"
         android:id="@+id/search_history_list"
         />
 
-
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="搜索"/>
 </LinearLayout>

@@ -366,6 +366,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
             mMediaController.setSeekBarVisible(View.GONE);
+            dimissChangeChannelPop();
             ScreenUtils.setSystemUiVisibility(this,false);
         }
 
@@ -868,5 +869,11 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             }
         }
         return false;
+    }
+
+    private void dimissChangeChannelPop(){
+        if (changeChannelPop != null && changeChannelPop.isShowing()) {
+            changeChannelPop.dismiss();
+        }
     }
 }

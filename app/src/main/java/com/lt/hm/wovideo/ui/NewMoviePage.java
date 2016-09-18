@@ -18,13 +18,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
-import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
 import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.adapter.video.BrefIntroAdapter;
@@ -34,18 +31,13 @@ import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.NetUtils;
-import com.lt.hm.wovideo.http.RespHeader;
 import com.lt.hm.wovideo.http.ResponseCode;
-import com.lt.hm.wovideo.http.ResponseObj;
-import com.lt.hm.wovideo.http.parser.ResponseParser;
 import com.lt.hm.wovideo.model.CommentModel;
 import com.lt.hm.wovideo.model.LikeModel;
 import com.lt.hm.wovideo.model.PlayList;
-import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.ValidateComment;
 import com.lt.hm.wovideo.model.VfinfoModel;
 import com.lt.hm.wovideo.model.VideoType;
-import com.lt.hm.wovideo.model.VideoURL;
 import com.lt.hm.wovideo.model.response.ResponseComment;
 import com.lt.hm.wovideo.model.response.ResponseLikeList;
 import com.lt.hm.wovideo.model.response.ResponsePlayList;
@@ -53,7 +45,6 @@ import com.lt.hm.wovideo.model.response.ResponseValidateComment;
 import com.lt.hm.wovideo.model.response.ResponseVfinfo;
 import com.lt.hm.wovideo.model.response.ResponseVideoRealUrl;
 import com.lt.hm.wovideo.utils.ShareUtils;
-import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UIHelper;
@@ -163,15 +154,6 @@ public class NewMoviePage extends BaseVideoActivity {
     private int typeId = 0;
 
     @Override
-    protected void onBeforeSetContentLayout() {
-//        //取消标题
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        //取消状态栏
-//        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-//                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-    }
-
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         //Check the orientation of the screen
@@ -263,15 +245,8 @@ public class NewMoviePage extends BaseVideoActivity {
         if (beans.size() > 0) {
             beans.clear();
         }
-        HashMap<String, Object> map = new HashMap<>();
-        String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(), "userinfo");
-        if (!StringUtils.isNullOrEmpty(userinfo)) {
-            UserModel model = new Gson().fromJson(userinfo, UserModel.class);
-            map.put("userId", model.getId());
-            map.put("pageNum", 1);
-            map.put("numPerPage", 50);
-            map.put("vfId", vfId);
-            HttpApis.commentList(map, HttpApis.http_for, new HttpCallback<>(ResponseComment.class, this));
+        if (UserMgr.isLogin()) {
+            NetUtils.getCommentList(vfId, this);
         } else {
             UnLoginHandler.unLogin(NewMoviePage.this);
         }
@@ -355,12 +330,7 @@ public class NewMoviePage extends BaseVideoActivity {
             ShareUtils.showShare(this, null, true, share_title, share_desc, HttpUtils.appendUrl(img_url));
         });
 
-        videoLike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clickZan();
-            }
-        });
+        videoLike.setOnClickListener(v -> clickZan());
 
         addComment.setOnClickListener((View v) -> {
             if (TextUtils.isEmpty(etAddComment.getText().toString().trim())) {
@@ -495,7 +465,7 @@ public class NewMoviePage extends BaseVideoActivity {
                 if (grid_list.size() == 0) return;
                 initBottomGrid(grid_list);
                 break;
-            case HttpApis.http_for:
+            case HttpApis.http_comments:
                 ResponseComment responseComment = (ResponseComment) value;
                 beans = responseComment.getBody().getCommentList();
                 if (beans == null || beans.size() == 0) return;
@@ -541,6 +511,8 @@ public class NewMoviePage extends BaseVideoActivity {
             case HttpApis.http_video_real_url:
                 ResponseVideoRealUrl realUrl = (ResponseVideoRealUrl) value;
                 if (videoUrl != null && video != null) {
+                    TLog.error("realUrl--->" + realUrl.getBody().getUrl());
+
                     videoUrl.setFormatUrl(realUrl.getBody().getUrl());
                     video.setmPlayUrl(videoUrl);
                     // Reset player and params.
@@ -573,45 +545,8 @@ public class NewMoviePage extends BaseVideoActivity {
                 collect_tag = playIntro.getId();
                 free_hint.setText(playIntro.getZan() + "");
                 videoAddHit(playIntro.getId());
-                VideoModel model = new VideoModel();
-                ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
-                if (!StringUtils.isNullOrEmpty(playIntro.getFluentUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("流畅");
-                    url.setFormatUrl(playIntro.getFluentUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(playIntro.getStandardUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("标清");
-                    url.setFormatUrl(playIntro.getStandardUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(playIntro.getBlueUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("蓝光");
-                    url.setFormatUrl(playIntro.getBlueUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(playIntro.getHighUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("高清");
-                    url.setFormatUrl(playIntro.getHighUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(playIntro.getSuperUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("超清");
-                    url.setFormatUrl(playIntro.getSuperUrl());
-                    urls.add(url);
-                }
-                if (!StringUtils.isNullOrEmpty(playIntro.getFkUrl())) {
-                    VideoUrl url = new VideoUrl();
-                    url.setFormatName("4K");
-                    url.setFormatUrl(playIntro.getFkUrl());
-                    urls.add(url);
-                }
-                model.setmVideoUrl(urls);
+
+                VideoModel model = initVideoModel();
 
                 setVideoModel(model);
                 setQualityListener(new AVController.OnQualitySelected() {
@@ -630,11 +565,64 @@ public class NewMoviePage extends BaseVideoActivity {
         }
     }
 
+    /**
+     * 保存播放历史
+     *
+     * @param vfinfoModel
+     */
     private void saveVideoHistory(VfinfoModel vfinfoModel) {
         videoHistory.setmName(vfinfoModel.getName());
         videoHistory.setmId(vfinfoModel.getId());
         videoHistory.setCreate_time(System.currentTimeMillis() + "");
         videoHistory.setImg_url(vfinfoModel.getImg());
+    }
+
+    /**
+     * 得到电影播放画质类型
+     *
+     * @return
+     */
+    private VideoModel initVideoModel() {
+        VideoModel model = new VideoModel();
+        ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
+        if (!StringUtils.isNullOrEmpty(playIntro.getFluentUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("流畅");
+            url.setFormatUrl(playIntro.getFluentUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(playIntro.getStandardUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("标清");
+            url.setFormatUrl(playIntro.getStandardUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(playIntro.getBlueUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("蓝光");
+            url.setFormatUrl(playIntro.getBlueUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(playIntro.getHighUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("高清");
+            url.setFormatUrl(playIntro.getHighUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(playIntro.getSuperUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("超清");
+            url.setFormatUrl(playIntro.getSuperUrl());
+            urls.add(url);
+        }
+        if (!StringUtils.isNullOrEmpty(playIntro.getFkUrl())) {
+            VideoUrl url = new VideoUrl();
+            url.setFormatName("4K");
+            url.setFormatUrl(playIntro.getFkUrl());
+            urls.add(url);
+        }
+        model.setmVideoUrl(urls);
+        return model;
     }
 
 
@@ -648,7 +636,7 @@ public class NewMoviePage extends BaseVideoActivity {
             case HttpApis.http_push_comment:
                 UT.showNormal(error);
                 break;
-            case HttpApis.http_for:
+            case HttpApis.http_comments:
                 //评论内容获取失败布局添加
                 videoCommentList.setVisibility(View.GONE);
                 empty.setVisibility(View.VISIBLE);
@@ -763,7 +751,7 @@ public class NewMoviePage extends BaseVideoActivity {
             setVideoId(videoId); // Set Video Id for Bullet Screen usage
             getBullets(); // get Bullet list after set Video Id.
         }
-        NetUtils.getVideoRealURL(url, UserMgr.getUsePhone(), this);
+        NetUtils.getVideoRealURL(isAd?"http://111.206.133.39:9910/video/wovideo//ads/spfb15/spfb15.m3u8":url, UserMgr.getUsePhone(), this);
     }
 
     int currentEpisode = 0;
@@ -782,59 +770,9 @@ public class NewMoviePage extends BaseVideoActivity {
         per_Id = antholys.get(i).getId();
         PlayList.PlaysListBean details = antholys.get(i);
         videoHistory.setmId(details.getVfId());
-        VideoModel model = new VideoModel();
-        ArrayList<VideoUrl> urls = new ArrayList<VideoUrl>();
-        if (!StringUtils.isNullOrEmpty(details.getFluentUrl())) {
-            VideoUrl url = new VideoUrl();
-            url.setFormatName("流畅");
-            url.setFormatUrl(details.getFluentUrl());
-            urls.add(url);
-        }
-        if (!StringUtils.isNullOrEmpty(details.getStandardUrl())) {
-            VideoUrl url = new VideoUrl();
-            url.setFormatName("标清");
-            url.setFormatUrl(details.getStandardUrl());
-            urls.add(url);
-        }
-        if (!StringUtils.isNullOrEmpty(details.getBlueUrl())) {
-            VideoUrl url = new VideoUrl();
-            url.setFormatName("蓝光");
-            url.setFormatUrl(details.getBlueUrl());
-            urls.add(url);
-        }
-        if (!StringUtils.isNullOrEmpty(details.getHighUrl())) {
-            VideoUrl url = new VideoUrl();
-            url.setFormatName("高清");
-            url.setFormatUrl(details.getHighUrl());
-            urls.add(url);
-        }
-        if (!StringUtils.isNullOrEmpty(details.getSuperUrl())) {
-            VideoUrl url = new VideoUrl();
-            url.setFormatName("超清");
-            url.setFormatUrl(details.getSuperUrl());
-            urls.add(url);
-        }
-        if (!StringUtils.isNullOrEmpty(details.getFkUrl())) {
-            VideoUrl url = new VideoUrl();
-            url.setFormatName("4K");
-            url.setFormatUrl(details.getFkUrl());
-            urls.add(url);
-        }
-        model.setmVideoUrl(urls);
-
+        VideoModel model = initVideoModel();
         setVideoModel(model);
-        setQualityListener(new AVController.OnQualitySelected() {
-            @Override
-            public void onQualitySelect(String key, String value) {
-                getRealURL(value, "");
-                isQualitySwitch = true;
-            }
-        });
-        if (model.getmVideoUrl().size() > 0) {
-            isQualitySwitch = false;
-            getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), details.getId());
-            mQualityName = model.getmVideoUrl().get(0).getFormatName();
-        }
+        getRealURL(model.getmVideoUrl().get(0).getFormatUrl(), details.getId());
     }
 
     @Override
@@ -912,4 +850,21 @@ public class NewMoviePage extends BaseVideoActivity {
 
     }
 
+    @Override
+    public void adOnComplete() {
+        super.adOnComplete();
+        getFirstURL(vfId);
+    }
+
+    @Override
+    public void onTouchAd() {
+        super.onTouchAd();
+    }
+
+    @Override
+    public void onPassAd() {
+        super.onPassAd();
+        isAd = false;
+        getFirstURL(vfId);
+    }
 }

@@ -31,6 +31,7 @@ import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.fragment.EventsPage;
 import com.lt.hm.wovideo.fragment.MineInfo;
 import com.lt.hm.wovideo.fragment.NewChoicePage;
+import com.lt.hm.wovideo.fragment.SearchFrg;
 import com.lt.hm.wovideo.fragment.VipRecommendFrg;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.interf.updateTagLister;
@@ -76,7 +77,7 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
     @BindView(R.id.choice_head_layout)
     PercentRelativeLayout choiceHeadLayout;
     @BindView(R.id.choice_search_layout)
-    LinearLayout choiceSearchLayout;
+    TextView choiceSearchLayout;
     @BindView(R.id.choice_qr_scan)
     ImageView choiceQrScan;
     @BindView(R.id.choice_person_center)
@@ -302,7 +303,10 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
             startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
         });
         choiceSearchLayout.setOnClickListener((View v) -> {
-            UIHelper.ToSearchPage(this);
+          //  UIHelper.ToSearchPage(this);
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.fragment_container1, SearchFrg.newInstance(), "searchfrg");
+            fragmentTransaction.commitAllowingStateLoss();
         });
         //检测更新
 //		CheckUpdate();

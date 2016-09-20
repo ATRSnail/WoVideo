@@ -61,4 +61,7 @@
     <color name="bg_smell_video_item">#e8e7ed</color>
     <color name="bg_smell_video_whit_item">#e4e3e9</color>
 
+    <color name="color_divider_line_gray">#e2e2e2</color>
+    <color name="color_gray_light_content_text">#5d5d5d</color>
+
 </resources>

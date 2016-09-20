@@ -9,6 +9,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
+import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
+
 /**
  * Created by KECB on 7/10/16.
  */
@@ -22,10 +24,12 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
 
     private AVPlayerGestureListener mListener;
     private Context mContext;
+    private ScreenSwitchUtils screenSwitchUtils;
 
-    public ViewGestureListener(Context context, AVPlayerGestureListener listener) {
+    public ViewGestureListener(Context context, AVPlayerGestureListener listener,ScreenSwitchUtils screenSwitchUtils) {
         mListener = listener;
         mContext = context;
+        this.screenSwitchUtils = screenSwitchUtils;
     }
 
     @Override
@@ -36,7 +40,8 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-
+        //竖屏不让划屏调节
+        if (screenSwitchUtils != null && screenSwitchUtils.isPortrait()) return false;
         //获取坐标点
         float mOldX = e1.getX(), mOldY = e1.getY();
         float deltaX = e2.getX() - e1.getX();

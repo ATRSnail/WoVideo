@@ -43,4 +43,6 @@
     <dimen name="listview_peak_meter_two_padding_right">70dp</dimen>
     <dimen name="listview_album_art">44dp</dimen>
     <dimen name="listview_album_margin">4dp</dimen>
+
+    <dimen name="sp_txt_size_content">14sp</dimen>
 </resources>

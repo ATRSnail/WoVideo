@@ -1,5 +1,6 @@
 package com.lt.hm.wovideo.ui;
 
+import android.app.AlertDialog;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
 import android.net.Uri;
@@ -280,7 +281,7 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
             }
         }
     }
-
+    public static final int SCAN_REQUEST_CODE = 100;
     @Override
     public void initViews() {
         personCenter.setOnClickListener((View v) -> {
@@ -291,16 +292,22 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
         });
 
         qrScan.setOnClickListener((View v) -> {
-            Intent intent = new Intent();
-            intent.setClass(MainPage2.this, MipcaActivityCapture.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
+//            Intent intent = new Intent();
+//            intent.setClass(MainPage2.this, MipcaActivityCapture.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
+            Intent scanIntent = new Intent(MainPage2.this,
+                    cn.handsight.android.handsightsdk.ScanActivity.class);
+            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
         });
         choiceQrScan.setOnClickListener((View v) -> {
-            Intent intent = new Intent();
-            intent.setClass(MainPage2.this, MipcaActivityCapture.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
+            Intent scanIntent = new Intent(MainPage2.this,
+                    cn.handsight.android.handsightsdk.ScanActivity.class);
+            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
+//            Intent intent = new Intent();
+//            intent.setClass(MainPage2.this, MipcaActivityCapture.class);
+//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//            startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
         });
         choiceSearchLayout.setOnClickListener((View v) -> {
           //  UIHelper.ToSearchPage(this);
@@ -369,7 +376,24 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
 
                 }
                 break;
+            case SCAN_REQUEST_CODE:
+                if (data == null) return;
+                String result = data.getStringExtra("RESULT");
+                if (result != null) {
+                    showRusltDialog(result);
+                }
+                break;
         }
+    }
+    public void showRusltDialog(String result) {
+        // 1. Instantiate an AlertDialog.Builder with its constructor
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // 2. Chain together various setter methods to set the dialog characteristics
+        builder.setMessage(result)
+                .setTitle("扫描结果");
+        // 3. Get the AlertDialog from create()
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void restartHome(){

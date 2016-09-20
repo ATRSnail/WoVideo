@@ -57,6 +57,7 @@ import com.lt.hm.wovideo.widget.CustomListView;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.lt.hm.wovideo.widget.SpacesItemDecoration;
 import com.lt.hm.wovideo.widget.SpacesVideoItemDecoration;
+import com.lt.hm.wovideo.widget.TextViewExpandableAnimation;
 import com.lt.hm.wovideo.widget.multiselector.MultiSelector;
 import com.lt.hm.wovideo.widget.multiselector.SingleSelector;
 import com.lt.hm.wovideo.widget.multiselector.SwappingHolder;
@@ -67,6 +68,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
+import cn.handsight.android.handsightsdk.fragment.HsBaseFragment;
+import cn.handsight.android.handsightsdk.fragment.HsPortraitFragment;
 import okhttp3.Call;
 
 /**
@@ -74,7 +77,9 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 16/6/29
  */
-public class NewMoviePage extends BaseVideoActivity {
+public class NewMoviePage extends BaseVideoActivity
+//        implements HsBaseFragment.PlayerListener,HsBaseFragment.EventListener
+{
 
     @BindView(R.id.video_name)
     TextView videoName;
@@ -95,11 +100,7 @@ public class NewMoviePage extends BaseVideoActivity {
     @BindView(R.id.movie_bref_purch)
     ImageView movieBrefPurch;
     @BindView(R.id.bref_txt_short)
-    TextView bref_txt_short;
-    @BindView(R.id.bref_txt_long)
-    TextView bref_txt_long;
-    @BindView(R.id.bref_expand)
-    ImageView brefExpand;
+    TextViewExpandableAnimation bref_txt_short;
     @BindView(R.id.video_bottom_grid)
     RecyclerView videoBottomGrid;
     @BindView(R.id.free_hint)
@@ -124,6 +125,8 @@ public class NewMoviePage extends BaseVideoActivity {
     EditText etAddComment;
     @BindView(R.id.add_comment)
     LinearLayout addComment;
+
+    HsPortraitFragment motiveFragment;
 
 
     @BindView(R.id.ly_demand_anthology)
@@ -201,7 +204,6 @@ public class NewMoviePage extends BaseVideoActivity {
         videoShare.setVisibility(View.VISIBLE);
         videoProjection.setVisibility(View.VISIBLE);
         bref_txt_short.setVisibility(View.VISIBLE);
-        brefExpand.setVisibility(View.VISIBLE);
         movieBrefPurch.setVisibility(View.GONE);
         if (typeId == 1 || typeId == 5) {
             if (typeId == VideoType.SMIML.getId()) {
@@ -252,7 +254,7 @@ public class NewMoviePage extends BaseVideoActivity {
         }
     }
 
-    private List<LikeModel> grid_list = new ArrayList<LikeModel>();//猜你喜欢
+    private List<LikeModel> grid_list = new ArrayList<>();//猜你喜欢
 
     /**
      * 猜你喜欢接口调用
@@ -305,9 +307,15 @@ public class NewMoviePage extends BaseVideoActivity {
     }
 
     private RecyclerView.ItemDecoration itemDecoration;
+    private String videoId;
+    private int totalTime;
 
     @Override
     public void initViews() {
+//        motiveFragment = (HsPortraitFragment) getFragmentManager().findFragmentById(R.id.hs_vertical_fragment);
+//        videoId = "1750";
+//        totalTime = 477;
+//        motiveFragment.setVideo(videoId, totalTime, 0, HsBaseFragment.PLAY_SATART);
         videoProjection.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -355,22 +363,6 @@ public class NewMoviePage extends BaseVideoActivity {
                 isCollected = true;
             } else {
                 CancelCollect();
-            }
-        });
-
-
-        brefExpand.setOnClickListener((View v) -> {
-            if (!text_flag) {
-                text_flag = true;
-//                bref_txt_short.setMaxHeight(100);
-                bref_txt_short.setVisibility(View.GONE);
-                bref_txt_long.setVisibility(View.VISIBLE);
-                brefExpand.setImageDrawable(getResources().getDrawable(R.drawable.icon_zoom));
-            } else {
-                text_flag = false;
-                brefExpand.setImageDrawable(getResources().getDrawable(R.drawable.icon_expand));
-                bref_txt_short.setVisibility(View.VISIBLE);
-                bref_txt_long.setVisibility(View.GONE);
             }
         });
 
@@ -505,7 +497,6 @@ public class NewMoviePage extends BaseVideoActivity {
 
                 videoName.setText(share_title);
                 bref_txt_short.setText(share_desc);
-                bref_txt_long.setText(share_desc);
                 videoPlayNumber.setText(vfinfoModel.getHit());
                 break;
             case HttpApis.http_video_real_url:
@@ -751,7 +742,7 @@ public class NewMoviePage extends BaseVideoActivity {
             setVideoId(videoId); // Set Video Id for Bullet Screen usage
             getBullets(); // get Bullet list after set Video Id.
         }
-        NetUtils.getVideoRealURL(isAd?"http://111.206.133.39:9910/video/wovideo//ads/spfb15/spfb15.m3u8":url, UserMgr.getUsePhone(), this);
+        NetUtils.getVideoRealURL(isAd ? "http://111.206.133.39:9910/video/wovideo//ads/spfb15/spfb15.m3u8" : url, UserMgr.getUsePhone(), this);
     }
 
     int currentEpisode = 0;
@@ -782,6 +773,21 @@ public class NewMoviePage extends BaseVideoActivity {
         history.save(videoHistory);
         super.onDestroy();
     }
+
+//    @Override
+//    public void onLogin() {
+//
+//    }
+//
+//    @Override
+//    public void onShare(String s, String s1, String s2, int i) {
+//
+//    }
+//
+//    @Override
+//    public void onPlay(int i) {
+//
+//    }
 
     private class EpisodeAdapter extends RecyclerView.Adapter<EpisodeHolder> {
         private int selectedItem = 0;
@@ -864,7 +870,6 @@ public class NewMoviePage extends BaseVideoActivity {
     @Override
     public void onPassAd() {
         super.onPassAd();
-        isAd = false;
-        getFirstURL(vfId);
+        adOnComplete();
     }
 }

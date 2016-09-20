@@ -1,35 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:id="@+id/topbar_main"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/white"
-    android:id="@+id/topbar_main"
-    >
+    android:orientation="vertical">
+
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:id="@+id/person_center"
-        android:padding="10dp"
-        android:visibility="gone"
-        android:layout_centerVertical="true"
-        android:src="@drawable/person_selecter"
-        android:layout_alignParentLeft="true"
-        />
-    <ImageView android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/logo"
-        android:padding="10dp"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:src="@drawable/top_logo"
-        />
-    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/qr_scan"
-        android:padding="10dp"
+        android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/icon_scan"
+        android:padding="10dp"
+        android:src="@drawable/person_selecter"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:padding="10dp"
+        android:src="@drawable/top_logo" />
+
+    <ImageView
+        android:id="@+id/qr_scan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        />
+        android:layout_centerVertical="true"
+        android:padding="10dp"
+        android:src="@drawable/icon_scan" />
 </RelativeLayout>

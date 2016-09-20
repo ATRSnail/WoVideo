@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.lt.hm.wovideo.widget.PercentLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:background="@color/white"
     android:orientation="vertical">
 
@@ -52,32 +53,17 @@
 
     </android.support.percent.PercentRelativeLayout>
 
-    <LinearLayout
+    <com.lt.hm.wovideo.widget.TextViewExpandableAnimation
+        android:id="@+id/bref_txt_short"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:padding="10dp"
+        app:tvea_expandBitmap="@drawable/icon_expand"
+        app:tvea_expandLines="3"
+        app:tvea_shrinkBitmap="@drawable/icon_zoom"
+        app:tvea_textContentColor="@color/color_gray_light_content_text"
+        app:tvea_textContentSize="@dimen/sp_txt_size_content"
+        app:tvea_textStateColor="@color/colorPrimary" />
 
-        <TextView
-            android:id="@+id/bref_txt_short"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="3"
-            android:text="有时候我们会遇到这样的情况，为了让布局显得更为精简，会对大段的文本（一般用于人物介绍等地方）进行折叠，用户点击展开。通常都带有一个小图标，随着折叠展开来进行翻转。这种效果是怎么展现的呢，老规矩，先上效果图。用的是genymotion模拟器，确实快了很多，只是电脑太渣，占用很多内存。" />
 
-        <TextView
-            android:id="@+id/bref_txt_long"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="gone" />
-
-        <ImageView
-            android:id="@+id/bref_expand"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center"
-            android:paddingTop="10dp"
-            android:src="@drawable/icon_expand" />
-    </LinearLayout>
 </com.lt.hm.wovideo.widget.PercentLinearLayout>

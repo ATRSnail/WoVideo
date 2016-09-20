@@ -102,6 +102,11 @@ public class AVPlayerControl implements AVController.MediaPlayerControl {
     }
 
     @Override
+    public void releasePlay() {
+        mExoPlayer.release();
+    }
+
+    @Override
     public void seekTo(long pos) {
         long seekPosition = mExoPlayer.getDuration() == ExoPlayer.UNKNOWN_TIME ? 0
                 : Math.min(Math.max(0, pos), getDuration());

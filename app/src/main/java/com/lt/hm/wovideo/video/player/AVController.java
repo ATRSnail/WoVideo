@@ -3,6 +3,7 @@ package com.lt.hm.wovideo.video.player;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.media.AudioManager;
 import android.os.Handler;
 import android.os.Message;
@@ -58,10 +59,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private static final int sDefaultTimeout = 3000;
     private static final int FADE_OUT = 1;
     private static final int SHOW_PROGRESS = 2;
-    private boolean mUseFastForward;
     private boolean mFromXml;
     private boolean mListenersSet;
-    private View.OnClickListener mNextListener, mPrevListener;
     StringBuilder mFormatBuilder;
     Formatter mFormatter;
     private TextView mVideoTitle;
@@ -69,15 +68,15 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private ImageView mChooseChannel;
     private SwitchCompat mBulletSwitch;
     private ImageButton mPauseButton;
-    private ImageButton mFfwdButton;
-    private ImageButton mRewButton;
-    private ImageButton mNextButton;
-    private ImageButton mPrevButton;
     private ImageButton mFullscreenButton;
+    private ImageButton mSoundButton;//广告声音
+    private TextView tv_know_more;//广告详情
     private TextView tv_pass_ad;//跳过广告按钮
     private ImageView mBackButton;
     private ImageButton mSendBulletButton;
     private View layout_bottom;//进度条布局
+    private View rl_top;//播放器头
+    private View view_ad_count_dowm;//倒计时布局
     private LinearLayout ly_seek;
     private QualityPopWindow mQualityPopWindow;
     private Handler mHandler = new MessageHandler(this);
@@ -131,23 +130,15 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         super(context, attrs);
         mRoot = null;
         mContext = context;
-        mUseFastForward = true;
         mFromXml = true;
 
         Log.i(TAG, TAG);
     }
 
-
-    public AVController(Context context, boolean useFastForward) {
+    public AVController(Context context,ScreenSwitchUtils screenSwitchUtils) {
         super(context);
         mContext = context;
-        mUseFastForward = useFastForward;
-
-        Log.i(TAG, TAG);
-    }
-
-    public AVController(Context context) {
-        this(context, true);
+        this.screenSwitchUtils = screenSwitchUtils;
 
         Log.i(TAG, TAG);
     }
@@ -208,7 +199,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         mVideoGestureListener = this;
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        mGestureDetector = new GestureDetector(context, new ViewGestureListener(context, mVideoGestureListener));
+        mGestureDetector = new GestureDetector(context, new ViewGestureListener(context, mVideoGestureListener,screenSwitchUtils));
     }
 
     /**
@@ -228,11 +219,18 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
 
     private void initControllerView(View v) {
-
+        Typeface fontFace = Typeface.createFromAsset(mContext.getAssets(), "Regular.ttf");
         tv_pass_ad = (TextView) v.findViewById(R.id.tv_pass_ad);
-        tv_pass_ad.setOnClickListener(mPassAdListener);
+        tv_pass_ad.setTypeface(fontFace);
+
+        view_ad_count_dowm = v.findViewById(R.id.view_ad_count_dowm);
+        view_ad_count_dowm.setOnClickListener(mPassAdListener);
 
         layout_bottom = v.findViewById(R.id.layout_bottom);
+        rl_top = v.findViewById(R.id.rl_top);
+
+        mSoundButton = (ImageButton) v.findViewById(R.id.btn_sound);
+        tv_know_more = (TextView) v.findViewById(R.id.tv_know_more);
 
         mVideoTitle = (TextView) v.findViewById(R.id.video_title);
         mChooseChannel = (ImageView) v.findViewById(R.id.tv_choose_channel);
@@ -289,32 +287,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             mFullscreenButton.setOnClickListener(mFullscreenListener);
         }
 
-        mFfwdButton = (ImageButton) v.findViewById(R.id.ffwd);
-        if (mFfwdButton != null) {
-            mFfwdButton.setOnClickListener(mFfwdListener);
-            if (!mFromXml) {
-                mFfwdButton.setVisibility(mUseFastForward ? View.VISIBLE : View.GONE);
-            }
-        }
-
-        mRewButton = (ImageButton) v.findViewById(R.id.rew);
-        if (mRewButton != null) {
-            mRewButton.setOnClickListener(mRewListener);
-            if (!mFromXml) {
-                mRewButton.setVisibility(mUseFastForward ? View.VISIBLE : View.GONE);
-            }
-        }
-
-        // By default these are hidden. They will be enabled when setPrevNextListeners() is called
-        mNextButton = (ImageButton) v.findViewById(R.id.next);
-        if (mNextButton != null && !mFromXml && !mListenersSet) {
-            mNextButton.setVisibility(View.GONE);
-        }
-        mPrevButton = (ImageButton) v.findViewById(R.id.prev);
-        if (mPrevButton != null && !mFromXml && !mListenersSet) {
-            mPrevButton.setVisibility(View.GONE);
-        }
-
         mProgress = (AppCompatSeekBar) v.findViewById(R.id.mediacontroller_progress);
         if (mProgress != null) {
             mProgress.setOnSeekBarChangeListener(mSeekListener);
@@ -325,8 +297,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         mCurrentTime = (TextView) v.findViewById(R.id.time_current);
         mFormatBuilder = new StringBuilder();
         mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
-
-        installPrevNextListeners();
 
         // Volume & Brightness
         mCenterLayout = v.findViewById(R.id.layout_center);
@@ -348,11 +318,39 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     public void setAdUiVisibility(boolean isAd) {
         if (isAd) {
             layout_bottom.setBackgroundColor(Color.parseColor("#00000000"));
+            if (rl_top != null)
+                rl_top.setBackgroundColor(Color.parseColor("#00000000"));
         } else {
             layout_bottom.setBackgroundColor(Color.parseColor("#CC000000"));
+            if (rl_top != null)
+                rl_top.setBackgroundColor(Color.parseColor("#CC000000"));
         }
+        tv_know_more.setVisibility(isAd ? VISIBLE : GONE);
+        mSoundButton.setVisibility(isAd ? VISIBLE : GONE);
         setSeekBarVisible(isAd ? GONE : VISIBLE);
+        setPassAdVisility(isAd ? VISIBLE : GONE);
+        setVideoTitleVisility(isAd ? GONE : VISIBLE);
+        setSwitchVisibility(isAd ? GONE : VISIBLE);
+        setBulletVisible(isAd ? GONE : VISIBLE);
+        setmChooseChannel(GONE);
         show(0);
+    }
+
+    /**
+     * 广告倒计时按钮
+     *
+     * @param visibility
+     */
+    public void setPassAdVisility(int visibility) {
+        if (view_ad_count_dowm != null) {
+            view_ad_count_dowm.setVisibility(visibility);
+        }
+    }
+
+    public void setVideoTitleVisility(int visibility) {
+        if (mVideoTitle != null) {
+            mVideoTitle.setVisibility(visibility);
+        }
     }
 
     public void setSwitchVisibility(int visibility) {
@@ -411,12 +409,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         try {
             if (mPauseButton != null && !mPlayer.canPause()) {
                 mPauseButton.setEnabled(false);
-            }
-            if (mRewButton != null && !mPlayer.canSeekBackward()) {
-                mRewButton.setEnabled(false);
-            }
-            if (mFfwdButton != null && !mPlayer.canSeekForward()) {
-                mFfwdButton.setEnabled(false);
             }
         } catch (IncompatibleClassChangeError ex) {
             // We were given an old version of the interface, that doesn't have
@@ -502,6 +494,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     }
 
     private int setProgress() {
+        TLog.error("---->setProgress");
         if (mPlayer == null || mDragging) {
             return 0;
         }
@@ -676,6 +669,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         if (!screenSwitchUtils.isPortrait()) {
             doToggleFullscreen();
         } else {
+            mPlayer.releasePlay();
             ((Activity) mContext).finish();
         }
     }
@@ -696,9 +690,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
 
         if (mPlayer.isPlaying()) {
-            mPauseButton.setBackground(getResources().getDrawable(R.drawable.ic_media_pause));
+            mPauseButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_media_pause));
         } else {
-            mPauseButton.setBackground(getResources().getDrawable(R.drawable.ic_media_play));
+            mPauseButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_media_play));
         }
     }
 
@@ -708,9 +702,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
 
         if (screenSwitchUtils.isPortrait()) {
-            mFullscreenButton.setImageResource(R.drawable.ic_media_fullscreen_shrink);
-        } else {
             mFullscreenButton.setImageResource(R.drawable.ic_media_fullscreen_stretch);
+        } else {
+            mFullscreenButton.setVisibility(GONE);
         }
     }
 
@@ -778,8 +772,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
         public void onStopTrackingTouch(SeekBar bar) {
             mDragging = false;
-            setProgress();
-//      show(sDefaultTimeout);
 
             // Ensure that progress is properly updated in the future,
             // the call to show() does not guarantee this because it is a
@@ -788,26 +780,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     };
 
-    public void setScreenSwitchUtils(ScreenSwitchUtils screenSwitchUtils) {
-        this.screenSwitchUtils = screenSwitchUtils;
-    }
-
     @Override
     public void setEnabled(boolean enabled) {
         if (mPauseButton != null) {
             mPauseButton.setEnabled(enabled);
-        }
-        if (mFfwdButton != null) {
-            mFfwdButton.setEnabled(enabled);
-        }
-        if (mRewButton != null) {
-            mRewButton.setEnabled(enabled);
-        }
-        if (mNextButton != null) {
-            mNextButton.setEnabled(enabled && mNextListener != null);
-        }
-        if (mPrevButton != null) {
-            mPrevButton.setEnabled(enabled && mPrevListener != null);
         }
         if (mProgress != null) {
             mProgress.setEnabled(enabled);
@@ -826,65 +802,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
         super.onInitializeAccessibilityNodeInfo(info);
         info.setClassName(AVController.class.getName());
-    }
-
-    private View.OnClickListener mRewListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            if (mPlayer == null) {
-                return;
-            }
-
-            long pos = mPlayer.getCurrentPosition();
-            pos -= 5000; // milliseconds
-            mPlayer.seekTo(pos);
-            setProgress();
-
-//      show(sDefaultTimeout);
-        }
-    };
-
-    private View.OnClickListener mFfwdListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            if (mPlayer == null) {
-                return;
-            }
-
-            long pos = mPlayer.getCurrentPosition();
-            pos += 15000; // milliseconds
-            mPlayer.seekTo(pos);
-            setProgress();
-
-//      show(sDefaultTimeout);
-        }
-    };
-
-    private void installPrevNextListeners() {
-        if (mNextButton != null) {
-            mNextButton.setOnClickListener(mNextListener);
-            mNextButton.setEnabled(mNextListener != null);
-        }
-
-        if (mPrevButton != null) {
-            mPrevButton.setOnClickListener(mPrevListener);
-            mPrevButton.setEnabled(mPrevListener != null);
-        }
-    }
-
-    public void setPrevNextListeners(View.OnClickListener next, View.OnClickListener prev) {
-        mNextListener = next;
-        mPrevListener = prev;
-        mListenersSet = true;
-
-        if (mRoot != null) {
-            installPrevNextListeners();
-
-            if (mNextButton != null && !mFromXml) {
-                mNextButton.setVisibility(View.VISIBLE);
-            }
-            if (mPrevButton != null && !mFromXml) {
-                mPrevButton.setVisibility(View.VISIBLE);
-            }
-        }
     }
 
     @Override
@@ -1019,6 +936,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
         void pause();
 
+        void releasePlay();
+
         int getDuration();
 
         long getCurrentPosition();
@@ -1076,6 +995,12 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             }
         }
     }
+
+    public void showAdCountDown(long time) {
+        if (tv_pass_ad != null)
+            tv_pass_ad.setText(time + "");
+    }
+
 
     public interface OnQualitySelected {
         void onQualitySelect(String key, String value);

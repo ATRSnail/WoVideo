@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -26,7 +25,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,7 +37,6 @@ import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.util.Util;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.adapter.video.LiveTVListAdapter;
 import com.lt.hm.wovideo.adapter.video.VideoPipAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
@@ -51,7 +48,6 @@ import com.lt.hm.wovideo.model.LiveTVList;
 import com.lt.hm.wovideo.model.response.ResponseLiveList;
 import com.lt.hm.wovideo.model.response.ResponseVideoRealUrl;
 import com.lt.hm.wovideo.utils.ScreenUtils;
-import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.VideoModel;
@@ -65,7 +61,6 @@ import com.lt.hm.wovideo.widget.PercentLinearLayout;
 import com.lt.hm.wovideo.widget.PipListviwPopuWindow;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.lt.hm.wovideo.widget.ViewMiddle.ViewMiddle;
-import com.lt.hm.wovideo.widget.ViewMiddle.ViewMiddleModel;
 import com.victor.loading.rotate.RotateLoading;
 
 import java.net.CookieHandler;
@@ -73,13 +68,12 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.BindView;
 
-import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
-import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_TYPE_EXTRA;
-import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
+import static com.lt.hm.wovideo.base.BaseVideoActivity.CONTENT_ID_EXTRA;
+import static com.lt.hm.wovideo.base.BaseVideoActivity.CONTENT_TYPE_EXTRA;
+import static com.lt.hm.wovideo.base.BaseVideoActivity.PROVIDER_EXTRA;
 
 /**
  * @author leonardo
@@ -225,7 +219,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         mSurfaceView = (SurfaceView) findViewById(R.id.surface_view);
         mSurfaceView.getHolder().addCallback(this);
 
-        mMediaController = new AVController(this);
+        mMediaController = new AVController(this,screenSwitchUtils);
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         mMediaController.setSeekBarVisible(View.GONE);
         mMediaController.setGestureListener(this);
@@ -414,7 +408,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
             mPlayerNeedsPrepare = true;
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
             mMediaController.setEnabled(true);
-            mMediaController.setScreenSwitchUtils(screenSwitchUtils);
             mEventLogger = new EventLogger();
             mEventLogger.startSession();
             mPlayer.addListener(mEventLogger);

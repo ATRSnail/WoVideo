@@ -117,8 +117,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
             // TODO: 16/6/8  获取验证码
             if (TextUtils.isEmpty(etResigtAccount.getText())) {
 //                TLog.log("用户名不能为空");
-                Toast.makeText(getApplicationContext(),"用户名不能为空",Toast.LENGTH_SHORT).show();
-                return;
+                UT.showNormal("用户名不能为空");
             } else {
                     sendValidateCode();
             }

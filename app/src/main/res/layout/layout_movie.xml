@@ -59,6 +59,13 @@
 
     <include layout="@layout/video_bottom" />
 
+    <!--<fragment-->
+        <!--android:id="@+id/hs_vertical_fragment"-->
+        <!--android:name="cn.handsight.android.handsightsdk.fragment.HsPortraitFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="400dp"-->
+        <!--tools:layout="@layout/hs_fragment_motive" />-->
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -99,6 +106,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:background="@color/gray_lighter" />
+
             </LinearLayout>
         </ScrollView>
 
@@ -107,5 +115,9 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_gravity="bottom" />
+
     </FrameLayout>
+
+
+
 </LinearLayout>

@@ -5,7 +5,6 @@ import android.annotation.TargetApi;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -30,7 +29,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 
@@ -40,18 +38,15 @@ import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer.metadata.id3.Id3Frame;
 import com.google.android.exoplayer.text.Cue;
 import com.google.android.exoplayer.util.Util;
-import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
-import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.ResponseCode;
 import com.lt.hm.wovideo.model.NetUsage;
-import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseBullet;
+import com.lt.hm.wovideo.utils.AdvancedCountdownTimer;
 import com.lt.hm.wovideo.utils.ScreenUtils;
-import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.UserMgr;
@@ -62,6 +57,7 @@ import com.lt.hm.wovideo.video.player.AVPlayer;
 import com.lt.hm.wovideo.video.player.BulletSendDialog;
 import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
+import com.lt.hm.wovideo.video.player.KeyCompatibleMediaController;
 import com.lt.hm.wovideo.video.player.WoDanmakuParser;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 import com.victor.loading.rotate.RotateLoading;
@@ -78,24 +74,13 @@ import java.util.HashMap;
 import java.util.List;
 
 import master.flame.danmaku.controller.IDanmakuView;
-import master.flame.danmaku.danmaku.loader.ILoader;
-import master.flame.danmaku.danmaku.loader.IllegalDataException;
-import master.flame.danmaku.danmaku.loader.android.DanmakuLoaderFactory;
 import master.flame.danmaku.danmaku.model.BaseDanmaku;
 import master.flame.danmaku.danmaku.model.DanmakuTimer;
 import master.flame.danmaku.danmaku.model.IDisplayer;
 import master.flame.danmaku.danmaku.model.android.BaseCacheStuffer;
 import master.flame.danmaku.danmaku.model.android.DanmakuContext;
-import master.flame.danmaku.danmaku.model.android.Danmakus;
 import master.flame.danmaku.danmaku.model.android.SpannedCacheStuffer;
-import master.flame.danmaku.danmaku.parser.BaseDanmakuParser;
-import master.flame.danmaku.danmaku.parser.IDataSource;
-import master.flame.danmaku.danmaku.parser.android.BiliDanmukuParser;
 import master.flame.danmaku.danmaku.util.IOUtils;
-
-import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_ID_EXTRA;
-import static com.lt.hm.wovideo.video.NewVideoPage.CONTENT_TYPE_EXTRA;
-import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
 
 /**
  * As a base class for all activity which needs to play a video.
@@ -108,13 +93,13 @@ import static com.lt.hm.wovideo.video.NewVideoPage.PROVIDER_EXTRA;
  */
 
 public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener, AVController.OnInterfaceInteract,AVController.onTouchAd {
-
+        AudioCapabilitiesReceiver.Listener, AVController.OnInterfaceInteract, AVController.onTouchAd {
+    public static final String CONTENT_ID_EXTRA = "content_id";
+    public static final String CONTENT_TYPE_EXTRA = "content_type";
+    public static final String PROVIDER_EXTRA = "provider";
     // Video thing
     // For use when launching the demo app using adb.
     private static final String CONTENT_EXT_EXTRA = "type";
-    private static final int MENU_GROUP_TRACKS = 1;
-    private static final int ID_OFFSET = 2;
     private static final CookieManager defaultCookieManager;
     private ScreenSwitchUtils instance;
 
@@ -206,7 +191,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                             if (mDanmakuView != null) {
                                 mDanmakuView.invalidateDanmaku(danmaku, false);
                             }
-                            return;
                         }
                     }
                 }.start();
@@ -251,16 +235,13 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
         }
 
-        root.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                if (keyCode == KeyEvent.KEYCODE_BACK
-                        || keyCode == KeyEvent.KEYCODE_ESCAPE
-                        || keyCode == KeyEvent.KEYCODE_MENU) {
-                    return false;
-                }
-                return mMediaController.dispatchKeyEvent(event);
+        root.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_BACK
+                    || keyCode == KeyEvent.KEYCODE_ESCAPE
+                    || keyCode == KeyEvent.KEYCODE_MENU) {
+                return false;
             }
+            return mMediaController.dispatchKeyEvent(event);
         });
 
         mRotateLoading = (RotateLoading) findViewById(R.id.loading);
@@ -272,7 +253,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         mSurfaceView = (SurfaceView) findViewById(R.id.surface_view);
         mSurfaceView.getHolder().addCallback(this);
 
-        mMediaController = new KeyCompatibleMediaController(this, mDanmakuView);
+        mMediaController = new KeyCompatibleMediaController(this, mDanmakuView,instance);
 
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         mMediaController.setGestureListener(this);
@@ -280,6 +261,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
         mMediaController.setIsAd(isAd);
         mMediaController.setAdUiVisibility(isAd);
+        startNormalCountDownTime(18);
 
         CookieHandler currentHanlder = CookieHandler.getDefault();
         if (currentHanlder != defaultCookieManager) {
@@ -290,10 +272,10 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         mAudioCapabilitiesReceiver.register();
 
         // 设置最大显示行数
-        HashMap<Integer, Integer> maxLinesPair = new HashMap<Integer, Integer>();
+        HashMap<Integer, Integer> maxLinesPair = new HashMap<>();
         maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 5); // 滚动弹幕最大显示5行
         // 设置是否禁止重叠
-        HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<Integer, Boolean>();
+        HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<>();
         overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
         overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
         mContext = DanmakuContext.create();
@@ -303,7 +285,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 .setMaximumLines(maxLinesPair)
                 .preventOverlapping(overlappingEnablePair);
         if (mDanmakuView != null) {
-//            mParser = createParser(this.getResources().openRawResource(R.raw.comments));
+            //        mParser = createParser(this.getResources().openRawResource(R.raw.comments));
             mDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
                 @Override
                 public void updateTimer(DanmakuTimer timer) {
@@ -340,40 +322,12 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     }
 
-
-    //TODO using real data
-    private BaseDanmakuParser createParser(InputStream stream) {
-        if (stream == null) {
-            return new BaseDanmakuParser() {
-
-                @Override
-                protected Danmakus parse() {
-                    return new Danmakus();
-                }
-            };
-        }
-
-        ILoader loader = DanmakuLoaderFactory.create(DanmakuLoaderFactory.TAG_BILI);
-
-        try {
-            loader.load(stream);
-        } catch (IllegalDataException e) {
-            e.printStackTrace();
-        }
-        BaseDanmakuParser parser = new BiliDanmukuParser();
-        IDataSource<?> dataSource = loader.getDataSource();
-        parser.load(dataSource);
-        return parser;
-
-    }
-
     protected Intent onUrlGot(VideoModel video) {
-        Intent mpdIntent = new Intent(this, BaseVideoActivity.class)
+        return new Intent(this, BaseVideoActivity.class)
                 .setData(Uri.parse(video.getmPlayUrl().getFormatUrl()))
                 .putExtra(CONTENT_ID_EXTRA, video.getmVideoName())
                 .putExtra(CONTENT_TYPE_EXTRA, Util.TYPE_HLS)
                 .putExtra(PROVIDER_EXTRA, "");
-        return mpdIntent;
     }
 
     @Override
@@ -486,6 +440,17 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mDanmakuView = null;
         }
 
+        //广告倒计时取消
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+
+        if (mMediaController != null) {
+            mMediaController.hide();
+            mMediaController = null;
+        }
+
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -494,6 +459,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         super.onConfigurationChanged(newConfig);
         TLog.error("sensor--999>");
         //Check the orientation of the screen
+
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_root));
@@ -512,9 +478,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             }
 
             mMediaController.setBulletScreen(true);
-            mMediaController.setmChooseChannel(View.GONE);
 
-            ScreenUtils.setSystemUiVisibility(this,true);
+            ScreenUtils.setSystemUiVisibility(this, true);
 
             //show danmu
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -528,8 +493,9 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             if (mDanmakuView != null) {
                 mDanmakuView.hide();
             }
-            ScreenUtils.setSystemUiVisibility(this,false);
+            ScreenUtils.setSystemUiVisibility(this, false);
         }
+
         mMediaController.setIsAd(isAd);
         mMediaController.setAdUiVisibility(isAd);
 
@@ -572,20 +538,47 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     public void onId3Metadata(List<Id3Frame> id3Frames) {
 
     }
+
     public boolean isAd = true;
 
     @Override
     public void onStateChanged(boolean playWhenReady, int playbackState) {
+        TLog.error("playbackState--->" + playbackState);
+        if (isAd) {
+            if (playbackState == AVPlayer.STATE_ENDED) {//播放结束5
+                adOnComplete();
+                if (timer != null) {
+                    timer.cancel();
+                }
+            }
+            if (playbackState == AVPlayer.STATE_PREPARING) { //准备播放2
+
+            }
+            if (playbackState == AVPlayer.STATE_READY) { //播放4
+                if (timer != null) {
+                    if (timer.getIsFirst()) {
+                        timer.start();
+                    } else {
+                        timer.resume();
+                    }
+
+                }
+            }
+            if (playbackState == AVPlayer.STATE_BUFFERING) {//缓冲3
+                if (timer != null) {
+                    timer.pause();
+                }
+            }
+
+        }
         if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
-           TLog.error("playbackState--->"+playbackState);
+
             mRotateLoading.stop();
             //TODO play next if exist.
 
             mDanmakuView.show();
             mDanmakuView.seekTo(mPlayer.getCurrentPosition());
-            if (isAd && playbackState == AVPlayer.STATE_ENDED){
-                adOnComplete();
-            }
+
         } else {
             mRotateLoading.start();
             if (mDanmakuView == null) return;
@@ -599,7 +592,29 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     }
 
-    public void adOnComplete(){
+    private AdvancedCountdownTimer timer;
+
+    private void startNormalCountDownTime(long time) {
+
+        timer = new AdvancedCountdownTimer(time * 1000, 1000) {
+            @Override
+            public void onTick(long millisUntilFinished, int percent) {
+                TLog.error("millisUntilFinished---->" + millisUntilFinished);
+                mMediaController.showAdCountDown(millisUntilFinished / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+
+            }
+        };
+
+    }
+
+    /**
+     * 广告播放完成
+     */
+    public void adOnComplete() {
         isAd = false;
         mMediaController.setIsAd(false);
         mMediaController.setAdUiVisibility(false);
@@ -632,7 +647,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mPlayerNeedsPrepare = true;
             mMediaController.setMediaPlayer(mPlayer.getPlayerControl());
             mMediaController.setEnabled(true);
-            mMediaController.setScreenSwitchUtils(instance);
             mMediaController.setInterfaceListener(this);
             mEventLogger = new EventLogger();
             mEventLogger.startSession();
@@ -747,13 +761,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     }
 
-    protected long getCurrentPosition() {
-        if (mPlayer != null && mPlayer.getPlaybackState() != AVPlayer.STATE_PREPARING) {
-            return mPlayer.getCurrentPosition() / 1000;
-        }
-        return 0;
-    }
-
     protected void setVideoTitle(String title) {
         mMediaController.setTitle(title);
     }
@@ -855,71 +862,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     public void onTouchAd() {
         UT.showNormal("点击的广告");
-    }
-
-    private static final class KeyCompatibleMediaController extends AVController {
-
-        private MediaPlayerControl playerControl;
-        private IDanmakuView mDanmakuView;
-
-        public KeyCompatibleMediaController(Context context, IDanmakuView danmakuView) {
-            super(context);
-            mDanmakuView = danmakuView;
-
-        }
-
-        @Override
-        public void setMediaPlayer(MediaPlayerControl playerControl) {
-            super.setMediaPlayer(playerControl);
-            this.playerControl = playerControl;
-        }
-
-        @Override
-        public void toggleBulletScreen(boolean isShow) {
-            super.toggleBulletScreen(isShow);
-            if (isShow) {
-                TLog.log("toggleBullet_status" + isShow);
-                if (playerControl == null) mDanmakuView.hide();
-                mDanmakuView.seekTo(playerControl.getCurrentPosition());
-                mDanmakuView.show();
-            } else {
-                TLog.log("toggleBullet_status" + isShow);
-                mDanmakuView.hide();
-            }
-        }
-
-        @Override
-        public void show() {
-            super.show();
-        }
-
-        @Override
-        public void setTitle(String titleName) {
-            super.setTitle(titleName);
-        }
-
-
-        @Override
-        public boolean dispatchKeyEvent(KeyEvent event) {
-            int keyCode = event.getKeyCode();
-            TLog.error("keyCode---->"+keyCode);
-            if (playerControl.canSeekForward() && (keyCode == KeyEvent.KEYCODE_MEDIA_FAST_FORWARD
-                    || keyCode == KeyEvent.KEYCODE_DPAD_RIGHT)) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    playerControl.seekTo(playerControl.getCurrentPosition() + 15000); // milliseconds
-                    show();
-                }
-                return true;
-            } else if (playerControl.canSeekBackward() && (keyCode == KeyEvent.KEYCODE_MEDIA_REWIND
-                    || keyCode == KeyEvent.KEYCODE_DPAD_LEFT)) {
-                if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                    playerControl.seekTo(playerControl.getCurrentPosition() - 5000); // milliseconds
-                    show();
-                }
-                return true;
-            }
-            return super.dispatchKeyEvent(event);
-        }
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.lt.hm.wovideo.ui;
 
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
@@ -19,7 +20,6 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -47,7 +47,9 @@ import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.utils.location.CheckPermissionsActivity;
 import com.lt.hm.wovideo.utils.location.Utils;
 import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
-import com.lt.hm.wovideo.zxing.ui.MipcaActivityCapture;
+
+import net.robinx.lib.blur.widget.BlurMaskRelativeLayout;
+import net.robinx.lib.blur.widget.BlurMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -94,8 +96,12 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
         currIndex = 0;
         fragmentTags = new ArrayList<>(Arrays.asList("HomeFragment", "LiveFragment", "VipFragment", "MineFragment"));
     }
+    private BlurMaskRelativeLayout blurLayout;
 
     private void initView() {
+
+        blurLayout = (BlurMaskRelativeLayout) this.findViewById(R.id.blur_mask_container);
+
         group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {

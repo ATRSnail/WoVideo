@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.KeyEvent;
 
 import com.lt.hm.wovideo.utils.TLog;
-import com.lt.hm.wovideo.video.NewVideoPage;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 
 import master.flame.danmaku.controller.IDanmakuView;

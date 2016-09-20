@@ -118,7 +118,7 @@ dependencies {
     /*图片选择器*/
     compile 'cn.finalteam:galleryfinal:1.4.3'
     /*毛玻璃*/
-//    compile 'net.robinx:lib.blur:1.0.1'
+    compile 'net.robinx:lib.blur:1.0.1'
     /*第三方*/
     compile(name: 'handsightsdk-release', ext: 'aar')
 }

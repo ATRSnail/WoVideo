@@ -317,6 +317,7 @@ public class SliderLayout extends RelativeLayout {
             case MotionEvent.ACTION_DOWN:
                 TLog.error("slider---ACTION_DOWN");
                 pauseAutoCycle();
+                getParent().requestDisallowInterceptTouchEvent(true);
                 disScroll.disScroll(true);
                 return false;
             case MotionEvent.ACTION_MOVE:

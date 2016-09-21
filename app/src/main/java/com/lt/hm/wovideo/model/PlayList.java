@@ -1,5 +1,7 @@
 package com.lt.hm.wovideo.model;
 
+import com.chad.library.adapter.base.entity.MultiItemEntity;
+
 import java.util.List;
 
 /**
@@ -27,7 +29,7 @@ public class PlayList {
                 '}';
     }
 
-    public static class PlaysListBean {
+    public static class PlaysListBean extends MultiItemEntity {
         private String id;//主键
         private long utime;
         private String vfId;//视频主信息ID
@@ -47,6 +49,16 @@ public class PlayList {
         private String fkUrl;//4K源地址
         private String fluentUrl;//流畅地址
         private String sc;//是否收藏 1是0否
+
+        private boolean isSelect = false;//被选中
+
+        public boolean isSelect() {
+            return isSelect;
+        }
+
+        public void setSelect(boolean select) {
+            isSelect = select;
+        }
 
         public String getFluentUrl() {
             return fluentUrl;

@@ -221,6 +221,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
         mMediaController = new AVController(this,screenSwitchUtils);
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
+        mMediaController.setAdUiVisibility(false);
         mMediaController.setSeekBarVisible(View.GONE);
         mMediaController.setGestureListener(this);
         mMediaController.setmChooseChannelListener(this);
@@ -343,7 +344,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     Gravity.CENTER
             );
             mMediaController.setTitle(videoName.getText().toString());
+            mMediaController.setAdUiVisibility(false);
             mMediaController.setSwitchVisibility(View.INVISIBLE);
+            mMediaController.setmChooseChannel(View.VISIBLE);
             mMediaController.setBulletVisible(View.GONE);
             mMediaController.setSeekBarVisible(View.GONE);
             mMediaController.setmSendBulletVisible(View.GONE);
@@ -359,6 +362,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
+            mMediaController.setAdUiVisibility(false);
             mMediaController.setSeekBarVisible(View.GONE);
             dimissChangeChannelPop();
             ScreenUtils.setSystemUiVisibility(this,false);
@@ -806,6 +810,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         if (changeChannelPop == null) {
             initPop();
         }
+        mMediaController.hide();
         changeChannelPop.showAtLocation(v, Gravity.RIGHT, 0, -25);
     }
 
@@ -837,7 +842,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     @Override
     public void onDismiss() {
-
+      mMediaController.show();
     }
 
     @Override

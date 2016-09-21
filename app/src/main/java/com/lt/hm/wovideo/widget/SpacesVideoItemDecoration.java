@@ -36,8 +36,8 @@ public class SpacesVideoItemDecoration extends RecyclerView.ItemDecoration {
 
             }
         } else {
-            outRect.left = parent.getChildAdapterPosition(view) % 6 == 0 ? space * 2 : space;
-            outRect.right = parent.getChildAdapterPosition(view) % 6 == 2 ? space * 2 : space;
+            outRect.left =  space;
+            outRect.right = space;
             outRect.bottom = space;
             outRect.top = space;
         }

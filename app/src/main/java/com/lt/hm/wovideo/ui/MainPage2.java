@@ -4,6 +4,7 @@ import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +47,7 @@ import com.lt.hm.wovideo.utils.UpdateManager;
 import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.utils.location.CheckPermissionsActivity;
 import com.lt.hm.wovideo.utils.location.Utils;
+import com.lt.hm.wovideo.widget.BlurPopuwindow.BlurBuilder;
 import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
 
 import net.robinx.lib.blur.widget.BlurMaskRelativeLayout;
@@ -96,11 +98,8 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
         currIndex = 0;
         fragmentTags = new ArrayList<>(Arrays.asList("HomeFragment", "LiveFragment", "VipFragment", "MineFragment"));
     }
-    private BlurMaskRelativeLayout blurLayout;
 
     private void initView() {
-
-        blurLayout = (BlurMaskRelativeLayout) this.findViewById(R.id.blur_mask_container);
 
         group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -302,14 +301,14 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
 //            intent.setClass(MainPage2.this, MipcaActivityCapture.class);
 //            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 //            startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
-            Intent scanIntent = new Intent(MainPage2.this,
-                    cn.handsight.android.handsightsdk.ScanActivity.class);
-            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
+//            Intent scanIntent = new Intent(MainPage2.this,
+//                    cn.handsight.android.handsightsdk.ScanActivity.class);
+//            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
         });
         choiceQrScan.setOnClickListener((View v) -> {
-            Intent scanIntent = new Intent(MainPage2.this,
-                    cn.handsight.android.handsightsdk.ScanActivity.class);
-            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
+//            Intent scanIntent = new Intent(MainPage2.this,
+//                    cn.handsight.android.handsightsdk.ScanActivity.class);
+//            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
 //            Intent intent = new Intent();
 //            intent.setClass(MainPage2.this, MipcaActivityCapture.class);
 //            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -317,8 +316,9 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
         });
         choiceSearchLayout.setOnClickListener((View v) -> {
           //  UIHelper.ToSearchPage(this);
+            Bitmap bitmap = BlurBuilder.snapShotWithoutStatusBar(this);
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.fragment_container1, SearchFrg.newInstance(), "searchfrg");
+            fragmentTransaction.add(R.id.fragment_container1, SearchFrg.newInstance(bitmap), "searchfrg");
             fragmentTransaction.commitAllowingStateLoss();
         });
         //检测更新

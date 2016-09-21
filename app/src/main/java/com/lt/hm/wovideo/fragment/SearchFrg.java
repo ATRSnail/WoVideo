@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
@@ -30,11 +31,16 @@ public class SearchFrg extends Fragment{
 
     @BindView(R.id.tv_name)
     TextView tv_name;
-    @BindView(R.id.search_view_layout)
-    View mBlurDrawableRelativeLayout;
+    @BindView(R.id.img_bg)
+    ImageView mBlurDrawableRelativeLayout;
 
-    public static SearchFrg newInstance() {
+    private Bitmap bgBitmap;
+
+    public static SearchFrg newInstance(Bitmap bitmap) {
         SearchFrg fragment = new SearchFrg();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable("bg",bitmap);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -49,13 +55,13 @@ public class SearchFrg extends Fragment{
         super.onActivityCreated(savedInstanceState);
         ButterKnife.bind(this,getActivity());
         tv_name.setText("ssss");
+        bgBitmap = getArguments().getParcelable("bg");
         //background
-        Bitmap bgBitmap = BitmapFactory.decodeResource(getResources(),R.mipmap.bg_2);
         Bitmap compressedBgBitmap = BlurUtils.compressBitmap(bgBitmap,8);
-        Bitmap blurBgBitmap = StackBlur.blurNativelyPixels(compressedBgBitmap,25,false);
-        /*mBlurDrawableRelativeLayout.setBackground(blurBgBitmap);
-        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mBlurDrawableRelativeLayout,View.ALPHA,0,1f);
-        alphaAnimator.setDuration(2000);
-        alphaAnimator.start();*/
+        Bitmap blurBgBitmap = StackBlur.blurNativelyPixels(compressedBgBitmap,4,false);
+        mBlurDrawableRelativeLayout.setImageBitmap(blurBgBitmap);
+//        ObjectAnimator alphaAnimator = ObjectAnimator.ofFloat(mBlurDrawableRelativeLayout,View.ALPHA,0,1f);
+//        alphaAnimator.setDuration(2000);
+//        alphaAnimator.start();
     }
 }

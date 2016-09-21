@@ -9,9 +9,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +23,7 @@ import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.adapter.comment.CommentAdapter;
 import com.lt.hm.wovideo.adapter.home.LikeListAdapter;
 import com.lt.hm.wovideo.adapter.video.BrefIntroAdapter;
+import com.lt.hm.wovideo.adapter.video.EpisodeAdapter;
 import com.lt.hm.wovideo.base.BaseVideoActivity;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
@@ -60,7 +59,6 @@ import com.lt.hm.wovideo.widget.SpacesVideoItemDecoration;
 import com.lt.hm.wovideo.widget.TextViewExpandableAnimation;
 import com.lt.hm.wovideo.widget.multiselector.MultiSelector;
 import com.lt.hm.wovideo.widget.multiselector.SingleSelector;
-import com.lt.hm.wovideo.widget.multiselector.SwappingHolder;
 import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.ArrayList;
@@ -68,8 +66,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
-import cn.handsight.android.handsightsdk.fragment.HsBaseFragment;
-import cn.handsight.android.handsightsdk.fragment.HsPortraitFragment;
+//import cn.handsight.android.handsightsdk.fragment.HsBaseFragment;
+//import cn.handsight.android.handsightsdk.fragment.HsPortraitFragment;
 import okhttp3.Call;
 
 /**
@@ -115,7 +113,7 @@ public class NewMoviePage extends BaseVideoActivity
     LikeListAdapter grid_adapter;
     BrefIntroAdapter biAdapter;
     String[] names = new String[]{"导演", "主演", "类型", "地区", "年份", "来源"};
-    String[] values = new String[]{"王京", "周润发，刘德华"};
+    String[] values = new String[]{};
     List<CommentModel> beans;
     @BindView(R.id.video_comment_list)
     RecyclerView videoCommentList;
@@ -126,7 +124,7 @@ public class NewMoviePage extends BaseVideoActivity
     @BindView(R.id.add_comment)
     LinearLayout addComment;
 
-    HsPortraitFragment motiveFragment;
+//    HsPortraitFragment motiveFragment;
 
 
     @BindView(R.id.ly_demand_anthology)
@@ -138,14 +136,11 @@ public class NewMoviePage extends BaseVideoActivity
     @BindView(R.id.anthology_all)
     Button anthologyALL;
 
+    private int selectedItem = 0;
     private MultiSelector mMultiSelector = new SingleSelector();
-    private long cur_position;
-    private String mCurrentEpisode = "1";
-    private ArrayList<String> mEpisodes;
     boolean expand_flag = false;
     private LinearLayoutManager manager;
 
-    boolean text_flag = false;
     private boolean isCollected;
 
     private String mQualityName;
@@ -381,7 +376,7 @@ public class NewMoviePage extends BaseVideoActivity
                 expand_flag = true;
             }
             anthologyList.setLayoutManager(manager);
-            anthologyList.scrollToPosition(currentEpisode - 1 > 0 ? currentEpisode - 1 : currentEpisode);
+            anthologyList.scrollToPosition(selectedItem - 1 > 0 ? selectedItem - 1 : selectedItem);
         });
     }
 
@@ -526,8 +521,9 @@ public class NewMoviePage extends BaseVideoActivity
                 playIntro = vaP.getBody().getPlaysList().get(0);
 
                 if (typeId == 2 || typeId == 3 || typeId == 4) {
+                    antholys.clear();
                     antholys.addAll(vaP.getBody().getPlaysList());
-                    initAnthologys(vaP.getBody().getPlaysList().size());
+                    initAnthologys();
                 }
 
                 isCollected = playIntro.getSc() != null && playIntro.getSc().equals("1");
@@ -637,34 +633,42 @@ public class NewMoviePage extends BaseVideoActivity
         }
     }
 
-    private void initAnthologys(int length) {
-        mEpisodes = new ArrayList<>();
-        for (int i = 0; i < length; i++) {
-            mEpisodes.add(i + 1 + "");
-        }
+    private void initAnthologys() {
         LinearLayoutManager manager = new LinearLayoutManager(this.getApplicationContext());
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         anthologyList.addItemDecoration(itemDecoration);
         anthologyList.setLayoutManager(manager);
         mMultiSelector.setSelectable(true);
-        EpisodeAdapter adapter = new EpisodeAdapter();
+        antholys.get(0).setSelect(true);
+        EpisodeAdapter adapter = new EpisodeAdapter(antholys);
         anthologyList.setAdapter(adapter);
-        if (getIntent().getExtras().containsKey("episode")) {
-            if (!getIntent().getExtras().getString("episode").equals("null")) {
-                int c_episode = Integer.parseInt(getIntent().getExtras().getString("episode"));
-                mMultiSelector.setSelected(c_episode - 1, 0, true);
-                adapter.setSelectedItem(c_episode - 1);
-                selectEpisode(c_episode + "");
-            } else {
-                mMultiSelector.setSelected(0, 0, true);
-                adapter.notifyItemChanged(0);
-                selectEpisode("1");
-            }
-        } else {
-            selectEpisode("1");
-            adapter.notifyItemChanged(0);
-            mMultiSelector.setSelected(0, 0, true);
-        }
+        adapter.setOnRecyclerViewItemClickListener((view, i) -> {
+            //改变之前被选中颜色
+            antholys.get(selectedItem).setSelect(false);
+            adapter.notifyItemChanged(selectedItem);
+            selectedItem = i;
+            //改变现在被选中颜色
+            antholys.get(selectedItem).setSelect(true);
+            adapter.notifyItemChanged(selectedItem);
+            videoHistory.setEpisode(i+"");
+            selectEpisode(i);
+        });
+//        if (getIntent().getExtras().containsKey("episode")) {
+//            if (!getIntent().getExtras().getString("episode").equals("null")) {
+//                int c_episode = Integer.parseInt(getIntent().getExtras().getString("episode"));
+//                mMultiSelector.setSelected(c_episode - 1, 0, true);
+//                adapter.setSelectedItem(c_episode - 1);
+//                selectEpisode(c_episode + "");
+//            } else {
+//                mMultiSelector.setSelected(0, 0, true);
+//                adapter.notifyItemChanged(0);
+//                selectEpisode("1");
+//            }
+//        } else {
+//            selectEpisode("1");
+//            adapter.notifyItemChanged(0);
+//            mMultiSelector.setSelected(0, 0, true);
+//        }
 //        mMultiSelector.setSelected(0,0,true);
     }
 
@@ -745,21 +749,18 @@ public class NewMoviePage extends BaseVideoActivity
         NetUtils.getVideoRealURL(isAd ? "http://111.206.133.39:9910/video/wovideo//ads/spfb15/spfb15.m3u8" : url, UserMgr.getUsePhone(), this);
     }
 
-    int currentEpisode = 0;
     String per_Id;//单集Id
     List<PlayList.PlaysListBean> antholys = new ArrayList<>();
 
-    private void selectEpisode(String episode) {
-        int i = Integer.valueOf(episode) - 1;
-        currentEpisode = i;
+    private void selectEpisode(int episode) {
         if (antholys.size() > 0) {
-            videoHistory.setEpisode(episode);
+            videoHistory.setEpisode(episode+"");
         } else {
             videoHistory.setEpisode("0");
         }
-        vfId = antholys.get(i).getVfId();
-        per_Id = antholys.get(i).getId();
-        PlayList.PlaysListBean details = antholys.get(i);
+        vfId = antholys.get(episode).getVfId();
+        per_Id = antholys.get(episode).getId();
+        PlayList.PlaysListBean details = antholys.get(episode);
         videoHistory.setmId(details.getVfId());
         VideoModel model = initVideoModel();
         setVideoModel(model);
@@ -789,72 +790,6 @@ public class NewMoviePage extends BaseVideoActivity
 //
 //    }
 
-    private class EpisodeAdapter extends RecyclerView.Adapter<EpisodeHolder> {
-        private int selectedItem = 0;
-
-        @Override
-        public EpisodeHolder onCreateViewHolder(ViewGroup parent, int pos) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.layout_video_episode_item, parent, false);
-            EpisodeHolder episodeHolder = new EpisodeHolder(view);
-            episodeHolder.itemView.setOnClickListener(v -> {
-                notifyItemChanged(selectedItem);
-                selectedItem = anthologyList.getChildAdapterPosition(v);
-                notifyItemChanged(selectedItem);
-                if (!mCurrentEpisode.equals(selectedItem + 1 + "")) {
-                    cur_position = 0;
-                    mCurrentEpisode = selectedItem + 1 + "";
-                    videoHistory.setEpisode(mCurrentEpisode);
-                    selectEpisode(mCurrentEpisode);
-                }
-            });
-            return episodeHolder;
-        }
-
-        @Override
-        public void onBindViewHolder(EpisodeHolder holder, int pos) {
-            String episode = mEpisodes.get(pos);
-            holder.bindCrime(episode);
-            holder.setSelectionModeBackgroundDrawable(null);
-            if (selectedItem == pos) {
-                holder.mTitleTextView.setBackground(getResources().getDrawable(R.drawable.blue_circle));
-                mMultiSelector.setSelected(holder, true);
-                holder.mTitleTextView.setTextColor(getResources().getColor(R.color.white));
-            } else {
-                holder.mTitleTextView.setBackground(getResources().getDrawable(R.drawable.grey_circle));
-                holder.mTitleTextView.setTextColor(getResources().getColor(R.color.class_font_color));
-            }
-        }
-
-        @Override
-        public int getItemCount() {
-            return mEpisodes.size();
-        }
-
-        public void setSelectedItem(int pos) {
-            notifyItemChanged(pos);
-            selectedItem = pos;
-        }
-    }
-
-    private class EpisodeHolder extends SwappingHolder {
-        private final TextView mTitleTextView;
-        private String mEposide;
-
-        public EpisodeHolder(View itemView) {
-            super(itemView, mMultiSelector);
-
-            mTitleTextView = (TextView) itemView.findViewById(R.id.episode_text);
-            itemView.setLongClickable(true);
-        }
-
-
-        public void bindCrime(String episode) {
-            mEposide = episode;
-            mTitleTextView.setText(episode);
-        }
-
-    }
 
     @Override
     public void adOnComplete() {

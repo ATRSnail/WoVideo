@@ -1,7 +1,6 @@
 package com.lt.hm.wovideo.widget.ViewMiddle;
 
 import android.content.Context;
-import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,14 +34,9 @@ public class ViewMiddle extends LinearLayout implements ViewBaseAction {
     private ViewMiddleModel showString = new ViewMiddleModel(-1, 0, "不限");
     private Map<Integer, ViewMiddleModel> id_name = new HashMap<>();
 
-    public ViewMiddle(Context context,List<LiveModles> menuList) {
+    public ViewMiddle(Context context, List<LiveModles> menuList) {
         super(context);
         this.menuList = menuList;
-        init(context);
-    }
-
-    public ViewMiddle(Context context, AttributeSet attrs) {
-        super(context, attrs);
         init(context);
     }
 
@@ -73,6 +67,7 @@ public class ViewMiddle extends LinearLayout implements ViewBaseAction {
 
     private int parentId;
     private ViewMiddleModel viewMiddleModel;
+
     private void init(Context context) {
         if ((menuList == null) || (menuList.size() == 0)) {
             return;

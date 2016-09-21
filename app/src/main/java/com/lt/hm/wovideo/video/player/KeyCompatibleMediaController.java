@@ -34,7 +34,10 @@ public class KeyCompatibleMediaController extends AVController {
         super.toggleBulletScreen(isShow);
         if (isShow) {
             TLog.log("toggleBullet_status" + isShow);
-            if (playerControl == null) mDanmakuView.hide();
+            if (playerControl == null) {
+                mDanmakuView.hide();
+                return;
+            }
             mDanmakuView.seekTo(playerControl.getCurrentPosition());
             mDanmakuView.show();
         } else {

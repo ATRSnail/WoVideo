@@ -65,7 +65,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     Formatter mFormatter;
     private TextView mVideoTitle;
     private TextView mQualitySwitch;
-    private ImageView mChooseChannel;
+    private ImageView mChooseChannel;//选台
+    private ImageView mChooseAnthology;//选集
     private SwitchCompat mBulletSwitch;
     private ImageButton mPauseButton;
     private ImageButton mFullscreenButton;
@@ -234,10 +235,14 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
         mVideoTitle = (TextView) v.findViewById(R.id.video_title);
         mChooseChannel = (ImageView) v.findViewById(R.id.tv_choose_channel);
+        mChooseAnthology = (ImageView) v.findViewById(R.id.tv_choose_anthology);
         ly_seek = (LinearLayout) v.findViewById(R.id.ly_seek);
 
         if (mChooseChannel != null) {
             mChooseChannel.setOnClickListener(mChooseChannelListener);
+        }
+        if (mChooseAnthology != null){
+            mChooseAnthology.setOnClickListener(mChooseChannelListener);
         }
 
         mQualitySwitch = (TextView) v.findViewById(R.id.quality_switch);

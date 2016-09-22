@@ -55,6 +55,7 @@ import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.player.AVController;
 import com.lt.hm.wovideo.video.player.AVPlayer;
 import com.lt.hm.wovideo.video.player.BulletSendDialog;
+import com.lt.hm.wovideo.video.player.DanmakuControl;
 import com.lt.hm.wovideo.video.player.EventLogger;
 import com.lt.hm.wovideo.video.player.HlsRendererBuilder;
 import com.lt.hm.wovideo.video.player.KeyCompatibleMediaController;
@@ -130,7 +131,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
     private WoDanmakuParser mParser;
     private IDanmakuView mDanmakuView;
-    private DanmakuContext mContext;
+    private DanmakuControl danmakuControl;
 
     private long mLoadedBytes;
     private int statueHight;//5.0以上的状态栏高度
@@ -153,64 +154,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     public boolean onTouchEvent(MotionEvent event) {
         mMediaController.onTouchEvent(event);
         return super.onTouchEvent(event);
-    }
-
-    private BaseCacheStuffer.Proxy mCacheStufferAdapter = new BaseCacheStuffer.Proxy() {
-
-        private Drawable mDrawable;
-
-        @Override
-        public void prepareDrawing(final BaseDanmaku danmaku, boolean fromWorkerThread) {
-            if (danmaku.text instanceof Spanned) { // 根据你的条件检查是否需要需要更新弹幕
-                // FIXME 这里只是简单启个线程来加载远程url图片，请使用你自己的异步线程池，最好加上你的缓存池
-                new Thread() {
-
-                    @Override
-                    public void run() {
-                        String url = "http://www.bilibili.com/favicon.ico";
-                        InputStream inputStream = null;
-                        Drawable drawable = mDrawable;
-                        if (drawable == null) {
-                            try {
-                                URLConnection urlConnection = new URL(url).openConnection();
-                                inputStream = urlConnection.getInputStream();
-                                drawable = BitmapDrawable.createFromStream(inputStream, "bitmap");
-                                mDrawable = drawable;
-                            } catch (MalformedURLException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            } finally {
-                                IOUtils.closeQuietly(inputStream);
-                            }
-                        }
-                        if (drawable != null) {
-                            drawable.setBounds(0, 0, 100, 100);
-                            SpannableStringBuilder spannable = createSpannable(drawable);
-                            danmaku.text = spannable;
-                            if (mDanmakuView != null) {
-                                mDanmakuView.invalidateDanmaku(danmaku, false);
-                            }
-                        }
-                    }
-                }.start();
-            }
-        }
-
-        @Override
-        public void releaseResource(BaseDanmaku danmaku) {
-            // TODO 重要:清理含有ImageSpan的text中的一些占用内存的资源 例如drawable
-        }
-    };
-
-    private SpannableStringBuilder createSpannable(Drawable drawable) {
-        String text = "bitmap";
-        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder(text);
-        ImageSpan span = new ImageSpan(drawable);//ImageSpan.ALIGN_BOTTOM);
-        spannableStringBuilder.setSpan(span, 0, text.length(), Spannable.SPAN_INCLUSIVE_EXCLUSIVE);
-        spannableStringBuilder.append("图文混排");
-        spannableStringBuilder.setSpan(new BackgroundColorSpan(Color.parseColor("#8A2233B1")), 0, spannableStringBuilder.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        return spannableStringBuilder;
     }
 
     // Activity lifecycle
@@ -271,54 +214,20 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         mAudioCapabilitiesReceiver = new AudioCapabilitiesReceiver(this, this);
         mAudioCapabilitiesReceiver.register();
 
-        // 设置最大显示行数
-        HashMap<Integer, Integer> maxLinesPair = new HashMap<>();
-        maxLinesPair.put(BaseDanmaku.TYPE_SCROLL_RL, 5); // 滚动弹幕最大显示5行
-        // 设置是否禁止重叠
-        HashMap<Integer, Boolean> overlappingEnablePair = new HashMap<>();
-        overlappingEnablePair.put(BaseDanmaku.TYPE_SCROLL_RL, true);
-        overlappingEnablePair.put(BaseDanmaku.TYPE_FIX_TOP, true);
-        mContext = DanmakuContext.create();
-        mContext.setDanmakuStyle(IDisplayer.DANMAKU_STYLE_STROKEN, 3).setDuplicateMergingEnabled(false).setScrollSpeedFactor(1.2f).setScaleTextSize(1.2f)
-                .setCacheStuffer(new SpannedCacheStuffer(), mCacheStufferAdapter) // 图文混排使用SpannedCacheStuffer
-//        .setCacheStuffer(new BackgroundCacheStuffer())  // 绘制背景使用BackgroundCacheStuffer
-                .setMaximumLines(maxLinesPair)
-                .preventOverlapping(overlappingEnablePair);
-        if (mDanmakuView != null) {
-            //        mParser = createParser(this.getResources().openRawResource(R.raw.comments));
-            mDanmakuView.setCallback(new master.flame.danmaku.controller.DrawHandler.Callback() {
-                @Override
-                public void updateTimer(DanmakuTimer timer) {
-                }
+        danmakuControl = new DanmakuControl(mDanmakuView);
+        danmakuControl.hideDanmaku();
 
-                @Override
-                public void drawingFinished() {
-
-                }
-
-                @Override
-                public void danmakuShown(BaseDanmaku danmaku) {
-//                    Log.d("DFM", "danmakuShown(): text=" + danmaku.text);
-                }
-
-                @Override
-                public void prepared() {
-                    mDanmakuView.start();
-                }
-            });
-            mDanmakuView.hide();
-        }
-        ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    //toggleControlsVisibility();
-                } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    v.performClick();
-                }
-                return false;
-            }
-        });
+//        ((View) mDanmakuView).setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+//                    //toggleControlsVisibility();
+//                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+//                    v.performClick();
+//                }
+//                return false;
+//            }
+//        });
 
     }
 
@@ -354,9 +263,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         if (Util.SDK_INT <= 23 || mPlayer == null) {
             onShown();
         }
-        if (mDanmakuView != null && mDanmakuView.isPrepared() && mDanmakuView.isPaused()) {
-            mDanmakuView.resume();
-        }
+        danmakuControl.resumeDanmaku();
     }
 
     protected void onShown() {
@@ -389,9 +296,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         if (Util.SDK_INT <= 23) {
             onHidden();
         }
-        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
-            mDanmakuView.pause();
-        }
+        danmakuControl.pauseDanmaku();
     }
 
     @Override
@@ -400,12 +305,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         if (Util.SDK_INT > 23) {
             onHidden();
         }
-        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
-            Log.d("Bullet", "onStop: danmu prepared and gonna release");
-            // dont forget release!
-            mDanmakuView.release();
-            mDanmakuView = null;
-        }
+        danmakuControl.releaseDanmaku();
         if (instance != null) {
             instance.stop();
         }
@@ -433,13 +333,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
         mAudioCapabilitiesReceiver.unregister();
         releasePlayer();
-        if (mDanmakuView != null && mDanmakuView.isPrepared()) {
-            Log.d("Bullet", "onDestroy: danmu prepared and gonna release");
-            // dont forget release!
-            mDanmakuView.release();
-            mDanmakuView = null;
-        }
-
+        danmakuControl.releaseDanmaku();
         //广告倒计时取消
         if (timer != null) {
             timer.cancel();
@@ -490,9 +384,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
             // when in portrait screen, turn off bullet screen.
-            if (mDanmakuView != null) {
-                mDanmakuView.hide();
-            }
+            danmakuControl.hideDanmaku();
             ScreenUtils.setSystemUiVisibility(this, false);
         }
 
@@ -576,13 +468,12 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mRotateLoading.stop();
             //TODO play next if exist.
 
-            mDanmakuView.show();
-            mDanmakuView.seekTo(mPlayer.getCurrentPosition());
+            danmakuControl.showDanmaku();
+            danmakuControl.seekToDanmaku(mPlayer.getCurrentPosition());
 
         } else {
             mRotateLoading.start();
-            if (mDanmakuView == null) return;
-            mDanmakuView.hide();
+            danmakuControl.hideDanmaku();
         }
         mMediaController.updatePausePlay();
     }
@@ -708,7 +599,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 String str = (String) value;
                 if (TextUtils.isEmpty(str) || !str.equals(ResponseCode.Success)) return;
                 UT.showNormal("弹幕成功");
-                addDanmaku(bullet);
+                danmakuControl.addDanmaku(bullet);
                 break;
         }
     }
@@ -737,28 +628,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         } else {
             UnLoginHandler.unLogin(this);
         }
-    }
-
-    private void addDanmaku(Bullet bullet) {
-        BaseDanmaku danmaku = mContext.mDanmakuFactory.createDanmaku(BaseDanmaku.TYPE_SCROLL_RL, mContext);
-
-        if (danmaku == null || mDanmakuView == null || mParser == null) {
-            return;
-        }
-
-        danmaku.text = bullet.getContent();
-        danmaku.padding = 5;
-        danmaku.isLive = false; //是否是直播弹幕
-        danmaku.priority = 0;  // 可能会被各种过滤器过滤并隐藏显示
-        danmaku.time = mDanmakuView.getCurrentTime() + 1200;
-        danmaku.textSize = 22f * (mParser.getDisplayer().getDensity() - 0.6f);
-//            danMaKu.textColor = Color.parseColor(bullet.getFontColor());
-        danmaku.textShadowColor = Color.WHITE;
-//        danmaku.underlineColor = Color.GREEN;
-//        danmaku.borderColor = Color.GREEN;
-        mDanmakuView.addDanmaku(danmaku);
-//            getBullets();
-
     }
 
     protected void setVideoTitle(String title) {

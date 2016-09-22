@@ -2,19 +2,24 @@ package com.lt.hm.wovideo.ui;
 
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.percent.PercentRelativeLayout;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -52,11 +57,13 @@ import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
 import com.lt.hm.wovideo.video.player.AVController;
+import com.lt.hm.wovideo.widget.Anthology.AnthologyLinear;
 import com.lt.hm.wovideo.widget.CustomListView;
 import com.lt.hm.wovideo.widget.RecycleViewDivider;
 import com.lt.hm.wovideo.widget.SpacesItemDecoration;
 import com.lt.hm.wovideo.widget.SpacesVideoItemDecoration;
 import com.lt.hm.wovideo.widget.TextViewExpandableAnimation;
+import com.lt.hm.wovideo.widget.ViewMiddle.ViewMiddle;
 import com.lt.hm.wovideo.widget.multiselector.MultiSelector;
 import com.lt.hm.wovideo.widget.multiselector.SingleSelector;
 import com.zhy.http.okhttp.callback.StringCallback;
@@ -75,7 +82,7 @@ import okhttp3.Call;
  * @version 1.0
  * @create_date 16/6/29
  */
-public class NewMoviePage extends BaseVideoActivity
+public class NewMoviePage extends BaseVideoActivity implements AVController.OnChooseChannel, PopupWindow.OnDismissListener
 //        implements HsBaseFragment.PlayerListener,HsBaseFragment.EventListener
 {
 
@@ -151,6 +158,8 @@ public class NewMoviePage extends BaseVideoActivity
     private String collect_tag;
     private int typeId = 0;
 
+    private Context mContext;
+
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -167,8 +176,14 @@ public class NewMoviePage extends BaseVideoActivity
     }
 
     @Override
-    protected void init(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mMediaController.setmChooseChannelListener(this);
+    }
 
+    @Override
+    protected void init(Bundle savedInstanceState) {
+        mContext = this;
         beans = new ArrayList<>();
         Bundle bundle = getIntent().getExtras();
 
@@ -301,7 +316,8 @@ public class NewMoviePage extends BaseVideoActivity
         HttpApis.getVideoInfo(maps, HttpApis.http_fiv, new HttpCallback<>(ResponseVfinfo.class, this));
     }
 
-    private RecyclerView.ItemDecoration itemDecoration;
+    private SpacesVideoItemDecoration itemGvDecoration;
+    private SpacesVideoItemDecoration itemLiDecoration;
     private String videoId;
     private int totalTime;
 
@@ -361,22 +377,24 @@ public class NewMoviePage extends BaseVideoActivity
             }
         });
 
-        itemDecoration = new SpacesVideoItemDecoration(10, false);
+        itemGvDecoration = new SpacesVideoItemDecoration(16, false);
+        itemLiDecoration = new SpacesVideoItemDecoration(10,true);
         anthologyALL.setOnClickListener((View v) -> {
+            anthologyList.removeItemDecoration(itemLiDecoration);
+            anthologyList.removeItemDecoration(itemGvDecoration);
             if (expand_flag) {
                 manager = new LinearLayoutManager(this);
                 manager.setOrientation(GridLayoutManager.HORIZONTAL);
+                anthologyList.addItemDecoration(itemLiDecoration);
                 expand_flag = false;
+                anthologyList.scrollToPosition(selectedItem - 1 > 0 ? selectedItem - 1 : selectedItem);
             } else {
                 manager = new GridLayoutManager(this, 6);
                 manager.setOrientation(GridLayoutManager.VERTICAL);
-                anthologyList.invalidateItemDecorations();
-                anthologyList.removeItemDecoration(itemDecoration);
-                anthologyList.addItemDecoration(itemDecoration);
+                anthologyList.addItemDecoration(itemGvDecoration);
                 expand_flag = true;
             }
             anthologyList.setLayoutManager(manager);
-            anthologyList.scrollToPosition(selectedItem - 1 > 0 ? selectedItem - 1 : selectedItem);
         });
     }
 
@@ -636,7 +654,7 @@ public class NewMoviePage extends BaseVideoActivity
     private void initAnthologys() {
         LinearLayoutManager manager = new LinearLayoutManager(this.getApplicationContext());
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        anthologyList.addItemDecoration(itemDecoration);
+        anthologyList.addItemDecoration(itemLiDecoration);
         anthologyList.setLayoutManager(manager);
         mMultiSelector.setSelectable(true);
         antholys.get(0).setSelect(true);
@@ -806,5 +824,36 @@ public class NewMoviePage extends BaseVideoActivity
     public void onPassAd() {
         super.onPassAd();
         adOnComplete();
+    }
+
+    private AnthologyLinear anthologyLinear;
+    private PopupWindow anthologyPop;
+
+    private void initPop() {
+        // TODO Auto-generated method stub
+        anthologyLinear = new AnthologyLinear(mContext, antholys);
+        anthologyPop = new PopupWindow();
+        anthologyPop.setContentView(anthologyLinear);
+        anthologyPop.setWidth(ViewGroup.LayoutParams.WRAP_CONTENT);
+        anthologyPop.setHeight(ViewGroup.LayoutParams.MATCH_PARENT);
+        anthologyPop.setFocusable(true);
+        anthologyPop.setOnDismissListener(this);
+        anthologyPop.setAnimationStyle(R.style.AnimationRightFade);
+        anthologyPop.setBackgroundDrawable(new ColorDrawable(0x00000000));
+    }
+
+    @Override
+    public void onChooseChannel(View v) {
+        TLog.error("onChoose");
+        if (anthologyPop == null){
+            initPop();
+        }
+        mMediaController.hide();
+        anthologyPop.showAtLocation(v, Gravity.RIGHT, 0, -25);
+    }
+
+    @Override
+    public void onDismiss() {
+        mMediaController.show();
     }
 }

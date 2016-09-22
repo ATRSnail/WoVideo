@@ -54,7 +54,7 @@
     <color name="password_bg">#f5f5f5</color>
     <color name="btn_yzm">#70B3E5</color>
 
-    <color name="mask_color">#dd414141</color>
+    <color name="mask_color">#dd000000</color>
     <color name="item_alpha_back">#43000000</color>
 
     <color name="bg_new_color">#f4f4f4</color>

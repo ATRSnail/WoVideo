@@ -239,6 +239,18 @@
             android:src="@drawable/iocn_more"
             android:text="选台" />
 
+        <ImageView
+            android:id="@+id/tv_choose_anthology"
+            android:layout_width="58dp"
+            android:layout_height="33dp"
+            android:layout_alignParentRight="true"
+            android:paddingBottom="2dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="15dp"
+            android:paddingTop="2dp"
+            android:src="@drawable/iocn_more"
+            android:text="选集" />
+
     </RelativeLayout>
 
     <ImageButton

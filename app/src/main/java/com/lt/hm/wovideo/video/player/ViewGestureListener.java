@@ -9,6 +9,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
+import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 
 /**
@@ -40,8 +41,10 @@ public class ViewGestureListener implements GestureDetector.OnGestureListener {
 
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+
         //竖屏不让划屏调节
         if (screenSwitchUtils != null && screenSwitchUtils.isPortrait()) return false;
+        TLog.error("keyeventdd---scroll---");
         //获取坐标点
         float mOldX = e1.getX(), mOldY = e1.getY();
         float deltaX = e2.getX() - e1.getX();

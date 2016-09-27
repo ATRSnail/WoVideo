@@ -22,6 +22,7 @@ import com.lt.hm.wovideo.model.response.ResponseLocalCityModel;
 import com.lt.hm.wovideo.model.response.ResponsePlayList;
 import com.lt.hm.wovideo.model.response.ResponseTag;
 import com.lt.hm.wovideo.model.response.ResponseValidateComment;
+import com.lt.hm.wovideo.model.response.ResponseVfinfo;
 import com.lt.hm.wovideo.model.response.ResponseVideoRealUrl;
 import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
@@ -354,5 +355,11 @@ public class NetUtils {
         map.put("numPerPage", 50);
         map.put("vfId", vfId);
         HttpApis.commentList(map, HttpApis.http_comments, new HttpCallback<>(ResponseComment.class, httpUtilBack));
+    }
+
+    public static void getVideoDetails(String id,HttpUtilBack httpUtilBack) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("vfid", id);
+        HttpApis.getVideoInfo(map, HttpApis.http_video_detail, new HttpCallback<>(ResponseVfinfo.class, httpUtilBack));
     }
 }

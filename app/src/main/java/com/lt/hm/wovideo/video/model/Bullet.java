@@ -54,4 +54,12 @@ public class Bullet {
         setFontSize((random.nextInt(max - min) + min) + "");
     }
 
+    @Override
+    public String toString() {
+        return "Bullet{" +
+                "content='" + content + '\'' +
+                ", fontColor='" + fontColor + '\'' +
+                ", fontSize='" + fontSize + '\'' +
+                '}';
+    }
 }

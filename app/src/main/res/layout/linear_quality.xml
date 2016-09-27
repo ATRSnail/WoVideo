@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="100dp"
+    android:id="@+id/rg_quality"
+    android:layout_height="match_parent"
+    android:background="@color/mask_color"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <RadioButton
+        android:id="@+id/tv_liu"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_marginTop="64dp"
+        android:button="@null"
+        android:drawablePadding="10dp"
+        android:gravity="center"
+        android:text="流畅"
+        android:textColor="@drawable/popu_text_color"
+        android:textSize="12sp" />
+
+    <RadioButton
+        android:id="@+id/tv_biao"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:button="@null"
+        android:drawablePadding="10dp"
+        android:gravity="center"
+        android:text="标清"
+        android:textColor="@drawable/popu_text_color"
+        android:textSize="12sp" />
+
+    <RadioButton
+        android:id="@+id/tv_blue"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:button="@null"
+        android:gravity="center"
+        android:text="蓝光"
+        android:textColor="@drawable/popu_text_color"
+        android:textSize="12sp" />
+
+    <RadioButton
+        android:id="@+id/tv_gao"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:button="@null"
+        android:gravity="center"
+        android:text="高清"
+        android:textColor="@drawable/popu_text_color"
+        android:textSize="12sp" />
+
+    <RadioButton
+        android:id="@+id/tv_chao"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:button="@null"
+        android:gravity="center"
+        android:text="超清"
+        android:textColor="@drawable/popu_text_color"
+        android:textSize="12sp" />
+
+    <RadioButton
+        android:id="@+id/tv_4k"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:button="@null"
+        android:gravity="center"
+        android:text="4k"
+        android:textColor="@color/white"
+        android:textSize="12sp" />
+</RadioGroup>

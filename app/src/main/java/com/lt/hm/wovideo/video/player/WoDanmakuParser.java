@@ -1,9 +1,12 @@
 package com.lt.hm.wovideo.video.player;
 
 import android.graphics.Color;
+import android.text.TextUtils;
+import android.widget.TextView;
 
 import com.lt.hm.wovideo.model.BulletModel;
 import com.lt.hm.wovideo.utils.StringUtils;
+import com.lt.hm.wovideo.utils.TLog;
 
 import java.util.List;
 
@@ -66,16 +69,17 @@ public class WoDanmakuParser extends BaseDanmakuParser{
                 // TODO : parse advance danmaku json
                 continue;
             long time = bullet.getTime() * 1000; // 出现时间
+            TLog.error("bullTime---"+time);
             /**
              * {@link Color.BLACK} {@link Color#parseColor(String)}
              */
             bullet.setFontColor("#669900");
             int color = bullet.getFontColor().equals("") ? Color.BLACK : Color.parseColor(bullet.getFontColor()) ; // 颜色
             float textSize = 0;
-            if (!StringUtils.isNullOrEmpty(bullet.getFontSize())){
-                textSize= Float.parseFloat(bullet.getFontSize()); // 字体大小
-            }else{
+            if (TextUtils.isEmpty(bullet.getFontSize())){
                 textSize=30f;
+            }else{
+                textSize= Float.parseFloat(bullet.getFontSize()); // 字体大小
             }
             BaseDanmaku item = mContext.mDanmakuFactory.createDanmaku(type, mContext);
             if (item != null) {

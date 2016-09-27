@@ -315,11 +315,11 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
 //            startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
         });
         choiceSearchLayout.setOnClickListener((View v) -> {
-          //  UIHelper.ToSearchPage(this);
-            Bitmap bitmap = BlurBuilder.snapShotWithoutStatusBar(this);
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.fragment_container1, SearchFrg.newInstance(bitmap), "searchfrg");
-            fragmentTransaction.commitAllowingStateLoss();
+            UIHelper.ToSearchPage(this);
+//            Bitmap bitmap = BlurBuilder.snapShotWithoutStatusBar(this);
+//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//            fragmentTransaction.add(R.id.fragment_container1, SearchFrg.newInstance(bitmap), "searchfrg");
+//            fragmentTransaction.commitAllowingStateLoss();
         });
         //检测更新
 //		CheckUpdate();

@@ -33,6 +33,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 
 import com.google.android.exoplayer.AspectRatioFrameLayout;
+import com.google.android.exoplayer.ExoPlayer;
 import com.google.android.exoplayer.audio.AudioCapabilities;
 import com.google.android.exoplayer.audio.AudioCapabilitiesReceiver;
 import com.google.android.exoplayer.metadata.id3.Id3Frame;
@@ -43,6 +44,7 @@ import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.http.ResponseCode;
+import com.lt.hm.wovideo.interf.OnMediaOtherListener;
 import com.lt.hm.wovideo.model.NetUsage;
 import com.lt.hm.wovideo.model.response.ResponseBullet;
 import com.lt.hm.wovideo.utils.AdvancedCountdownTimer;
@@ -62,6 +64,7 @@ import com.lt.hm.wovideo.video.player.KeyCompatibleMediaController;
 import com.lt.hm.wovideo.video.player.WoDanmakuParser;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 import com.victor.loading.rotate.RotateLoading;
+import com.zhy.http.okhttp.OkHttpUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -129,12 +132,12 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     private String mProvider;
 
     private AudioCapabilitiesReceiver mAudioCapabilitiesReceiver;
-    private WoDanmakuParser mParser;
     private IDanmakuView mDanmakuView;
     private DanmakuControl danmakuControl;
 
     private long mLoadedBytes;
     private int statueHight;//5.0以上的状态栏高度
+    public boolean isMovie = true;//默认是电影,或者小视屏
 
     /**
      * Makes a best guess to infer the type from a media {@link Uri} and an optional overriding file
@@ -196,14 +199,14 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         mSurfaceView = (SurfaceView) findViewById(R.id.surface_view);
         mSurfaceView.getHolder().addCallback(this);
 
-        mMediaController = new KeyCompatibleMediaController(this, mDanmakuView,instance);
+        mMediaController = new KeyCompatibleMediaController(this, mDanmakuView, instance);
 
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
         mMediaController.setGestureListener(this);
         mMediaController.setonTouchAd(this);
 
         mMediaController.setIsAd(isAd);
-        mMediaController.setAdUiVisibility(isAd);
+        mMediaController.setAdUi();
         startNormalCountDownTime(18);
 
         CookieHandler currentHanlder = CookieHandler.getDefault();
@@ -323,7 +326,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
+
         NetUsage usage = new NetUsage();
         usage.setUserId("");
         usage.setVideoId(mVideoId);
@@ -344,7 +347,26 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
             mMediaController.hide();
             mMediaController = null;
         }
+        cancelOkhttps();
+        super.onDestroy();
+    }
 
+    /**
+     * ondestory方法取消网络请求
+     */
+    private void cancelOkhttps() {
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_video_fake_url);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_video_real_url);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_video_detail);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_comments);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_you_like);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_push_comment);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_video_uncollect);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_valide_comment);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_video_collect);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_zan);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_bullet);
+        OkHttpUtils.getInstance().cancelTag(HttpApis.http_add_bullet);
     }
 
     @TargetApi(Build.VERSION_CODES.KITKAT)
@@ -389,7 +411,11 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         }
 
         mMediaController.setIsAd(isAd);
-        mMediaController.setAdUiVisibility(isAd);
+        if (isAd) {
+            mMediaController.setAdUi();
+        } else {
+            mMediaController.setMovieUi(isMovie);
+        }
 
     }
 
@@ -416,9 +442,21 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         }
     }
 
+    /**
+     * 当音频功能更改时调用
+     *
+     * @param audioCapabilities Current audio capabilities for the device.
+     */
     @Override
     public void onAudioCapabilitiesChanged(AudioCapabilities audioCapabilities) {
-
+        if (mPlayer == null) {
+            return;
+        }
+        boolean backgrounded = mPlayer.getBackgrounded();
+        boolean playWhenReady = mPlayer.getPlayWhenReady();
+        releasePlayer();
+        preparePlayer(playWhenReady);
+        mPlayer.setBackgrounded(backgrounded);
     }
 
     @Override
@@ -461,21 +499,42 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                     timer.pause();
                 }
             }
-
+        }else {
+            if (playbackState == AVPlayer.STATE_ENDED) {
+                rewind(false);
+            }
+            final boolean showProgress = playbackState == AVPlayer.STATE_BUFFERING
+                    || playbackState == AVPlayer.STATE_PREPARING;
+            if (showProgress){
+                mRotateLoading.start();
+            }else {
+                mRotateLoading.stop();
+            }
         }
-        if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
 
-            mRotateLoading.stop();
-            //TODO play next if exist.
+//        mRotateLoading.setVisibility(showProgress ? View.VISIBLE : View.GONE);
 
-            danmakuControl.showDanmaku();
-            danmakuControl.seekToDanmaku(mPlayer.getCurrentPosition());
-
-        } else {
-            mRotateLoading.start();
-            danmakuControl.hideDanmaku();
-        }
+//        if (playbackState == AVPlayer.STATE_READY || playbackState == AVPlayer.STATE_ENDED) {
+//
+//            mRotateLoading.stop();
+//            //TODO play next if exist.
+//
+//            danmakuControl.showDanmaku();
+//            danmakuControl.seekToDanmaku(mPlayer.getCurrentPosition());
+//
+//        } else {
+//            mRotateLoading.start();
+//            danmakuControl.hideDanmaku();
+//        }
         mMediaController.updatePausePlay();
+    }
+
+    private void rewind(boolean playWhenReady) {
+        if (mPlayer != null) {
+            mPlayerPosition = 0L;
+            mPlayer.seekTo(mPlayerPosition);
+            preparePlayer(playWhenReady);
+        }
     }
 
     @Override
@@ -508,7 +567,7 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     public void adOnComplete() {
         isAd = false;
         mMediaController.setIsAd(false);
-        mMediaController.setAdUiVisibility(false);
+        mMediaController.setMovieUi(isMovie);
     }
 
     @Override
@@ -581,14 +640,8 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
         switch (flag) {
             case HttpApis.http_bullet:
                 ResponseBullet res = (ResponseBullet) value;
-                mParser = new WoDanmakuParser();
-                TLog.log("getBullet" + mParser);
-                mParser.setmDanmuListData(res.getBody());
-                if (mContext == null || mParser == null || mDanmakuView == null)
-                    return;
-                mDanmakuView.prepare(mParser, mContext);
-                mDanmakuView.showFPS(false);
-                mDanmakuView.enableDanmakuDrawingCache(true);
+                danmakuControl.setDanmuListData(res.getBody());
+                danmakuControl.prepareDanmaku();
                 if (mMediaController.getBulletScreen()) {
                     mDanmakuView.hide();
                 } else {
@@ -597,8 +650,10 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
                 break;
             case HttpApis.http_add_bullet:
                 String str = (String) value;
+
                 if (TextUtils.isEmpty(str) || !str.equals(ResponseCode.Success)) return;
                 UT.showNormal("弹幕成功");
+                TLog.error("bulletaa--->" + bullet.toString());
                 danmakuControl.addDanmaku(bullet);
                 break;
         }
@@ -632,14 +687,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
 
     protected void setVideoTitle(String title) {
         mMediaController.setTitle(title);
-    }
-
-    protected void setVideoModel(VideoModel model) {
-        mMediaController.setVideoModel(model);
-    }
-
-    protected void setQualityListener(AVController.OnQualitySelected listener) {
-        mMediaController.setListener(listener);
     }
 
     protected void setQualitySwitchText(String name) {
@@ -726,11 +773,6 @@ public class BaseVideoActivity extends BaseActivity implements SurfaceHolder.Cal
     @Override
     public void onPassAd() {
 
-    }
-
-    @Override
-    public void onTouchAd() {
-        UT.showNormal("点击的广告");
     }
 
     /**

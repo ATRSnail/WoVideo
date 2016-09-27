@@ -3,6 +3,7 @@ package com.lt.hm.wovideo.video.player;
 import android.content.Context;
 import android.view.KeyEvent;
 
+import com.lt.hm.wovideo.interf.MediaPlayerControl;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 

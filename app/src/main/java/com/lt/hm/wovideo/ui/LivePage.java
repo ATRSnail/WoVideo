@@ -42,6 +42,7 @@ import com.lt.hm.wovideo.adapter.video.VideoPipAdapter;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.NetUtils;
+import com.lt.hm.wovideo.interf.OnMediaOtherListener;
 import com.lt.hm.wovideo.model.LiveModel;
 import com.lt.hm.wovideo.model.LiveModles;
 import com.lt.hm.wovideo.model.LiveTVList;
@@ -81,7 +82,7 @@ import static com.lt.hm.wovideo.base.BaseVideoActivity.PROVIDER_EXTRA;
  * @create_date 16/6/12
  */
 public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AVPlayer.Listener, AVPlayer.CaptionListener, AVPlayer.Id3MetadataListener,
-        AudioCapabilitiesReceiver.Listener, VideoPipAdapter.ItemClickCallBack, AVController.OnChooseChannel, PopupWindow.OnDismissListener, ViewMiddle.OnSelectListener {
+        AudioCapabilitiesReceiver.Listener, VideoPipAdapter.ItemClickCallBack, OnMediaOtherListener, PopupWindow.OnDismissListener, ViewMiddle.OnSelectListener {
     @BindView(R.id.video_name)
     TextView videoName;
     @BindView(R.id.video_play_number)
@@ -221,10 +222,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
         mMediaController = new AVController(this,screenSwitchUtils);
         mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
-        mMediaController.setAdUiVisibility(false);
-        mMediaController.setSeekBarVisible(View.GONE);
+        mMediaController.setLiveUi();
         mMediaController.setGestureListener(this);
-        mMediaController.setmChooseChannelListener(this);
+        mMediaController.setOnMediaOtherListener(this);
         CookieHandler currentHanlder = CookieHandler.getDefault();
         if (currentHanlder != defaultCookieManager) {
             CookieHandler.setDefault(defaultCookieManager);
@@ -309,7 +309,6 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         if (screenSwitchUtils != null) {
             screenSwitchUtils.stop();
         }
-
     }
 
     private void onHidden() {
@@ -344,12 +343,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
                     Gravity.CENTER
             );
             mMediaController.setTitle(videoName.getText().toString());
-            mMediaController.setAdUiVisibility(false);
-            mMediaController.setSwitchVisibility(View.INVISIBLE);
-            mMediaController.setmChooseChannel(View.VISIBLE);
-            mMediaController.setBulletVisible(View.GONE);
-            mMediaController.setSeekBarVisible(View.GONE);
-            mMediaController.setmSendBulletVisible(View.GONE);
+            mMediaController.setLiveUi();
             mVideoFrame.setLayoutParams(lp);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 mVideoFrame.setAspectRatio((float) height / (width + statueHight));
@@ -362,8 +356,7 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
             mMediaController.hide();
             mMediaController.setAnchorView((FrameLayout) findViewById(R.id.video_frame));
-            mMediaController.setAdUiVisibility(false);
-            mMediaController.setSeekBarVisible(View.GONE);
+            mMediaController.setLiveUi();
             dimissChangeChannelPop();
             ScreenUtils.setSystemUiVisibility(this,false);
         }
@@ -812,6 +805,26 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
         }
         mMediaController.hide();
         changeChannelPop.showAtLocation(v, Gravity.RIGHT, 0, -25);
+    }
+
+    @Override
+    public void onChooseMore(View v) {
+
+    }
+
+    @Override
+    public void onShowQuality(View v) {
+
+    }
+
+    @Override
+    public void onQualitySelect(String key, String value) {
+
+    }
+
+    @Override
+    public void onAnthologyItemClick(int position) {
+
     }
 
     private ViewMiddle viewMiddle;

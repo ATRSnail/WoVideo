@@ -27,14 +27,16 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
+import com.lt.hm.wovideo.interf.MediaPlayerControl;
+import com.lt.hm.wovideo.interf.OnMediaOtherListener;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.model.Bullet;
-import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 
 import java.lang.ref.WeakReference;
@@ -45,7 +47,7 @@ import java.util.Locale;
  * Created by KECB on 7/6/16.
  */
 
-public class AVController extends FrameLayout implements AVPlayerGestureListener {
+public class AVController extends FrameLayout implements View.OnTouchListener {
     private static final String TAG = "AVController";
 
     private MediaPlayerControl mPlayer;
@@ -66,7 +68,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private TextView mVideoTitle;
     private TextView mQualitySwitch;
     private ImageView mChooseChannel;//选台
-    private ImageView mChooseAnthology;//选集
+    private TextView mChooseAnthology;//选集
+    private ImageView mMore;//更多
     private SwitchCompat mBulletSwitch;
     private ImageButton mPauseButton;
     private ImageButton mFullscreenButton;
@@ -78,8 +81,8 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private View layout_bottom;//进度条布局
     private View rl_top;//播放器头
     private View view_ad_count_dowm;//倒计时布局
+    private ViewGroup textureViewContainer;
     private LinearLayout ly_seek;
-    private QualityPopWindow mQualityPopWindow;
     private Handler mHandler = new MessageHandler(this);
     private boolean mIsBulletScreenOn = false;
     // Getsutre
@@ -97,30 +100,18 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     private TextView mScheduleText;
     private ScreenSwitchUtils screenSwitchUtils;
 
-    private OnQualitySelected listener;
+    private OnMediaOtherListener onMediaOtherListener;
     private OnInterfaceInteract mInterfaceListener;
-    private OnChooseChannel onChooseChannelListener;
     private onTouchAd onTouchAdListener;
 
     private boolean isAd = false;
 
-    private VideoModel videoModel;
-    QualityPopWindow window;
-
-    public void setVideoModel(VideoModel videoModel) {
-        this.videoModel = videoModel;
-    }
-
-    public void setListener(OnQualitySelected listener) {
-        this.listener = listener;
+    public void setOnMediaOtherListener(OnMediaOtherListener listener) {
+        this.onMediaOtherListener = listener;
     }
 
     public void setonTouchAd(onTouchAd listener) {
         this.onTouchAdListener = listener;
-    }
-
-    public void setmChooseChannelListener(OnChooseChannel listener) {
-        this.onChooseChannelListener = listener;
     }
 
     public void setInterfaceListener(OnInterfaceInteract interfaceListener) {
@@ -136,7 +127,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         Log.i(TAG, TAG);
     }
 
-    public AVController(Context context,ScreenSwitchUtils screenSwitchUtils) {
+    public AVController(Context context, ScreenSwitchUtils screenSwitchUtils) {
         super(context);
         mContext = context;
         this.screenSwitchUtils = screenSwitchUtils;
@@ -197,10 +188,10 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
      * @param context
      */
     public void setGestureListener(Context context) {
-        mVideoGestureListener = this;
+     //   mVideoGestureListener = this;
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        mGestureDetector = new GestureDetector(context, new ViewGestureListener(context, mVideoGestureListener,screenSwitchUtils));
+    //    mGestureDetector = new GestureDetector(context, new ViewGestureListener(context, mVideoGestureListener, screenSwitchUtils));
     }
 
     /**
@@ -220,6 +211,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
 
     private void initControllerView(View v) {
+        mScreenHeight = getContext().getResources().getDisplayMetrics().heightPixels;
+        textureViewContainer = (RelativeLayout) v.findViewById(R.id.surface_container);
+        if (textureViewContainer!= null){
+            textureViewContainer.setOnTouchListener(this);
+        }
         Typeface fontFace = Typeface.createFromAsset(mContext.getAssets(), "Regular.ttf");
         tv_pass_ad = (TextView) v.findViewById(R.id.tv_pass_ad);
         tv_pass_ad.setTypeface(fontFace);
@@ -235,34 +231,35 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
         mVideoTitle = (TextView) v.findViewById(R.id.video_title);
         mChooseChannel = (ImageView) v.findViewById(R.id.tv_choose_channel);
-        mChooseAnthology = (ImageView) v.findViewById(R.id.tv_choose_anthology);
+        mChooseAnthology = (TextView) v.findViewById(R.id.tv_choose_anthology);
+        mMore = (ImageView) v.findViewById(R.id.img_video_more);
+
         ly_seek = (LinearLayout) v.findViewById(R.id.ly_seek);
 
-        if (mChooseChannel != null) {
-            mChooseChannel.setOnClickListener(mChooseChannelListener);
+        if (mMore != null) {
+            mMore.setOnClickListener(v1 -> {
+                if (onMediaOtherListener != null)
+                    onMediaOtherListener.onChooseMore(v1);
+            });
         }
-        if (mChooseAnthology != null){
-            mChooseAnthology.setOnClickListener(mChooseChannelListener);
+
+        if (mChooseChannel != null) {
+            mChooseChannel.setOnClickListener(v1 -> {
+                if (onMediaOtherListener != null)
+                    onMediaOtherListener.onChooseChannel(v1);
+            });
+        }
+        if (mChooseAnthology != null) {
+            mChooseAnthology.setOnClickListener(v1 -> {
+                if (onMediaOtherListener != null)
+                    onMediaOtherListener.onChooseChannel(v1);
+            });
         }
 
         mQualitySwitch = (TextView) v.findViewById(R.id.quality_switch);
         if (mQualitySwitch != null) {
-            mQualitySwitch.setOnClickListener(mQualitySwitchListener);
+            mQualitySwitch.setOnClickListener(v1 -> onMediaOtherListener.onShowQuality(v1));
         }
-
-        // Quality
-        mQualityPopWindow = new QualityPopWindow(mContext, videoModel);
-        mQualityPopWindow.setOutsideTouchable(true);
-        mQualityPopWindow.setListener(new QualityPopWindow.OnQulitySelect() {
-            @Override
-            public void selected(String key, String value) {
-                mQualitySwitch.setText(key);
-                // TODO: 16/7/11 ADD CALLBACK TO ACTIVITY TO CHANGE VIDEO
-                if (listener != null) {
-                    listener.onQualitySelect(key, value);
-                }
-            }
-        });
 
         mSendBulletButton = (ImageButton) v.findViewById(R.id.send_bullet);
         if (mSendBulletButton != null) {
@@ -320,25 +317,64 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         }
     }
 
-    public void setAdUiVisibility(boolean isAd) {
-        if (isAd) {
-            layout_bottom.setBackgroundColor(Color.parseColor("#00000000"));
-            if (rl_top != null)
-                rl_top.setBackgroundColor(Color.parseColor("#00000000"));
-        } else {
-            layout_bottom.setBackgroundColor(Color.parseColor("#CC000000"));
-            if (rl_top != null)
-                rl_top.setBackgroundColor(Color.parseColor("#CC000000"));
-        }
-        tv_know_more.setVisibility(isAd ? VISIBLE : GONE);
-        mSoundButton.setVisibility(isAd ? VISIBLE : GONE);
-        setSeekBarVisible(isAd ? GONE : VISIBLE);
-        setPassAdVisility(isAd ? VISIBLE : GONE);
-        setVideoTitleVisility(isAd ? GONE : VISIBLE);
-        setSwitchVisibility(isAd ? GONE : VISIBLE);
-        setBulletVisible(isAd ? GONE : VISIBLE);
+    /**
+     * 广告布局
+     */
+    public void setAdUi() {
+        layout_bottom.setBackgroundColor(Color.parseColor("#00000000"));
+        if (rl_top != null)
+            rl_top.setBackgroundColor(Color.parseColor("#00000000"));
+
+        tv_know_more.setVisibility(VISIBLE);
+        mSoundButton.setVisibility(VISIBLE);
+        setSeekBarVisible(GONE);
+        setPassAdVisility(VISIBLE);
+        setVideoTitleVisility(GONE);
+        setSwitchVisibility(GONE);
+        setBulletVisible(GONE);
         setmChooseChannel(GONE);
+        setmSendBulletVisible(GONE);
+        setChooseAnthologyVisible(GONE);
+        setmMoreVisible(GONE);
         show(0);
+    }
+
+    /**
+     * 电影布局UI
+     *
+     * @param isMovie
+     */
+    public void setMovieUi(boolean isMovie) {
+        layout_bottom.setBackgroundColor(Color.parseColor("#CC000000"));
+        if (rl_top != null)
+            rl_top.setBackgroundColor(Color.parseColor("#CC000000"));
+        tv_know_more.setVisibility(GONE);
+        mSoundButton.setVisibility(GONE);
+        setmChooseChannel(GONE);
+        setBulletVisible(VISIBLE);
+        setSwitchVisibility(VISIBLE);
+        setVideoTitleVisility(VISIBLE);
+        setSeekBarVisible(VISIBLE);
+        setmMoreVisible(VISIBLE);
+        setChooseAnthologyVisible(isMovie ? GONE : VISIBLE);
+        setmSendBulletVisible(mIsBulletScreenOn ? VISIBLE : GONE);
+        setPassAdVisility(GONE);
+    }
+
+    /**
+     * 直播布局
+     */
+    public void setLiveUi() {
+        setSwitchVisibility(INVISIBLE);
+        setmChooseChannel(VISIBLE);
+        setBulletVisible(GONE);
+        setSeekBarVisible(GONE);
+        setmSendBulletVisible(GONE);
+        setPassAdVisility(GONE);
+        setChooseAnthologyVisible(GONE);
+        tv_know_more.setVisibility(GONE);
+        mSoundButton.setVisibility(GONE);
+        setmMoreVisible(GONE);
     }
 
     /**
@@ -349,6 +385,18 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     public void setPassAdVisility(int visibility) {
         if (view_ad_count_dowm != null) {
             view_ad_count_dowm.setVisibility(visibility);
+        }
+    }
+
+    public void setChooseAnthologyVisible(int visible) {
+        if (mChooseAnthology != null) {
+            mChooseAnthology.setVisibility(visible);
+        }
+    }
+
+    public void setmMoreVisible(int visible) {
+        if (mMore != null) {
+            mMore.setVisibility(visible);
         }
     }
 
@@ -526,17 +574,14 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (null != mGestureDetector) {
-            mGestureDetector.onTouchEvent(event);
-            return true;
-        }
+        TLog.error("keyeventdd--dd->"+event.getAction());
+//        if (null != mGestureDetector) {
+//            mGestureDetector.onTouchEvent(event);
+//            return true;
+//        }
         return super.onTouchEvent(event);
     }
 
-    @Override
-    public boolean onTrackballEvent(MotionEvent ev) {
-        return false;
-    }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
@@ -544,6 +589,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             return true;
         }
 
+        TLog.error("keyeventdd--->"+event.getAction());
         int keyCode = event.getKeyCode();
         final boolean uniqueDown = event.getRepeatCount() == 0
                 && event.getAction() == KeyEvent.ACTION_DOWN;
@@ -590,32 +636,11 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         return super.dispatchKeyEvent(event);
     }
 
-    private OnClickListener mQualitySwitchListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            //TODO show qulity listview
-            if (!mQualityPopWindow.isShowing()) {
-                mQualityPopWindow.showPopupWindow(mQualitySwitch);
-            } else {
-                mQualityPopWindow.dismiss();
-            }
-        }
-    };
-
     private OnClickListener mBulletSendListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
             if (mInterfaceListener != null) {
                 mInterfaceListener.onOpenBulletEditor();
-            }
-        }
-    };
-
-    private OnClickListener mChooseChannelListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (onChooseChannelListener != null) {
-                onChooseChannelListener.onChooseChannel(v);
             }
         }
     };
@@ -637,6 +662,7 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
             mIsBulletScreenOn = isChecked;
             mBulletSwitch.setChecked(mIsBulletScreenOn);
             toggleBulletScreen(isChecked);
+            setmSendBulletVisible(mIsBulletScreenOn ? VISIBLE : GONE);
         }
     };
 
@@ -809,31 +835,27 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         info.setClassName(AVController.class.getName());
     }
 
-    @Override
-    public void onSingleTap() {
-        if (isAd) {
-            if (onTouchAdListener != null) {
-                onTouchAdListener.onTouchAd();
-            }
-        } else {
-            if (isShowing()) {
-                hide();
-            } else {
-                show(0);
-            }
-        }
-    }
+//    @Override
+//    public void onSingleTap() {
+//        if (!isAd) {
+//            if (isShowing()) {
+//                hide();
+//            } else {
+//                show(0);
+//            }
+//        }
+//    }
 
-    @Override
-    public void onHorizontalScroll(MotionEvent event, float delta) {
-        show(sDefaultTimeout);
-        Log.i(TAG, delta + "");
-        if (event.getPointerCount() == 1)
-            if (mPlayer == null) return;
-        long toPosition = mPlayer.getCurrentPosition() + Math.round(delta);
-        updateSchedule(toPosition);
-        mPlayer.seekTo(toPosition);
-    }
+//    @Override
+//    public void onHorizontalScroll(MotionEvent event, float delta) {
+//        show(sDefaultTimeout);
+//        Log.i(TAG, delta + "");
+//        if (event.getPointerCount() == 1)
+//            if (mPlayer == null) return;
+//        long toPosition = mPlayer.getCurrentPosition() + Math.round(delta);
+//        updateSchedule(toPosition);
+//        mPlayer.seekTo(toPosition);
+//    }
 
     private void updateSchedule(long toPosition) {
         mScheduleLayout.setVisibility(VISIBLE);
@@ -848,26 +870,26 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     }
 
-    @Override
-    public void onVerticalScroll(MotionEvent event, float delta, int direction) {
-        show(sDefaultTimeout);
-        Log.i(TAG, delta + "");
-        if (event.getPointerCount() == 1) {
-            if (direction == ViewGestureListener.SWIPE_LEFT) {
-                onBrightnessSlide(delta);
-                Log.i(TAG, "onVerticalScroll: Brightness");
-            } else {
-                onVolumeSlide(delta);
-                Log.i(TAG, "onVerticalScroll: Volume");
-            }
-            postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mCenterLayout.setVisibility(GONE);
-                }
-            }, 1000);
-        }
-    }
+//    @Override
+//    public void onVerticalScroll(MotionEvent event, float delta, int direction) {
+//        show(sDefaultTimeout);
+//        Log.i(TAG, delta + "");
+//        if (event.getPointerCount() == 1) {
+//            if (direction == ViewGestureListener.SWIPE_LEFT) {
+//                onBrightnessSlide(delta);
+//                Log.i(TAG, "onVerticalScroll: Brightness");
+//            } else {
+//                onVolumeSlide(delta);
+//                Log.i(TAG, "onVerticalScroll: Volume");
+//            }
+//            postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    mCenterLayout.setVisibility(GONE);
+//                }
+//            }, 1000);
+//        }
+//    }
 
     /**
      * 改变音量
@@ -936,39 +958,90 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
         mCenterPorgress.setProgress((int) per);
     }
 
-    public interface MediaPlayerControl {
-        void start();
+    protected boolean mTouchingProgressBar;
+    protected float mDownX;
+    protected float mDownY;
+    protected boolean mChangeVolume;
+    protected boolean mChangePosition;
+    protected int mDownPosition;
+    protected int mGestureDownVolume;
+    protected int mSeekTimePosition;
+    public static final int THRESHOLD = 80;
+    protected int mScreenHeight;
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        int id = v.getId();
+        if (id == R.id.surface_container) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    mTouchingProgressBar = true;
 
-        void pause();
+                    mDownX = x;
+                    mDownY = y;
+                    mChangeVolume = false;
+                    mChangePosition = false;
+                    /////////////////////
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float deltaX = x - mDownX;
+                    float deltaY = y - mDownY;
+                    float absDeltaX = Math.abs(deltaX);
+                    float absDeltaY = Math.abs(deltaY);
+                    if (!screenSwitchUtils.isPortrait()) {
+                        if (!mChangePosition && !mChangeVolume) {
+                            if (absDeltaX > THRESHOLD || absDeltaY > THRESHOLD) {
+                               // cancelProgressTimer();
+                                if (absDeltaX >= THRESHOLD) {
+                                    mChangePosition = true;
+                                //    mDownPosition = getCurrentPositionWhenPlaying();
+                                } else {
+                                    mChangeVolume = true;
+                                    mGestureDownVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                                }
+                            }
+                        }
+                    }
+//                    if (mChangePosition) {
+//                        int totalTimeDuration = getDuration();
+//                        mSeekTimePosition = (int) (mDownPosition + deltaX * totalTimeDuration / mScreenWidth);
+//                        if (mSeekTimePosition > totalTimeDuration)
+//                            mSeekTimePosition = totalTimeDuration;
+//                        String seekTime = JCUtils.stringForTime(mSeekTimePosition);
+//                        String totalTime = JCUtils.stringForTime(totalTimeDuration);
+//
+//                        showProgressDialog(deltaX, seekTime, mSeekTimePosition, totalTime, totalTimeDuration);
+//                    }
+                    if (mChangeVolume) {
+                        deltaY = -deltaY;
+                        int max = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                        int deltaV = (int) (max * deltaY * 3 / mScreenHeight);
+                        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mGestureDownVolume + deltaV, 0);
+                        int volumePercent = (int) (mGestureDownVolume * 100 / max + deltaY * 3 * 100 / mScreenHeight);
+                        onVolumeSlide(volumePercent);
+                   //     showVolumDialog(-deltaY, volumePercent);
+                    }
 
-        void releasePlay();
-
-        int getDuration();
-
-        long getCurrentPosition();
-
-        void seekTo(long pos);
-
-        boolean isPlaying();
-
-        int getBufferPercentage();
-
-        boolean canPause();
-
-        boolean canSeekBackward();
-
-        boolean canSeekForward();
-
-        /**
-         * Get the audio seesion id for the player used by this VideoView. This can be used to
-         * apply audio effects to the audio track of a video.
-         *
-         * @return The audio session, or 0 if there was an error.
-         */
-        int getAudioSessionId();
-
-        void toggleFullScreen(ScreenSwitchUtils screenSwitchUtils);
-
+                    break;
+                case MotionEvent.ACTION_UP:
+                    mTouchingProgressBar = false;
+                    mCenterLayout.setVisibility(GONE);
+//                    if (mChangePosition) {
+//                        onEvent(JCBuriedPoint.ON_TOUCH_SCREEN_SEEK_POSITION);
+//                        JCMediaManager.instance().mediaPlayer.seekTo(mSeekTimePosition);
+//                        int duration = getDuration();
+//                        int progress = mSeekTimePosition * 100 / (duration == 0 ? 1 : duration);
+//                        progressBar.setProgress(progress);
+//                    }
+//                    if (mChangeVolume) {
+//                        onEvent(JCBuriedPoint.ON_TOUCH_SCREEN_SEEK_VOLUME);
+//                    }
+//                    startProgressTimer();
+                    break;
+            }
+        }
+        return false;
     }
 
     private static class MessageHandler extends Handler {
@@ -1007,10 +1080,6 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
     }
 
 
-    public interface OnQualitySelected {
-        void onQualitySelect(String key, String value);
-    }
-
     public interface OnInterfaceInteract {
         void onOpenBulletEditor();
 
@@ -1020,15 +1089,9 @@ public class AVController extends FrameLayout implements AVPlayerGestureListener
 
     }
 
-    public interface OnChooseChannel {
-        void onChooseChannel(View v);
-    }
-
 
     public interface onTouchAd {
         void onPassAd();
-
-        void onTouchAd();
     }
 
 }

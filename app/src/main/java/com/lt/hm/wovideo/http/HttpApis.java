@@ -38,6 +38,7 @@ public class HttpApis {
     public static final int http_video_fake_url = 0xffffff23; //视频网络地址
     public static final int http_video_lives_url = 0xffffff24; //直播视频网络地址
     public static final int http_comments = 0xffffff25; //直播视频网络地址
+    public static final int http_video_detail = 0xffffff26; //视频详情
 
 
     /**

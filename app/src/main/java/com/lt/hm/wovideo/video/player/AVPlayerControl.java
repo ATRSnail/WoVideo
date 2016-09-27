@@ -13,17 +13,18 @@ import android.os.Message;
 import android.util.Log;
 
 import com.google.android.exoplayer.ExoPlayer;
+import com.lt.hm.wovideo.interf.MediaPlayerControl;
 import com.lt.hm.wovideo.utils.TLog;
 import com.lt.hm.wovideo.video.sensor.ScreenSwitchUtils;
 
 /**
- * An implementation of {@link AVController.MediaPlayerControl} for controlling an {@link ExoPlayer}
+ * An implementation of {@link MediaPlayerControl} for controlling an {@link ExoPlayer}
  * instance.
  * <p>
  * Created by KECB on 7/7/16.
  */
 
-public class AVPlayerControl implements AVController.MediaPlayerControl {
+public class AVPlayerControl implements MediaPlayerControl {
 
     private final ExoPlayer mExoPlayer;
 

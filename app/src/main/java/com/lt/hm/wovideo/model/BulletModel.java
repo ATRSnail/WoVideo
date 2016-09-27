@@ -109,6 +109,28 @@ public class BulletModel {
         public void setCtime(long ctime) {
             this.ctime = ctime;
         }
+
+        @Override
+        public String toString() {
+            return "BarrageListBean{" +
+                    "id=" + id +
+                    ", utime=" + utime +
+                    ", time=" + time +
+                    ", fontColor='" + fontColor + '\'' +
+                    ", vfPlayId='" + vfPlayId + '\'' +
+                    ", userId='" + userId + '\'' +
+                    ", state='" + state + '\'' +
+                    ", context='" + context + '\'' +
+                    ", fontSize='" + fontSize + '\'' +
+                    ", ctime=" + ctime +
+                    '}';
+        }
     }
 
+    @Override
+    public String toString() {
+        return "BulletModel{" +
+                "barrageList=" + barrageList +
+                '}';
+    }
 }

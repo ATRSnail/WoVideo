@@ -11,7 +11,6 @@ public class VideoModel {
     private String str_url;
     private String mVideoName;//视频名称 如房源视频、小区视频
     private VideoUrl mPlayUrl;//当前正在播放的地址。 外界不用传
-    private ArrayList<VideoUrl> mVideoUrl;//视频的地址列表
 
     public String getStr_url() {
         return str_url;
@@ -35,20 +34,6 @@ public class VideoModel {
 
     public void setmPlayUrl(VideoUrl mPlayUrl) {
         this.mPlayUrl = mPlayUrl;
-    }
-
-    public ArrayList<VideoUrl> getmVideoUrl() {
-        return mVideoUrl;
-    }
-
-    public void setmVideoUrl(ArrayList<VideoUrl> mVideoUrl) {
-        this.mVideoUrl = mVideoUrl;
-    }
-
-
-    public void setPlayUrl(int position){
-        if(position < 0 || position >= mVideoUrl.size())return;
-        setmPlayUrl(mVideoUrl.get(position));
     }
 
     public boolean equal(VideoModel video){

@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.adapter.video;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.TextView;
 
 import com.lt.hm.wovideo.R;
 import com.lt.hm.wovideo.model.PlayList;
+import com.lt.hm.wovideo.model.PlaysListBean;
 import com.lt.hm.wovideo.utils.BaseViewHolder;
 
 import java.util.List;
@@ -22,11 +24,15 @@ import java.util.List;
 public class AnthologyGvAdapter extends BaseAdapter{
 
     private Context mContext;
-    private List<PlayList.PlaysListBean> list;
+    private List<PlaysListBean> list;
+    private int selectPos = 0;//选中
+    private Drawable blueBg;
 
-    public AnthologyGvAdapter(Context mContext,List<PlayList.PlaysListBean> list) {
+    public AnthologyGvAdapter(Context mContext,List<PlaysListBean> list,int selectPos) {
         this.mContext = mContext;
+        this.selectPos = selectPos;
         this.list = list;
+        blueBg = mContext.getResources().getDrawable(R.drawable.text_circle_blue);
     }
 
     @Override
@@ -53,7 +59,18 @@ public class AnthologyGvAdapter extends BaseAdapter{
         TextView tv = BaseViewHolder.get(convertView, R.id.tv_anthology);
         ImageView iv = BaseViewHolder.get(convertView, R.id.img_anthology);
 
+        if (selectPos == position){
+            tv.setBackground(blueBg);
+        }else {
+            tv.setBackground(null);
+        }
+
         tv.setText(position+1+"");
         return convertView;
+    }
+
+    public void notifyStyle(int selectPos){
+        this.selectPos = selectPos;
+        notifyDataSetChanged();
     }
 }

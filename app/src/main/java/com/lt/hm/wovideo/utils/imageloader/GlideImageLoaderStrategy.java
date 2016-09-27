@@ -39,14 +39,14 @@ public class GlideImageLoaderStrategy implements BaseImageLoaderStrategy {
             int netType = AppUtils.getNetWorkType(ctx);
             //如果是在wifi下才加载图片，并且当前网络是wifi,直接加载
             if (netType == AppUtils.NETWORKTYPE_WIFI) {
-                loadNormal(img.getImgView(), img.getUrl());
+                loadNormal(img);
             } else {
                 //如果是在wifi下才加载图片，并且当前网络不是wifi，加载缓存
                 loadCache(ctx, img);
             }
         } else {
             //如果不是在wifi下才加载图片
-            loadNormal(img.getImgView(), img.getUrl());
+            loadNormal(img);
         }
 
     }
@@ -55,16 +55,16 @@ public class GlideImageLoaderStrategy implements BaseImageLoaderStrategy {
     /**
      * load image with Glide
      */
-    private void loadNormal(ImageView imageView, final String url) {
-        Glide.get(imageView.getContext())
-                .with(imageView.getContext())
-                .load(HttpUtils.appendUrl(url))
+    private void loadNormal(ImageLoader img) {
+        Glide.with(img.getImgView().getContext())
+                .load(HttpUtils.appendUrl(img.getUrl()))
+                .placeholder(img.getPlaceHolder())
                 //  .asBitmap()//强制转换Bitmap
                 .crossFade(1000)
                 //  .skipMemoryCache(true)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
-                .into(imageView);
-          }
+                .into(img.getImgView());
+    }
 
 
     /**

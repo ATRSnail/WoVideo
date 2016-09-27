@@ -38,6 +38,7 @@ public class AutoSliderView extends BaseSliderView{
         title.setText(pageIconBean.getVfName());
         item_type.setText(pageIconBean.getTypeName());
         item_desc.setText(pageIconBean.getHit());
+        empty(R.drawable.default_horizental);
         bindEventAndShow(view, imageView);
         return view;
     }

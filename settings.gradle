@@ -1,1 +1,1 @@
-include ':app', ':share_sdk', ':library'
+include ':app', ':share_sdk', ':library', ':jcvideoplayer-lib'

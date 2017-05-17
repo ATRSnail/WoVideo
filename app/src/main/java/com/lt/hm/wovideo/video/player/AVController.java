@@ -47,7 +47,7 @@ import java.util.Locale;
  * Created by KECB on 7/6/16.
  */
 
-public class AVController extends FrameLayout implements View.OnTouchListener {
+public class AVController extends FrameLayout implements View.OnTouchListener, AVPlayerGestureListener {
     private static final String TAG = "AVController";
 
     private MediaPlayerControl mPlayer;
@@ -87,7 +87,6 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
     private boolean mIsBulletScreenOn = false;
     // Getsutre
     private GestureDetector mGestureDetector;
-    private AVPlayerGestureListener mVideoGestureListener;
     // Volume, Brightness controller & view
     private View mCenterLayout;
     private ImageView mCenterImage;
@@ -103,11 +102,16 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
     private OnMediaOtherListener onMediaOtherListener;
     private OnInterfaceInteract mInterfaceListener;
     private onTouchAd onTouchAdListener;
+    private onSeekChange onSeekChangeListener;
 
     private boolean isAd = false;
 
     public void setOnMediaOtherListener(OnMediaOtherListener listener) {
         this.onMediaOtherListener = listener;
+    }
+
+    public void setOnSeekChangeListener(onSeekChange listener) {
+        this.onSeekChangeListener = listener;
     }
 
     public void setonTouchAd(onTouchAd listener) {
@@ -149,6 +153,9 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
         mPlayer = player;
         updatePausePlay();
         updateFullScreen();
+        if (isAd) {
+            show(0);
+        }
     }
 
     public void setBulletScreen(boolean isShow) {
@@ -188,10 +195,9 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
      * @param context
      */
     public void setGestureListener(Context context) {
-     //   mVideoGestureListener = this;
         mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
         mMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-    //    mGestureDetector = new GestureDetector(context, new ViewGestureListener(context, mVideoGestureListener, screenSwitchUtils));
+        mGestureDetector = new GestureDetector(context, new ViewGestureListener(context, this, screenSwitchUtils));
     }
 
     /**
@@ -209,11 +215,14 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
         return mRoot;
     }
 
+    private String videoId;
+    private long totalTime;
 
     private void initControllerView(View v) {
+
         mScreenHeight = getContext().getResources().getDisplayMetrics().heightPixels;
         textureViewContainer = (RelativeLayout) v.findViewById(R.id.surface_container);
-        if (textureViewContainer!= null){
+        if (textureViewContainer != null) {
             textureViewContainer.setOnTouchListener(this);
         }
         Typeface fontFace = Typeface.createFromAsset(mContext.getAssets(), "Regular.ttf");
@@ -336,7 +345,7 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
         setmSendBulletVisible(GONE);
         setChooseAnthologyVisible(GONE);
         setmMoreVisible(GONE);
-        show(0);
+        //      show(0);
     }
 
     /**
@@ -546,14 +555,15 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
         }
     }
 
+    private int duration;
+
     private int setProgress() {
-        TLog.error("---->setProgress");
         if (mPlayer == null || mDragging) {
             return 0;
         }
-
+        TLog.error("---->setProgress");
         int position = (int) mPlayer.getCurrentPosition();
-        int duration = mPlayer.getDuration();
+        duration = mPlayer.getDuration();
         if (mProgress != null) {
             if (duration > 0) {
                 // use long to avoid overflow
@@ -569,16 +579,31 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
         if (mCurrentTime != null)
             mCurrentTime.setText(stringForTime(position));
 
+        if (isAd) {
+            showAdCountDown(((duration - position) / 1000) % 60);
+            if (((duration - position) / 1000) % 60 == 0 && duration != 0) {
+                TLog.error("time--->");
+                onTouchAdListener.onAdComplete();
+            }
+            TLog.error("time--->" + ((duration - position) / 1000) % 60);
+        } else {
+            TLog.error("time--->" + position);
+//            if (onSeekChangeListener != null && (position / 1000) % 10 == 0)
+            if (onSeekChangeListener != null)
+                onSeekChangeListener.onSeekChange(position / 1000, duration / 1000, false);
+
+        }
+
         return position;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        TLog.error("keyeventdd--dd->"+event.getAction());
-//        if (null != mGestureDetector) {
-//            mGestureDetector.onTouchEvent(event);
-//            return true;
-//        }
+        TLog.error("keyeventdd--dd->" + event.getAction());
+        if (null != mGestureDetector) {
+            mGestureDetector.onTouchEvent(event);
+            return true;
+        }
         return super.onTouchEvent(event);
     }
 
@@ -589,7 +614,7 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
             return true;
         }
 
-        TLog.error("keyeventdd--->"+event.getAction());
+        TLog.error("keyeventdd--->" + event.getAction());
         int keyCode = event.getKeyCode();
         final boolean uniqueDown = event.getRepeatCount() == 0
                 && event.getAction() == KeyEvent.ACTION_DOWN;
@@ -740,14 +765,34 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
     }
 
     private void doPauseResume() {
-        if (mPlayer == null) {
+        if (mPlayer == null || onSeekChangeListener == null) {
             return;
         }
 
         if (mPlayer.isPlaying()) {
             mPlayer.pause();
+            onSeekChangeListener.onPauseOrPlay(false);
         } else {
             mPlayer.start();
+            onSeekChangeListener.onPauseOrPlay(true);
+        }
+        updatePausePlay();
+    }
+
+    public void doPauseResume(boolean toPlay) {
+        if (mPlayer == null || onSeekChangeListener == null) {
+            return;
+        }
+
+        if (toPlay) {
+            if (mPlayer.isPlaying()) return;
+            mPlayer.start();
+            onSeekChangeListener.onPauseOrPlay(true);
+        } else {
+            if (mPlayer.isPlaying()){
+                mPlayer.pause();
+                onSeekChangeListener.onPauseOrPlay(false);
+            }
         }
         updatePausePlay();
     }
@@ -760,6 +805,7 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
         mPlayer.toggleFullScreen(screenSwitchUtils);
     }
 
+    private long newposition;
     // There are two scenarios that can trigger the seekbar listener to trigger:
     //
     // The first is the user using the touchpad to adjust the posititon of the
@@ -782,9 +828,12 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
             // we will post one of these messages to the queue again and
             // this ensures that there will be exactly one message queued up.
             mHandler.removeMessages(SHOW_PROGRESS);
+
+            TLog.error("seek---->onStartTrackingTouch");
         }
 
         public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
+            TLog.error("seek---->onProgressChanged");
             if (mPlayer == null) {
                 return;
             }
@@ -795,19 +844,24 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
             }
 
             long duration = mPlayer.getDuration();
-            long newposition = (duration * progress) / 1000L;
+            newposition = (duration * progress) / 1000L;
             mPlayer.seekTo((int) newposition);
             if (mCurrentTime != null)
                 mCurrentTime.setText(stringForTime((int) newposition));
+
         }
 
         public void onStopTrackingTouch(SeekBar bar) {
+            TLog.error("seek---->onStopTrackingTouch" + duration);
             mDragging = false;
 
             // Ensure that progress is properly updated in the future,
             // the call to show() does not guarantee this because it is a
             // no-op if we are already showing.
             mHandler.sendEmptyMessage(SHOW_PROGRESS);
+            if (onSeekChangeListener != null && duration != 0)
+                onSeekChangeListener.onSeekChange((int) newposition / 1000, duration / 1000, true);
+
         }
     };
 
@@ -835,27 +889,28 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
         info.setClassName(AVController.class.getName());
     }
 
-//    @Override
-//    public void onSingleTap() {
-//        if (!isAd) {
-//            if (isShowing()) {
-//                hide();
-//            } else {
-//                show(0);
-//            }
-//        }
-//    }
+    @Override
+    public void onSingleTap() {
+        if (isAd) return;
 
-//    @Override
-//    public void onHorizontalScroll(MotionEvent event, float delta) {
-//        show(sDefaultTimeout);
-//        Log.i(TAG, delta + "");
-//        if (event.getPointerCount() == 1)
-//            if (mPlayer == null) return;
-//        long toPosition = mPlayer.getCurrentPosition() + Math.round(delta);
-//        updateSchedule(toPosition);
-//        mPlayer.seekTo(toPosition);
-//    }
+        if (isShowing()) {
+            hide();
+        } else {
+            show(sDefaultTimeout);
+        }
+
+    }
+
+    @Override
+    public void onHorizontalScroll(MotionEvent event, float delta) {
+        show(sDefaultTimeout);
+        Log.i(TAG, delta + "");
+        if (event.getPointerCount() == 1)
+            if (mPlayer == null) return;
+        long toPosition = mPlayer.getCurrentPosition() + Math.round(delta);
+        updateSchedule(toPosition);
+        mPlayer.seekTo(toPosition);
+    }
 
     private void updateSchedule(long toPosition) {
         mScheduleLayout.setVisibility(VISIBLE);
@@ -870,26 +925,26 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
 
     }
 
-//    @Override
-//    public void onVerticalScroll(MotionEvent event, float delta, int direction) {
-//        show(sDefaultTimeout);
-//        Log.i(TAG, delta + "");
-//        if (event.getPointerCount() == 1) {
-//            if (direction == ViewGestureListener.SWIPE_LEFT) {
-//                onBrightnessSlide(delta);
-//                Log.i(TAG, "onVerticalScroll: Brightness");
-//            } else {
-//                onVolumeSlide(delta);
-//                Log.i(TAG, "onVerticalScroll: Volume");
-//            }
-//            postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mCenterLayout.setVisibility(GONE);
-//                }
-//            }, 1000);
-//        }
-//    }
+    @Override
+    public void onVerticalScroll(MotionEvent event, float delta, int direction) {
+        show(sDefaultTimeout);
+        Log.i(TAG, delta + "");
+        if (event.getPointerCount() == 1) {
+            if (direction == ViewGestureListener.SWIPE_LEFT) {
+                onBrightnessSlide(delta);
+                Log.i(TAG, "onVerticalScroll: Brightness");
+            } else {
+                onVolumeSlide(delta);
+                Log.i(TAG, "onVerticalScroll: Volume");
+            }
+            postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mCenterLayout.setVisibility(GONE);
+                }
+            }, 1000);
+        }
+    }
 
     /**
      * 改变音量
@@ -968,6 +1023,7 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
     protected int mSeekTimePosition;
     public static final int THRESHOLD = 80;
     protected int mScreenHeight;
+
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         float x = event.getX();
@@ -992,10 +1048,10 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
                     if (!screenSwitchUtils.isPortrait()) {
                         if (!mChangePosition && !mChangeVolume) {
                             if (absDeltaX > THRESHOLD || absDeltaY > THRESHOLD) {
-                               // cancelProgressTimer();
+                                // cancelProgressTimer();
                                 if (absDeltaX >= THRESHOLD) {
                                     mChangePosition = true;
-                                //    mDownPosition = getCurrentPositionWhenPlaying();
+                                    //    mDownPosition = getCurrentPositionWhenPlaying();
                                 } else {
                                     mChangeVolume = true;
                                     mGestureDownVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -1020,7 +1076,7 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
                         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, mGestureDownVolume + deltaV, 0);
                         int volumePercent = (int) (mGestureDownVolume * 100 / max + deltaY * 3 * 100 / mScreenHeight);
                         onVolumeSlide(volumePercent);
-                   //     showVolumDialog(-deltaY, volumePercent);
+                        //     showVolumDialog(-deltaY, volumePercent);
                     }
 
                     break;
@@ -1092,6 +1148,14 @@ public class AVController extends FrameLayout implements View.OnTouchListener {
 
     public interface onTouchAd {
         void onPassAd();
+
+        void onAdComplete();
+    }
+
+    public interface onSeekChange {
+        void onSeekChange(int time, int totalTime, boolean isActive);
+
+        void onPauseOrPlay(boolean play);
     }
 
 }

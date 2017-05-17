@@ -8,14 +8,13 @@
 
 package msgcopy.wovideo.onekeyshare.themes.classic.port;
 
-import android.content.Context;
-
-import com.mob.tools.utils.R;
-
 import java.util.ArrayList;
 
+import android.content.Context;
 import msgcopy.wovideo.onekeyshare.themes.classic.PlatformPage;
 import msgcopy.wovideo.onekeyshare.themes.classic.PlatformPageAdapter;
+
+import com.mob.tools.utils.R;
 
 /** 竖屏的九宫格页面适配器 */
 public class PlatformPageAdapterPort extends PlatformPageAdapter {
@@ -33,6 +32,7 @@ public class PlatformPageAdapterPort extends PlatformPageAdapter {
 	protected void calculateSize(Context context, ArrayList<Object> plats) {
 		int screenWidth = R.getScreenWidth(context);
 		lineSize = LINE_SIZE_P;
+
 		float ratio = ((float) screenWidth) / DESIGN_SCREEN_WIDTH_P;
 		sepLineWidth = (int) (DESIGN_SEP_LINE_WIDTH * ratio);
 		sepLineWidth = sepLineWidth < 1 ? 1 : sepLineWidth;

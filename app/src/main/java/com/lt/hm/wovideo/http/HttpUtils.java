@@ -53,7 +53,7 @@ public class HttpUtils {
 
     public static void formPost(String url, HashMap<String, Object> maps, int flag, Callback<?> callback) {
         PostFormBuilder builder;
-        TLog.error("flag---"+flag);
+        TLog.error("flag---" + flag);
         if (flag == -1) {//不加flag
             builder = OkHttpUtils.post().url(getAbsoluteApiUrl(url));
         } else {
@@ -142,7 +142,7 @@ public class HttpUtils {
      * @return
      */
     public static String appendUrl(String partUrl) {
-        if (!partUrl.startsWith("http:") && !partUrl.startsWith("https:")) {
+        if (partUrl != null && !partUrl.startsWith("http:") && !partUrl.startsWith("https:")) {
             partUrl = HOST + partUrl;
         }
         return partUrl;

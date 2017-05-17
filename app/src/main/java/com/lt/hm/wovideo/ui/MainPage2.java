@@ -1,10 +1,8 @@
 package com.lt.hm.wovideo.ui;
 
-import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.app.TaskStackBuilder;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -12,6 +10,7 @@ import android.support.percent.PercentRelativeLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +32,6 @@ import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.fragment.EventsPage;
 import com.lt.hm.wovideo.fragment.MineInfo;
 import com.lt.hm.wovideo.fragment.NewChoicePage;
-import com.lt.hm.wovideo.fragment.SearchFrg;
 import com.lt.hm.wovideo.fragment.VipRecommendFrg;
 import com.lt.hm.wovideo.handler.UnLoginHandler;
 import com.lt.hm.wovideo.interf.updateTagLister;
@@ -47,11 +45,7 @@ import com.lt.hm.wovideo.utils.UpdateManager;
 import com.lt.hm.wovideo.utils.UpdateRecommedMsg;
 import com.lt.hm.wovideo.utils.location.CheckPermissionsActivity;
 import com.lt.hm.wovideo.utils.location.Utils;
-import com.lt.hm.wovideo.widget.BlurPopuwindow.BlurBuilder;
 import com.lt.hm.wovideo.widget.materialshowcaseview.MaterialShowcaseView;
-
-import net.robinx.lib.blur.widget.BlurMaskRelativeLayout;
-import net.robinx.lib.blur.widget.BlurMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -286,29 +280,27 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
             }
         }
     }
+
     public static final int SCAN_REQUEST_CODE = 100;
+
     @Override
     public void initViews() {
         personCenter.setOnClickListener((View v) -> {
-     //       UIHelper.ToPerson(this);
+            //       UIHelper.ToPerson(this);
         });
         choicePersonCenter.setOnClickListener((View v) -> {
-     //       UIHelper.ToPerson(this);
+            //       UIHelper.ToPerson(this);
         });
 
         qrScan.setOnClickListener((View v) -> {
-//            Intent intent = new Intent();
-//            intent.setClass(MainPage2.this, MipcaActivityCapture.class);
-//            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivityForResult(intent, SCANNIN_GREQUEST_CODE);
-//            Intent scanIntent = new Intent(MainPage2.this,
-//                    cn.handsight.android.handsightsdk.ScanActivity.class);
-//            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
+            Intent scanIntent = new Intent(MainPage2.this,
+                    cn.handsight.android.handsightsdk.ScanActivity.class);
+            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
         });
         choiceQrScan.setOnClickListener((View v) -> {
-//            Intent scanIntent = new Intent(MainPage2.this,
-//                    cn.handsight.android.handsightsdk.ScanActivity.class);
-//            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
+            Intent scanIntent = new Intent(MainPage2.this,
+                    cn.handsight.android.handsightsdk.ScanActivity.class);
+            this.startActivityForResult(scanIntent, SCAN_REQUEST_CODE, null);
 //            Intent intent = new Intent();
 //            intent.setClass(MainPage2.this, MipcaActivityCapture.class);
 //            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -383,14 +375,30 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
                 }
                 break;
             case SCAN_REQUEST_CODE:
-                if (data == null) return;
-                String result = data.getStringExtra("RESULT");
-                if (result != null) {
-                    showRusltDialog(result);
+                if (resultCode == RESULT_OK) {
+                    if (data == null) return;
+                    String result = data.getStringExtra("RESULT");
+                    Bundle bundle = data.getBundleExtra("dataBundle");
+                    if (result != null) {
+                        showRusltDialog(result);
+                        String videoType = bundle.getString("MEDIATYPE");
+                        if (TextUtils.isEmpty(videoType)) return;
+                        if (videoType.equals("TV") || videoType.equals("TVAudio")) {
+                            UIHelper.ToLivePage(MainPage2.this);
+                        } else {
+                            String videoId = bundle.getString("MEDIA_ID");
+                            if (TextUtils.isEmpty(videoId)) return;
+                            if (videoId.equals("-9999") || videoId.equals("-9998") || videoId.equals("-9997"))
+                                return;
+                            UIHelper.ToAllCateVideo(MainPage2.this, 1, videoId);
+                        }
+
+                    }
                 }
                 break;
         }
     }
+
     public void showRusltDialog(String result) {
         // 1. Instantiate an AlertDialog.Builder with its constructor
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -402,7 +410,7 @@ public class MainPage2 extends BaseActivity implements updateTagLister {
         dialog.show();
     }
 
-    private void restartHome(){
+    private void restartHome() {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         Fragment fragment = instantFragment(currIndex);
         fragmentTransaction.replace(R.id.fragment_container, fragment, fragmentTags.get(currIndex));

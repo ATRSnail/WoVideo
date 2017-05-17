@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
 import com.lt.hm.wovideo.base.BaseActivity;
 import com.lt.hm.wovideo.http.HttpApis;
 import com.lt.hm.wovideo.http.RespHeader;
@@ -68,7 +67,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
     @BindView(R.id.regist_validate_layout)
     PercentRelativeLayout regist_validate_layout;
     @BindView(R.id.divider_layout2)
-            View divider_layout2;
+    View divider_layout2;
 
     boolean Operators_flag = false;
 
@@ -90,18 +89,18 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-               if (s.length()==11){
-                   if (PhoneUtils.isPhoneNum(s.toString())){
-                       Operators_flag =true;
-                       regist_validate_layout.setVisibility(View.VISIBLE);
-                       divider_layout2.setVisibility(View.VISIBLE);
-                   }else{
-                       Operators_flag =false;
-                       Toast.makeText(getApplicationContext(),"只支持联通手机号登录",Toast.LENGTH_SHORT).show();
+                if (s.length() == 11) {
+                    if (PhoneUtils.isPhoneNum(s.toString())) {
+                        Operators_flag = true;
+                        regist_validate_layout.setVisibility(View.VISIBLE);
+                        divider_layout2.setVisibility(View.VISIBLE);
+                    } else {
+                        Operators_flag = false;
+                        Toast.makeText(getApplicationContext(), "只支持联通手机号登录", Toast.LENGTH_SHORT).show();
 //                       regist_validate_layout.setVisibility(View.GONE);
 //                       divider_layout2.setVisibility(View.GONE);
-                   }
-               }
+                    }
+                }
             }
 
             @Override
@@ -119,33 +118,33 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
 //                TLog.log("用户名不能为空");
                 UT.showNormal("用户名不能为空");
             } else {
-                    sendValidateCode();
+                sendValidateCode();
             }
         });
         btnRegistSubmit.setOnClickListener((View v) -> {
             if (TextUtils.isEmpty(etResigtAccount.getText())) {
                 TLog.log("用户名不能为空");
-                Toast.makeText(getApplicationContext(),"用户名不能为空",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "用户名不能为空", Toast.LENGTH_SHORT).show();
                 return;
-            } else if (Operators_flag&&TextUtils.isEmpty(etRegistValidate.getText())) {
+            } else if (Operators_flag && TextUtils.isEmpty(etRegistValidate.getText())) {
                 TLog.log("验证码不能为空");
-                Toast.makeText(getApplicationContext(),"验证码不能为空",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "验证码不能为空", Toast.LENGTH_SHORT).show();
                 return;
             } else if (TextUtils.isEmpty(etRegistPwd.getText())) {
 //                TLog.log("密码不能为空");
-                Toast.makeText(getApplicationContext(),"密码不能为空",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "密码不能为空", Toast.LENGTH_SHORT).show();
 
                 return;
             } else if (TextUtils.isEmpty(etRegistPwdT.getText())) {
                 TLog.log("请重新输入密码");
-                Toast.makeText(getApplicationContext(),"请重新输入密码",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "请重新输入密码", Toast.LENGTH_SHORT).show();
                 return;
             } else if (!etRegistPwd.getText().toString().equals(etRegistPwdT.getText().toString())) {
                 TLog.log("两次密码 不一致");
-                Toast.makeText(getApplicationContext(),"两次密码 不一致",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "两次密码 不一致", Toast.LENGTH_SHORT).show();
                 return;
             } else {
-                if (Operators_flag){
+                if (Operators_flag) {
                     checkValidateCode();
                 }
             }
@@ -156,7 +155,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
         });
         tvRegistProtocal.setOnClickListener((View v) -> {
             // TODO: 16/6/8  查看 协议
-            Toast.makeText(getApplicationContext(),"协议起草中,请稍后",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "协议起草中,请稍后", Toast.LENGTH_SHORT).show();
         });
 
     }
@@ -179,7 +178,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 ResponseParser.parse(resp, response, String.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                     ToRegist();
-                }else {
+                } else {
                     UT.showNormal(resp.getHead().getRspMsg());
                 }
             }
@@ -206,13 +205,13 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                     // TODO: 16/6/12 控制跳转
                     // TODO: 16/6/12 提示注册成功
                     ToLogin();
-                    SharedPrefsUtils.setBooleanPreference(getApplicationContext(),"regist",true);
+                    SharedPrefsUtils.setBooleanPreference(getApplicationContext(), "regist", true);
                     UpdateRecommedMsg.getInstance().downloadListeners.get(0).onUpdateTagLister();
                     UT.showNormal("注册成功");
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                        //     UIHelper.ToMain2(RegistPage.this);
+                            //     UIHelper.ToMain2(RegistPage.this);
                             RegistPage.this.finish();
                         }
                     }, 1000);
@@ -246,7 +245,7 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
                 ResponseParser.loginParse(resp, response, UserModel.class, RespHeader.class);
                 if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
 
-                    SharedPrefsUtils.setBooleanPreference(getApplicationContext(),"regist",true);
+                    SharedPrefsUtils.setBooleanPreference(getApplicationContext(), "regist", true);
                     UT.showNormal("注册成功");
                     UserModel model = resp.getBody();
                     String json = new Gson().toJson(model);
@@ -283,13 +282,13 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
 
             @Override
             public void onResponse(String response, int id) {
-                ResponseObj<String,RespHeader> resp = new ResponseObj<String, RespHeader>();
-                ResponseParser.parse(resp,response,String.class,RespHeader.class);
-                if (resp.getHead().getRspCode().equals(ResponseCode.Error)){
+                ResponseObj<String, RespHeader> resp = new ResponseObj<String, RespHeader>();
+                ResponseParser.parse(resp, response, String.class, RespHeader.class);
+                if (resp.getHead().getRspCode().equals(ResponseCode.Error)) {
                     etResigtAccount.setHint(resp.getHead().getRspMsg());
                     counter.cancel();
 
-                }else {
+                } else {
                     UT.showNormal(resp.getHead().getRspMsg());
                 }
                 TLog.log(response);
@@ -311,8 +310,9 @@ public class RegistPage extends BaseActivity implements SecondTopbar.myTopbarCli
     public void rightClick() {
 
     }
+
     @OnClick(R.id.btn_change_login)
-    void changeLogin(){
+    void changeLogin() {
         UIHelper.ToLogin(this);
         this.finish();
     }

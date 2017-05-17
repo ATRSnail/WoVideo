@@ -8,22 +8,20 @@
 
 package msgcopy.wovideo.onekeyshare;
 
+import static com.mob.tools.utils.BitmapHelper.captureView;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
-
-import com.mob.tools.utils.R;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.ShareSDK;
-
-import static com.mob.tools.utils.BitmapHelper.captureView;
+import com.mob.tools.utils.R;
 
 /**
 * 快捷分享的入口
@@ -150,9 +148,9 @@ public class OnekeyShare {
 	}
 
 	/** 设置自定义的外部回调 */
-//	public void setCallback(PlatformActionListener callback) {
-//		params.put("callback", callback);
-//	}
+	public void setCallback(PlatformActionListener callback) {
+		params.put("callback", callback);
+	}
 
 	/** 返回操作回调 */
 	public PlatformActionListener getCallback() {

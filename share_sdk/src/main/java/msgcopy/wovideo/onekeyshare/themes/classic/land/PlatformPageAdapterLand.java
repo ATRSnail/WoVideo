@@ -8,14 +8,13 @@
 
 package msgcopy.wovideo.onekeyshare.themes.classic.land;
 
-import android.content.Context;
-
-import com.mob.tools.utils.R;
-
 import java.util.ArrayList;
 
+import android.content.Context;
 import msgcopy.wovideo.onekeyshare.themes.classic.PlatformPage;
 import msgcopy.wovideo.onekeyshare.themes.classic.PlatformPageAdapter;
+
+import com.mob.tools.utils.R;
 
 /** 横屏的九宫格页面适配器 */
 public class PlatformPageAdapterLand extends PlatformPageAdapter {

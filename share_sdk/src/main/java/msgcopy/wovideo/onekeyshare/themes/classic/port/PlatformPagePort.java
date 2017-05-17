@@ -14,7 +14,6 @@ import msgcopy.wovideo.onekeyshare.OnekeyShareThemeImpl;
 import msgcopy.wovideo.onekeyshare.themes.classic.PlatformPage;
 import msgcopy.wovideo.onekeyshare.themes.classic.PlatformPageAdapter;
 
-
 /** 竖屏的九宫格页面 */
 public class PlatformPagePort extends PlatformPage {
 

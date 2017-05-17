@@ -54,18 +54,25 @@
                 android:text="@string/free_network"
                 android:visibility="invisible" />
 
+            <fragment
+                android:id="@+id/hs_land_fragment"
+                android:name="cn.handsight.android.handsightsdk.fragment.HsLandFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:layout="@layout/hs_fragment_land" />
+
         </com.google.android.exoplayer.AspectRatioFrameLayout>
 
     </FrameLayout>
 
     <include layout="@layout/video_bottom" />
 
-    <!--<fragment-->
-        <!--android:id="@+id/hs_vertical_fragment"-->
-        <!--android:name="cn.handsight.android.handsightsdk.fragment.HsPortraitFragment"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--tools:layout="@layout/hs_fragment_motive" />-->
+    <fragment
+        android:id="@+id/hs_vertical_fragment"
+        android:name="cn.handsight.android.handsightsdk.fragment.HsPortraitFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/hs_fragment_portrait" />
 
     <FrameLayout
         android:layout_width="match_parent"

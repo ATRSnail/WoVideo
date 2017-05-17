@@ -10,7 +10,6 @@ package msgcopy.wovideo.onekeyshare.themes.classic;
 
 import android.content.Context;
 import android.content.res.Configuration;
-
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.Platform.ShareParams;
 import msgcopy.wovideo.onekeyshare.OnekeyShareThemeImpl;

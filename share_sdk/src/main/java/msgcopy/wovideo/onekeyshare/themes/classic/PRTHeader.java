@@ -8,6 +8,7 @@
 
 package msgcopy.wovideo.onekeyshare.themes.classic;
 
+import static com.mob.tools.utils.R.getStringRes;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.TypedValue;
@@ -18,8 +19,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.mob.tools.utils.R;
-
-import static com.mob.tools.utils.R.getStringRes;
 
 /** 下拉刷新的头部控件  */
 public class PRTHeader extends LinearLayout {

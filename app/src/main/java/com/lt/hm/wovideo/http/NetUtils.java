@@ -2,13 +2,6 @@ package com.lt.hm.wovideo.http;
 
 import android.text.TextUtils;
 
-import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.lt.hm.wovideo.R;
-import com.lt.hm.wovideo.acache.ACache;
-import com.lt.hm.wovideo.handler.UnLoginHandler;
-import com.lt.hm.wovideo.model.ChannelModel;
-import com.lt.hm.wovideo.model.TagListModel;
 import com.lt.hm.wovideo.model.UserModel;
 import com.lt.hm.wovideo.model.response.ResponseBanner;
 import com.lt.hm.wovideo.model.response.ResponseBullet;
@@ -24,17 +17,12 @@ import com.lt.hm.wovideo.model.response.ResponseTag;
 import com.lt.hm.wovideo.model.response.ResponseValidateComment;
 import com.lt.hm.wovideo.model.response.ResponseVfinfo;
 import com.lt.hm.wovideo.model.response.ResponseVideoRealUrl;
-import com.lt.hm.wovideo.utils.SharedPrefsUtils;
 import com.lt.hm.wovideo.utils.StringUtils;
 import com.lt.hm.wovideo.utils.TLog;
-import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.Bullet;
-import com.zhy.http.okhttp.callback.StringCallback;
 
 import java.util.HashMap;
-
-import okhttp3.Call;
 
 /**
  * @author xch
@@ -274,7 +262,7 @@ public class NetUtils {
     public static void VideoCollect(String vfid, String userId, HttpUtilBack httpUtilBack) {
         HashMap<String, Object> map = new HashMap<>();
         map.put("userid", userId);
-        map.put("vfids", vfid);
+        map.put("vfid", vfid);
         HttpApis.collectVideo(map, HttpApis.http_video_collect, new HttpCallback<>(String.class, httpUtilBack));
     }
 

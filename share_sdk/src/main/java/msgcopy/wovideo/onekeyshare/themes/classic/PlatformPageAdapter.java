@@ -8,25 +8,24 @@
 
 package msgcopy.wovideo.onekeyshare.themes.classic;
 
+import java.util.ArrayList;
+
 import android.content.Context;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.ImageView.ScaleType;
+import cn.sharesdk.framework.Platform;
+import msgcopy.wovideo.onekeyshare.CustomerLogo;
 
 import com.mob.tools.gui.ViewPagerAdapter;
 import com.mob.tools.utils.R;
-
-import java.util.ArrayList;
-
-import cn.sharesdk.framework.Platform;
-import msgcopy.wovideo.onekeyshare.CustomerLogo;
 
 /** 九宫格的适配器抽象类 */
 public abstract class PlatformPageAdapter extends ViewPagerAdapter implements OnClickListener {
@@ -100,7 +99,7 @@ public abstract class PlatformPageAdapter extends ViewPagerAdapter implements On
 	private View createPanel(Context context) {
 		LinearLayout llPanel = new LinearLayout(context);
 		llPanel.setOrientation(LinearLayout.VERTICAL);
-		llPanel.setBackgroundColor(0xffffffff);
+		llPanel.setBackgroundColor(0xfff2f2f2);
 
 		int lineCount = panelHeight / cellHeight;
 		LinearLayout[] llCells = new LinearLayout[lineCount * lineSize];

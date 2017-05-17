@@ -55,6 +55,7 @@ import com.lt.hm.wovideo.utils.UT;
 import com.lt.hm.wovideo.utils.UserMgr;
 import com.lt.hm.wovideo.video.model.VideoModel;
 import com.lt.hm.wovideo.video.model.VideoUrl;
+import com.lt.hm.wovideo.video.player.AVController;
 import com.lt.hm.wovideo.widget.Anthology.AnthologyLinear;
 import com.lt.hm.wovideo.widget.Anthology.FunctionLinear;
 import com.lt.hm.wovideo.widget.Anthology.QualityLinear;
@@ -72,6 +73,11 @@ import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
+import cn.handsight.android.handsightsdk.PlayerListener;
+import cn.handsight.android.handsightsdk.fragment.HsBaseFragment;
+import cn.handsight.android.handsightsdk.fragment.HsLandFragment;
+import cn.handsight.android.handsightsdk.fragment.HsPortraitFragment;
+import cn.handsight.android.handsightsdk.vo.UserVO;
 import okhttp3.Call;
 
 //import cn.handsight.android.handsightsdk.fragment.HsBaseFragment;
@@ -85,8 +91,9 @@ import okhttp3.Call;
 public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListener
         , PopupWindow.OnDismissListener
         , onFunctionListener
-//        implements HsBaseFragment.PlayerListener,HsBaseFragment.EventListener
-{
+        , AVController.onSeekChange
+        , PlayerListener
+        , HsBaseFragment.EventListener {
 
     @BindView(R.id.video_name)
     TextView videoName;
@@ -133,7 +140,7 @@ public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListe
     @BindView(R.id.add_comment)
     LinearLayout addComment;
 
-//    HsPortraitFragment motiveFragment;
+    HsPortraitFragment motiveFragment;
 
 
     @BindView(R.id.ly_demand_anthology)
@@ -184,6 +191,7 @@ public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListe
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMediaController.setOnMediaOtherListener(this);
+        mMediaController.setOnSeekChangeListener(this);
     }
 
     @Override
@@ -326,13 +334,27 @@ public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListe
     private SpacesVideoItemDecoration itemLiDecoration;
     private String videoId;
     private int totalTime;
+    private UserVO user;
+    private HsLandFragment hsLandFragment;
+
 
     @Override
     public void initViews() {
-//        motiveFragment = (HsPortraitFragment) getFragmentManager().findFragmentById(R.id.hs_vertical_fragment);
-//        videoId = "1750";
-//        totalTime = 477;
-//        motiveFragment.setVideo(videoId, totalTime, 0, HsBaseFragment.PLAY_SATART);
+        hsLandFragment = (HsLandFragment) getFragmentManager().findFragmentById(R.id.hs_land_fragment);
+        hsLandFragment.getView().setVisibility(View.GONE);
+
+        motiveFragment = (HsPortraitFragment) getFragmentManager().findFragmentById(R.id.hs_vertical_fragment);
+        //    motiveFragment.getView().setVisibility(View.GONE);
+        if (hsLandFragment != null) {
+            videoId = vfId;
+            hsLandFragment.setVideo(videoId, 0, 0, HsBaseFragment.PLAY_SATART);
+        }
+        if (motiveFragment != null) {
+            videoId = vfId;
+            motiveFragment.setVideo(videoId, 0, 0, HsBaseFragment.PLAY_SATART);
+        }
+
+
         videoProjection.setOnClickListener(v -> onTouClick());
 
         videoShare.setOnClickListener((View v) ->
@@ -384,6 +406,31 @@ public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListe
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        if (UserMgr.isLogin()) {
+            if(user==null){
+                user = new UserVO();
+                user.setUserId(UserMgr.getUseInfo().getId());
+                user.setHeadImg(HttpUtils.appendUrl(UserMgr.getUseInfo().getHeadImg()));
+                user.setNickName(UserMgr.getUseInfo().getNickName());
+            }
+        }else{
+            user = null;
+        }
+        motiveFragment.setUserInfo(user);
+
+    }
+
+    @Override
+    public void setLandFragmentGone(boolean gone) {
+        if (hsLandFragment == null) return;
+        TLog.error("landfrg--->" + gone);
+        hsLandFragment.setVideo(videoId, totalTime, time, HsBaseFragment.PLAY_PLAY);
+        hsLandFragment.getView().setVisibility(gone ? View.GONE : View.VISIBLE);
+    }
+
+    @Override
     public <T> void onSuccess(T value, int flag) {
         super.onSuccess(value, flag);
         switch (flag) {
@@ -396,6 +443,7 @@ public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListe
                 }
                 break;
             case HttpApis.http_video_collect:
+                TLog.error("ddd---"+value);
                 String va = (String) value;
                 if (!TextUtils.isEmpty(va) && va.equals(ResponseCode.Success)) {
                     UT.showNormal("收藏成功");
@@ -754,20 +802,32 @@ public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListe
         super.onDestroy();
     }
 
-//    @Override
-//    public void onLogin() {
-//
-//    }
-//
-//    @Override
-//    public void onShare(String s, String s1, String s2, int i) {
-//
-//    }
-//
-//    @Override
-//    public void onPlay(int i) {
-//
-//    }
+    @Override
+    public void onLogin() {
+        if (UserMgr.isLogin()) {
+            if(user==null){
+                user = new UserVO();
+                user.setUserId(UserMgr.getUseInfo().getId());
+                user.setHeadImg(HttpUtils.appendUrl(UserMgr.getUseInfo().getHeadImg()));
+                user.setNickName(UserMgr.getUseInfo().getNickName());
+            }
+        }else{
+            UnLoginHandler.unLogin(NewMoviePage.this);
+        }
+        motiveFragment.setUserInfo(user);
+
+    }
+
+    @Override
+    public void onShare(String title, String description, String thumbURL, String shareURL, int shareType) {
+        TLog.error("onShare----");
+//        onShareClick();
+        ShareUtils.showShare(this, null, true, title, description, thumbURL,shareURL);
+
+//        Random rd = new Random();
+//        int nmb = rd.nextInt() % 3;
+//        motiveFragment.shareResult(shareType, nmb + 1);
+    }
 
 
     @Override
@@ -915,7 +975,9 @@ public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListe
 
     @Override
     public void onShareClick() {
-        ShareUtils.showShare(this, null, true, share_title, share_desc, HttpUtils.appendUrl(img_url));
+        ShareUtils.showShare(this, null, true, share_title, share_desc, HttpUtils.appendUrl(img_url),"app");
+
+        //   ShareUtils.showShare(this,null,false);
     }
 
     @Override
@@ -929,4 +991,46 @@ public class NewMoviePage extends BaseVideoActivity implements OnMediaOtherListe
     }
 
 
+    @Override
+    public void onPlay(int i) {
+        doPauseResume(i == HsBaseFragment.PLAY_PLAY);
+    }
+
+    private int time;
+
+    @Override
+    public void onSeekChange(int time, int totalTime, boolean isActive) {
+        TLog.error("SeekBardd---->" + time);
+        this.totalTime = totalTime;
+        this.time = time;
+        if (isActive) {
+            if (instance.isPortrait()) {
+                motiveFragment.setVideo(videoId, totalTime, time, HsBaseFragment.PLAY_PLAY);
+            } else {
+                hsLandFragment.setVideo(videoId, totalTime, time, HsBaseFragment.PLAY_PLAY);
+            }
+        }
+
+    }
+
+    @Override
+    public void onPauseOrPlay(boolean play) {
+        if (instance.isPortrait()) {
+            motiveFragment.setVideo(videoId, totalTime, time, play ? HsBaseFragment.PLAY_PLAY : HsBaseFragment.PLAY_PAUSE);
+        } else {
+            hsLandFragment.setVideo(videoId, totalTime, time, play ? HsBaseFragment.PLAY_PLAY : HsBaseFragment.PLAY_PAUSE);
+        }
+    }
+
+    @Override
+    public void setStateInfo(boolean state) {
+        TLog.error("SeekBaree---->" + state);
+        onPauseOrPlay(!state);
+    }
+
+    public void doPauseResume(boolean toPlay){
+        if (mMediaController != null) {
+            mMediaController.doPauseResume(toPlay);
+        }
+    }
 }

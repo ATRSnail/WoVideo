@@ -1,6 +1,7 @@
 package com.lt.hm.wovideo.base;
 
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.lt.hm.wovideo.http.HttpUtilBack;
 import com.lt.hm.wovideo.utils.TLog;
@@ -8,7 +9,7 @@ import com.lt.hm.wovideo.utils.TLog;
 /**
  * Created by xuchunhui on 16/8/12.
  */
-public class BaseRequestActivity extends FragmentActivity implements HttpUtilBack {
+public class BaseRequestActivity extends AppCompatActivity implements HttpUtilBack {
     @Override
     public void onBefore(String dialog) {
 

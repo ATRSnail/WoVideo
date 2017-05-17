@@ -226,13 +226,13 @@ public class CollectPage extends BaseActivity implements CustomTopbar.myTopbarCl
 
     private void getCollectList() {
         String userinfo = SharedPrefsUtils.getStringPreference(getApplicationContext(),"userinfo");
-        TLog.log("collectInfo"+userinfo);
         if (!StringUtils.isNullOrEmpty(userinfo)){
             UserModel model = new Gson().fromJson(userinfo, UserModel.class);
             HashMap<String, Object> map = new HashMap<>();
             map.put("userid", model.getId());
             map.put("pageNum", pageNum);
             map.put("numPerPage", pageSize);
+            TLog.log("collectInfo"+model.getId()+"---"+pageNum+"---"+pageSize);
             HttpApis.collectList(map, new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e, int id) {
@@ -241,8 +241,8 @@ public class CollectPage extends BaseActivity implements CustomTopbar.myTopbarCl
 
                 @Override
                 public void onResponse(String response, int id) {
-                    TLog.log("collect" + response);
-                    ResponseObj<CollectModel, RespHeader> resp = new ResponseObj<CollectModel, RespHeader>();
+                    TLog.log("collectoooo" + response);
+                    ResponseObj<CollectModel, RespHeader> resp = new ResponseObj<>();
                     ResponseParser.parse(resp, response, CollectModel.class, RespHeader.class);
                     if (resp.getHead().getRspCode().equals(ResponseCode.Success)) {
                         List<CollectModel.CollListBean> models = resp.getBody().getCollList();

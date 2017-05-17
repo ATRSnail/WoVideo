@@ -58,33 +58,25 @@ public class BulletSendDialog extends DialogFragment{
 
         EditText content = (EditText) v.findViewById(R.id.bullet_content);
         TextView send = (TextView) v.findViewById(R.id.send_bullet);
-        send.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //TODO send the bullet screen
-                if (!StringUtils.isNullOrEmpty(content.getText().toString())){
-                    Bullet bullet = new Bullet();
-                    bullet.setContent(content.getText().toString().trim());
-                    bullet.randomFontColor(getResources().getColor(R.color.red_bullet));
-                    bullet.randomFontSize();
-                    mInterfaceListener.onSendBulletClick(bullet);
-                }else{
-                    Toast.makeText(v.getContext(),"内容不能为空",Toast.LENGTH_SHORT).show();
-                }
-                //TODO reset eidt text
-
-                //TODO close current dialog
-
+        send.setOnClickListener(v1 -> {
+            //TODO send the bullet screen
+            if (!StringUtils.isNullOrEmpty(content.getText().toString())){
+                Bullet bullet = new Bullet();
+                bullet.setContent(content.getText().toString().trim());
+                bullet.randomFontColor(getResources().getColor(R.color.red_bullet));
+                bullet.randomFontSize();
+                mInterfaceListener.onSendBulletClick(bullet);
+            }else{
+                Toast.makeText(v1.getContext(),"内容不能为空",Toast.LENGTH_SHORT).show();
             }
+            //TODO reset eidt text
+
+            //TODO close current dialog
+
         });
 
         ImageView close = (ImageView) v.findViewById(R.id.close);
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mBulletSendDialog.dismiss();
-            }
-        });
+        close.setOnClickListener(v1 -> mBulletSendDialog.dismiss());
 
         return v;
     }

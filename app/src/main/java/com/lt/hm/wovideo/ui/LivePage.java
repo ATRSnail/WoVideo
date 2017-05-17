@@ -322,9 +322,9 @@ public class LivePage extends BaseActivity implements SurfaceHolder.Callback, AV
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        mAudioCapabilitiesReceiver.unregister();
-        releasePlayer();
+            super.onDestroy();
+            mAudioCapabilitiesReceiver.unregister();
+            releasePlayer();
     }
 
     private int width, height;

@@ -144,6 +144,7 @@ public class NewChoicePage extends BaseFragment implements OnPlaceChangeListener
             CommonTypePage page = CommonTypePage.getInstance(bean);
             if (bean.getFunCode().equals(ChannelModel.LOCAL_ID))
                 page.setOnPlaceChangeListener(this);
+//            VideoListFrg page = new VideoListFrg();
             fragments.add(page);
         }
 

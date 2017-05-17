@@ -8,6 +8,9 @@
 
 package msgcopy.wovideo.onekeyshare.themes.classic;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.graphics.drawable.ColorDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -20,16 +23,13 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
-import com.mob.tools.gui.PullToRequestView;
-import com.mob.tools.utils.R;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import cn.sharesdk.framework.Platform;
 import msgcopy.wovideo.onekeyshare.OnekeySharePage;
 import msgcopy.wovideo.onekeyshare.OnekeyShareThemeImpl;
+import msgcopy.wovideo.onekeyshare.themes.classic.FriendAdapter.Following;
+
+import com.mob.tools.gui.PullToRequestView;
+import com.mob.tools.utils.R;
 
 /** 编辑界面，@好友时，弹出的好友列表 */
 public abstract class FriendListPage extends OnekeySharePage implements OnClickListener, OnItemClickListener {
@@ -166,12 +166,12 @@ public abstract class FriendListPage extends OnekeySharePage implements OnClickL
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		if ("FacebookMessenger".equals(platform.getName())) {
 			if(lastPosition >= 0) {
-				FriendAdapter.Following lastFollwing = adapter.getItem(lastPosition);
+				Following lastFollwing = adapter.getItem(lastPosition);
 				lastFollwing.checked = false;
 			}
 			lastPosition = position;
 		}
-		FriendAdapter.Following following = adapter.getItem(position);
+		Following following = adapter.getItem(position);
 		following.checked = !following.checked;
 
 		if(following.checked) {

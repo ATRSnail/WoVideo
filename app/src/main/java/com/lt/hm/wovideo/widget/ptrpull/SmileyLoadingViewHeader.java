@@ -67,12 +67,7 @@ public class SmileyLoadingViewHeader extends FrameLayout implements PtrUIHandler
     @Override
     public void onUIRefreshComplete(final PtrFrameLayout frame) {
         mLoadingView.stop();
-        mLoadingView.setOnAnimPerformCompletedListener(new SmileyLoadingView.OnAnimPerformCompletedListener() {
-            @Override
-            public void onCompleted() {
-                mLoadingView.setPaintAlpha(0x0);
-            }
-        });
+        mLoadingView.setOnAnimPerformCompletedListener(() -> mLoadingView.setPaintAlpha(0x0));
     }
 
     @Override

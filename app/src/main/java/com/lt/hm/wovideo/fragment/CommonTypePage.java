@@ -13,7 +13,6 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -31,7 +30,6 @@ import com.lt.hm.wovideo.adapter.recommend.GridAdapter;
 import com.lt.hm.wovideo.adapter.recommend.LiveAdapter;
 import com.lt.hm.wovideo.base.BaseLazyFragment;
 import com.lt.hm.wovideo.http.HttpApis;
-import com.lt.hm.wovideo.http.HttpCallback;
 import com.lt.hm.wovideo.http.HttpUtils;
 import com.lt.hm.wovideo.http.NetUtils;
 import com.lt.hm.wovideo.interf.OnPlaceChangeListener;
@@ -68,7 +66,6 @@ import com.lt.hm.wovideo.widget.TopTileView;
 import com.lt.hm.wovideo.widget.ptrpull.SamplePtrFrameLayout;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import butterknife.BindView;
@@ -452,21 +449,18 @@ public class CommonTypePage extends BaseLazyFragment implements SwipeRefreshLayo
             listAdapter.addHeaderView(mHeadView);
         }
         listAdapter.openLoadMore(numPerPage, true);
-        listAdapter.setOnLoadMoreListener(new BaseQuickAdapter.RequestLoadMoreListener() {
-            @Override
-            public void onLoadMoreRequested() {
-                if (isLoading || isNoData) return;
-                isLoading = true;
-                TLog.error("上拉加载----");
+        listAdapter.setOnLoadMoreListener(() -> {
+            if (isLoading || isNoData) return;
+            isLoading = true;
+            TLog.error("上拉加载----");
 
-                switch (channelCode) {
-                    case ChannelModel.RECOMMEND_ID://推荐
-                    case ChannelModel.LOCAL_ID://地方
-                        getYouLikeData();
-                        break;
-                    default://其他
-                        getListByType();
-                }
+            switch (channelCode) {
+                case ChannelModel.RECOMMEND_ID://推荐
+                case ChannelModel.LOCAL_ID://地方
+                    getYouLikeData();
+                    break;
+                default://其他
+                    getListByType();
             }
         });
         mRecyclerView.setAdapter(listAdapter);

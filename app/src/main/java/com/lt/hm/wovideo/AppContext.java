@@ -15,7 +15,7 @@ import cn.finalteam.galleryfinal.FunctionConfig;
 import cn.finalteam.galleryfinal.GalleryFinal;
 import cn.finalteam.galleryfinal.ImageLoader;
 import cn.finalteam.galleryfinal.ThemeConfig;
-import cn.sharesdk.framework.ShareSDK;
+import cn.handsight.android.handsightsdk.utils.ServerManager;
 import okhttp3.OkHttpClient;
 
 /**
@@ -36,9 +36,10 @@ public class AppContext extends BaseApplication {
         instance = this;
         _context = getApplicationContext();
         _resource = _context.getResources();
-        ShareSDK.initSDK(this);
+//        ShareSDK.initSDK(this);
         Stetho.initializeWithDefaults(this);
         initNetWork();
+        ServerManager.initApplication(getApplicationContext());
 //        initNewsLens();
 //        CrashReport.initCrashReport(getApplicationContext(), "3a002a01fb", false);
 //        Glide.get(this).register(GlideUrl.class, InputStream.class,

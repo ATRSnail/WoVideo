@@ -8,6 +8,11 @@
 
 package msgcopy.wovideo.onekeyshare;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ResolveInfo;
@@ -17,20 +22,14 @@ import android.os.Handler.Callback;
 import android.os.Message;
 import android.text.TextUtils;
 import android.widget.Toast;
-
-import com.mob.tools.utils.R;
-import com.mob.tools.utils.UIHandler;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import cn.sharesdk.framework.CustomPlatform;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.Platform.ShareParams;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.framework.ShareSDK;
+
+import com.mob.tools.utils.R;
+import com.mob.tools.utils.UIHandler;
 
 /** 快捷分享的主题样式的实现父类 */
 public abstract class OnekeyShareThemeImpl implements PlatformActionListener, Callback {
@@ -124,10 +123,17 @@ public abstract class OnekeyShareThemeImpl implements PlatformActionListener, Ca
 			}
 		} else if ("SinaWeibo".equals(name)) {
 			if ("true".equals(platform.getDevinfo("ShareByAppClient"))) {
+
 				Intent test = new Intent(Intent.ACTION_SEND);
 				test.setPackage("com.sina.weibo");
 				test.setType("image/*");
 				ResolveInfo ri = platform.getContext().getPackageManager().resolveActivity(test, 0);
+				if(ri == null) {
+					test = new Intent(Intent.ACTION_SEND);
+					test.setPackage("com.sina.weibog3");
+					test.setType("image/*");
+					ri = platform.getContext().getPackageManager().resolveActivity(test, 0);
+				}
 				return (ri != null);
 			}
 		}
@@ -168,12 +174,6 @@ public abstract class OnekeyShareThemeImpl implements PlatformActionListener, Ca
 
 	final boolean formateShareData(Platform plat) {
 		String name = plat.getName();
-
-		boolean isGooglePlus = "GooglePlus".equals(name);
-		if (isGooglePlus && !plat.isClientValid()) {
-			toast("ssdk_google_plus_client_inavailable");
-			return false;
-		}
 
 		boolean isAlipay = "Alipay".equals(name);
 		if (isAlipay && !plat.isClientValid()) {
